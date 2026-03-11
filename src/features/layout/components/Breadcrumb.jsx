@@ -20,7 +20,7 @@ export default function Breadcrumb({ activeTab, onTabChange, openTabs = [], onCl
         {openTabs.map((tabId) => (
           <div 
             key={tabId}
-            className={`group flex items-center gap-2.5 px-4 py-2.5 border-r border-slate-200 dark:border-slate-800 border-t-2 font-medium text-sm cursor-pointer min-w-[140px] transition-colors whitespace-nowrap ${activeTab === tabId ? 'bg-background-light dark:bg-[#1a1b1e] border-t-blue-500 dark:border-t-blue-500' : 'bg-transparent hover:bg-slate-200 dark:hover:bg-[#151822] border-t-transparent text-slate-500 dark:text-slate-400'}`}
+            className={`group flex items-center gap-2.5 px-2 py-1 border-r border-slate-200 dark:border-slate-800 border-t-2 font-medium text-sm cursor-pointer min-w-[140px] transition-colors whitespace-nowrap ${activeTab === tabId ? 'bg-background-light dark:bg-[#1a1b1e] border-t-blue-500 dark:border-t-blue-500' : 'bg-transparent hover:bg-slate-200 dark:hover:bg-[#151822] border-t-transparent text-slate-500 dark:text-slate-400'}`}
             onClick={() => onTabChange(tabId)}
           >
             <span className={`material-symbols-outlined text-[16px] ${activeTab === tabId ? 'text-blue-600 dark:text-blue-500' : 'opacity-70'}`}>

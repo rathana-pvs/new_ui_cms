@@ -23,46 +23,39 @@ export default function StatusModal() {
       : 'bg-blue-500 hover:bg-blue-600 shadow-blue-500/20';
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 animate-in fade-in duration-200">
-      {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity"
-        onClick={() => dispatch(closeStatusModal())}
-      ></div>
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans">
       
       {/* Modal Content */}
-      <div className="relative bg-white dark:bg-slate-900 rounded-lg shadow-2xl w-full max-w-sm border border-slate-200 dark:border-slate-800/50 overflow-hidden transform transition-all z-10 p-8 flex flex-col items-center text-center animate-in zoom-in-95 duration-200">
+      <div className="relative bg-white dark:bg-[#1e2230] w-full max-w-sm rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all z-10 p-7 flex flex-col items-center text-center animate-in zoom-in-95 duration-200">
         
         {/* Close Button Top Right */}
         <button 
           onClick={() => dispatch(closeStatusModal())}
-          className="absolute top-4 right-4 p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-400 group"
+          className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
         >
-          <span className="material-symbols-outlined text-[20px] group-hover:text-slate-600 dark:group-hover:text-slate-200">close</span>
+          <span className="material-symbols-outlined text-[18px]">close</span>
         </button>
 
-        {/* Animated Icon Container */}
-        <div className={`w-20 h-20 ${bgColor} rounded-full flex items-center justify-center mb-6 animate-in zoom-in motion-safe:duration-500 delay-100`}>
-          <div className="w-14 h-14 rounded-full bg-white dark:bg-slate-900 shadow-sm flex items-center justify-center">
-            <span className={`material-symbols-outlined text-4xl ${iconColor}`}>
-              {icon}
-            </span>
-          </div>
+        {/* Icon Container */}
+        <div className={`w-16 h-16 ${bgColor} rounded-2xl flex items-center justify-center mb-5 shadow-sm`}>
+          <span className={`material-symbols-outlined text-[34px] ${iconColor}`}>
+            {icon}
+          </span>
         </div>
 
-        <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">
+        <h3 className="text-[17px] font-bold text-slate-800 dark:text-white mb-2 tracking-tight">
           {title || (isSuccess ? 'Success!' : isError ? 'Error Occurred' : 'Information')}
         </h3>
         
-        <p className="text-[15px] text-slate-500 dark:text-slate-400 mb-8 leading-relaxed font-medium">
+        <p className="text-[13px] text-slate-500 dark:text-slate-400 mb-6 leading-relaxed font-medium px-2">
           {message}
         </p>
 
         <button 
-          className={`w-full py-3.5 rounded-2xl text-white font-bold text-[15px] transition-all active:scale-[0.97] shadow-xl hover:shadow-2xl ${btnClasses}`}
+          className={`w-full h-[40px] rounded-md text-white font-bold text-[14px] transition-all hover:brightness-105 active:scale-[0.98] shadow-sm ${btnClasses}`}
           onClick={() => dispatch(closeStatusModal())}
         >
-          {isSuccess ? 'Great' : isError ? 'I Understand' : 'Close'}
+          {isSuccess ? 'Continue' : isError ? 'I Understand' : 'Close'}
         </button>
       </div>
     </div>

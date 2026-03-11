@@ -13,35 +13,39 @@ html, body {
 }
 
 @layer base {
-  /* Scrollbar overrides */
+  body {
+    @apply bg-background-light text-slate-900;
+  }
+  .dark body {
+    @apply bg-background-dark text-slate-200;
+  }
+
+  /* Flat Scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: transparent;
+    @apply bg-transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: #cbd5e1; /* slate-300 */
-    border-radius: 4px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8; /* slate-400 */
+    @apply bg-slate-300 border-none bg-clip-padding hover:bg-slate-400;
   }
   .dark ::-webkit-scrollbar-thumb {
-    background: #334155; /* slate-700 */
-  }
-  .dark ::-webkit-scrollbar-thumb:hover {
-    background: #475569; /* slate-600 */
+    @apply bg-slate-700 hover:bg-slate-600;
   }
   
-  /* Firefox */
-  * {
-    scrollbar-width: thin;
-    scrollbar-color: #cbd5e1 transparent;
+  /* Buttons and Interactive Elements */
+  button, a, input, select, textarea {
+    @apply transition-colors duration-100 outline-none;
   }
-  .dark * {
-    scrollbar-color: #334155 transparent;
+
+  /* Custom Scrollbar Utility */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-slate-200 dark:bg-slate-800 rounded-none;
   }
 }
 

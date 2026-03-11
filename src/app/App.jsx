@@ -83,7 +83,7 @@ function DashboardLayout() {
         
         {openTabs.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-slate-50 dark:bg-[#0f1116]">
-            <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
+            <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-sm flex items-center justify-center mb-4">
               <span className="material-symbols-outlined text-4xl text-slate-400">tab_unselected</span>
             </div>
             <h3 className="text-lg font-semibold text-slate-700 dark:text-slate-200">No Tabs Open</h3>

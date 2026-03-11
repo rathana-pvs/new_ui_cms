@@ -50,7 +50,7 @@ export function SubMenu({ icon, iconColor = '', label, children, width = 'w-56',
 
   return (
     <div ref={containerRef} className="relative" onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
-      <button className="w-full text-left px-3 py-1.5 text-[13px] text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-between transition-colors rounded-md group">
+      <button className="w-full text-left px-3 py-1.5 text-[13px] text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-between transition-colors rounded-sm group">
         <span className="flex items-center gap-2">
           {icon && <span className={`material-symbols-outlined text-[16px] ${iconColor}`}>{icon}</span>}
           {label}
@@ -62,7 +62,7 @@ export function SubMenu({ icon, iconColor = '', label, children, width = 'w-56',
       {open && (
         <div 
           ref={menuRef}
-          className={`absolute ${position.y === 'bottom' ? 'top-0' : 'bottom-0'} ${position.x === 'right' ? 'left-full ml-1' : 'right-full mr-1'} ${width} bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg p-1.5 z-50 animate-in fade-in zoom-in-95 duration-75 ${isPositioned ? 'opacity-100' : 'opacity-0'}`}
+          className={`absolute ${position.y === 'bottom' ? 'top-0' : 'bottom-0'} ${position.x === 'right' ? 'left-full ml-1' : 'right-full mr-1'} ${width} bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-sm p-1.5 z-50 animate-in fade-in zoom-in-95 duration-75 ${isPositioned ? 'opacity-100' : 'opacity-0'}`}
         >
           {children}
         </div>
@@ -119,7 +119,7 @@ export function DropdownMenu({ label, children, width = 'w-48' }) {
       {open && (
         <div 
           ref={menuRef}
-          className={`absolute ${align === 'left' ? 'left-0' : 'right-0'} top-full mt-1 ${width} bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg p-1.5 z-50 animate-in fade-in zoom-in-95 duration-75 ${isPositioned ? 'opacity-100' : 'opacity-0'}`}
+          className={`absolute ${align === 'left' ? 'left-0' : 'right-0'} top-full mt-1 ${width} bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-sm p-1.5 z-50 animate-in fade-in zoom-in-95 duration-75 ${isPositioned ? 'opacity-100' : 'opacity-0'}`}
         >
           <div className="space-y-0.5">
             {children}
@@ -134,7 +134,7 @@ export function DropdownMenu({ label, children, width = 'w-48' }) {
  * Simple menu item for use inside DropdownMenu or SubMenu.
  */
 export function MenuItem({ icon, iconColor = '', label, onClick, href, disabled = false }) {
-  const cls = `flex items-center gap-2 px-3 py-1.5 text-[13px] transition-colors w-full text-left rounded-md ${disabled ? 'opacity-40 cursor-not-allowed text-slate-400' : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700'}`;
+  const cls = `flex items-center gap-2 px-3 py-1.5 text-[13px] transition-colors w-full text-left rounded-sm ${disabled ? 'opacity-40 cursor-not-allowed text-slate-400' : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700'}`;
   
   if (href) {
     return (

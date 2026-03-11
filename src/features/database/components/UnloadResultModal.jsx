@@ -23,40 +23,39 @@ export default function UnloadResultModal() {
 
 
   return (
-    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-[#1e2230] w-full max-w-2xl rounded shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[80vh]">
+    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans">
+      <div className="bg-white dark:bg-[#1e2230] w-full max-w-2xl rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[85vh]">
         
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-[#1e2230]">
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary">analytics</span>
+        <div className="flex items-center justify-between px-5 py-3 border-b border-slate-50 dark:border-slate-800/50">
+          <h3 className="text-[15px] font-bold text-slate-700 dark:text-white flex items-center gap-2">
             Unload Detail Result
           </h3>
           <button 
             onClick={() => dispatch(closeUnloadResultModal())}
-            className="p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-400 dark:text-slate-500"
+            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
           >
-            <span className="material-symbols-outlined">close</span>
+            <span className="material-symbols-outlined text-[18px]">close</span>
           </button>
         </div>
 
         {/* Body */}
-        <div className="p-6 overflow-y-auto custom-scrollbar flex-1 bg-white dark:bg-[#1e2230]">
-          <div className="border border-slate-200 dark:border-slate-800 rounded bg-slate-50/50 dark:bg-[#1e2230] overflow-hidden">
-            <table className="w-full text-left text-[13px]">
-              <thead className="bg-slate-100 dark:bg-slate-800/50 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+        <div className="px-5 py-5 overflow-y-auto custom-scrollbar flex-1 bg-white dark:bg-[#1e2230]">
+          <div className="border border-slate-200 dark:border-slate-800/60 rounded-lg bg-white dark:bg-slate-900 overflow-hidden shadow-sm">
+            <table className="w-full text-left text-[13px] border-collapse">
+              <thead className="bg-slate-50 dark:bg-slate-800/80 text-[10px] font-bold text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-800">
                 <tr>
-                  <th className="px-4 py-3 border-b border-slate-200 dark:border-slate-800">CLASS NAME</th>
-                  <th className="px-4 py-3 border-b border-slate-200 dark:border-slate-800 text-center">TOTAL INSTANCE</th>
-                  <th className="px-4 py-3 border-b border-slate-200 dark:border-slate-800 text-center">SUCCESS INSTANCE</th>
+                  <th className="px-4 py-2">CLASS NAME</th>
+                  <th className="px-4 py-2 text-center">TOTAL INSTANCE</th>
+                  <th className="px-4 py-2 text-center">SUCCESS INSTANCE</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-200 font-medium">
+              <tbody className="divide-y divide-slate-50 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
                 {listData.length > 0 ? listData.map((row, idx) => (
-                  <tr key={idx} className="hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors">
-                    <td className="px-4 py-2.5 font-bold uppercase tracking-tight">{row.classname}</td>
-                    <td className="px-4 py-2.5 text-center font-mono">{row.totalinstance}</td>
-                    <td className="px-4 py-2.5 text-center font-mono text-emerald-500 dark:text-emerald-400">{row.successinstance}</td>
+                  <tr key={idx} className="hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-colors">
+                    <td className="px-4 py-2 font-bold text-blue-600 dark:text-blue-400 tracking-tight">{row.classname}</td>
+                    <td className="px-4 py-2 text-center font-mono">{row.totalinstance}</td>
+                    <td className="px-4 py-2 text-center font-mono text-emerald-600 dark:text-emerald-400 font-bold">{row.successinstance}</td>
                   </tr>
                 )) : (
                   <tr>
@@ -69,12 +68,13 @@ export default function UnloadResultModal() {
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 bg-slate-50 dark:bg-[#1e2230] flex justify-end border-t border-slate-100 dark:border-slate-800">
+        <div className="px-5 py-4 flex justify-end bg-slate-50 dark:bg-slate-800/20 border-t border-slate-50 dark:border-slate-800/50 font-sans">
           <button 
             onClick={() => dispatch(closeUnloadResultModal())}
-            className="px-10 py-1.5 bg-primary hover:bg-primary/90 active:bg-primary/80 text-white text-sm rounded shadow-lg shadow-primary/20 transition-all font-bold"
+            className="h-[34px] px-6 bg-blue-600 hover:bg-blue-700 text-white text-[13px] rounded-md shadow-sm transition-all font-bold flex items-center justify-center gap-2"
           >
-            Finished
+            <span className="material-symbols-outlined text-[18px]">done_all</span>
+            <span>Finished</span>
           </button>
         </div>
       </div>

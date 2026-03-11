@@ -38,35 +38,36 @@ export default function UserProfileModal({ isOpen, onClose }) {
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose}></div>
-
-      <div className="relative bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xl w-full max-w-md mx-4 animate-in">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans">
+      
+      {/* Modal */}
+      <div className="relative bg-white dark:bg-[#1e2230] w-full max-w-md rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col">
+        
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-700">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <span className="material-symbols-outlined text-primary text-[22px]">account_circle</span>
+        <div className="flex items-center justify-between px-5 py-3 border-b border-slate-50 dark:border-slate-800/50">
+          <div className="flex items-center gap-4">
+            <div className="h-10 w-10 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center shadow-sm">
+              <span className="material-symbols-outlined text-blue-600 dark:text-blue-400 text-[24px]">account_circle</span>
             </div>
             <div>
-              <h2 className="text-base font-semibold text-slate-900 dark:text-white">User Profile</h2>
-              <p className="text-xs text-slate-400">{profile.role}</p>
+              <h2 className="text-[15px] font-bold text-slate-700 dark:text-white">User Profile</h2>
+              <p className="text-[11px] text-slate-400 font-bold tracking-widest">{profile.role}</p>
             </div>
           </div>
           <button
-            className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
             onClick={onClose}
           >
-            <span className="material-symbols-outlined text-[20px]">close</span>
+            <span className="material-symbols-outlined text-[18px]">close</span>
           </button>
         </div>
 
-        {/* Fields */}
-        <div className="px-6 py-5 space-y-4 max-h-[380px] overflow-y-auto">
+        {/* Body */}
+        <div className="px-5 py-4 space-y-4 max-h-[60vh] overflow-y-auto custom-scrollbar flex-1 bg-white dark:bg-[#1e2230]">
           {fields.map(({ key, label, icon, color }) => (
-            <div key={key} className="group">
-              <label className="flex items-center gap-2 text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5">
-                <span className={`material-symbols-outlined text-[15px] ${color}`}>{icon}</span>
+            <div key={key} className="space-y-1.5">
+              <label className="flex items-center gap-2 text-[10px] font-bold text-slate-400 dark:text-slate-500 pl-1">
+                <span className={`material-symbols-outlined text-[16px]`}>{icon}</span>
                 {label}
               </label>
               {isEditing ? (
@@ -74,52 +75,52 @@ export default function UserProfileModal({ isOpen, onClose }) {
                   type="text"
                   value={editProfile[key]}
                   onChange={(e) => handleChange(key, e.target.value)}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                  className="w-full h-[34px] px-3 text-[13px] rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#1e2230] text-slate-700 dark:text-slate-200 focus:border-blue-500 outline-none transition-all shadow-sm"
                 />
               ) : (
-                <p className="text-sm text-slate-700 dark:text-slate-200 px-3 py-2 bg-slate-50 dark:bg-slate-800/60 rounded-lg border border-transparent">
+                <div className="w-full px-4 py-2 text-[13.5px] text-slate-700 dark:text-slate-200 bg-slate-50/50 dark:bg-slate-900/40 rounded-lg border border-slate-100/50 dark:border-slate-800/60 font-medium">
                   {profile[key]}
-                </p>
+                </div>
               )}
             </div>
           ))}
         </div>
 
-        {/* Actions */}
-        <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-700 flex items-center gap-3 justify-end">
+        {/* Footer */}
+        <div className="px-5 py-4 flex items-center gap-2.5 justify-end bg-slate-50 dark:bg-slate-800/20 border-t border-slate-50 dark:border-slate-800/50">
           {isEditing ? (
             <>
               <button
-                className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                className="h-[34px] px-4 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-[13px] rounded-md transition-all font-bold"
                 onClick={handleCancel}
               >
                 Cancel
               </button>
               <button
-                className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-1.5"
+                className="h-[34px] px-6 bg-blue-600 hover:bg-blue-700 text-white text-[13px] rounded-md shadow-sm transition-all font-bold flex items-center justify-center gap-2"
                 onClick={handleSave}
               >
-                <span className="material-symbols-outlined text-[16px]">check</span>
-                Save
+                <span className="material-symbols-outlined text-[18px]">check</span>
+                Save Changes
               </button>
             </>
           ) : (
             <>
               <button
-                className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                className="h-[34px] px-4 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-[13px] rounded-md transition-all font-bold"
                 onClick={onClose}
               >
                 Close
               </button>
               <button
-                className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-1.5"
+                className="h-[34px] px-6 bg-blue-600 hover:bg-blue-700 text-white text-[13px] rounded-md shadow-sm transition-all font-bold flex items-center justify-center gap-2"
                 onClick={() => {
                   setEditProfile({ ...profile });
                   setIsEditing(true);
                 }}
               >
-                <span className="material-symbols-outlined text-[16px]">edit</span>
-                Edit
+                <span className="material-symbols-outlined text-[18px]">edit</span>
+                Edit Profile
               </button>
             </>
           )}

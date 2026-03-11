@@ -18,8 +18,8 @@ export default function Header({ theme, toggleTheme }) {
   return (
     <>
     <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 h-16 flex items-center justify-between px-6">
-      <div className="flex items-center gap-6">
-        <nav className="flex items-center gap-4 text-sm font-medium text-slate-600 dark:text-slate-400">
+      <div className="flex items-center gap-2">
+        <nav className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-400">
 
           <DropdownMenu label="File">
             <MenuItem icon="add_box" iconColor="text-accent-blue" label="Add Host" href="#" />
@@ -53,24 +53,24 @@ export default function Header({ theme, toggleTheme }) {
         </nav>
         <div className="h-6 w-px bg-slate-200 dark:border-slate-800"></div>
         <div className="flex items-center gap-2">
-          <button className="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" title="Start">
+          <button className="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-sm transition-colors" title="Start">
             <span className="material-symbols-outlined text-accent-green text-[20px]">play_arrow</span>
           </button>
-          <button className="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" title="Dashboard">
+          <button className="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-sm transition-colors" title="Dashboard">
             <span className="material-symbols-outlined text-accent-orange text-[20px]">grid_view</span>
           </button>
-          <button className="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" title="Refresh">
+          <button className="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-sm transition-colors" title="Refresh">
             <span className="material-symbols-outlined text-accent-blue text-[20px]">refresh</span>
           </button>
         </div>
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2">
         <div className="relative w-64">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 text-[18px]">search</span>
-          <input className="w-full pl-10 pr-4 py-1.5 text-sm bg-slate-100 dark:bg-slate-800 border-none rounded-lg focus:ring-2 focus:ring-primary/20" placeholder="Search databases..." type="text"/>
+          <input className="w-full pl-10 pr-4 py-1.5 text-sm bg-slate-100 dark:bg-slate-800 border-none rounded-sm focus:ring-2 focus:ring-primary/20" placeholder="Search databases..." type="text"/>
         </div>
         <button 
-          className="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors flex items-center justify-center"
+          className="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-sm transition-colors flex items-center justify-center"
           onClick={toggleTheme}
           title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
         >
@@ -79,14 +79,14 @@ export default function Header({ theme, toggleTheme }) {
           </span>
         </button>
         <div 
-          className="h-8 w-8 rounded-full bg-slate-200 dark:bg-slate-700 cursor-pointer hover:ring-2 hover:ring-slate-300 transition-all flex items-center justify-center" 
+          className="h-8 w-8 rounded-sm bg-slate-200 dark:bg-slate-700 cursor-pointer hover:ring-2 hover:ring-slate-300 transition-all flex items-center justify-center" 
           title="User Profile"
           onClick={() => setIsProfileOpen(true)}
         >
           <span className="material-symbols-outlined text-slate-500 text-[18px]">person</span>
         </div>
         <button 
-          className="p-2 text-slate-500 hover:bg-accent-red/10 hover:text-accent-red rounded-full transition-colors flex items-center justify-center"
+          className="p-2 text-slate-500 hover:bg-accent-red/10 hover:text-accent-red rounded-sm transition-colors flex items-center justify-center"
           onClick={handleLogout}
           title="Logout"
         >

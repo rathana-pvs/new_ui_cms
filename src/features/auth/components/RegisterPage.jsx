@@ -73,15 +73,15 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#0f1117] relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-accent-green/5 blur-3xl"></div>
-        <div className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-primary/5 blur-3xl"></div>
-        <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] rounded-full bg-accent-purple/3 blur-3xl"></div>
+        <div className="absolute -top-40 -left-40 w-96 h-96 rounded-sm bg-accent-green/5 blur-3xl"></div>
+        <div className="absolute -bottom-40 -right-40 w-96 h-96 rounded-sm bg-primary/5 blur-3xl"></div>
+        <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] rounded-sm bg-accent-purple/3 blur-3xl"></div>
       </div>
 
       <div className="w-full max-w-md mx-4 relative z-10">
         {/* Logo & Title */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-accent-green/10 mb-4">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-sm bg-accent-green/10 mb-4">
             <span className="material-symbols-outlined text-accent-green text-3xl">person_add</span>
           </div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
@@ -93,7 +93,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Register Card */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-black/20 border border-slate-200/60 dark:border-slate-800 p-8">
+        <div className="bg-white dark:bg-slate-900 rounded-sm shadow-slate-200/50 dark:shadow-black/20 border border-slate-200/60 dark:border-slate-800 p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Username */}
             <div>
@@ -108,7 +108,7 @@ export default function RegisterPage() {
                   type="text"
                   value={username}
                   onChange={(e) => { setUsername(e.target.value); clearFieldError('username'); }}
-                  className={`w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border ${errors.username ? 'border-accent-red focus:ring-accent-red/20' : 'border-slate-200 dark:border-slate-700 focus:ring-primary/20'} bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:border-transparent transition-all`}
+                  className={`w-full pl-10 pr-4 py-3 text-sm rounded-sm border ${errors.username ? 'border-accent-red focus:ring-accent-red/20' : 'border-slate-200 dark:border-slate-700 focus:ring-primary/20'} bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:border-transparent transition-all`}
                   placeholder="Choose a username"
                 />
               </div>
@@ -133,7 +133,7 @@ export default function RegisterPage() {
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => { setPassword(e.target.value); clearFieldError('password'); }}
-                  className={`w-full pl-10 pr-12 py-2.5 text-sm rounded-xl border ${errors.password ? 'border-accent-red focus:ring-accent-red/20' : 'border-slate-200 dark:border-slate-700 focus:ring-primary/20'} bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:border-transparent transition-all`}
+                  className={`w-full pl-10 pr-12 py-3 text-sm rounded-sm border ${errors.password ? 'border-accent-red focus:ring-accent-red/20' : 'border-slate-200 dark:border-slate-700 focus:ring-primary/20'} bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:border-transparent transition-all`}
                   placeholder="Create a password"
                 />
                 <button
@@ -153,7 +153,7 @@ export default function RegisterPage() {
                     {[1, 2, 3, 4].map((i) => (
                       <div
                         key={i}
-                        className={`h-1 flex-1 rounded-full transition-all ${i <= strength.level ? strength.color : 'bg-slate-200 dark:bg-slate-700'}`}
+                        className={`h-1 flex-1 rounded-sm transition-all ${i <= strength.level ? strength.color : 'bg-slate-200 dark:bg-slate-700'}`}
                       />
                     ))}
                   </div>
@@ -183,7 +183,7 @@ export default function RegisterPage() {
                   type={showConfirm ? 'text' : 'password'}
                   value={confirmPassword}
                   onChange={(e) => { setConfirmPassword(e.target.value); clearFieldError('confirmPassword'); }}
-                  className={`w-full pl-10 pr-12 py-2.5 text-sm rounded-xl border ${errors.confirmPassword ? 'border-accent-red focus:ring-accent-red/20' : confirmPassword && password === confirmPassword ? 'border-accent-green focus:ring-accent-green/20' : 'border-slate-200 dark:border-slate-700 focus:ring-primary/20'} bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:border-transparent transition-all`}
+                  className={`w-full pl-10 pr-12 py-3 text-sm rounded-sm border ${errors.confirmPassword ? 'border-accent-red focus:ring-accent-red/20' : confirmPassword && password === confirmPassword ? 'border-accent-green focus:ring-accent-green/20' : 'border-slate-200 dark:border-slate-700 focus:ring-primary/20'} bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:border-transparent transition-all`}
                   placeholder="Confirm your password"
                 />
                 <button
@@ -212,7 +212,7 @@ export default function RegisterPage() {
 
             {/* API Error */}
             {apiError && (
-              <div className="flex items-center gap-2 px-4 py-3 text-sm text-accent-red bg-accent-red/10 border border-accent-red/20 rounded-xl">
+              <div className="flex items-center gap-2 px-2 py-1 text-sm text-accent-red bg-accent-red/10 border border-accent-red/20 rounded-sm">
                 <span className="material-symbols-outlined text-[18px]">error</span>
                 {apiError}
               </div>
@@ -222,7 +222,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 px-4 bg-primary hover:bg-primary/90 text-white text-sm font-semibold rounded-xl shadow-sm shadow-primary/25 hover:shadow-md hover:shadow-primary/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
+              className="w-full py-3 px-4 bg-primary hover:bg-primary/90 text-white text-sm font-semibold rounded-sm shadow-primary/25 hover:shadow-md hover:shadow-primary/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
             >
               {loading ? (
                 <>

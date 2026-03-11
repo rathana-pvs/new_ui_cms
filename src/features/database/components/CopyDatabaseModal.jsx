@@ -3,9 +3,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { closeCopyDatabaseModal } from '../databaseSlice';
 
 const InputField = ({ label, value, onChange, placeholder, readOnly = false }) => (
-  <div className="flex flex-col gap-1.5">
-    <label className="text-[13px] font-medium text-slate-500 dark:text-slate-400">
-      {label}
+  <div className="flex items-center gap-4">
+    <label className="w-[140px] text-[12px] font-bold text-slate-600 dark:text-slate-400 text-right uppercase tracking-tight">
+      {label} :
     </label>
     <input
       type="text"
@@ -13,22 +13,22 @@ const InputField = ({ label, value, onChange, placeholder, readOnly = false }) =
       onChange={(e) => onChange && onChange(e.target.value)}
       placeholder={placeholder}
       readOnly={readOnly}
-      className={`h-9 px-3 rounded text-[13px] border transition-all outline-none font-medium
+      className={`flex-1 h-[34px] px-3 rounded-md text-[13px] border transition-all outline-none shadow-sm
         ${readOnly 
-          ? 'bg-slate-100 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 cursor-default' 
-          : 'bg-white dark:bg-[#1e2230] border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-200 focus:border-primary/50'
+          ? 'bg-slate-50/50 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800/60 text-slate-500 dark:text-slate-500 cursor-default' 
+          : 'bg-white dark:bg-[#1e2230] border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-200 focus:border-blue-500'
         }`}
     />
   </div>
 );
 
 const Section = ({ label, children }) => (
-  <div className="space-y-2">
-    <div className="text-[11px] font-bold text-slate-400 dark:text-slate-500 italic mb-1 uppercase tracking-widest">{label}</div>
-    <div className="p-4 border border-slate-200 dark:border-slate-800 rounded bg-slate-50/30 dark:bg-[#1e2230] space-y-4">
-      {children}
-    </div>
-  </div>
+  <fieldset className="border border-slate-200 dark:border-slate-800 rounded-md p-3 space-y-3.5">
+    <legend className="text-[12px] font-bold text-slate-500 dark:text-slate-400 px-2 mx-2 uppercase tracking-wider">
+      {label}
+    </legend>
+    {children}
+  </fieldset>
 );
 
 export default function CopyDatabaseModal() {
@@ -47,25 +47,24 @@ export default function CopyDatabaseModal() {
   if (!isCopyDatabaseModalOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-[#1e2230] w-full max-w-2xl rounded shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans">
+      <div className="bg-white dark:bg-[#1e2230] w-full max-w-2xl rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
         
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-[#1e2230]">
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary">content_copy</span>
-            Copy DB
+        <div className="flex items-center justify-between px-5 py-3 border-b border-slate-50 dark:border-slate-800/50">
+          <h3 className="text-[15px] font-bold text-slate-700 dark:text-white">
+            Copy Database
           </h3>
           <button 
             onClick={() => dispatch(closeCopyDatabaseModal())}
-            className="p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-400 dark:text-slate-500"
+            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
           >
-            <span className="material-symbols-outlined">close</span>
+            <span className="material-symbols-outlined text-[18px]">close</span>
           </button>
         </div>
 
         {/* Body */}
-        <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar flex-1 bg-white dark:bg-[#1e2230]">
+        <div className="px-5 py-4 space-y-5 overflow-y-auto custom-scrollbar flex-1 bg-white dark:bg-[#1e2230]">
           
           <Section label="Source Database">
             <InputField 
@@ -85,7 +84,7 @@ export default function CopyDatabaseModal() {
               label="Database Name" 
               value={formData.destName}
               onChange={(val) => setFormData({...formData, destName: val})}
-              placeholder="Enter destination database name..."
+              placeholder=""
             />
             <InputField 
               label="Database Path" 
@@ -104,36 +103,25 @@ export default function CopyDatabaseModal() {
             />
           </Section>
 
-          <div className="p-4 border border-slate-200 dark:border-slate-800 rounded bg-slate-50 dark:bg-slate-800/20 space-y-4">
-             <div className="flex items-center justify-between px-2">
-              <div className="flex flex-col">
-                <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-1">Free Disk Space</span>
-                <span className="text-[14px] font-mono font-bold text-slate-700 dark:text-slate-300 leading-none">232420 (MB)</span>
-              </div>
-              <div className="flex flex-col text-right">
-                <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-1">Database Size</span>
-                <span className="text-[14px] font-mono font-bold text-rose-500 leading-none">128 (MB)</span>
-              </div>
+          <div className="flex flex-col gap-5 pt-1">
+            <div className="flex items-center justify-between text-[12px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest px-1">
+              <span>Free Disk Space: 232420(MB)</span>
+              <span>Database Size: 128(MB)</span>
             </div>
 
-            <div className="flex flex-col gap-3 pt-2">
+            <div className="flex flex-col gap-2.5">
               {[
                 { id: 'replace', label: 'Replace an Existing Database', key: 'replaceExisting' },
                 { id: 'delete', label: 'Delete a Source Database', key: 'deleteSource' }
               ].map((opt) => (
                 <label key={opt.id} className="flex items-center gap-3 cursor-pointer group w-fit">
-                  <div className="relative flex items-center">
-                    <input 
-                      type="checkbox" 
-                      checked={formData[opt.key]}
-                      onChange={(e) => setFormData({...formData, [opt.key]: e.target.checked})}
-                      className="peer h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 checked:bg-primary checked:border-primary transition-colors"
-                    />
-                    <span className="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-                      <span className="material-symbols-outlined text-[14px]">check</span>
-                    </span>
-                  </div>
-                  <span className="text-[13px] font-bold text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
+                  <input 
+                    type="checkbox" 
+                    checked={formData[opt.key]}
+                    onChange={(e) => setFormData({...formData, [opt.key]: e.target.checked})}
+                    className="h-[18px] w-[18px] rounded border-slate-300 dark:border-slate-800 text-blue-600 focus:ring-blue-500/20 transition-all cursor-pointer bg-white dark:bg-[#1e2230]"
+                  />
+                  <span className="text-[13px] text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
                     {opt.label}
                   </span>
                 </label>
@@ -143,18 +131,18 @@ export default function CopyDatabaseModal() {
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 bg-slate-50 dark:bg-[#1e2230] flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800">
+        <div className="px-5 py-4 flex justify-end gap-2.5 bg-slate-50 dark:bg-slate-800/20 border-t border-slate-50 dark:border-slate-800/50 font-sans">
           <button 
             onClick={() => dispatch(closeCopyDatabaseModal())}
-            className="px-8 py-1.5 text-sm bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded border border-slate-200 dark:border-slate-700 transition-all font-medium"
+            className="h-[34px] px-4 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-[13px] rounded-md transition-all font-bold"
           >
             Cancel
           </button>
           <button 
             onClick={() => dispatch(closeCopyDatabaseModal())}
-            className="px-8 py-1.5 bg-primary hover:bg-primary/90 active:bg-primary/80 text-white text-sm rounded shadow transition-all flex items-center justify-center font-bold"
+            className="h-[34px] px-8 bg-blue-600 hover:bg-blue-700 text-white text-[13px] rounded-md shadow-sm transition-all font-bold"
           >
-            Copy
+            Copy Database
           </button>
         </div>
       </div>

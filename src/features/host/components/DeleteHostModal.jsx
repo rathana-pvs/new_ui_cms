@@ -21,80 +21,73 @@ export default function DeleteHostModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"
-        onClick={loading ? undefined : handleClose}
-      ></div>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans">
       
       {/* Modal */}
-      <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-sm border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all z-10">
+      <div className="relative bg-white dark:bg-[#1e2230] w-full max-w-md rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col">
         
         {/* Loading Overlay */}
         {loading && (
-          <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/60 dark:bg-slate-900/60 backdrop-blur-[2px]">
-            <div className="flex flex-col items-center gap-3 bg-white dark:bg-slate-800 px-6 py-4 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700">
-              <svg className="animate-spin h-8 w-8 text-accent-red" viewBox="0 0 24 24">
-                <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                <path className="opacity-80" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-              </svg>
-              <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Deleting Host...</span>
+          <div className="absolute inset-0 z-[110] flex items-center justify-center bg-white dark:bg-[#1e2230]/80">
+            <div className="flex flex-col items-center gap-3">
+              <div className="w-8 h-8 border-4 border-blue-600/20 border-t-blue-600 rounded-sm animate-spin"></div>
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400 font-sans tracking-wide">Deleting Host...</span>
             </div>
           </div>
         )}
+
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900">
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <span className="material-symbols-outlined text-accent-red">delete_forever</span>
+        <div className="flex items-center justify-between px-5 py-3 border-b border-slate-50 dark:border-slate-800/50">
+          <h3 className="text-[15px] font-bold text-slate-700 dark:text-white">
             Delete Host
           </h3>
           <button 
-            disabled={loading}
-            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors rounded-lg p-1 hover:bg-slate-200 dark:hover:bg-slate-800 flex items-center justify-center disabled:opacity-50"
             onClick={handleClose}
+            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
           >
-            <span className="material-symbols-outlined">close</span>
+            <span className="material-symbols-outlined text-[18px]">close</span>
           </button>
         </div>
         
         {/* Body */}
-        <div className="p-6 space-y-4 text-sm text-slate-700 dark:text-slate-300">
+        <div className="px-6 py-5 space-y-4 text-[13.5px] text-slate-600 dark:text-slate-300 bg-white dark:bg-[#1e2230]">
           {apiError && (
-            <div className="flex items-center gap-2 px-4 py-3 text-sm text-accent-red bg-accent-red/10 border border-accent-red/20 rounded-xl">
-              <span className="material-symbols-outlined text-[18px]">error</span>
-              {apiError}
+            <div className="flex items-center gap-3 px-3 py-2 text-[13px] text-rose-600 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 rounded-md">
+              <span className="material-symbols-outlined text-[16px]">error</span>
+              <span className="font-medium">{apiError}</span>
             </div>
           )}
 
-          <p>Are you sure you want to delete the host <strong>{hostToDeleteAlias || hostToDeleteUid}</strong>?</p>
-          <p className="text-slate-500 dark:text-slate-400 text-xs">This action cannot be undone and will permanently remove the host configuration.</p>
+          <div className="space-y-4">
+            <p className="leading-relaxed">
+              Are you sure you want to delete the host <strong className="text-blue-600 dark:text-blue-400">{hostToDeleteAlias || hostToDeleteUid}</strong>?
+            </p>
+            <div className="p-4 bg-rose-50/50 dark:bg-rose-900/10 border border-rose-100 dark:border-rose-800/30 rounded-lg">
+              <p className="text-rose-600/80 dark:text-rose-400/80 text-[12px] font-medium leading-relaxed">
+                This action cannot be undone and will permanently remove the host configuration.
+              </p>
+            </div>
+          </div>
         </div>
         
         {/* Footer */}
-        <div className="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-3">
+        <div className="px-5 py-4 flex justify-end gap-2.5 font-sans bg-slate-50 dark:bg-slate-800/20 border-t border-slate-50 dark:border-slate-800/50">
           <button 
             disabled={loading}
-            className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors disabled:opacity-50"
+            className="h-[34px] px-4 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-[13px] rounded-md transition-all font-bold disabled:opacity-50"
             onClick={handleClose}
           >
             Cancel
           </button>
           <button 
             disabled={loading}
-            className="px-4 py-2 text-sm font-medium bg-accent-red text-white hover:bg-accent-red/90 rounded-lg transition-colors shadow-sm flex items-center justify-center gap-2 min-w-[100px] disabled:opacity-50"
+            className="h-[34px] px-6 bg-rose-600 hover:bg-rose-700 text-white text-[13px] rounded-md shadow-sm transition-all font-bold flex items-center justify-center gap-2 disabled:opacity-50"
             onClick={handleDelete}
           >
             {loading ? (
-              <>
-                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                Deleting...
-              </>
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-sm animate-spin"></div>
             ) : (
-              'Delete'
+              'Delete Host'
             )}
           </button>
         </div>

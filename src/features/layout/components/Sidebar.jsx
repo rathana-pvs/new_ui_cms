@@ -40,7 +40,7 @@ function ContextMenuWrapper({ x, y, children, onClose }) {
   return (
     <div 
       ref={menuRef}
-      className={`fixed z-50 w-60 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg shadow-2xl py-1 animate-in fade-in zoom-in-95 duration-75 ${isPositioned ? 'opacity-100' : 'opacity-0'}`}
+      className={`fixed z-50 w-60 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-sm py-1 animate-in fade-in zoom-in-95 duration-75 ${isPositioned ? 'opacity-100' : 'opacity-0'}`}
       style={{ top: position.top, left: position.left }}
       onClick={(e) => e.stopPropagation()}
     >
@@ -205,7 +205,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
 
         <div className="flex flex-col flex-1 overflow-hidden">
           {/* Section 1: Host List */}
-          <div ref={hostSectionRef} className="flex-none overflow-y-auto p-4 space-y-1 min-h-[100px]" id="host-section" style={{ height: '180px' }}>
+          <div ref={hostSectionRef} className="flex-none overflow-y-auto p-2 space-y-1 min-h-[100px]" id="host-section" style={{ height: '180px' }}>
             <p className="px-3 text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 section-title">Servers</p>
             
             {hostsLoading && (
@@ -218,15 +218,15 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
             )}
 
             {!hostsLoading && hosts.length === 0 && (
-              <p className="px-3 py-2 text-xs text-slate-400 text-center">No hosts found</p>
+              <p className="px-3 py-1.5 text-xs text-slate-400 text-center">No hosts found</p>
             )}
 
             {hosts.map((host) => (
               <div
                 key={host.uid}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors select-none ${
+                className={`flex items-center gap-3 px-3 py-1.5 rounded-sm cursor-pointer transition-colors select-none ${
                   selectedHostUid === host.uid
-                    ? 'bg-primary/10 text-primary font-semibold-light dark:shadow-ob-inset'
+                    ? 'bg-primary/10 text-primary font-semibold-light '
                     : 'text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800'
                 }`}
                 onClick={() => {
@@ -253,23 +253,23 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
               <>
                 {/* Section 2: Tabs */}
                 <div className="px-4 py-2 bg-white dark:bg-slate-900">
-              <div className="flex items-center gap-1 p-1 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+              <div className="flex items-center gap-1 p-1 bg-slate-50 dark:bg-slate-800/50 rounded-sm">
                 <button
-                  className={`flex-1 flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg transition-colors ${activeTab === 'db' ? 'bg-primary/10 text-primary font-semibold-light dark:shadow-ob-inset' : 'text-slate-500 hover:bg-white/50 dark:hover:bg-slate-800'}`}
+                  className={`flex-1 flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-sm transition-colors ${activeTab === 'db' ? 'bg-primary/10 text-primary font-semibold-light ' : 'text-slate-500 hover:bg-white dark:hover:bg-slate-800'}`}
                   onClick={() => setActiveTab('db')}
                 >
                   <span className={`material-symbols-outlined text-[20px] ${activeTab === 'db' ? 'text-primary' : ''}`}>database</span>
                   <span className="text-[9px] uppercase tracking-wider">DB</span>
                 </button>
                 <button
-                  className={`flex-1 flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg transition-colors ${activeTab === 'broker' ? 'bg-primary/10 text-primary font-semibold-light dark:shadow-ob-inset' : 'text-slate-500 hover:bg-white/50 dark:hover:bg-slate-800'}`}
+                  className={`flex-1 flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-sm transition-colors ${activeTab === 'broker' ? 'bg-primary/10 text-primary font-semibold-light ' : 'text-slate-500 hover:bg-white dark:hover:bg-slate-800'}`}
                   onClick={() => setActiveTab('broker')}
                 >
                   <span className={`material-symbols-outlined text-[20px] ${activeTab === 'broker' ? 'text-primary' : ''}`}>hub</span>
                   <span className="text-[9px] uppercase tracking-wider">Broker</span>
                 </button>
                 <button
-                  className={`flex-1 flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg transition-colors ${activeTab === 'log' ? 'bg-primary/10 text-primary font-semibold-light dark:shadow-ob-inset' : 'text-slate-500 hover:bg-white/50 dark:hover:bg-slate-800'}`}
+                  className={`flex-1 flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-sm transition-colors ${activeTab === 'log' ? 'bg-primary/10 text-primary font-semibold-light ' : 'text-slate-500 hover:bg-white dark:hover:bg-slate-800'}`}
                   onClick={() => setActiveTab('log')}
                 >
                   <span className={`material-symbols-outlined text-[20px] ${activeTab === 'log' ? 'text-primary' : ''}`}>receipt_long</span>
@@ -282,8 +282,8 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
             <div className="flex-1 overflow-y-auto px-4 pb-4 relative">
               {/* Loading overlay for start/stop operations */}
               {dbActionLoading && (
-                <div className="absolute inset-0 bg-white/60 dark:bg-slate-900/60 z-10 flex items-center justify-center backdrop-blur-[1px]">
-                  <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-4 py-2 rounded-lg shadow-lg border border-slate-200 dark:border-slate-800">
+                <div className="absolute inset-0 bg-white dark:bg-slate-900 z-10 flex items-center justify-center[1px]">
+                  <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-2 py-1 rounded-sm border border-slate-200 dark:border-slate-800">
                     <svg className="animate-spin h-4 w-4 text-primary" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
@@ -310,14 +310,14 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
                         </div>
                       ) : (
                         databases.length === 0 ? (
-                          <div className="px-3 py-2 text-xs text-slate-400">No databases found</div>
+                          <div className="px-3 py-1.5 text-xs text-slate-400">No databases found</div>
                         ) : (
                           databases.map((db) => {
                             const isActive = activeDatabases.includes(db.dbname);
                             return (
                               <details key={db.dbname} className="group" open>
                                 <summary 
-                                  className="flex items-center gap-1.5 px-2 py-1.5 cursor-pointer list-none hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors select-none"
+                                  className="flex items-center gap-1.5 px-2 py-1.5 cursor-pointer list-none hover:bg-slate-50 dark:hover:bg-slate-800 rounded-sm transition-colors select-none"
                                   onClick={() => dispatch(setSelectedDatabase(db.dbname))}
                                   onDoubleClick={() => dispatch(setActiveMainTab('db:' + db.dbname))}
                                   onContextMenu={(e) => handleDbContextMenu(e, db.dbname, isActive)}
@@ -353,14 +353,14 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
                         </div>
                       ) : (
                         brokers.length === 0 ? (
-                          <div className="px-3 py-2 text-xs text-slate-400">No brokers found</div>
+                          <div className="px-3 py-1.5 text-xs text-slate-400">No brokers found</div>
                         ) : (
                           brokers.map((broker) => {
                             const isOn = broker.state === 'ON';
                             return (
                               <a
                                 key={broker.name}
-                                className="flex items-center gap-1.5 px-3 py-1.5 text-[13px] text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer select-none"
+                                className="flex items-center gap-1.5 px-3 py-1.5 text-[13px] text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800 rounded-sm transition-colors cursor-pointer select-none"
                               >
                                 <span className={`material-symbols-outlined text-[18px] ${isOn ? 'text-accent-green' : 'text-slate-400'}`}>hub</span>
                                 <span className="font-medium">{broker.name} ({broker.port})</span>
@@ -373,15 +373,15 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
                   )}
                   {activeTab === 'log' && (
                     <>
-                      <a className="flex items-center gap-2 px-3 py-1.5 text-[13px] text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer">
+                      <a className="flex items-center gap-2 px-3 py-1.5 text-[13px] text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800 rounded-sm transition-colors cursor-pointer">
                         <span className="material-symbols-outlined text-accent-orange text-[18px]">hub</span>
                         <span className="font-medium">Broker</span>
                       </a>
-                      <a className="flex items-center gap-2 px-3 py-1.5 text-[13px] text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer">
+                      <a className="flex items-center gap-2 px-3 py-1.5 text-[13px] text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800 rounded-sm transition-colors cursor-pointer">
                         <span className="material-symbols-outlined text-accent-purple text-[18px]">manage_accounts</span>
                         <span className="font-medium">Manager</span>
                       </a>
-                      <a className="flex items-center gap-2 px-3 py-1.5 text-[13px] text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer">
+                      <a className="flex items-center gap-2 px-3 py-1.5 text-[13px] text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800 rounded-sm transition-colors cursor-pointer">
                         <span className="material-symbols-outlined text-accent-green text-[18px]">dns</span>
                         <span className="font-medium">Server</span>
                       </a>
@@ -392,7 +392,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
                 </div>
               </>
             ) : (
-              <div className="flex-1 flex flex-col items-center justify-center p-6 text-center text-slate-400">
+              <div className="flex-1 flex flex-col items-center justify-center p-2 text-center text-slate-400">
                 <span className="material-symbols-outlined text-4xl mb-2 opacity-50">dns</span>
                 <p className="text-sm">Select a server to view details</p>
               </div>
@@ -403,7 +403,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
         {/* Section 4: Add Host Footer */}
         <div className="p-4 border-t border-slate-200 dark:border-slate-800">
           <button 
-            className="flex w-full items-center justify-center gap-2 bg-primary text-white px-4 py-2.5 rounded-lg text-sm font-semibold shadow-sm hover:bg-primary/90 transition-colors" 
+            className="flex w-full items-center justify-center gap-2 bg-primary text-white px-2 py-1 rounded-sm text-sm font-semibold hover:bg-primary/90 transition-colors" 
             id="sidebar-footer-btn"
             onClick={onAddHost}
           >
@@ -430,7 +430,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
             {contextMenu.server}
           </div>
           <button 
-            className="w-full text-left px-4 py-2 text-sm text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 transition-colors"
+            className="w-full text-left px-2 py-1 text-sm text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 transition-colors"
             onClick={() => {
               const targetUid = contextMenu.hostUid;
               dispatch(revokeHostLogin(targetUid));
@@ -445,12 +445,12 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
             Disconnect
           </button>
           <div className="h-px bg-slate-100 dark:bg-slate-700 my-1"></div>
-          <button className="w-full text-left px-4 py-2 text-sm text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 transition-colors">
+          <button className="w-full text-left px-2 py-1 text-sm text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 transition-colors">
             <span className="material-symbols-outlined text-[18px] text-accent-blue">add_box</span>
             Add Host
           </button>
           <button 
-            className="w-full text-left px-4 py-2 text-sm text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 transition-colors"
+            className="w-full text-left px-2 py-1 text-sm text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 transition-colors"
             onClick={() => {
               dispatch(openEditHostModal(contextMenu.hostUid));
               setContextMenu(null);
@@ -460,7 +460,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
             Edit Host
           </button>
           <button 
-            className="w-full text-left px-4 py-2 text-sm text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 transition-colors"
+            className="w-full text-left px-2 py-1 text-sm text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 transition-colors"
             onClick={() => {
               dispatch(openDeleteHostModal({ hostUid: contextMenu.hostUid, alias: contextMenu.alias }));
               setContextMenu(null);
@@ -470,11 +470,11 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
             Delete Host
           </button>
           <div className="h-px bg-slate-100 dark:bg-slate-700 my-1"></div>
-          <button className="w-full text-left px-4 py-2 text-sm text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 transition-colors">
+          <button className="w-full text-left px-2 py-1 text-sm text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 transition-colors">
             <span className="material-symbols-outlined text-[18px] text-accent-purple">lock</span>
             Change Manager Password
           </button>
-          <button className="w-full text-left px-4 py-2 text-sm text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 transition-colors">
+          <button className="w-full text-left px-2 py-1 text-sm text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 transition-colors">
             <span className="material-symbols-outlined text-[18px] text-accent-green">info</span>
             Server Version
           </button>
@@ -494,7 +494,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
           </div>
           {dbContextMenu.isActive ? (
             <button 
-              className="w-full text-left px-4 py-2 text-sm text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 transition-colors"
+              className="w-full text-left px-2 py-1 text-sm text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 transition-colors"
               onClick={() => {
                 dispatch(stopDatabase({ hostUid: selectedHostUid, dbname: dbContextMenu.db }));
                 setDbContextMenu(null);
@@ -505,7 +505,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
             </button>
           ) : (
             <button 
-              className="w-full text-left px-4 py-2 text-sm text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 transition-colors"
+              className="w-full text-left px-2 py-1 text-sm text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 transition-colors"
               onClick={() => {
                 dispatch(startDatabase({ hostUid: selectedHostUid, dbname: dbContextMenu.db }));
                 setDbContextMenu(null);
