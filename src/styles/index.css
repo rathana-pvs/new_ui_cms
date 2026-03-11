@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .cursor-col-resize { cursor: col-resize; }
+  .cursor-row-resize { cursor: row-resize; }
+}
+
+html, body {
+  margin: 0;
+  height: 100vh;
+}
+
+@layer base {
+  /* Scrollbar overrides */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #cbd5e1; /* slate-300 */
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8; /* slate-400 */
+  }
+  .dark ::-webkit-scrollbar-thumb {
+    background: #334155; /* slate-700 */
+  }
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: #475569; /* slate-600 */
+  }
+  
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+  }
+  .dark * {
+    scrollbar-color: #334155 transparent;
+  }
+}
+
+#sidebar.collapsed {
+  width: 80px !important;
+}
+
+#sidebar.collapsed h2, 
+#sidebar.collapsed .text-sm, 
+#sidebar.collapsed .text-\[10px\], 
+#sidebar.collapsed .text-xs, 
+#sidebar.collapsed summary .text-sm,
+#sidebar.collapsed summary .material-symbols-outlined:first-child,
+#sidebar.collapsed #db-tree-container p,
+#sidebar.collapsed #broker-tree-container p,
+#sidebar.collapsed details div,
+#sidebar.collapsed #sidebar-footer-btn span:last-child,
+#sidebar.collapsed .section-title {
+  display: none !important;
+}
+
+#sidebar.collapsed .px-3, #sidebar.collapsed .p-4 {
+  padding-left: 0.75rem !important;
+  padding-right: 0.75rem !important;
+}
+
+#sidebar.collapsed summary {
+  justify-content: center !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+#sidebar.collapsed .flex-1.flex.flex-col.items-center {
+  padding: 0.5rem !important;
+}
+
+#sidebar.collapsed #sidebar-footer-btn {
+  justify-content: center !important;
+  padding: 0.75rem !important;
+}
+
+#sidebar.collapsed #toggle-icon {
+  transform: rotate(180deg);
+}
+
+#sidebar.collapsed summary .material-symbols-outlined:not(:first-child) {
+  margin: 0 !important;
+}
+
+#v-resizer:hover, #v-resizer.resizing { background-color: #6366f1; }
