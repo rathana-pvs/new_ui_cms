@@ -70,20 +70,24 @@ export default function RegisterPage() {
   const strength = getPasswordStrength();
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#0f1117] relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-bk-main relative overflow-hidden font-sans">
+
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-accent-green/5 blur-3xl"></div>
-        <div className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-primary/5 blur-3xl"></div>
-        <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] rounded-full bg-accent-purple/3 blur-3xl"></div>
+        <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-bk-yellow/5 blur-3xl"></div>
+        <div className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-bk-yellow/5 blur-3xl"></div>
+
+        <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] rounded-full bg-bk-yellow/2 blur-3xl"></div>
       </div>
+
 
       <div className="w-full max-w-md mx-4 relative z-10">
         {/* Logo & Title */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-accent-green/10 mb-4">
-            <span className="material-symbols-outlined text-accent-green text-3xl">person_add</span>
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-bk-yellow/10 mb-4">
+            <span className="material-symbols-outlined text-bk-yellow text-3xl" style={{ fontVariationSettings: "'wght' 300" }}>person_add</span>
           </div>
+
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
             Create Account
           </h1>
@@ -93,7 +97,8 @@ export default function RegisterPage() {
         </div>
 
         {/* Register Card */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-black/20 border border-slate-200/60 dark:border-slate-800 p-8">
+        <div className="bg-white dark:bg-bk-side rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-black/40 border border-slate-200/60 dark:border-slate-800 p-8">
+
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Username */}
             <div>
@@ -101,17 +106,18 @@ export default function RegisterPage() {
                 Username
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 text-[20px]">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 text-[20px]" style={{ fontVariationSettings: "'wght' 300" }}>
                   person
                 </span>
                 <input
                   type="text"
                   value={username}
                   onChange={(e) => { setUsername(e.target.value); clearFieldError('username'); }}
-                  className={`w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border ${errors.username ? 'border-accent-red focus:ring-accent-red/20' : 'border-slate-200 dark:border-slate-700 focus:ring-primary/20'} bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:border-transparent transition-all`}
+                  className={`w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border ${errors.username ? 'border-accent-red focus:ring-accent-red/20' : 'border-slate-200 dark:border-slate-800 focus:ring-bk-yellow/20'} bg-slate-50 dark:bg-bk-main/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:border-bk-yellow/50 transition-all`}
                   placeholder="Choose a username"
                 />
               </div>
+
               {errors.username && (
                 <p className="mt-1.5 text-xs text-accent-red flex items-center gap-1">
                   <span className="material-symbols-outlined text-[14px]">error</span>
@@ -126,26 +132,27 @@ export default function RegisterPage() {
                 Password
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 text-[20px]">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 text-[20px]" style={{ fontVariationSettings: "'wght' 300" }}>
                   lock
                 </span>
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => { setPassword(e.target.value); clearFieldError('password'); }}
-                  className={`w-full pl-10 pr-12 py-2.5 text-sm rounded-xl border ${errors.password ? 'border-accent-red focus:ring-accent-red/20' : 'border-slate-200 dark:border-slate-700 focus:ring-primary/20'} bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:border-transparent transition-all`}
+                  className={`w-full pl-10 pr-12 py-2.5 text-sm rounded-xl border ${errors.password ? 'border-accent-red focus:ring-accent-red/20' : 'border-slate-200 dark:border-slate-800 focus:ring-bk-yellow/20'} bg-slate-50 dark:bg-bk-main/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:border-bk-yellow/50 transition-all`}
                   placeholder="Create a password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-bk-yellow transition-colors"
                 >
-                  <span className="material-symbols-outlined text-[20px]">
+                  <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'wght' 300" }}>
                     {showPassword ? 'visibility_off' : 'visibility'}
                   </span>
                 </button>
               </div>
+
               {/* Password Strength */}
               {password && (
                 <div className="mt-2">
@@ -176,26 +183,27 @@ export default function RegisterPage() {
                 Confirm Password
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 text-[20px]">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 text-[20px]" style={{ fontVariationSettings: "'wght' 300" }}>
                   lock_reset
                 </span>
                 <input
                   type={showConfirm ? 'text' : 'password'}
                   value={confirmPassword}
                   onChange={(e) => { setConfirmPassword(e.target.value); clearFieldError('confirmPassword'); }}
-                  className={`w-full pl-10 pr-12 py-2.5 text-sm rounded-xl border ${errors.confirmPassword ? 'border-accent-red focus:ring-accent-red/20' : confirmPassword && password === confirmPassword ? 'border-accent-green focus:ring-accent-green/20' : 'border-slate-200 dark:border-slate-700 focus:ring-primary/20'} bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:border-transparent transition-all`}
+                  className={`w-full pl-10 pr-12 py-2.5 text-sm rounded-xl border ${errors.confirmPassword ? 'border-accent-red focus:ring-accent-red/20' : confirmPassword && password === confirmPassword ? 'border-accent-green focus:ring-accent-green/20' : 'border-slate-200 dark:border-slate-800 focus:ring-bk-yellow/20'} bg-slate-50 dark:bg-bk-main/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:border-bk-yellow/50 transition-all`}
                   placeholder="Confirm your password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirm(!showConfirm)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-bk-yellow transition-colors"
                 >
-                  <span className="material-symbols-outlined text-[20px]">
+                  <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'wght' 300" }}>
                     {showConfirm ? 'visibility_off' : 'visibility'}
                   </span>
                 </button>
               </div>
+
               {confirmPassword && password === confirmPassword && !errors.confirmPassword && (
                 <p className="mt-1.5 text-xs text-accent-green flex items-center gap-1">
                   <span className="material-symbols-outlined text-[14px]">check_circle</span>
@@ -222,7 +230,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 px-4 bg-primary hover:bg-primary/90 text-white text-sm font-semibold rounded-xl shadow-sm shadow-primary/25 hover:shadow-md hover:shadow-primary/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
+              className="w-full py-2.5 px-4 bg-bk-yellow hover:bg-bk-yellow/90 text-bk-side text-sm font-bold rounded-xl shadow-lg shadow-bk-yellow/10 hover:shadow-bk-yellow/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
             >
               {loading ? (
                 <>
@@ -234,11 +242,12 @@ export default function RegisterPage() {
                 </>
               ) : (
                 <>
-                  <span className="material-symbols-outlined text-[18px]">person_add</span>
+                  <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'wght' 500" }}>person_add</span>
                   Create Account
                 </>
               )}
             </button>
+
           </form>
 
           {/* Divider */}
@@ -256,12 +265,13 @@ export default function RegisterPage() {
             Already have an account?{' '}
             <Link
               to="/login"
-              className="font-semibold text-primary hover:text-primary/80 transition-colors inline-flex items-center gap-1"
+              className="font-bold text-bk-yellow hover:underline transition-all inline-flex items-center gap-1"
             >
-              <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+              <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'wght' 300" }}>arrow_back</span>
               Back to login
             </Link>
           </p>
+
         </div>
 
         {/* Footer */}

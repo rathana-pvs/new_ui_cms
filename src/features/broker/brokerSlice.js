@@ -87,6 +87,7 @@ export const stopBroker = createAsyncThunk(
 
 const initialState = {
   brokers: [],
+  selectedBroker: null,
   loading: false,
   actionLoading: false,
   error: null,
@@ -95,7 +96,11 @@ const initialState = {
 const brokerSlice = createSlice({
   name: 'broker',
   initialState,
-  reducers: {},
+  reducers: {
+    setSelectedBroker: (state, action) => {
+      state.selectedBroker = action.payload;
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchBrokerList.pending, (state) => {
@@ -105,6 +110,10 @@ const brokerSlice = createSlice({
       .addCase(fetchBrokerList.fulfilled, (state, action) => {
         state.loading = false;
         state.brokers = action.payload;
+        
+        // Ensure selected broker still exists
+        const exists = state.brokers.find(b => b.name === state.selectedBroker);
+        if (!exists) state.selectedBroker = null;
       })
       .addCase(fetchBrokerList.rejected, (state, action) => {
         state.loading = false;
@@ -131,5 +140,7 @@ const brokerSlice = createSlice({
       });
   },
 });
+
+export const { setSelectedBroker } = brokerSlice.actions;
 
 export default brokerSlice.reducer;

@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'https://100.72.152.120:8081',
-  timeout: 10000,
+  timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -22,61 +22,111 @@ if (initialToken) {
   setAuthToken(initialToken);
 }
 
-// Track continuous auth failures per host to avoid infinite fetch/revoke loops
-const failedRevokeAttempts = new Map();
+// Map to track active host re-authentication promises
+const refreshingHosts = new Map();
 
-// Response interceptor (e.g. handle 401)
+// Helper to determine if a URL belongs to a specific host
+const getHostUidFromUrl = (url) => {
+  if (!url) return null;
+  // URLs usually follow pattern /UID/endpoint
+  const cleanUrl = url.replace(/^\//, '');
+  const segments = cleanUrl.split('/');
+  let hostUid = segments[0];
+  
+  // If URL is /host/UID/..., the UID is the second segment
+  if (hostUid === 'host' && segments[1]) {
+    hostUid = segments[1];
+  }
+
+  // Simple heuristic: host UIDs are usually long strings (UUID-like) or specific identifiers
+  return (hostUid && hostUid.length > 15) ? hostUid : null;
+};
+
+// Response interceptor
 apiClient.interceptors.response.use(
   (response) => {
-    // Backend always returns { data: {...}, status: 200, note: "success" }
-    // Unwrap the top level structure automatically
-    const urlParts = response.config?.url?.split('/');
-    const possibleHostUid = urlParts && urlParts[1];
-
-    // Reset the fail counter if a request to this host succeeds
-    if (possibleHostUid && failedRevokeAttempts.has(possibleHostUid)) {
-      failedRevokeAttempts.delete(possibleHostUid);
+    // Standard unwrap logic: if backend returned { data: ..., note: ... }, extract data
+    // If data is false or null, we still return the full response object to avoid falsy unwrap bugs
+    // or we check strictly for property existence.
+    const rawData = response.data;
+    if (rawData && typeof rawData === 'object' && Object.prototype.hasOwnProperty.call(rawData, 'data')) {
+      if (rawData.data === false || rawData.data === null || rawData.data === 0) {
+          // If data is explicitly false/null, return the whole object so callers like hostSlice 
+          // can check response.data === false reliably.
+          return rawData;
+      }
+      return rawData.data;
     }
-
-    return response.data?.data || response.data;
+    return rawData;
   },
-  (error) => {
+  async (error) => {
+    const originalRequest = error.config;
     const apiData = error.response?.data;
+    const statusCode = error.response?.status;
 
-    // Handle generic unauthorized
-    if (error.response?.status === 401) {
-      console.warn('Unauthorized. Redirecting to login...');
-      localStorage.removeItem('token');
-      // Forcing standard reload to kick the router to /login without React cyclic redundancy
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
-      }
-    }
+    // Handle 401 Unauthorized
+    if (statusCode === 401 && !originalRequest._retry) {
+      const hostUid = getHostUidFromUrl(originalRequest.url);
+      const isLoginRequest = originalRequest.url?.includes('/cms-auth/login');
 
-    // Handle specific host session expiry
-    if (apiData?.note === 'INVALID_TOKEN') {
-      const urlParts = error.config?.url?.split('/');
-      // e.g. /host-uid-1/database/start-info -> target URL starts with / so index 1 is the host UID
-      const possibleHostUid = urlParts && urlParts[1];
-
-      if (possibleHostUid) {
-        const attempts = (failedRevokeAttempts.get(possibleHostUid) || 0) + 1;
-        failedRevokeAttempts.set(possibleHostUid, attempts);
-
-        if (attempts <= 2) {
-          console.warn(`Host session expired for ${possibleHostUid} (Attempt ${attempts}). Revoking access...`);
-          import('../app/store').then(({ store }) => {
-            import('../features/host/hostSlice').then(({ revokeHostLogin }) => {
-              store.dispatch(revokeHostLogin(possibleHostUid));
-            });
-          });
-        } else {
-          console.error(`Host session for ${possibleHostUid} failed to authorize after ${attempts} attempts. Aborting endless retry loop.`);
+      if (hostUid) {
+        // SCENARIO: Host-level 401
+        
+        if (isLoginRequest) {
+          // 401 during a host login attempt -> System session itself is expired
+          // "if revoke host login failed 401-> then it is consider as system login is expired. so do a logout operation."
+          console.error('Host authentication failed with 401. Main system session has expired.');
+          localStorage.removeItem('token');
+          window.location.href = '/login';
+          return Promise.reject(error);
         }
+
+        // Standard host request failed with 401 -> Attempt re-authentication
+        console.warn(`Host session for ${hostUid} expired. Initiating revocation and re-login...`);
+        
+        try {
+          const { store } = await import('../app/store');
+          const { revokeHostLogin, loginToHost } = await import('../features/host/hostSlice');
+
+          // 1. "it should revoke host login"
+          store.dispatch(revokeHostLogin(hostUid));
+
+          // 2. "wait for result"
+          if (!refreshingHosts.has(hostUid)) {
+            const refreshPromise = store.dispatch(loginToHost(hostUid)).unwrap();
+            refreshingHosts.set(hostUid, refreshPromise);
+          }
+
+          await refreshingHosts.get(hostUid);
+          refreshingHosts.delete(hostUid);
+
+          // 3. "proceed those request again"
+          originalRequest._retry = true;
+          // Ensure we use current headers (though token shouldn't have changed)
+          return apiClient(originalRequest);
+        } catch (refreshError) {
+          refreshingHosts.delete(hostUid);
+          
+          // Note: If refreshError was a 401, it was already handled by the isLoginRequest check above 
+          // for the secondary request generated by store.dispatch(loginToHost).
+          
+          // "if revoke host login failed (but not 401). just show error page of host login"
+          // This is already accomplished as loginToHost.rejected updates the hostAuthErrors state,
+          // which the Sidebar UI uses to show the "Connection Failed" / "Try Again" overlay.
+          return Promise.reject(error);
+        }
+      } else {
+        // Generic or system-level 401
+        console.warn('Authentication expired. Redirecting to system login...');
+        localStorage.removeItem('token');
+        if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+          window.location.href = '/login';
+        }
+        return Promise.reject(error);
       }
     }
 
-    // Standardize the error message into apiData.message so all components get it automatically
+    // Standardize error messaging for components
     if (apiData) {
       apiData.message = apiData.data?.title || apiData.note || apiData.message || 'An unexpected error occurred';
     }

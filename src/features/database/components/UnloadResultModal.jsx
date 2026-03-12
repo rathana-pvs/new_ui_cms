@@ -7,60 +7,70 @@ export default function UnloadResultModal() {
 
   if (!isUnloadResultModalOpen) return null;
 
-  // Transform object into array for the table
-  // The structure from user is { data: [ { table: "info", ... } ], ... }
-  const resultObj = unloadResultData?.[0] || {};
-  const rows = Object.entries(resultObj).map(([tableName, stats]) => ({
+  const resultData = unloadResultData?.[0] || {};
+  const rows = Object.entries(resultData).map(([tableName, stats]) => ({
     tableName,
     stats
   }));
 
-  // The new structure expects `listData` with `classname`, `totalinstance`, `successinstance`
-  // This transformation is based on the new table headers and data structure implied by the edit.
-  // Assuming `unloadResultData` might now contain an array of objects like:
-  // [{ classname: "User", totalinstance: 100, successinstance: 95 }, ...]
-  const listData = unloadResultData || [];
-
-
   return (
-    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-[#1e2230] w-full max-w-2xl rounded shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[80vh]">
-        
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-1.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-[#1e2230] flex-shrink-0">
-          <h3 className="text-[13px] font-normal text-slate-900 dark:text-white flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary text-[18px]">analytics</span>
-            Unload Detail Result
-          </h3>
-          <button 
+    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-300 font-sans text-left">
+      <div className="bg-white dark:bg-bk-side w-full max-w-[500px] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[85vh] relative text-left">
+
+        {/* Subtle Top Accent */}
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-bk-yellow/60"></div>
+
+        {/* Header - Compact */}
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
+              <span className="material-symbols-outlined text-bk-yellow text-xl">analytics</span>
+            </div>
+            <div>
+              <h3 className="text-sm font-medium text-slate-900 dark:text-white leading-none">Unload job summary</h3>
+            </div>
+          </div>
+          <button
             onClick={() => dispatch(closeUnloadResultModal())}
-            className="p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-400 dark:text-slate-500"
+            className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
           >
-            <span className="material-symbols-outlined text-[20px]">close</span>
+            <span className="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform">close</span>
           </button>
         </div>
 
         {/* Body */}
-        <div className="p-4 overflow-y-auto custom-scrollbar flex-1 bg-white dark:bg-[#1e2230]">
-          <div className="border border-slate-200 dark:border-slate-800 rounded bg-slate-50/10 dark:bg-slate-900/10 overflow-hidden">
-            <table className="w-full text-left text-[11px]">
-              <thead className="bg-slate-50 dark:bg-slate-800/80 text-[10px] font-medium text-slate-400 dark:text-slate-500 tracking-tight uppercase">
+        <div className="p-5 space-y-4 overflow-y-auto custom-scrollbar flex-1">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Class results</span>
+            <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
+          </div>
+
+          <div className="border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden bg-slate-50/20 dark:bg-bk-main/30">
+            <table className="w-full text-left text-[11px] border-collapse">
+              <thead className="bg-slate-50/80 dark:bg-bk-main/50 text-[10px] font-medium text-slate-400 tracking-wide border-b border-slate-100 dark:border-slate-800">
                 <tr>
-                  <th className="px-3 py-1.5 font-medium border-b border-slate-100 dark:border-slate-800">Class Name</th>
-                  <th className="px-3 py-1.5 font-medium border-b border-slate-100 dark:border-slate-800 text-center">Total Instance</th>
-                  <th className="px-3 py-1.5 font-medium border-b border-slate-100 dark:border-slate-800 text-center">Success Instance</th>
+                  <th className="px-4 py-3">Class identifier</th>
+                  <th className="px-4 py-3 text-right">Records / Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50 dark:divide-slate-800 text-slate-600 dark:text-slate-400">
-                {listData.length > 0 ? listData.map((row, idx) => (
-                  <tr key={idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
-                    <td className="px-3 py-1 font-normal text-slate-700 dark:text-slate-300">{row.classname}</td>
-                    <td className="px-3 py-1 text-center font-mono text-[10px]">{row.totalinstance}</td>
-                    <td className="px-3 py-1 text-center font-mono text-[10px] text-emerald-500 dark:text-emerald-400">{row.successinstance}</td>
+              <tbody className="divide-y divide-slate-100 dark:divide-white/5 font-mono text-[11px]">
+                {rows.length > 0 ? rows.map((row, idx) => (
+                  <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-all">
+                    <td className="px-4 py-2.5 font-medium text-slate-700 dark:text-slate-300">{row.tableName}</td>
+                    <td className="px-4 py-2.5 text-right">
+                      <span className="text-bk-yellow font-bold px-2 py-0.5 rounded bg-bk-yellow/5 border border-bk-yellow/10">
+                        {row.stats}
+                      </span>
+                    </td>
                   </tr>
                 )) : (
                   <tr>
-                    <td colSpan="3" className="px-4 py-20 text-center text-slate-400 italic">No data available</td>
+                    <td colSpan="2" className="px-4 py-20 text-center">
+                      <div className="flex flex-col items-center justify-center gap-3 opacity-30 grayscale items-center">
+                        <span className="material-symbols-outlined text-4xl">inventory_2</span>
+                        <p className="text-[10px] font-medium tracking-wide">No results metadata found</p>
+                      </div>
+                    </td>
                   </tr>
                 )}
               </tbody>
@@ -69,12 +79,12 @@ export default function UnloadResultModal() {
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-2 bg-slate-50 dark:bg-[#1e2230] flex justify-end border-t border-slate-100 dark:border-slate-800">
-          <button 
+        <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 backdrop-blur-sm flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
+          <button
             onClick={() => dispatch(closeUnloadResultModal())}
-            className="px-6 py-1.5 bg-primary hover:bg-primary/90 active:bg-primary/80 text-white text-xs rounded shadow transition-all font-normal"
+            className="px-8 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center min-w-[120px]"
           >
-            Finished
+            Acknowledge
           </button>
         </div>
       </div>

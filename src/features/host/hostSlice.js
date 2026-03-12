@@ -1,5 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { hostApi } from './hostApi';
+import { databaseApi } from '../database/databaseApi';
+import { brokerApi } from '../broker/brokerApi';
+import { fetchDatabaseStartInfo } from '../database/databaseSlice';
+import { fetchBrokerList } from '../broker/brokerSlice';
 
 // Async thunk to fetch hosts from API
 export const fetchHosts = createAsyncThunk(
@@ -59,14 +63,97 @@ export const editHost = createAsyncThunk(
   }
 );
 
+// Async thunk to start CUBRID service (Brokers + Auto-start Databases)
+export const startService = createAsyncThunk(
+  'host/startService',
+  async (hostUid, { dispatch, rejectWithValue }) => {
+    try {
+      // 1. Start all Brokers
+      dispatch(hostSlice.actions.setServiceProgressMessage('Starting brokers...'));
+      const brokerResponse = await brokerApi.getBrokerList(hostUid);
+      const brokerList = brokerResponse.result || (Array.isArray(brokerResponse) ? brokerResponse[0]?.broker : []);
+      if (brokerList) {
+        await Promise.all(brokerList.map(b => brokerApi.startBroker(hostUid, b.name).catch(() => {})));
+      }
+
+      // 2. Fetch cubrid.conf to find auto-start databases
+      dispatch(hostSlice.actions.setServiceProgressMessage('Checking auto-start configuration...'));
+      const configRes = await hostApi.getHostConfig(hostUid, 'cubridconf');
+      const lines = configRes?.conflist?.[0]?.confdata || [];
+      
+      let serviceEnabled = false;
+      let autoStartServers = [];
+      
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed.startsWith('#') || !trimmed) continue;
+        if (trimmed.startsWith('service=')) {
+          const val = trimmed.split('=')[1] || '';
+          if (val.split(',').map(s => s.trim().toLowerCase()).includes('server')) serviceEnabled = true;
+        }
+        if (trimmed.startsWith('server=')) {
+          const val = trimmed.split('=')[1] || '';
+          autoStartServers = val.split(',').map(s => s.trim());
+        }
+      }
+
+      // 3. Start auto-start databases if service is enabled
+      if (serviceEnabled && autoStartServers.length > 0) {
+        dispatch(hostSlice.actions.setServiceProgressMessage(`Starting databases (${autoStartServers.join(', ')})...`));
+        await Promise.all(autoStartServers.map(dbname => databaseApi.startDatabase(hostUid, dbname).catch(() => {})));
+      }
+
+      // Refresh everything
+      dispatch(hostSlice.actions.setServiceProgressMessage('Refreshing status...'));
+      dispatch(fetchDatabaseStartInfo(hostUid));
+      dispatch(fetchBrokerList(hostUid));
+      return true;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Failed to start service');
+    }
+  }
+);
+
+// Async thunk to stop CUBRID service (All Brokers + All Databases)
+export const stopService = createAsyncThunk(
+  'host/stopService',
+  async (hostUid, { dispatch, getState, rejectWithValue }) => {
+    try {
+      // 1. Stop all Brokers
+      dispatch(hostSlice.actions.setServiceProgressMessage('Stopping brokers...'));
+      const brokerResponse = await brokerApi.getBrokerList(hostUid);
+      const brokerList = brokerResponse.result || (Array.isArray(brokerResponse) ? brokerResponse[0]?.broker : []);
+      if (brokerList) {
+        await Promise.all(brokerList.map(b => brokerApi.stopBroker(hostUid, b.name).catch(() => {})));
+      }
+
+      // 2. Stop all Databases
+      dispatch(hostSlice.actions.setServiceProgressMessage('Stopping databases...'));
+      const { database } = getState();
+      const dbList = database.databases || [];
+      if (dbList.length > 0) {
+        await Promise.all(dbList.map(db => databaseApi.stopDatabase(hostUid, db.dbname).catch(() => {})));
+      }
+
+      // Refresh everything
+      dispatch(hostSlice.actions.setServiceProgressMessage('Refreshing status...'));
+      dispatch(fetchDatabaseStartInfo(hostUid));
+      dispatch(fetchBrokerList(hostUid));
+      return true;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Failed to stop service');
+    }
+  }
+);
+
 // Async thunk to explicitly login/forward to a specific host
 export const loginToHost = createAsyncThunk(
   'host/loginToHost',
   async (hostUid, { rejectWithValue }) => {
     try {
       const response = await hostApi.loginToHost(hostUid);
-      // The API returns { data: false } (which apiClient unwraps to just boolean `false`) on failure
-      if (response.data === false) {
+      // The API returns { data: false } or just false on failure
+      if (response === false || response?.data === false) {
         return rejectWithValue('Host login failed (bad credentials or unavailable)');
       }
       return hostUid;
@@ -83,10 +170,17 @@ const initialState = {
   hostToDeleteUid: null,
   hostToDeleteAlias: null,
   hostToEditUid: null,
+  isServerVersionModalOpen: false,
+  serverVersionHostUid: null,
   hosts: [],
   authorizedHosts: [], // Array of hostUids that have active forwarded sessions
   selectedHostUid: null,
   loading: false,
+  isLoggingIntoHost: false,
+  isServiceOperating: false,
+  serviceOperationType: null, // 'start' or 'stop'
+  serviceProgressMessage: '',
+  hostAuthErrors: {}, // { [hostUid]: errorMessage }
   error: null,
 };
 
@@ -102,6 +196,9 @@ const hostSlice = createSlice({
     },
     setSelectedHost: (state, action) => {
       state.selectedHostUid = action.payload;
+    },
+    setServiceProgressMessage: (state, action) => {
+      state.serviceProgressMessage = action.payload;
     },
     revokeHostLogin: (state, action) => {
       state.authorizedHosts = state.authorizedHosts.filter(uid => uid !== action.payload);
@@ -123,6 +220,17 @@ const hostSlice = createSlice({
     closeEditHostModal: (state) => {
       state.isEditHostModalOpen = false;
       state.hostToEditUid = null;
+    },
+    openServerVersionModal: (state, action) => {
+      state.isServerVersionModalOpen = true;
+      state.serverVersionHostUid = action.payload;
+    },
+    closeServerVersionModal: (state) => {
+      state.isServerVersionModalOpen = false;
+      state.serverVersionHostUid = null;
+    },
+    clearHostError: (state) => {
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
@@ -152,19 +260,22 @@ const hostSlice = createSlice({
         state.loading = false;
         state.error = action.payload; // AddHostModal can also show this
       })
-      .addCase(loginToHost.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+      .addCase(loginToHost.pending, (state, action) => {
+        state.isLoggingIntoHost = true;
+        // Clean up previous error for this host if any
+        if (state.hostAuthErrors[action.meta.arg]) {
+          delete state.hostAuthErrors[action.meta.arg];
+        }
       })
       .addCase(loginToHost.fulfilled, (state, action) => {
-        state.loading = false;
+        state.isLoggingIntoHost = false;
         if (!state.authorizedHosts.includes(action.payload)) {
           state.authorizedHosts.push(action.payload);
         }
       })
       .addCase(loginToHost.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
+        state.isLoggingIntoHost = false;
+        state.hostAuthErrors[action.meta.arg] = action.payload;
       })
       .addCase(deleteHost.pending, (state) => {
         state.loading = true;
@@ -197,6 +308,34 @@ const hostSlice = createSlice({
       .addCase(editHost.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(startService.pending, (state) => {
+        state.isServiceOperating = true;
+        state.serviceOperationType = 'start';
+        state.error = null;
+      })
+      .addCase(startService.fulfilled, (state) => {
+        state.isServiceOperating = false;
+        state.serviceOperationType = null;
+      })
+      .addCase(startService.rejected, (state, action) => {
+        state.isServiceOperating = false;
+        state.serviceOperationType = null;
+        state.error = action.payload;
+      })
+      .addCase(stopService.pending, (state) => {
+        state.isServiceOperating = true;
+        state.serviceOperationType = 'stop';
+        state.error = null;
+      })
+      .addCase(stopService.fulfilled, (state) => {
+        state.isServiceOperating = false;
+        state.serviceOperationType = null;
+      })
+      .addCase(stopService.rejected, (state, action) => {
+        state.isServiceOperating = false;
+        state.serviceOperationType = null;
+        state.error = action.payload;
       });
   },
 });
@@ -210,6 +349,10 @@ export const {
   closeDeleteHostModal,
   openEditHostModal,
   closeEditHostModal,
+  openServerVersionModal,
+  closeServerVersionModal,
+  clearHostError,
+  setServiceProgressMessage,
 } = hostSlice.actions;
 
 export default hostSlice.reducer;

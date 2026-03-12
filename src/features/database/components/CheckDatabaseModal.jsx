@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { closeCheckDatabaseModal } from '../databaseSlice';
 import { databaseApi } from '../databaseApi';
 import { showStatusModal } from '../../layout/layoutSlice';
+import LoadingOverlay from '../../../components/common/LoadingOverlay';
+import ErrorOverlay from '../../../components/common/ErrorOverlay';
 
 export default function CheckDatabaseModal() {
   const dispatch = useDispatch();
@@ -10,6 +12,7 @@ export default function CheckDatabaseModal() {
   const { selectedHostUid } = useSelector((state) => state.host);
   const [repair, setRepair] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   if (!isCheckDatabaseModalOpen) return null;
 
@@ -17,6 +20,7 @@ export default function CheckDatabaseModal() {
     if (!selectedHostUid || !selectedDatabase) return;
     
     setLoading(true);
+    setError(null);
     try {
       const payload = {
         repairdb: repair ? 'y' : 'n'
@@ -26,97 +30,125 @@ export default function CheckDatabaseModal() {
       dispatch(closeCheckDatabaseModal());
       dispatch(showStatusModal({
         type: 'success',
-        title: 'Check Complete',
+        title: 'Check complete',
         message: response.note || 'Database check completed successfully.'
       }));
     } catch (err) {
-      dispatch(showStatusModal({
-        type: 'error',
-        title: 'Check Failed',
-        message: err.response?.data?.message || err.message || 'An error occurred during database check.'
-      }));
+      setError(err.response?.data?.note || err.response?.data?.message || 'The database check operation encountered a conflict or failed to reach the server.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-[#1e2230] w-full max-w-md rounded shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-1.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-[#1e2230] flex-shrink-0">
-          <h3 className="text-[13px] font-normal text-slate-900 dark:text-white flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary text-[18px]">verified</span>
-            Check Database
-          </h3>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-300 font-sans text-left">
+      <div className="bg-white dark:bg-bk-side w-full max-w-[440px] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col relative text-left">
+        
+        {/* Subtle Top Accent */}
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-bk-yellow/60"></div>
+
+        <LoadingOverlay 
+            isVisible={loading} 
+            title="Checking database" 
+            subtitle="Verifying consistency and integrity flags..." 
+        />
+        <ErrorOverlay 
+          isVisible={!!error} 
+          error={error} 
+          onRetry={handleCheck}
+          onClose={() => setError(null)}
+        />
+
+        {/* Header - Compact */}
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
+              <span className="material-symbols-outlined text-bk-yellow text-xl">verified</span>
+            </div>
+            <div>
+              <h3 className="text-[12px] font-medium text-slate-900 dark:text-white leading-none tracking-wide">Check database</h3>
+            </div>
+          </div>
           <button 
+            disabled={loading}
             onClick={() => dispatch(closeCheckDatabaseModal())}
-            className="p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-400 dark:text-slate-500"
+            className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
           >
-            <span className="material-symbols-outlined text-[20px]">close</span>
+            <span className="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform">close</span>
           </button>
         </div>
 
         {/* Body */}
-        <div className="p-4 space-y-4 bg-white dark:bg-[#1e2230]">
-          <div className="flex items-center gap-2">
-            <label className="w-32 shrink-0 text-[11px] font-normal text-slate-500 dark:text-slate-400 text-left">Database Name :</label>
-            <div className="flex-1 h-8 flex items-center px-2 bg-slate-50/50 dark:bg-slate-800/20 border border-slate-100 dark:border-slate-800 rounded-lg text-[12px] font-normal text-slate-600 dark:text-slate-300">
-              {selectedDatabase}
+        <div className="p-5 space-y-5 flex-1">
+          {/* Section: Target Information */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Verification target</span>
+              <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
+            </div>
+            
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">Database identifier</label>
+              <div className="w-full h-9 px-3 flex items-center bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded text-[12px] font-medium text-slate-700 dark:text-slate-100">
+                {selectedDatabase}
+              </div>
             </div>
           </div>
 
-          <div className="relative border border-slate-200 dark:border-slate-800 rounded-xl p-3 pt-4 mt-2">
-             <div className="absolute top-0 -translate-y-[55%] left-4 px-2 bg-white dark:bg-[#1e2230]">
-               <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300 leading-none">
-                 Description & Options
-               </span>
-             </div>
-
-             <div className="space-y-3">
-                <div className="p-3 bg-primary/5 border border-primary/10 rounded-lg">
-                  <p className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400 font-normal italic">
-                    Verified a database. If inconsistencies are found, please contact CUBRID Support to help interpret the output and address any indicated problem.
-                  </p>
-                </div>
-
-                <label className="flex items-center gap-2 p-2 bg-slate-50/50 dark:bg-slate-800/20 border border-slate-100 dark:border-slate-800 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800/40 transition-colors group">
-                  <div className="relative flex items-center">
-                    <input 
-                      type="checkbox" 
-                      checked={repair}
-                      onChange={(e) => setRepair(e.target.checked)}
-                      className="peer h-3.5 w-3.5 cursor-pointer appearance-none rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 checked:bg-primary checked:border-primary transition-colors"
-                    />
-                    <span className="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-                      <span className="material-symbols-outlined text-[12px]">check</span>
-                    </span>
+          {/* Section: Integrity Parameters */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Integrity flags</span>
+              <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
+            </div>
+            
+            <div className="space-y-3">
+              <div className="p-3 bg-bk-yellow/5 border border-bk-yellow/10 rounded-lg">
+                <div className="flex gap-2.5 items-start">
+                  <span className="material-symbols-outlined text-bk-yellow text-sm mt-0.5">info</span>
+                  <div className="space-y-1.5 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400 font-medium">
+                    <p>Scanning for storage inconsistencies. If errors are found, the utility will attempt automatic recovery if flag is active.</p>
                   </div>
-                  <span className="text-[11px] font-normal text-slate-600 dark:text-slate-400 transition-colors">
-                    Repaired when inconsistency is found
-                  </span>
-                </label>
-             </div>
+                </div>
+              </div>
+
+              <label className="flex items-center gap-3 p-3 bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-white/5 transition-all group active:scale-[0.99]">
+                <input 
+                  type="checkbox" 
+                  checked={repair}
+                  onChange={(e) => setRepair(e.target.checked)}
+                  className="w-4 h-4 cursor-pointer rounded border-slate-300 dark:border-slate-700 bg-white dark:bg-bk-main text-bk-yellow focus:ring-bk-yellow/50 accent-bk-yellow"
+                />
+                <div className="flex flex-col">
+                  <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300 group-hover:text-bk-yellow transition-colors tracking-tight">Auto-repair repair</span>
+                  <span className="text-[10px] text-slate-400 dark:text-slate-500">Attempt to fix inconsistencies if discovered</span>
+                </div>
+              </label>
+            </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-2 bg-slate-50 dark:bg-[#1e2230] flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
+        <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 backdrop-blur-sm flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
           <button 
+            disabled={loading}
+            className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-all"
             onClick={() => dispatch(closeCheckDatabaseModal())}
-            className="px-6 py-1.5 text-xs bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded border border-slate-200 dark:border-slate-700 transition-all font-normal"
           >
-            Cancel
+            Discard
           </button>
           <button 
-            onClick={handleCheck}
             disabled={loading}
-            className="px-6 py-1.5 bg-primary hover:bg-primary/90 active:bg-primary/80 text-white text-xs rounded shadow transition-all flex items-center justify-center gap-2 min-w-[100px] font-normal disabled:opacity-50"
+            className="px-6 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center gap-2 min-w-[130px] disabled:opacity-50"
+            onClick={handleCheck}
           >
             {loading ? (
-              <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              <div className="w-3 h-3 border-2 border-bk-side/30 border-t-bk-side rounded-full animate-spin"></div>
             ) : (
-              'Check Database'
+              <>
+                <span className="material-symbols-outlined text-[16px]">play_circle</span>
+                <span>Run check</span>
+              </>
             )}
           </button>
         </div>

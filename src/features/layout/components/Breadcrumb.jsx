@@ -1,7 +1,9 @@
 export default function Breadcrumb({ activeTab, onTabChange, openTabs = [], onCloseTab, labels = {} }) {
   const getTabIcon = (id) => {
-    if (id.startsWith('host:')) return 'monitoring';
-    if (id.startsWith('db:')) return 'table_chart';
+    if (id.startsWith('host:')) return 'dns';
+    if (id.startsWith('db:')) return 'database';
+    if (id.startsWith('edit_config:')) return 'settings_applications';
+    if (id.startsWith('broker_config:')) return 'table_rows';
     return 'description';
   };
 
@@ -15,32 +17,45 @@ export default function Breadcrumb({ activeTab, onTabChange, openTabs = [], onCl
   };
 
   return (
-    <div className="bg-slate-200/60 dark:bg-[#0a0c10] border-b border-slate-200 dark:border-slate-800">
+    <div className="bg-slate-50 dark:bg-bk-main border-b border-slate-200 dark:border-slate-800 font-sans">
+
       <div className="flex overflow-x-auto scrollbar-hide">
-        {openTabs.map((tabId) => (
-          <div 
-            key={tabId}
-            className={`group flex items-center gap-2.5 px-4 py-2.5 border-r border-slate-200 dark:border-slate-800 border-t-2 font-medium text-sm cursor-pointer min-w-[140px] transition-colors whitespace-nowrap ${activeTab === tabId ? 'bg-background-light dark:bg-[#1a1b1e] border-t-blue-500 dark:border-t-blue-500' : 'bg-transparent hover:bg-slate-200 dark:hover:bg-[#151822] border-t-transparent text-slate-500 dark:text-slate-400'}`}
-            onClick={() => onTabChange(tabId)}
-          >
-            <span className={`material-symbols-outlined text-[16px] ${activeTab === tabId ? 'text-blue-600 dark:text-blue-500' : 'opacity-70'}`}>
-              {getTabIcon(tabId)}
-            </span>
-            <span className={activeTab === tabId ? 'text-slate-800 dark:text-slate-200' : ''}>
-              {getTabLabel(tabId)}
-            </span>
+        {openTabs.map((tabId) => {
+          const isActive = activeTab === tabId;
+          return (
             <div 
-              className={`flex items-center justify-center p-0.5 ml-auto rounded transition-colors ${activeTab === tabId ? 'text-blue-600 dark:text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-500/20' : 'opacity-0 group-hover:opacity-100 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-700'}`}
-              onClick={(e) => {
-                e.stopPropagation();
-                onCloseTab(tabId);
-              }}
+              key={tabId}
+              className={`group flex items-center gap-2 px-5 py-2.5 border-r border-slate-200 dark:border-slate-800 font-medium text-[12px] tracking-wide cursor-pointer min-w-[140px] transition-all whitespace-nowrap relative ${
+                isActive 
+                  ? 'bg-white dark:bg-bk-side text-slate-800 dark:text-bk-yellow' 
+                  : 'bg-slate-100 dark:bg-bk-main text-slate-500 hover:bg-slate-50 dark:hover:bg-white/5'
+              }`}
+
+              onClick={() => onTabChange(tabId)}
             >
-              <span className="material-symbols-outlined text-[16px]">close</span>
+              {/* Active indicator line */}
+              {isActive && <div className="absolute top-0 left-0 right-0 h-[3px] bg-bk-yellow shadow-[0_0_8px_rgba(255,193,7,0.4)]"></div>}
+              
+              <span className={`material-symbols-outlined text-[16px] ${isActive ? 'text-bk-yellow' : 'opacity-60 text-slate-400'}`} style={{ fontVariationSettings: isActive ? "'wght' 500" : "'wght' 300" }}>
+                {getTabIcon(tabId)}
+              </span>
+              <span className="truncate flex-1">
+                {getTabLabel(tabId)}
+              </span>
+              <div 
+                className={`flex items-center justify-center p-1 ml-2 rounded hover:bg-slate-200 dark:hover:bg-white/10 transition-colors ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onCloseTab(tabId);
+                }}
+              >
+                <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'wght' 300" }}>close</span>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
 }
+

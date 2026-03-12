@@ -24,13 +24,14 @@ export default function DemoDBContent() {
   ];
 
   return (
-    <div className="flex-1 overflow-y-auto bg-slate-50 dark:bg-[#0f1116]">
+    <div className="flex-1 overflow-y-auto bg-slate-50 dark:bg-bk-main">
       {/* Top Breadcrumb Bar */}
-      <div className="flex items-center gap-2 px-3 py-2 text-xs text-slate-500 text-[13px] border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
-        <span className="font-medium hover:text-primary cursor-pointer transition-colors">localhost</span>
-        <span className="text-slate-500 opacity-60">›</span>
-        <span className="font-semibold text-slate-900 dark:text-white">Database - demodb@localhost:8001</span>
-        <button className="ml-auto text-slate-500 opacity-70 hover:text-primary dark:hover:text-white transition-colors" title="Reload View">
+      <div className="flex items-center gap-2 px-3 py-2 text-xs text-slate-500 border-b border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-bk-side/50">
+        <span className="font-medium text-slate-900 dark:text-bk-yellow tracking-wide flex items-center gap-1.5 font-sans">
+          <span className="material-symbols-outlined text-[14px]">database</span>
+          Database - demodb@localhost:8001
+        </span>
+        <button className="ml-auto text-slate-500 opacity-70 hover:text-bk-yellow dark:hover:text-bk-yellow transition-colors" title="Reload View">
           <span className="material-symbols-outlined text-[16px]">refresh</span>
         </button>
       </div>
@@ -38,57 +39,57 @@ export default function DemoDBContent() {
       <div className="flex flex-col p-4 space-y-4">
         
         {/* Database Stats */}
-        <details className="group border border-slate-200 dark:border-slate-800 rounded-lg shadow-sm bg-white dark:bg-slate-900 shadow-ob-subtle overflow-hidden" open>
-          <summary className="flex items-center gap-2 px-3 py-2.5 cursor-pointer list-none hover:bg-blue-100/50 dark:hover:bg-blue-900/30 transition-colors bg-blue-50/50 dark:bg-blue-900/20 border-b border-blue-100 dark:border-blue-900/30 text-sm font-semibold text-slate-900 dark:text-white">
-            <span className="material-symbols-outlined text-[16px] text-blue-500 dark:text-blue-400 leading-none transition-transform group-open:rotate-180">expand_more</span>
-            <span>Database</span>
+        <details className="group border border-slate-200 dark:border-slate-800 rounded-lg shadow-sm bg-white dark:bg-bk-side overflow-hidden" open>
+          <summary className="flex items-center gap-2 px-3 py-2.5 cursor-pointer list-none hover:bg-slate-50 dark:hover:bg-white/5 transition-colors bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-slate-800 text-sm font-medium text-slate-900 dark:text-slate-200">
+            <span className="material-symbols-outlined text-[16px] text-bk-yellow leading-none transition-transform group-open:rotate-180">expand_more</span>
+            <span>Database performance</span>
           </summary>
           <div className="overflow-x-auto w-full">
-            <table className="w-full text-left text-xs whitespace-nowrap">
+            <table className="w-full text-left text-xs whitespace-nowrap font-sans">
               <thead>
-                <tr className="text-slate-500 opacity-90 bg-slate-50/30 dark:bg-transparent border-b border-slate-200 dark:border-slate-800">
-                  <th className="px-4 py-3 font-medium">CPU</th>
-                  <th className="px-4 py-3 font-medium">Memory (MB)</th>
-                  <th className="px-4 py-3 font-medium">QPS</th>
-                  <th className="px-4 py-3 font-medium">Hit Ratio</th>
-                  <th className="px-4 py-3 font-medium">Fetch pages</th>
-                  <th className="px-4 py-3 font-medium">Dirty pages</th>
-                  <th className="px-4 py-3 font-medium">I/O Reads</th>
-                  <th className="px-4 py-3 font-medium">I/O Writes</th>
+                <tr className="text-slate-500 dark:text-slate-400 bg-slate-50/20 dark:bg-transparent border-b border-slate-200 dark:border-slate-800">
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">CPU</th>
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Memory (MB)</th>
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">QPS</th>
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Hit Ratio</th>
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Fetch pages</th>
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Dirty pages</th>
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">I/O Reads</th>
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">I/O Writes</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="font-mono">
                 {dbStats.map((row, i) => (
-                  <tr key={i} className="text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors">
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800">
+                  <tr key={i} className="text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition-colors border-b border-slate-100 dark:border-slate-800">
+                    <td className="px-4 py-3 text-slate-900 dark:text-white">
                       <div className="flex flex-col gap-1 w-full max-w-[80px]">
                         <span>{row.cpu}</span>
                         <div className="w-full bg-slate-200 dark:bg-slate-700/50 rounded-full h-1 overflow-hidden">
-                          <div className={`h-full rounded-full ${row.cpuPct > 80 ? 'bg-red-500' : row.cpuPct > 50 ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ width: `${row.cpuPct}%` }}></div>
+                          <div className={`h-full rounded-full ${row.cpuPct > 80 ? 'bg-rose-500' : row.cpuPct > 50 ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ width: `${row.cpuPct}%` }}></div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800">
+                    <td className="px-4 py-3">
                       <div className="flex flex-col gap-1 w-full max-w-[120px]">
                         <span>{row.memory}</span>
                         <div className="w-full bg-slate-200 dark:bg-slate-700/50 rounded-full h-1 overflow-hidden">
-                          <div className={`h-full rounded-full ${row.memPct > 80 ? 'bg-red-500' : 'bg-primary'}`} style={{ width: `${row.memPct}%` }}></div>
+                          <div className={`h-full rounded-full ${row.memPct > 80 ? 'bg-rose-500' : 'bg-bk-yellow'}`} style={{ width: `${row.memPct}%` }}></div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800 font-medium">{row.qps}</td>
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800">
+                    <td className="px-4 py-3 font-sans font-medium">{row.qps}</td>
+                    <td className="px-4 py-3">
                       <div className="flex flex-col gap-1 w-full max-w-[120px]">
                         <span>{row.hitRatio}</span>
                         <div className="w-full bg-slate-200 dark:bg-slate-700/50 rounded-full h-1 overflow-hidden">
-                          <div className={`h-full rounded-full ${row.hitPct < 80 ? 'bg-red-500' : 'bg-emerald-500'}`} style={{ width: `${row.hitPct}%` }}></div>
+                          <div className={`h-full rounded-full ${row.hitPct < 80 ? 'bg-rose-500' : 'bg-emerald-500'}`} style={{ width: `${row.hitPct}%` }}></div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800">{row.fetch}</td>
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800">{row.dirty}</td>
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800">{row.ioReads}</td>
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800">{row.ioWrites}</td>
+                    <td className="px-4 py-3">{row.fetch}</td>
+                    <td className="px-4 py-3">{row.dirty}</td>
+                    <td className="px-4 py-3">{row.ioReads}</td>
+                    <td className="px-4 py-3">{row.ioWrites}</td>
                   </tr>
                 ))}
               </tbody>
@@ -97,41 +98,41 @@ export default function DemoDBContent() {
         </details>
 
         {/* Volumes */}
-        <details className="group border border-slate-200 dark:border-slate-800 rounded-lg shadow-sm bg-white dark:bg-slate-900 shadow-ob-subtle overflow-hidden" open>
-          <summary className="flex items-center gap-2 px-3 py-2.5 cursor-pointer list-none hover:bg-emerald-100/50 dark:hover:bg-emerald-900/30 transition-colors bg-emerald-50/50 dark:bg-emerald-900/20 border-b border-emerald-100 dark:border-emerald-900/30 text-sm font-semibold text-slate-900 dark:text-white">
-            <span className="material-symbols-outlined text-[16px] text-emerald-500 dark:text-emerald-400 leading-none transition-transform group-open:rotate-180">expand_more</span>
+        <details className="group border border-slate-200 dark:border-slate-800 rounded-lg shadow-sm bg-white dark:bg-bk-side overflow-hidden" open>
+          <summary className="flex items-center gap-2 px-3 py-2.5 cursor-pointer list-none hover:bg-slate-50 dark:hover:bg-white/5 transition-colors bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-slate-800 text-sm font-medium text-slate-900 dark:text-slate-200">
+            <span className="material-symbols-outlined text-[16px] text-bk-yellow leading-none transition-transform group-open:rotate-180">expand_more</span>
             <span>Volumes</span>
           </summary>
           <div className="overflow-x-auto w-full">
-            <table className="w-full text-left text-xs whitespace-nowrap">
+            <table className="w-full text-left text-xs whitespace-nowrap font-sans">
               <thead>
-                <tr className="text-slate-500 opacity-90 bg-slate-50/30 dark:bg-transparent border-b border-slate-200 dark:border-slate-800">
-                  <th className="px-4 py-3 font-medium">Volume</th>
-                  <th className="px-4 py-3 font-medium">Type</th>
-                  <th className="px-4 py-3 font-medium">Purpose</th>
-                  <th className="px-4 py-3 font-medium">Free size / Total size</th>
-                  <th className="px-4 py-3 font-medium">Modify date</th>
-                  <th className="px-4 py-3 font-medium">Volume Path</th>
+                <tr className="text-slate-500 dark:text-slate-400 bg-slate-50/20 dark:bg-transparent border-b border-slate-200 dark:border-slate-800">
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Volume</th>
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Type</th>
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Purpose</th>
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Free size / Total size</th>
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Modify date</th>
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Volume Path</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="font-mono">
                 {volumes.map((row, i) => (
-                  <tr key={i} className="text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors">
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800 font-medium">{row.name}</td>
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800">{row.type}</td>
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800">{row.purpose}</td>
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800">
+                  <tr key={i} className="text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition-colors border-b border-slate-100 dark:border-slate-800">
+                    <td className="px-4 py-3 font-sans font-medium">{row.name}</td>
+                    <td className="px-4 py-3">{row.type}</td>
+                    <td className="px-4 py-3">{row.purpose}</td>
+                    <td className="px-4 py-3">
                       <div className="flex flex-col gap-1 w-full max-w-[150px]">
-                        <div className="flex items-center justify-between text-xs">
+                        <div className="flex items-center justify-between text-[10px]">
                           <span>{row.free} / {row.total}</span>
                         </div>
                         <div className="w-full bg-slate-200 dark:bg-slate-700/50 rounded-full h-1 overflow-hidden" title={`${row.freePct}% Free`}>
-                          <div className="h-full rounded-full bg-slate-400 dark:bg-slate-500" style={{ width: `${row.freePct}%` }}></div>
+                          <div className="h-full rounded-full bg-bk-yellow" style={{ width: `${row.freePct}%` }}></div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800">{row.date}</td>
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800 text-[11px] text-slate-500">{row.path}</td>
+                    <td className="px-4 py-3">{row.date}</td>
+                    <td className="px-4 py-3 text-[11px] text-slate-500 dark:text-slate-400 font-sans">{row.path}</td>
                   </tr>
                 ))}
               </tbody>
@@ -140,32 +141,32 @@ export default function DemoDBContent() {
         </details>
 
         {/* Space Info For Files */}
-        <details className="group border border-slate-200 dark:border-slate-800 rounded-lg shadow-sm bg-white dark:bg-slate-900 shadow-ob-subtle overflow-hidden" open>
-          <summary className="flex items-center gap-2 px-3 py-2.5 cursor-pointer list-none hover:bg-purple-100/50 dark:hover:bg-purple-900/30 transition-colors bg-purple-50/50 dark:bg-purple-900/20 border-b border-purple-100 dark:border-purple-900/30 text-sm font-semibold text-slate-900 dark:text-white">
-            <span className="material-symbols-outlined text-[16px] text-purple-500 dark:text-purple-400 leading-none transition-transform group-open:rotate-180">expand_more</span>
-            <span>Space Info For Files</span>
+        <details className="group border border-slate-200 dark:border-slate-800 rounded-lg shadow-sm bg-white dark:bg-bk-side overflow-hidden" open>
+          <summary className="flex items-center gap-2 px-3 py-2.5 cursor-pointer list-none hover:bg-slate-50 dark:hover:bg-white/5 transition-colors bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-slate-800 text-sm font-medium text-slate-900 dark:text-slate-200">
+            <span className="material-symbols-outlined text-[16px] text-bk-yellow leading-none transition-transform group-open:rotate-180">expand_more</span>
+            <span>Space info for files</span>
           </summary>
           <div className="overflow-x-auto w-full">
-            <table className="w-full text-left text-xs whitespace-nowrap">
+            <table className="w-full text-left text-xs whitespace-nowrap font-sans">
               <thead>
-                <tr className="text-slate-500 opacity-90 bg-slate-50/30 dark:bg-transparent border-b border-slate-200 dark:border-slate-800">
-                  <th className="px-4 py-3 font-medium">Type</th>
-                  <th className="px-4 py-3 font-medium">File Count</th>
-                  <th className="px-4 py-3 font-medium">Used Pages</th>
-                  <th className="px-4 py-3 font-medium">File Table Pages</th>
-                  <th className="px-4 py-3 font-medium">Reserved Pages</th>
-                  <th className="px-4 py-3 font-medium">Total Pages</th>
+                <tr className="text-slate-500 dark:text-slate-400 bg-slate-50/20 dark:bg-transparent border-b border-slate-200 dark:border-slate-800">
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Type</th>
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">File Count</th>
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Used Pages</th>
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">File Table Pages</th>
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Reserved Pages</th>
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Total Pages</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="font-mono">
                 {spaceInfo.map((row, i) => (
-                  <tr key={i} className="text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors">
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800 font-medium">{row.type}</td>
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800">{row.fileCount}</td>
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800">{row.usedPages}</td>
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800">{row.fileTablePages}</td>
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800">{row.reservedPages}</td>
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800">{row.totalPages}</td>
+                  <tr key={i} className="text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition-colors border-b border-slate-100 dark:border-slate-800">
+                    <td className="px-4 py-3 font-sans font-medium">{row.type}</td>
+                    <td className="px-4 py-3">{row.fileCount}</td>
+                    <td className="px-4 py-3">{row.usedPages}</td>
+                    <td className="px-4 py-3">{row.fileTablePages}</td>
+                    <td className="px-4 py-3">{row.reservedPages}</td>
+                    <td className="px-4 py-3">{row.totalPages}</td>
                   </tr>
                 ))}
               </tbody>
@@ -174,50 +175,54 @@ export default function DemoDBContent() {
         </details>
 
         {/* Brokers (CAS) */}
-        <details className="group border border-slate-200 dark:border-slate-800 rounded-lg shadow-sm bg-white dark:bg-slate-900 shadow-ob-subtle overflow-hidden" open>
-          <summary className="flex items-center gap-2 px-3 py-2.5 cursor-pointer list-none hover:bg-amber-100/50 dark:hover:bg-amber-900/30 transition-colors bg-amber-50/50 dark:bg-amber-900/20 border-b border-amber-100 dark:border-amber-900/30 text-sm font-semibold text-slate-900 dark:text-white">
-            <span className="material-symbols-outlined text-[16px] text-amber-500 dark:text-amber-400 leading-none transition-transform group-open:rotate-180">expand_more</span>
+        <details className="group border border-slate-200 dark:border-slate-800 rounded-lg shadow-sm bg-white dark:bg-bk-side overflow-hidden" open>
+          <summary className="flex items-center gap-2 px-3 py-2.5 cursor-pointer list-none hover:bg-slate-50 dark:hover:bg-white/5 transition-colors bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-slate-800 text-sm font-medium text-slate-900 dark:text-slate-200">
+            <span className="material-symbols-outlined text-[16px] text-bk-yellow leading-none transition-transform group-open:rotate-180">expand_more</span>
             <span>Brokers (CAS)</span>
           </summary>
           <div className="overflow-x-auto w-full">
-            <table className="w-full text-left text-xs whitespace-nowrap">
+            <table className="w-full text-left text-xs whitespace-nowrap font-sans">
               <thead>
-                <tr className="text-slate-500 opacity-90 bg-slate-50/30 dark:bg-transparent border-b border-slate-200 dark:border-slate-800">
-                  <th className="px-4 py-3 font-medium">Broker</th>
-                  <th className="px-4 py-3 font-medium">ID</th>
-                  <th className="px-4 py-3 font-medium">PID</th>
-                  <th className="px-4 py-3 font-medium">QPS</th>
-                  <th className="px-4 py-3 font-medium">LQS</th>
-                  <th className="px-4 py-3 font-medium">Status</th>
-                  <th className="px-4 py-3 font-medium">Last connection time</th>
+                <tr className="text-slate-500 dark:text-slate-400 bg-slate-50/20 dark:bg-transparent border-b border-slate-200 dark:border-slate-800">
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Broker</th>
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">ID</th>
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">PID</th>
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">QPS</th>
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">LQS</th>
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Status</th>
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Last connection time</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="font-mono">
                 {brokersCAS.map((row, i) => (
-                  <tr key={i} className="text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors">
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800 font-medium">{row.broker}</td>
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800">{row.id}</td>
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800">{row.pid}</td>
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800">{row.qps}</td>
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800">{row.lqs}</td>
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800">
-                      <div className="flex items-center gap-2">
-                        {row.status === 'READY' && (
-                          <span className="relative flex h-2 w-2">
+                  <tr key={i} className="text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition-colors border-b border-slate-100 dark:border-slate-800">
+                    <td className="px-4 py-3 font-sans font-medium">{row.broker}</td>
+                    <td className="px-4 py-3">{row.id}</td>
+                    <td className="px-4 py-3">{row.pid}</td>
+                    <td className="px-4 py-3">{row.qps}</td>
+                    <td className="px-4 py-3">{row.lqs}</td>
+                    <td className="px-4 py-3">
+                      {row.status === 'READY' ? (
+                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-600 border border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-500/20">
+                          <span className="relative flex h-1.5 w-1.5">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
                           </span>
-                        )}
-                        {row.status === 'BUSY' && (
-                          <span className="relative flex h-2 w-2">
+                          Ready
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-50 text-amber-600 border border-amber-100 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-500/20">
+                          <span className="relative flex h-1.5 w-1.5">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-500"></span>
                           </span>
-                        )}
-                        <span>{row.status}</span>
-                      </div>
+                          Busy
+                        </span>
+                      )}
                     </td>
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800 text-slate-500">{row.lastConn}</td>
+
+
+                    <td className="px-4 py-3 text-slate-500 dark:text-slate-400 font-sans">{row.lastConn}</td>
                   </tr>
                 ))}
               </tbody>
@@ -226,36 +231,38 @@ export default function DemoDBContent() {
         </details>
 
         {/* Lock and Transaction */}
-        <details className="group border border-slate-200 dark:border-slate-800 rounded-lg shadow-sm bg-white dark:bg-slate-900 shadow-ob-subtle overflow-hidden" open>
-          <summary className="flex items-center gap-2 px-3 py-2.5 cursor-pointer list-none hover:bg-rose-100/50 dark:hover:bg-rose-900/30 transition-colors bg-rose-50/50 dark:bg-rose-900/20 border-b border-rose-100 dark:border-rose-900/30 text-sm font-semibold text-slate-900 dark:text-white">
-            <span className="material-symbols-outlined text-[16px] text-rose-500 dark:text-rose-400 leading-none transition-transform group-open:rotate-180">expand_more</span>
-            <span>Lock and Transaction</span>
+        <details className="group border border-slate-200 dark:border-slate-800 rounded-lg shadow-sm bg-white dark:bg-bk-side overflow-hidden" open>
+          <summary className="flex items-center gap-2 px-3 py-2.5 cursor-pointer list-none hover:bg-slate-50 dark:hover:bg-white/5 transition-colors bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-slate-800 text-sm font-medium text-slate-900 dark:text-slate-200">
+            <span className="material-symbols-outlined text-[16px] text-bk-yellow leading-none transition-transform group-open:rotate-180">expand_more</span>
+            <span>Lock and transaction</span>
           </summary>
           <div className="overflow-x-auto w-full">
-            <table className="w-full text-left text-xs whitespace-nowrap">
+            <table className="w-full text-left text-xs whitespace-nowrap font-sans">
               <thead>
-                <tr className="text-slate-500 opacity-90 bg-slate-50/30 dark:bg-transparent border-b border-slate-200 dark:border-slate-800">
-                  <th className="px-4 py-3 font-medium">Tran index</th>
-                  <th className="px-4 py-3 font-medium">User name</th>
-                  <th className="px-4 py-3 font-medium">Host</th>
-                  <th className="px-4 py-3 font-medium">Process id</th>
-                  <th className="px-4 py-3 font-medium">Object type</th>
-                  <th className="px-4 py-3 font-medium">Mode</th>
+                <tr className="text-slate-500 dark:text-slate-400 bg-slate-50/20 dark:bg-transparent border-b border-slate-200 dark:border-slate-800">
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Tran index</th>
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">User name</th>
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Host</th>
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Process id</th>
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Object type</th>
+                  <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Mode</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="font-mono">
                 {locks.map((row, i) => (
-                  <tr key={i} className="text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors">
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800 font-medium">{row.index}</td>
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800">{row.user}</td>
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800 font-mono text-[11px]">{row.host}</td>
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800">{row.pid}</td>
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800">{row.obj}</td>
-                    <td className="px-4 py-2 border-b border-slate-200 dark:border-slate-800">
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide ${row.mode === 'X_LOCK' ? 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-400' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400'}`}>
+                  <tr key={i} className="text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition-colors border-b border-slate-100 dark:border-slate-800">
+                    <td className="px-4 py-3 font-sans font-medium">{row.index}</td>
+                    <td className="px-4 py-3 font-sans">{row.user}</td>
+                    <td className="px-4 py-3 text-[11px]">{row.host}</td>
+                    <td className="px-4 py-3">{row.pid}</td>
+                    <td className="px-4 py-3 font-sans">{row.obj}</td>
+                    <td className="px-4 py-3">
+                      <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium border ${row.mode === 'X_LOCK' ? 'bg-rose-50 text-rose-600 border-rose-100 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-500/20' : 'bg-bk-yellow/10 text-bk-yellow border-bk-yellow/20'}`}>
+                        {row.mode === 'X_LOCK' && <span className="h-1.5 w-1.5 rounded-full bg-rose-500"></span>}
                         {row.mode}
                       </span>
                     </td>
+
                   </tr>
                 ))}
               </tbody>
@@ -265,5 +272,6 @@ export default function DemoDBContent() {
 
       </div>
     </div>
+
   );
 }

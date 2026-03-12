@@ -45,8 +45,10 @@ const parseDbResponse = (state, payload) => {
   const exists = state.databases.find(db => db.dbname === state.selectedDatabase);
   if (!exists && state.databases.length > 0) {
     state.selectedDatabase = state.databases[0].dbname;
+    state.selectedDatabaseSubItem = null;
   } else if (state.databases.length === 0) {
     state.selectedDatabase = null;
+    state.selectedDatabaseSubItem = null;
   }
 };
 
@@ -54,6 +56,7 @@ const initialState = {
   databases: [],
   activeDatabases: [],
   selectedDatabase: null,
+  selectedDatabaseSubItem: null,
   isUnloadDBModalOpen: false,
   isLoadDBModalOpen: false,
   isCheckDatabaseModalOpen: false,
@@ -62,6 +65,9 @@ const initialState = {
   isBackupDatabaseModalOpen: false,
   isLockInfoModalOpen: false,
   isUnloadResultModalOpen: false,
+  isTransactionInfoModalOpen: false,
+  isKillTransactionModalOpen: false,
+  killTransactionData: null,
   unloadResultData: null,
   loading: false,
   actionLoading: false, // Separate loading for start/stop operations
@@ -73,7 +79,14 @@ const databaseSlice = createSlice({
   initialState,
   reducers: {
     setSelectedDatabase: (state, action) => {
-      state.selectedDatabase = action.payload;
+      if (state.selectedDatabase !== action.payload) {
+        state.selectedDatabase = action.payload;
+        state.selectedDatabaseSubItem = null; // Clear sub-item when switching DBs unless we click the parent
+      }
+    },
+    setSelectedDatabaseSubItem: (state, action) => {
+      // payload should be something like 'Users', 'Logs', etc.
+      state.selectedDatabaseSubItem = action.payload;
     },
     openUnloadDBModal: (state) => {
       state.isUnloadDBModalOpen = true;
@@ -125,6 +138,20 @@ const databaseSlice = createSlice({
       state.isUnloadResultModalOpen = false;
       state.unloadResultData = null;
     },
+    openTransactionInfoModal: (state) => {
+      state.isTransactionInfoModalOpen = true;
+    },
+    closeTransactionInfoModal: (state) => {
+      state.isTransactionInfoModalOpen = false;
+    },
+    openKillTransactionModal: (state, action) => {
+      state.isKillTransactionModalOpen = true;
+      state.killTransactionData = action.payload;
+    },
+    closeKillTransactionModal: (state) => {
+      state.isKillTransactionModalOpen = false;
+      state.killTransactionData = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -174,6 +201,7 @@ const databaseSlice = createSlice({
 
 export const { 
   setSelectedDatabase, 
+  setSelectedDatabaseSubItem,
   openUnloadDBModal, 
   closeUnloadDBModal,
   openLoadDBModal,
@@ -189,7 +217,11 @@ export const {
   openLockInfoModal,
   closeLockInfoModal,
   openUnloadResultModal,
-  closeUnloadResultModal 
+  closeUnloadResultModal,
+  openTransactionInfoModal,
+  closeTransactionInfoModal,
+  openKillTransactionModal,
+  closeKillTransactionModal 
 } = databaseSlice.actions;
 
 export default databaseSlice.reducer;

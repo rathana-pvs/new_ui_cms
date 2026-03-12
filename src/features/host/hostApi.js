@@ -19,4 +19,10 @@ export const hostApi = {
   editHost: (hostUid, payload) => {
     return apiClient.put(`/host/${hostUid}`, payload);
   },
+  getHostConfig: (hostUid, confname) => {
+    return apiClient.get(`/${hostUid}/cms-config/all-sys-param?confname=${confname}`);
+  },
+  setHostConfig: (hostUid, payload) => {
+    return apiClient.post(`/${hostUid}/cms-config/set-sys-param`, payload);
+  },
 };
