@@ -80,149 +80,157 @@ export default function EditHostModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"
-        onClick={loading ? undefined : handleClose}
-      ></div>
-      
-      {/* Modal */}
-      <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-lg border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all z-10">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-white dark:bg-[#1e2230] w-full max-w-lg rounded shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col">
         
         {/* Loading Overlay */}
         {loading && (
-          <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/60 dark:bg-slate-900/60 backdrop-blur-[2px]">
-            <div className="flex flex-col items-center gap-3 bg-white dark:bg-slate-800 px-6 py-4 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700">
-              <svg className="animate-spin h-8 w-8 text-accent-orange" viewBox="0 0 24 24">
-                <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                <path className="opacity-80" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-              </svg>
-              <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Updating Host...</span>
+          <div className="absolute inset-0 z-[110] flex items-center justify-center bg-white/80 dark:bg-[#1e2230]/80 backdrop-blur-sm">
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-8 h-8 border-3 border-orange-500/20 border-t-orange-500 rounded-full animate-spin"></div>
+              <span className="text-xs font-normal text-slate-500 dark:text-slate-400">Saving Changes...</span>
             </div>
           </div>
         )}
+
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900">
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <span className="material-symbols-outlined text-accent-orange">edit_square</span>
-            Edit Host
+        <div className="flex items-center justify-between px-6 py-1.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-[#1e2230] flex-shrink-0">
+          <h3 className="text-[13px] font-normal text-slate-900 dark:text-white flex items-center gap-2">
+            <span className="material-symbols-outlined text-orange-500 text-[18px]">edit_square</span>
+            Edit Host Configuration
           </h3>
           <button 
             disabled={loading}
-            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors rounded-lg p-1 hover:bg-slate-200 dark:hover:bg-slate-800 flex items-center justify-center disabled:opacity-50"
             onClick={handleClose}
+            className="p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-400 dark:text-slate-500"
           >
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
         
         {/* Body */}
-        <div className="p-6 space-y-4">
+        <div className="p-4 space-y-4 bg-white dark:bg-[#1e2230]">
           {apiError && (
-            <div className="flex items-center gap-2 px-4 py-3 text-sm text-accent-red bg-accent-red/10 border border-accent-red/20 rounded-xl">
-              <span className="material-symbols-outlined text-[18px]">error</span>
+            <div className="flex items-center gap-2 px-3 py-2 text-[12px] text-rose-500 bg-rose-500/5 border border-rose-500/10 rounded-lg font-normal">
+              <span className="material-symbols-outlined text-[16px]">error</span>
               {apiError}
             </div>
           )}
 
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Host Name *</label>
-            <input 
-              type="text" 
-              name="alias"
-              value={formData.alias}
-              onChange={handleChange}
-              className={`w-full px-3 py-1.5 bg-white dark:bg-slate-950 border ${errors.alias ? 'border-accent-red focus:ring-accent-red/50' : 'border-slate-300 dark:border-slate-700 focus:ring-primary/50'} rounded focus:outline-none focus:ring-2 text-[13px] text-slate-900 dark:text-slate-100 transition-shadow`} 
-              placeholder="e.g. Production DB" 
-              disabled={loading}
-            />
-            {errors.alias && <p className="mt-1 text-xs text-accent-red">{errors.alias}</p>}
-          </div>
-          
-          <div className="grid grid-cols-3 gap-4">
-            <div className="col-span-2">
-              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Host Address *</label>
-              <input 
-                type="text" 
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                className={`w-full px-3 py-2 bg-white dark:bg-slate-950 border ${errors.address ? 'border-accent-red focus:ring-accent-red/50' : 'border-slate-300 dark:border-slate-700 focus:ring-primary/50'} rounded-lg focus:outline-none focus:ring-2 text-sm text-slate-900 dark:text-slate-100 transition-shadow`} 
-                placeholder="192.168.1.102" 
-                disabled={loading}
-              />
-              {errors.address && <p className="mt-1 text-xs text-accent-red">{errors.address}</p>}
+          {/* Connection Details Section */}
+          <div className="relative border border-slate-200 dark:border-slate-800 rounded-xl p-3 pt-4">
+            <div className="absolute top-0 -translate-y-[55%] left-4 px-2 bg-white dark:bg-[#1e2230]">
+              <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300 leading-none">
+                Connection Details
+              </span>
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Port *</label>
-              <input 
-                type="text" 
-                name="port"
-                value={formData.port}
-                onChange={handleChange}
-                className={`w-full px-3 py-2 bg-white dark:bg-slate-950 border ${errors.port ? 'border-accent-red focus:ring-accent-red/50' : 'border-slate-300 dark:border-slate-700 focus:ring-primary/50'} rounded-lg focus:outline-none focus:ring-2 text-sm text-slate-900 dark:text-slate-100 transition-shadow`} 
-                placeholder="8001" 
-                disabled={loading}
-              />
-              {errors.port && <p className="mt-1 text-xs text-accent-red">{errors.port}</p>}
-            </div>
-          </div>
+            
+            <div className="space-y-3">
+              <div className="flex items-center gap-4">
+                <label className="w-32 shrink-0 text-[11px] font-normal text-slate-500 dark:text-slate-400 text-left">Host Name :</label>
+                <div className="flex-1">
+                  <input 
+                    type="text" 
+                    name="alias"
+                    value={formData.alias}
+                    onChange={handleChange}
+                    className={`w-full h-8 px-2 bg-white dark:bg-[#1a1d27] border ${errors.alias ? 'border-rose-500' : 'border-slate-200 dark:border-slate-700'} rounded-lg focus:outline-none focus:border-orange-500/50 focus:ring-4 focus:ring-orange-500/5 text-[12px] text-slate-900 dark:text-slate-100 transition-all font-normal`} 
+                    placeholder="e.g. Production DB" 
+                    disabled={loading}
+                  />
+                  {errors.alias && <p className="mt-0.5 text-[10px] text-rose-500">{errors.alias}</p>}
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-4">
+                <label className="w-32 shrink-0 text-[11px] font-normal text-slate-500 dark:text-slate-400 text-left">Address / Port :</label>
+                <div className="flex-1 flex gap-2">
+                  <div className="flex-[2]">
+                    <input 
+                      type="text" 
+                      name="address"
+                      value={formData.address}
+                      onChange={handleChange}
+                      className={`w-full h-8 px-2 bg-white dark:bg-[#1a1d27] border ${errors.address ? 'border-rose-500' : 'border-slate-200 dark:border-slate-700'} rounded-lg focus:outline-none focus:border-orange-500/50 focus:ring-4 focus:ring-orange-500/5 text-[12px] text-slate-900 dark:text-slate-100 transition-all font-normal`} 
+                      placeholder="IP or Hostname" 
+                      disabled={loading}
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <input 
+                      type="text" 
+                      name="port"
+                      value={formData.port}
+                      onChange={handleChange}
+                      className={`w-full h-8 px-2 bg-white dark:bg-[#1a1d27] border ${errors.port ? 'border-rose-500' : 'border-slate-200 dark:border-slate-700'} rounded-lg focus:outline-none focus:border-orange-500/50 focus:ring-4 focus:ring-orange-500/5 text-[12px] text-slate-900 dark:text-slate-100 transition-all font-normal`} 
+                      placeholder="8001" 
+                      disabled={loading}
+                    />
+                  </div>
+                </div>
+              </div>
+              {(errors.address || errors.port) && (
+                <div className="flex gap-2 pl-36">
+                  <div className="flex-[2]">{errors.address && <p className="text-[10px] text-rose-500">{errors.address}</p>}</div>
+                  <div className="flex-1">{errors.port && <p className="text-[10px] text-rose-500">{errors.port}</p>}</div>
+                </div>
+              )}
 
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">User *</label>
-            <input 
-              type="text" 
-              name="id"
-              value={formData.id}
-              onChange={handleChange}
-              className={`w-full px-3 py-2 bg-white dark:bg-slate-950 border ${errors.id ? 'border-accent-red focus:ring-accent-red/50' : 'border-slate-300 dark:border-slate-700 focus:ring-primary/50'} rounded-lg focus:outline-none focus:ring-2 text-sm text-slate-900 dark:text-slate-100 transition-shadow`} 
-              placeholder="e.g. admin" 
-              disabled={loading}
-            />
-            {errors.id && <p className="mt-1 text-xs text-accent-red">{errors.id}</p>}
-          </div>
-          
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">New Password <span className="text-slate-400 font-normal">(Leave blank to keep current)</span></label>
-            <input 
-              type="password" 
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className={`w-full px-3 py-2 bg-white dark:bg-slate-950 border ${errors.password ? 'border-accent-red focus:ring-accent-red/50' : 'border-slate-300 dark:border-slate-700 focus:ring-primary/50'} rounded-lg focus:outline-none focus:ring-2 text-sm text-slate-900 dark:text-slate-100 transition-shadow`} 
-              placeholder="••••••••" 
-              disabled={loading}
-            />
-            {errors.password && <p className="mt-1 text-xs text-accent-red">{errors.password}</p>}
+              <div className="flex items-center gap-4">
+                <label className="w-32 shrink-0 text-[11px] font-normal text-slate-500 dark:text-slate-400 text-left">User :</label>
+                <div className="flex-1">
+                  <input 
+                    type="text" 
+                    name="id"
+                    value={formData.id}
+                    onChange={handleChange}
+                    className={`w-full h-8 px-2 bg-white dark:bg-[#1a1d27] border ${errors.id ? 'border-rose-500' : 'border-slate-200 dark:border-slate-700'} rounded-lg focus:outline-none focus:border-orange-500/50 focus:ring-4 focus:ring-orange-500/5 text-[12px] text-slate-900 dark:text-slate-100 transition-all font-normal`} 
+                    placeholder="e.g. admin" 
+                    disabled={loading}
+                  />
+                  {errors.id && <p className="mt-0.5 text-[10px] text-rose-500">{errors.id}</p>}
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-4">
+                <label className="w-32 shrink-0 text-[11px] font-normal text-slate-500 dark:text-slate-400 text-left leading-tight">New Password :<br/><span className="text-[9px] text-slate-400 font-normal italic">(Optional)</span></label>
+                <div className="flex-1">
+                  <input 
+                    type="password" 
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className={`w-full h-8 px-2 bg-white dark:bg-[#1a1d27] border ${errors.password ? 'border-rose-500' : 'border-slate-200 dark:border-slate-700'} rounded-lg focus:outline-none focus:border-orange-500/50 focus:ring-4 focus:ring-orange-500/5 text-[12px] text-slate-900 dark:text-slate-100 transition-all font-normal`} 
+                    placeholder="••••••••" 
+                    disabled={loading}
+                  />
+                  {errors.password && <p className="mt-0.5 text-[10px] text-rose-500">{errors.password}</p>}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         
         {/* Footer */}
-        <div className="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-3">
+        <div className="px-6 py-2 bg-slate-50 dark:bg-[#1e2230] flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
           <button 
             disabled={loading}
-            className="px-4 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors disabled:opacity-50"
+            className="px-6 py-1.5 text-xs bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded border border-slate-200 dark:border-slate-700 transition-all font-normal"
             onClick={handleClose}
           >
             Cancel
           </button>
           <button 
             disabled={loading}
-            className="px-4 py-1.5 text-sm font-medium bg-accent-orange text-white hover:bg-accent-orange/90 rounded transition-colors shadow-sm flex items-center justify-center gap-2 min-w-[140px] disabled:opacity-50"
+            className="px-6 py-1.5 bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white text-xs rounded shadow transition-all flex items-center justify-center gap-2 min-w-[120px] font-normal disabled:opacity-50"
             onClick={handleSubmit}
           >
             {loading ? (
-              <>
-                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                Saving...
-              </>
+              <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
             ) : (
-              'Save Changes'
+              <span className="material-symbols-outlined text-sm">save_as</span>
             )}
+            Save Changes
           </button>
         </div>
       </div>

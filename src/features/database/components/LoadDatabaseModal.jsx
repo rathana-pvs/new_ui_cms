@@ -190,151 +190,185 @@ export default function LoadDatabaseModal() {
         
         {/* Loading Overlay */}
         {isLoading && (
-          <div className="absolute inset-0 z-[110] flex items-center justify-center bg-white/80 dark:bg-[#1e2230]/80 backdrop-blur-sm">
-            <div className="flex flex-col items-center gap-3 font-medium">
-              <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-              <span className="text-sm text-slate-500 dark:text-slate-400">Loading Database...</span>
+          <div className="absolute inset-0 z-[110] flex items-center justify-center bg-white/60 dark:bg-[#1e2230]/60 backdrop-blur-[2px]">
+            <div className="flex flex-col items-center gap-2 font-normal">
+              <div className="w-8 h-8 border-3 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+              <span className="text-[12px] text-slate-500 dark:text-slate-400">Loading...</span>
             </div>
           </div>
         )}
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-[#1e2230] flex-shrink-0">
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary">download</span>
-            Load DB
+        <div className="flex items-center justify-between px-6 py-1.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-[#1e2230] flex-shrink-0">
+          <h3 className="text-[13px] font-normal text-slate-900 dark:text-white flex items-center gap-2">
+            <span className="material-symbols-outlined text-primary text-[18px]">download</span>
+            Load Database
           </h3>
           <button 
             onClick={() => dispatch(closeLoadDBModal())}
             className="p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-400 dark:text-slate-500"
           >
-            <span className="material-symbols-outlined">close</span>
+            <span className="material-symbols-outlined text-[20px]">close</span>
           </button>
         </div>
         
         {/* Body */}
-        <div className="p-6 overflow-y-auto space-y-6 custom-scrollbar flex-1 bg-white dark:bg-[#1e2230]">
+        <div className="p-4 overflow-y-auto space-y-4 custom-scrollbar flex-1 bg-white dark:bg-[#1e2230]">
           
           {/* Section: Database Information */}
-          <div className="space-y-2">
-            <div className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest italic">Database Information</div>
-            <div className="p-4 border border-slate-200 dark:border-slate-800 rounded bg-slate-50/30 dark:bg-[#1e2230] space-y-3">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13px] font-medium text-slate-600 dark:text-slate-400">Target database name</label>
-                <input 
-                  type="text" 
-                  name="targetDbName"
-                  value={formData.targetDbName}
-                  readOnly
-                  className="h-9 px-3 rounded text-[13px] border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/40 text-slate-400 dark:text-slate-500 cursor-default outline-none"
-                />
+          <div className="relative border border-slate-200 dark:border-slate-800 rounded-xl p-3 pt-4 mt-2">
+            <div className="absolute top-0 -translate-y-[55%] left-4 px-2 bg-white dark:bg-[#1e2230]">
+              <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300 leading-none">
+                Database Information
+              </span>
+            </div>
+            <div className="space-y-2.5 px-2">
+              <div className="flex items-center gap-2">
+                <label className="w-44 shrink-0 text-[11px] font-normal text-slate-500 dark:text-slate-400 text-left">Target database name :</label>
+                <div className="flex-1">
+                  <input 
+                    type="text" 
+                    name="targetDbName"
+                    value={formData.targetDbName}
+                    readOnly
+                    className="w-full h-8 px-2 rounded-lg text-[12px] border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/10 text-slate-400 dark:text-slate-500 cursor-default outline-none font-normal"
+                  />
+                </div>
               </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13px] font-medium text-slate-600 dark:text-slate-400 flex items-center gap-1">
-                  Username <span className="text-rose-500">*</span>
-                </label>
-                <input 
-                  type="text" 
-                  name="dbUsername"
-                  value={formData.dbUsername}
-                  onChange={handleInputChange}
-                  className="h-9 px-3 rounded text-[13px] border border-slate-300 dark:border-slate-800 bg-white dark:bg-[#1e2230] text-slate-900 dark:text-slate-200 outline-none focus:border-primary/50"
-                />
+              <div className="flex items-center gap-2">
+                <label className="w-44 shrink-0 text-[11px] font-normal text-slate-500 dark:text-slate-400 text-left">Username <span className="text-rose-500">*</span> :</label>
+                <div className="flex-1">
+                  <input 
+                    type="text" 
+                    name="dbUsername"
+                    value={formData.dbUsername}
+                    onChange={handleInputChange}
+                    className="w-full h-8 px-2 rounded-lg text-[12px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#1a1d27] text-slate-900 dark:text-slate-200 outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/5 transition-all font-normal"
+                  />
+                </div>
               </div>
             </div>
           </div>
 
           {/* Section: Unload Files */}
-          <div className="space-y-2">
-            <div className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest italic">Unload Files</div>
-            <div className="p-4 border border-slate-200 dark:border-slate-800 rounded bg-slate-50/30 dark:bg-[#1e2230] space-y-4">
-                
-                <div className="flex items-center gap-3">
-                    <input 
-                        type="radio" 
-                        name="radioOption" 
-                        checked={radio === 0}
-                        onChange={() => setRadio(0)}
-                        className="w-4 h-4 text-primary border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 focus:ring-0"
-                    />
-                    <label className="text-[13px] font-medium text-slate-600 dark:text-slate-400">Custom Path :</label>
-                    <select 
-                        value={selectedUnload}
-                        onChange={(e) => handleUnloadSelectChange(e.target.value)}
-                        disabled={radio !== 0}
-                        className="flex-1 h-9 px-3 rounded text-[13px] border border-slate-300 dark:border-slate-800 bg-white dark:bg-[#1e2230] text-slate-900 dark:text-slate-200 outline-none focus:border-primary/50 disabled:opacity-30"
-                    >
-                        {unloadList.map(db => (
-                            <option key={db.dbname} value={db.dbname}>{db.dbname}</option>
-                        ))}
-                    </select>
+          <div className="relative border border-slate-200 dark:border-slate-800 rounded-xl p-3 pt-4 mt-2">
+            <div className="absolute top-0 -translate-y-[55%] left-4 px-2 bg-white dark:bg-[#1e2230]">
+              <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300 leading-none">
+                Unload Files
+              </span>
+            </div>
+            <div className="space-y-3 px-2">
+                <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 w-44 shrink-0 justify-start">
+                      <div className="relative flex items-center">
+                        <input 
+                            type="radio" 
+                            name="radioOption" 
+                            checked={radio === 0}
+                            onChange={() => setRadio(0)}
+                            className="peer w-3.5 h-3.5 appearance-none rounded-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 checked:border-primary transition-all cursor-pointer"
+                        />
+                        <div className="absolute w-1.5 h-1.5 bg-primary rounded-full left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                      </div>
+                      <label className="text-[11px] font-normal text-slate-500 dark:text-slate-400 text-left">Custom Path :</label>
+                    </div>
+                    <div className="flex-1 relative">
+                      <select 
+                          value={selectedUnload}
+                          onChange={(e) => handleUnloadSelectChange(e.target.value)}
+                          disabled={radio !== 0}
+                          className="w-full h-8 px-2 pr-8 rounded-lg text-[12px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#1a1d27] text-slate-900 dark:text-slate-200 outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/5 disabled:opacity-30 appearance-none transition-all font-normal"
+                      >
+                          {unloadList.map(db => (
+                              <option key={db.dbname} value={db.dbname}>{db.dbname}</option>
+                          ))}
+                      </select>
+                      <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                        <span className="material-symbols-outlined text-[16px]">expand_more</span>
+                      </div>
+                    </div>
                 </div>
 
-                <div className={`border border-slate-200 dark:border-slate-800 rounded flex flex-col bg-white dark:bg-slate-900/30 overflow-hidden transition-opacity ${radio !== 0 ? 'opacity-30' : ''}`}>
-                    <table className="w-full text-left text-[12px]">
-                        <thead className="bg-slate-50 dark:bg-slate-800/50 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                <div className={`border border-slate-200 dark:border-slate-800 rounded-lg flex flex-col bg-slate-50/30 dark:bg-slate-900/10 overflow-hidden transition-all ${radio !== 0 ? 'opacity-30 grayscale-[0.5]' : ''}`}>
+                    <table className="w-full text-left text-[11px]">
+                        <thead className="bg-slate-50 dark:bg-slate-800/80 text-[10px] font-medium text-slate-400 dark:text-slate-500 tracking-tight uppercase">
                             <tr>
-                                <th className="px-3 py-2">Load Type</th>
-                                <th className="px-3 py-2">Path</th>
-                                <th className="px-3 py-2 text-right">Date</th>
+                                <th className="px-3 py-1.5 font-medium">Load Type</th>
+                                <th className="px-3 py-1.5 font-medium">Path</th>
+                                <th className="px-3 py-1.5 font-medium text-right">Date</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800 border-t border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800 border-t border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400">
                             {dataSource.map(row => (
-                                <tr key={row.key} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                                    <td className="px-3 py-2 flex items-center gap-3">
-                                        <input 
-                                            type="checkbox" 
-                                            className="w-3.5 h-3.5 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 checked:bg-primary checked:border-primary focus:ring-0" 
-                                            checked={row.checked} 
-                                            disabled={radio !== 0}
-                                            onChange={(e) => handleTableCheckboxChange(e.target.checked, row.key)}
-                                        />
-                                        <span className="capitalize font-medium">{row.loadType}</span>
+                                <tr key={row.key} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                                    <td className="px-3 py-1 flex items-center gap-2">
+                                        <div className="relative flex items-center">
+                                          <input 
+                                              type="checkbox" 
+                                              className="peer h-3.5 w-3.5 cursor-pointer appearance-none rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 checked:bg-primary checked:border-primary transition-colors" 
+                                              checked={row.checked} 
+                                              disabled={radio !== 0}
+                                              onChange={(e) => handleTableCheckboxChange(e.target.checked, row.key)}
+                                          />
+                                          <span className="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                                            <span className="material-symbols-outlined text-[12px]">check</span>
+                                          </span>
+                                        </div>
+                                        <span className="capitalize font-normal">{row.loadType}</span>
                                     </td>
-                                    <td className="px-3 py-2 text-slate-500 font-mono text-[11px] truncate max-w-[240px] font-medium">{row.path}</td>
-                                    <td className="px-3 py-2 text-slate-500 text-[11px] text-right font-medium">{row.date}</td>
+                                    <td className="px-3 py-1 text-slate-400 font-mono text-[10px] truncate max-w-[240px] font-normal">{row.path}</td>
+                                    <td className="px-3 py-1 text-slate-400 text-[10px] text-right font-normal">{row.date}</td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
 
-                <div className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-3">
-                    <div className="flex items-center gap-3">
+                <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
+                    <div className="flex items-center gap-2 w-44 shrink-0 justify-start">
+                      <div className="relative flex items-center">
                         <input 
                             type="radio" 
                             name="radioOption" 
                             checked={radio === 1}
                             onChange={() => setRadio(1)}
-                            className="w-4 h-4 text-primary border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 focus:ring-0"
+                            className="peer w-3.5 h-3.5 appearance-none rounded-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 checked:border-primary transition-all cursor-pointer"
                         />
-                        <label className="text-[13px] font-medium text-slate-600 dark:text-slate-400">Unloaded file from :</label>
+                        <div className="absolute w-1.5 h-1.5 bg-primary rounded-full left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                      </div>
+                      <label className="text-[11px] font-normal text-slate-500 dark:text-slate-400 text-left">Unloaded file from :</label>
                     </div>
 
-                    <div className="space-y-2 pl-7">
+                    <div className="space-y-2 pl-2">
                         {['schema', 'object', 'index', 'trigger'].map(type => (
-                            <div key={type} className={`flex items-center gap-4 transition-opacity ${radio !== 1 ? 'opacity-30' : ''}`}>
-                                <label className="flex items-center gap-2 w-32 shrink-0 cursor-pointer group">
-                                    <input 
-                                        type="checkbox"
-                                        checked={formData.checkBoxes[type]}
-                                        onChange={(e) => handleCheckBoxChange(type, e.target.checked)}
-                                        disabled={radio !== 1}
-                                        className="w-3.5 h-3.5 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 checked:bg-primary checked:border-primary focus:ring-0"
-                                    />
-                                    <span className="text-[12px] text-slate-500 group-hover:text-slate-900 dark:text-slate-400 dark:group-hover:text-slate-200 transition-colors capitalize">Load {type}</span>
+                            <div key={type} className={`flex items-center gap-2 transition-all ${radio !== 1 ? 'opacity-30' : ''}`}>
+                                <label className="flex items-center gap-2 w-44 shrink-0 cursor-pointer group justify-start">
+                                    <div className="relative flex items-center">
+                                      <input 
+                                          type="checkbox"
+                                          checked={formData.checkBoxes[type]}
+                                          onChange={(e) => handleCheckBoxChange(type, e.target.checked)}
+                                          disabled={radio !== 1}
+                                          className="peer h-3.5 w-3.5 cursor-pointer appearance-none rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 checked:bg-primary checked:border-primary transition-colors"
+                                      />
+                                      <span className="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                                        <span className="material-symbols-outlined text-[12px]">check</span>
+                                      </span>
+                                    </div>
+                                    <span className="text-[11px] font-normal text-slate-500 dark:text-slate-400 transition-colors capitalize">Load {type} :</span>
                                 </label>
-                                <input 
-                                    type="text"
-                                    value={formData.unloadFiles[type]}
-                                    onChange={(e) => handleUnloadPathChange(type, e.target.value)}
-                                    disabled={radio !== 1 || !formData.checkBoxes[type]}
-                                    className={`flex-1 h-8 px-3 rounded text-[12px] border transition-all outline-none font-medium
-                                      ${(radio !== 1 || !formData.checkBoxes[type])
-                                        ? 'bg-slate-100 dark:bg-slate-800/10 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-600 italic cursor-not-allowed'
-                                        : 'bg-white dark:bg-[#1e2230] border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-200 focus:border-primary/50'}`}
-                                />
+                                <div className="flex-1">
+                                  <input 
+                                      type="text"
+                                      value={formData.unloadFiles[type]}
+                                      onChange={(e) => handleUnloadPathChange(type, e.target.value)}
+                                      disabled={radio !== 1 || !formData.checkBoxes[type]}
+                                      className={`w-full h-8 px-2 rounded-lg text-[12px] border transition-all outline-none font-normal
+                                        ${(radio !== 1 || !formData.checkBoxes[type])
+                                          ? 'bg-slate-50/50 dark:bg-slate-800/10 border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-600 italic cursor-not-allowed'
+                                          : 'bg-white dark:bg-[#1e2230] border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-200 focus:border-primary/50 focus:ring-4 focus:ring-primary/5'}`}
+                                  />
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -343,55 +377,71 @@ export default function LoadDatabaseModal() {
           </div>
 
           {/* Section: Load Option */}
-          <div className="space-y-2">
-            <div className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest italic">Load Option</div>
-            <div className="p-4 border border-slate-200 dark:border-slate-800 rounded bg-slate-50/30 dark:bg-[#1e2230] space-y-4">
-                <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+          <div className="relative border border-slate-200 dark:border-slate-800 rounded-xl p-3 pt-4 mt-2">
+            <div className="absolute top-0 -translate-y-[55%] left-4 px-2 bg-white dark:bg-[#1e2230]">
+              <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300 leading-none">
+                Load Option
+              </span>
+            </div>
+            <div className="space-y-4 px-2">
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1 bg-slate-50/50 dark:bg-slate-800/10 p-3 rounded-lg border border-slate-100 dark:border-slate-800/50">
                     {[
                         { id: 'checkoption', label: 'check syntax and load database' },
                         { id: 'nolog', label: "Don't create log" },
                         { id: 'oiduse', label: "Don't use OID" },
                         { id: 'statisticsuse', label: "Don't update statistics" },
                     ].map(opt => (
-                        <label key={opt.id} className="flex items-center gap-3 p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800/20 cursor-pointer group transition-colors">
-                            <input 
-                                type="checkbox"
-                                checked={formData.checkBoxes[opt.id]}
-                                onChange={(e) => handleCheckBoxChange(opt.id, e.target.checked)}
-                                className="w-3.5 h-3.5 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 checked:bg-primary checked:border-primary focus:ring-0"
-                            />
-                            <span className="text-[12px] text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors truncate font-medium">{opt.label}</span>
+                        <label key={opt.id} className="flex items-center gap-2 p-1 rounded-lg cursor-pointer group transition-all">
+                            <div className="relative flex items-center">
+                              <input 
+                                  type="checkbox"
+                                  checked={formData.checkBoxes[opt.id]}
+                                  onChange={(e) => handleCheckBoxChange(opt.id, e.target.checked)}
+                                  className="peer h-3.5 w-3.5 cursor-pointer appearance-none rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 checked:bg-primary checked:border-primary transition-colors"
+                              />
+                              <span className="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                                <span className="material-symbols-outlined text-[12px]">check</span>
+                              </span>
+                            </div>
+                            <span className="text-[11px] font-normal text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors truncate">{opt.label}</span>
                         </label>
                     ))}
                 </div>
 
-                <div className="pt-3 border-t border-slate-200 dark:border-slate-800 space-y-2.5">
+                <div className="space-y-2 pt-1 pb-1">
                     {[
                         { id: 'estimated', label: 'Estimated number of instances', type: 'number' },
                         { id: 'period', label: 'Insertion count for periodic commit', type: 'number' },
                         { id: 'errorcontrolfile', label: 'Using error control file', type: 'text' },
                         { id: 'ignoreclassfile', label: 'Ignored table file', type: 'text' },
                     ].map(item => (
-                        <div key={item.id} className="flex items-center gap-4">
-                            <label className="w-[200px] shrink-0 flex items-center gap-2 cursor-pointer group">
-                                <input 
-                                    type="checkbox"
-                                    checked={formData.checkBoxes[item.id]}
-                                    onChange={(e) => handleCheckBoxChange(item.id, e.target.checked)}
-                                    className="w-3.5 h-3.5 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 checked:bg-primary checked:border-primary focus:ring-0"
-                                />
-                                <span className="text-[11px] font-bold uppercase tracking-tight text-slate-400 dark:text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-300 transition-colors truncate">{item.label}</span>
+                        <div key={item.id} className="flex items-center gap-2">
+                            <label className="w-[190px] shrink-0 flex items-center gap-2 cursor-pointer group justify-start">
+                                <div className="relative flex items-center">
+                                  <input 
+                                      type="checkbox"
+                                      checked={formData.checkBoxes[item.id]}
+                                      onChange={(e) => handleCheckBoxChange(item.id, e.target.checked)}
+                                      className="peer h-3.5 w-3.5 cursor-pointer appearance-none rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 checked:bg-primary checked:border-primary transition-colors"
+                                  />
+                                  <span className="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                                    <span className="material-symbols-outlined text-[12px]">check</span>
+                                  </span>
+                                </div>
+                                <span className="text-[10px] font-normal tracking-tight text-slate-500 dark:text-slate-400 transition-colors truncate uppercase">{item.label} :</span>
                             </label>
-                            <input 
-                                type={item.type}
-                                value={formData.values[item.id]}
-                                onChange={(e) => handleValueChange(item.id, e.target.value)}
-                                disabled={!formData.checkBoxes[item.id]}
-                                className={`flex-1 h-8 px-3 rounded text-[12px] border transition-all outline-none font-medium
-                                  ${!formData.checkBoxes[item.id]
-                                    ? 'bg-slate-100 dark:bg-slate-800/10 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-600 italic cursor-not-allowed'
-                                    : 'bg-white dark:bg-[#1e2230] border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-200 focus:border-primary/50'}`}
-                            />
+                            <div className="flex-1">
+                              <input 
+                                  type={item.type}
+                                  value={formData.values[item.id]}
+                                  onChange={(e) => handleValueChange(item.id, e.target.value)}
+                                  disabled={!formData.checkBoxes[item.id]}
+                                  className={`w-full h-8 px-2 rounded-lg text-[12px] border transition-all outline-none font-normal
+                                    ${!formData.checkBoxes[item.id]
+                                      ? 'bg-slate-50/50 dark:bg-slate-800/10 border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-600 italic cursor-not-allowed'
+                                      : 'bg-white dark:bg-[#1e2230] border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-200 focus:border-primary/50 focus:ring-4 focus:ring-primary/5'}`}
+                              />
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -401,24 +451,24 @@ export default function LoadDatabaseModal() {
         </div>
         
         {/* Footer */}
-        <div className="px-6 py-4 bg-slate-50 dark:bg-[#1e2230] flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
+        <div className="px-6 py-2 bg-slate-50 dark:bg-[#1e2230] flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
           <button 
-            className="px-8 py-1.5 text-sm bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded border border-slate-200 dark:border-slate-700 transition-all font-medium"
+            className="px-6 py-1.5 text-xs bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded border border-slate-200 dark:border-slate-700 transition-all font-normal"
             onClick={() => dispatch(closeLoadDBModal())}
           >
             Cancel
           </button>
           <button 
-            className="px-10 py-1.5 bg-primary hover:bg-primary/90 active:bg-primary/80 text-white text-sm rounded shadow transition-all flex items-center justify-center gap-2 min-w-[100px] font-bold disabled:opacity-50"
+            className="px-6 py-1.5 bg-primary hover:bg-primary/90 active:bg-primary/80 text-white text-xs rounded shadow transition-all flex items-center justify-center gap-2 min-w-[100px] font-normal disabled:opacity-50"
             onClick={handleLoadDatabase}
             disabled={isLoading}
           >
             {isLoading ? (
-               <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+               <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
             ) : (
                 <>
                     <span className="material-symbols-outlined text-[16px]">check</span>
-                    <span>OK</span>
+                    <span>Load Database</span>
                 </>
             )}
           </button>

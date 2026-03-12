@@ -12,7 +12,8 @@ export default function Header({ theme, toggleTheme }) {
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate('/login');
+    // Use window.location.href to force a full page refresh and clear all in-memory state
+    window.location.href = '/login';
   };
 
   return (

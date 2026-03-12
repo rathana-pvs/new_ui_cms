@@ -163,17 +163,17 @@ export default function UnloadDatabaseModal() {
         {/* Loading Overlay */}
         {isUnloading && (
           <div className="absolute inset-0 z-[110] flex items-center justify-center bg-white/80 dark:bg-[#1e2230]/80 backdrop-blur-sm">
-            <div className="flex flex-col items-center gap-3">
-              <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-              <span className="text-sm font-bold text-slate-500 dark:text-slate-400">Unloading Database...</span>
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-8 h-8 border-3 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+              <span className="text-xs font-normal text-slate-500 dark:text-slate-400">Unloading Database...</span>
             </div>
           </div>
         )}
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-[#1e2230] flex-shrink-0">
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <span className="material-symbols-outlined text-rose-500">upload</span>
+        <div className="flex items-center justify-between px-6 py-1.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-[#1e2230] flex-shrink-0">
+          <h3 className="text-[13px] font-normal text-slate-900 dark:text-white flex items-center gap-2">
+            <span className="material-symbols-outlined text-rose-500 text-[18px]">upload</span>
             Unload DB
           </h3>
           <button 
@@ -185,65 +185,75 @@ export default function UnloadDatabaseModal() {
         </div>
         
         {/* Body */}
-        <div className="p-6 overflow-y-auto space-y-6 custom-scrollbar flex-1 bg-white dark:bg-[#1e2230]">
+        <div className="p-3 overflow-y-auto space-y-3 custom-scrollbar flex-1 bg-white dark:bg-[#1e2230]">
           
           {/* Section: Database Information */}
-          <div className="space-y-2">
-            <div className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest italic">Database Information</div>
-            <div className="p-4 border border-slate-200 dark:border-slate-800 rounded bg-slate-50/30 dark:bg-[#1e2230] space-y-3">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13px] font-medium text-slate-600 dark:text-slate-400">Target database name</label>
-                <input 
-                  type="text" 
-                  name="targetDbName"
-                  value={formData.targetDbName}
-                  onChange={handleInputChange}
-                  className="h-9 px-3 rounded text-[13px] border border-slate-300 dark:border-slate-800 bg-white dark:bg-[#1e2230] text-slate-900 dark:text-slate-200 outline-none focus:border-primary/50"
-                />
+          <div className="relative border border-slate-200 dark:border-slate-800 rounded-xl p-2 pt-3 mt-1">
+            <div className="absolute top-0 -translate-y-[55%] left-4 px-2 bg-white dark:bg-[#1e2230]">
+              <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300 leading-none">
+                Database Information
+              </span>
+            </div>
+            <div className="space-y-2 px-2">
+              <div className="flex items-center gap-2">
+                <label className="w-36 shrink-0 text-[11px] font-normal text-slate-500 dark:text-slate-400 text-left">Target database name :</label>
+                <div className="flex-1">
+                  <input 
+                    type="text" 
+                    name="targetDbName"
+                    value={formData.targetDbName}
+                    onChange={handleInputChange}
+                    className="w-full h-8 px-2 rounded-lg text-[12px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#1a1d27] text-slate-900 dark:text-slate-200 outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/5 transition-all font-normal"
+                  />
+                </div>
               </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13px] font-medium text-slate-600 dark:text-slate-400 flex items-center gap-1">
-                  Target directory <span className="text-rose-500">*</span>
-                </label>
-                <input 
-                  type="text" 
-                  name="targetDirectory"
-                  value={formData.targetDirectory}
-                  onChange={handleInputChange}
-                  className="h-9 px-3 rounded text-[13px] border border-slate-300 dark:border-slate-800 bg-white dark:bg-[#1e2230] text-slate-900 dark:text-slate-200 outline-none focus:border-primary/50"
-                />
+              <div className="flex items-center gap-2">
+                <label className="w-36 shrink-0 text-[11px] font-normal text-slate-500 dark:text-slate-400 text-left">Target directory <span className="text-rose-500">*</span> :</label>
+                <div className="flex-1">
+                  <input 
+                    type="text" 
+                    name="targetDirectory"
+                    value={formData.targetDirectory}
+                    onChange={handleInputChange}
+                    className="w-full h-8 px-2 rounded-lg text-[12px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#1a1d27] text-slate-900 dark:text-slate-200 outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/5 transition-all font-normal"
+                  />
+                </div>
               </div>
             </div>
           </div>
 
           {/* Section: Database Auth */}
-          <div className="space-y-2">
-            <div className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest italic">Database Auth</div>
-            <div className="p-4 border border-slate-200 dark:border-slate-800 rounded bg-slate-50/30 dark:bg-[#1e2230] space-y-3">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13px] font-medium text-slate-600 dark:text-slate-400 flex items-center gap-1">
-                  DB Username <span className="text-rose-500">*</span>
-                </label>
-                <input 
-                  type="text" 
-                  name="dbUsername"
-                  value={formData.dbUsername}
-                  onChange={handleInputChange}
-                  className="h-9 px-3 rounded text-[13px] border border-slate-300 dark:border-slate-800 bg-white dark:bg-[#1e2230] text-slate-900 dark:text-slate-200 outline-none focus:border-primary/50"
-                />
+          <div className="relative border border-slate-200 dark:border-slate-800 rounded-xl p-2 pt-3 mt-3">
+            <div className="absolute top-0 -translate-y-[55%] left-4 px-2 bg-white dark:bg-[#1e2230]">
+              <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300 leading-none">
+                Database Auth
+              </span>
+            </div>
+            <div className="space-y-2 px-2">
+              <div className="flex items-center gap-2">
+                <label className="w-36 shrink-0 text-[11px] font-normal text-slate-500 dark:text-slate-400 text-left">DB Username <span className="text-rose-500">*</span> :</label>
+                <div className="flex-1">
+                  <input 
+                    type="text" 
+                    name="dbUsername"
+                    value={formData.dbUsername}
+                    onChange={handleInputChange}
+                    className="w-full h-8 px-2 rounded-lg text-[12px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#1a1d27] text-slate-900 dark:text-slate-200 outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/5 transition-all font-normal"
+                  />
+                </div>
               </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13px] font-medium text-slate-600 dark:text-slate-400">DB Password</label>
-                <div className="relative">
+              <div className="flex items-center gap-2">
+                <label className="w-36 shrink-0 text-[11px] font-normal text-slate-500 dark:text-slate-400 text-left">DB Password :</label>
+                <div className="flex-1 relative">
                   <input 
                     type={showPassword ? "text" : "password"} 
                     name="dbPassword"
                     value={formData.dbPassword}
                     onChange={handleInputChange}
-                    className="w-full h-9 px-3 rounded text-[13px] border border-slate-300 dark:border-slate-800 bg-white dark:bg-[#1e2230] text-slate-900 dark:text-slate-200 outline-none focus:border-primary/50 pr-9"
+                    className="w-full h-8 px-2 rounded-lg text-[12px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#1a1d27] text-slate-900 dark:text-slate-200 outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/5 pr-10 transition-all font-normal"
                   />
                   <button 
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     <span className="material-symbols-outlined text-[18px]">
@@ -256,70 +266,93 @@ export default function UnloadDatabaseModal() {
           </div>
 
           {/* Section: Unload Target */}
-          <div className="space-y-2">
-            <div className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest italic">Unload Target</div>
-            <div className="p-4 border border-slate-200 dark:border-slate-800 rounded bg-slate-50/30 dark:bg-[#1e2230] space-y-4">
-              <div className="flex gap-4">
-                <div className="flex-1 space-y-2">
-                  <p className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase">Schema</p>
+          <div className="relative border border-slate-200 dark:border-slate-800 rounded-xl p-2 pt-3 mt-3">
+            <div className="absolute top-0 -translate-y-[55%] left-4 px-2 bg-white dark:bg-[#1e2230]">
+              <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300 leading-none">
+                Unload Target
+              </span>
+            </div>
+            <div className="space-y-3 px-2">
+              <div className="flex gap-4 pt-2">
+                <div className="flex-1 relative border border-slate-200 dark:border-slate-800 rounded-xl p-2 pt-3">
+                  <div className="absolute top-0 -translate-y-[55%] left-3 px-1.5 bg-white dark:bg-[#1e2230]">
+                    <span className="text-[10px] font-medium text-slate-600 dark:text-slate-400 leading-none">
+                      Schema
+                    </span>
+                  </div>
                   <div className="space-y-1.5">
                     {['All', 'Selected tables', 'Not include'].map(opt => (
-                      <label key={opt} className="flex items-center gap-2 cursor-pointer group">
-                        <input 
-                          type="radio" 
-                          name="schemaOption" 
-                          value={opt}
-                          checked={formData.schemaOption === opt}
-                          onChange={handleSchemaChange}
-                          className="w-3.5 h-3.5 text-primary border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 focus:ring-0" 
-                        />
-                        <span className="text-[13px] text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">{opt}</span>
+                      <label key={opt} className="flex items-center gap-2 cursor-pointer">
+                        <div className="relative flex items-center">
+                          <input 
+                            type="radio" 
+                            name="schemaOption" 
+                            value={opt}
+                            checked={formData.schemaOption === opt}
+                            onChange={handleSchemaChange}
+                            className="peer w-3.5 h-3.5 appearance-none rounded-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 checked:border-primary transition-all cursor-pointer" 
+                          />
+                          <div className="absolute w-1.5 h-1.5 bg-primary rounded-full left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                        </div>
+                        <span className="text-[12px] font-normal text-slate-600 dark:text-slate-400 transition-colors">{opt}</span>
                       </label>
                     ))}
                   </div>
                 </div>
-                <div className="flex-1 space-y-2">
-                  <p className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase">Data</p>
+                <div className="flex-1 relative border border-slate-200 dark:border-slate-800 rounded-xl p-2 pt-3">
+                  <div className="absolute top-0 -translate-y-[55%] left-3 px-1.5 bg-white dark:bg-[#1e2230]">
+                    <span className="text-[10px] font-medium text-slate-600 dark:text-slate-400 leading-none">
+                      Data
+                    </span>
+                  </div>
                   <div className="space-y-1.5">
                     {['Selected tables', 'Not include'].map(opt => (
-                      <label key={opt} className="flex items-center gap-2 cursor-pointer group">
-                        <input 
-                          type="radio" 
-                          name="dataOption" 
-                          value={opt}
-                          checked={formData.dataOption === opt}
-                          onChange={handleInputChange}
-                          className="w-3.5 h-3.5 text-primary border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 focus:ring-0" 
-                        />
-                        <span className="text-[13px] text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">{opt}</span>
+                      <label key={opt} className="flex items-center gap-2 cursor-pointer">
+                        <div className="relative flex items-center">
+                          <input 
+                            type="radio" 
+                            name="dataOption" 
+                            value={opt}
+                            checked={formData.dataOption === opt}
+                            onChange={handleInputChange}
+                            className="peer w-3.5 h-3.5 appearance-none rounded-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 checked:border-primary transition-all cursor-pointer" 
+                          />
+                          <div className="absolute w-1.5 h-1.5 bg-primary rounded-full left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                        </div>
+                        <span className="text-[12px] font-normal text-slate-600 dark:text-slate-400 transition-colors">{opt}</span>
                       </label>
                     ))}
                   </div>
                 </div>
               </div>
 
-              <div className="border border-slate-200 dark:border-slate-800 rounded bg-white dark:bg-slate-900/50 min-h-[120px] max-h-[160px] overflow-hidden flex flex-col">
-                <div className="flex-1 overflow-y-auto p-2 custom-scrollbar">
+              <div className="border border-slate-200 dark:border-slate-800 rounded-xl min-h-[100px] max-h-[140px] overflow-hidden flex flex-col p-1">
+                <div className="flex-1 overflow-y-auto p-1 custom-scrollbar">
                   {isTablesLoading ? (
-                    <div className="flex flex-col items-center justify-center py-8">
-                       <div className="w-5 h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin mb-1.5"></div>
-                       <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest">Loading...</span>
+                    <div className="flex flex-col items-center justify-center py-4">
+                       <div className="w-4 h-4 border-2 border-primary/20 border-t-primary rounded-full animate-spin mb-1"></div>
+                       <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal tracking-tight">Loading...</span>
                     </div>
                   ) : dynamicTables.length === 0 ? (
-                    <div className="flex items-center justify-center py-8 text-slate-400 dark:text-slate-500 italic text-[13px]">
+                    <div className="flex items-center justify-center py-4 text-slate-400 dark:text-slate-500 italic text-[12px]">
                       No tables found.
                     </div>
                   ) : (
-                    <div className="grid grid-cols-2 gap-0.5">
+                    <div className="grid grid-cols-1 gap-0.5 px-1">
                       {dynamicTables.map(table => (
-                        <label key={table} className="flex items-center gap-2 px-2 py-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded cursor-pointer transition-colors group">
-                          <input 
-                            type="checkbox" 
-                            checked={formData.selectedTables.includes(table)}
-                            onChange={() => handleTableToggle(table)}
-                            className="w-3.5 h-3.5 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 checked:bg-primary focus:ring-0" 
-                          />
-                          <span className="text-[12px] text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200 truncate">{table}</span>
+                        <label key={table} className="flex items-center gap-2 px-2 py-0.5 bg-white dark:bg-slate-900/40 rounded-lg cursor-pointer border border-transparent transition-all">
+                          <div className="relative flex items-center">
+                            <input 
+                              type="checkbox" 
+                              checked={formData.selectedTables.includes(table)}
+                              onChange={() => handleTableToggle(table)}
+                              className="peer h-3.5 w-3.5 cursor-pointer appearance-none rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 checked:bg-primary checked:border-primary transition-colors" 
+                            />
+                            <span className="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                              <span className="material-symbols-outlined text-[12px]">check</span>
+                            </span>
+                          </div>
+                          <span className="text-[12px] font-normal text-slate-600 dark:text-slate-400 truncate">{table}</span>
                         </label>
                       ))}
                     </div>
@@ -330,10 +363,14 @@ export default function UnloadDatabaseModal() {
           </div>
 
           {/* Section: Unload Option */}
-          <div className="space-y-2">
-            <div className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest italic">Unload Option</div>
-            <div className="p-4 border border-slate-200 dark:border-slate-800 rounded bg-slate-50/30 dark:bg-[#1e2230] space-y-4">
-              <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+          <div className="relative border border-slate-200 dark:border-slate-800 rounded-xl p-2 pt-3 mt-3">
+            <div className="absolute top-0 -translate-y-[55%] left-4 px-2 bg-white dark:bg-[#1e2230]">
+              <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300 leading-none">
+                Unload Option
+              </span>
+            </div>
+            <div className="space-y-3 px-2">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1 p-1.5 border border-slate-100 dark:border-slate-800/50 rounded-xl">
                 {[
                   { label: 'As dba', name: 'asDba' },
                   { label: 'Split schema files', name: 'splitSchema' },
@@ -342,21 +379,26 @@ export default function UnloadDatabaseModal() {
                   { label: 'Use delimited identifier', name: 'useDelimitedIdentifier' },
                   { label: 'include referenced tables', name: 'includeReferencedTables', disabled: formData.schemaOption !== 'Not include' },
                 ].map(opt => (
-                  <label key={opt.name} className={`flex items-center gap-2 ${opt.disabled ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800/30'} p-1 rounded transition-colors group`}>
-                    <input 
-                      type="checkbox" 
-                      name={opt.name}
-                      checked={formData[opt.name]}
-                      onChange={handleInputChange}
-                      disabled={opt.disabled}
-                      className="w-3.5 h-3.5 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 checked:bg-primary checked:border-primary focus:ring-0" 
-                    />
-                    <span className="text-[12px] text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200 truncate transition-colors font-medium">{opt.label}</span>
+                  <label key={opt.name} className={`flex items-center gap-2 ${opt.disabled ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'} p-1 rounded-lg transition-all`}>
+                    <div className="relative flex items-center">
+                      <input 
+                        type="checkbox" 
+                        name={opt.name}
+                        checked={formData[opt.name]}
+                        onChange={handleInputChange}
+                        disabled={opt.disabled}
+                        className="peer h-3.5 w-3.5 cursor-pointer appearance-none rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 checked:bg-primary checked:border-primary transition-colors" 
+                      />
+                      <span className="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                        <span className="material-symbols-outlined text-[12px]">check</span>
+                      </span>
+                    </div>
+                    <span className="text-[11px] font-normal text-slate-600 dark:text-slate-400 transition-colors uppercase tracking-tight">{opt.label}</span>
                   </label>
                 ))}
               </div>
 
-              <div className="pt-3 border-t border-slate-200 dark:border-slate-800 space-y-2.5">
+              <div className="space-y-1.5 pt-0.5">
                 {[
                   { label: 'Prefix for output files', name: 'prefixOutputFile', useName: 'usePrefixOutputFile', type: 'text' },
                   { label: 'File for hash', name: 'fileForHash', useName: 'useFileForHash', type: 'text' },
@@ -364,28 +406,35 @@ export default function UnloadDatabaseModal() {
                   { label: 'Estimate number of instances', name: 'estimateInstances', useName: 'useEstimateInstances', type: 'number' },
                   { label: 'Lo file for current directory', name: 'loFileDirectory', useName: 'useLoFileDirectory', type: 'text' },
                 ].map(field => (
-                  <div key={field.name} className="flex items-center gap-4">
-                    <div className="w-[180px] shrink-0 flex items-center gap-2">
-                        <input 
-                            type="checkbox" 
-                            name={field.useName}
-                            checked={formData[field.useName]}
-                            onChange={handleInputChange}
-                            className="w-3.5 h-3.5 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 checked:bg-primary focus:ring-0" 
-                        />
-                        <label className={`text-[11px] font-bold uppercase tracking-tight transition-colors ${formData[field.useName] ? 'text-slate-700 dark:text-slate-200' : 'text-slate-400 dark:text-slate-500'}`}>{field.label}</label>
+                  <div key={field.name} className="flex items-center gap-2">
+                    <div className="w-44 shrink-0 flex items-center gap-2">
+                        <div className="relative flex items-center">
+                          <input 
+                              type="checkbox" 
+                              name={field.useName}
+                              checked={formData[field.useName]}
+                              onChange={handleInputChange}
+                              className="peer h-3.5 w-3.5 cursor-pointer appearance-none rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 checked:bg-primary checked:border-primary transition-colors" 
+                          />
+                          <span className="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                            <span className="material-symbols-outlined text-[12px]">check</span>
+                          </span>
+                        </div>
+                        <label className={`text-[11px] font-normal tracking-tight transition-colors ${formData[field.useName] ? 'text-slate-700 dark:text-slate-200' : 'text-slate-400 dark:text-slate-500'}`}>{field.label}</label>
                     </div>
-                    <input 
-                      type={field.type} 
-                      name={field.name}
-                      value={formData[field.name]}
-                      onChange={handleInputChange}
-                      disabled={!formData[field.useName]}
-                      className={`flex-1 h-8 px-2 rounded text-[12px] border transition-all outline-none font-medium
-                        ${!formData[field.useName] 
-                          ? 'bg-slate-100 dark:bg-slate-800/20 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-600 italic cursor-not-allowed' 
-                          : 'bg-white dark:bg-[#1e2230] border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-200 focus:border-primary/50'}`}
-                    />
+                    <div className="flex-1">
+                      <input 
+                        type={field.type} 
+                        name={field.name}
+                        value={formData[field.name]}
+                        onChange={handleInputChange}
+                        disabled={!formData[field.useName]}
+                        className={`w-full h-8 px-2 rounded-lg text-[12px] border transition-all outline-none font-normal
+                          ${!formData[field.useName] 
+                            ? 'bg-slate-50 dark:bg-slate-800/10 border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-600 italic cursor-not-allowed' 
+                            : 'bg-white dark:bg-[#1e2230] border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-200 focus:border-primary/50 focus:ring-4 focus:ring-primary/5'}`}
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
@@ -395,20 +444,20 @@ export default function UnloadDatabaseModal() {
         </div>
         
         {/* Footer */}
-        <div className="px-6 py-4 bg-slate-50 dark:bg-[#1e2230] flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
+        <div className="px-6 py-2 bg-slate-50 dark:bg-[#1e2230] flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
           <button 
-            className="px-8 py-1.5 text-sm bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded border border-slate-200 dark:border-slate-700 transition-all font-medium"
+            className="px-6 py-1.5 text-xs bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded border border-slate-200 dark:border-slate-700 transition-all font-normal"
             onClick={() => dispatch(closeUnloadDBModal())}
           >
             Cancel
           </button>
           <button 
-            className="px-8 py-1.5 bg-primary hover:bg-primary/90 active:bg-primary/80 text-white text-sm rounded shadow transition-all flex items-center justify-center gap-2 min-w-[120px] font-bold disabled:opacity-50"
+            className="px-6 py-1.5 bg-primary hover:bg-primary/90 active:bg-primary/80 text-white text-xs rounded shadow transition-all flex items-center justify-center gap-2 min-w-[100px] font-normal disabled:opacity-50"
             onClick={handleUnloadDatabase}
             disabled={isUnloading}
           >
             {isUnloading ? (
-              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
             ) : (
               <span className="material-symbols-outlined text-sm">upload</span>
             )}

@@ -59,9 +59,36 @@ export const fetchBrokerList = createAsyncThunk(
   }
 );
 
+export const startBroker = createAsyncThunk(
+  'broker/startBroker',
+  async ({ hostUid, brokerName }, { dispatch, rejectWithValue }) => {
+    try {
+      await brokerApi.startBroker(hostUid, brokerName);
+      dispatch(fetchBrokerList(hostUid));
+      return { brokerName, success: true };
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Failed to start broker');
+    }
+  }
+);
+
+export const stopBroker = createAsyncThunk(
+  'broker/stopBroker',
+  async ({ hostUid, brokerName }, { dispatch, rejectWithValue }) => {
+    try {
+      await brokerApi.stopBroker(hostUid, brokerName);
+      dispatch(fetchBrokerList(hostUid));
+      return { brokerName, success: true };
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Failed to stop broker');
+    }
+  }
+);
+
 const initialState = {
   brokers: [],
   loading: false,
+  actionLoading: false,
   error: null,
 };
 
@@ -83,6 +110,24 @@ const brokerSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
         state.brokers = [];
+      })
+      .addCase(startBroker.pending, (state) => {
+        state.actionLoading = true;
+      })
+      .addCase(startBroker.fulfilled, (state) => {
+        state.actionLoading = false;
+      })
+      .addCase(startBroker.rejected, (state) => {
+        state.actionLoading = false;
+      })
+      .addCase(stopBroker.pending, (state) => {
+        state.actionLoading = true;
+      })
+      .addCase(stopBroker.fulfilled, (state) => {
+        state.actionLoading = false;
+      })
+      .addCase(stopBroker.rejected, (state) => {
+        state.actionLoading = false;
       });
   },
 });

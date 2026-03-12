@@ -3,62 +3,63 @@ import { useDispatch, useSelector } from 'react-redux';
 import { closeBackupDatabaseModal } from '../databaseSlice';
 
 const InputField = ({ label, value, onChange, placeholder, readOnly = false, required = false }) => (
-  <div className="flex flex-col gap-1.5">
-    <label className="text-[13px] font-medium text-slate-500 dark:text-slate-400 flex items-center gap-1">
-      {label}
-      {required && <span className="text-rose-500 font-bold">*</span>}
+  <div className="flex items-center gap-2">
+    <label className="w-36 shrink-0 text-[11px] font-normal text-slate-500 dark:text-slate-400 text-left">
+      {label} {required && <span className="text-rose-500">*</span>} :
     </label>
-    <input
-      type="text"
-      value={value}
-      onChange={(e) => onChange && onChange(e.target.value)}
-      placeholder={placeholder}
-      readOnly={readOnly}
-      className={`h-9 px-3 rounded text-[13px] border transition-all outline-none font-medium
-        ${readOnly 
-          ? 'bg-slate-100 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 cursor-default shadow-none' 
-          : 'bg-white dark:bg-[#1e2230] border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-200 focus:border-primary/50'
-        }`}
-    />
+    <div className="flex-1">
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => onChange && onChange(e.target.value)}
+        placeholder={placeholder}
+        readOnly={readOnly}
+        className={`w-full h-8 px-2 rounded-lg text-[12px] border transition-all outline-none font-normal
+          ${readOnly 
+            ? 'bg-slate-50/50 dark:bg-slate-800/20 border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 cursor-default' 
+            : 'bg-white dark:bg-[#1a1d27] border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-200 focus:border-primary/50 focus:ring-4 focus:ring-primary/5'
+          }`}
+      />
+    </div>
   </div>
 );
 
 const SelectField = ({ label, value, onChange, options }) => (
-  <div className="flex flex-col gap-1.5">
-    <label className="text-[13px] font-medium text-slate-500 dark:text-slate-400">
-      {label}
+  <div className="flex items-center gap-2">
+    <label className="w-36 shrink-0 text-[11px] font-normal text-slate-500 dark:text-slate-400 text-left">
+      {label} :
     </label>
-    <div className="relative">
+    <div className="flex-1 relative">
       <select
         value={value}
         onChange={(e) => onChange && onChange(e.target.value)}
-        className="w-full h-9 px-3 rounded text-[13px] border border-slate-300 dark:border-slate-800 bg-white dark:bg-[#1e2230] text-slate-900 dark:text-slate-200 focus:border-primary/50 outline-none appearance-none font-medium"
+        className="w-full h-8 px-2 pr-8 rounded-lg text-[12px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#1a1d27] text-slate-900 dark:text-slate-200 focus:border-primary/50 focus:ring-4 focus:ring-primary/5 outline-none appearance-none font-normal transition-all"
       >
         {options.map((opt) => (
           <option key={opt.value} value={opt.value}>{opt.label}</option>
         ))}
       </select>
-      <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-        <span className="material-symbols-outlined text-[18px]">expand_more</span>
+      <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+        <span className="material-symbols-outlined text-[16px]">expand_more</span>
       </div>
     </div>
   </div>
 );
 
 const CheckboxItem = ({ label, checked, onChange }) => (
-  <label className="flex items-center gap-3 cursor-pointer group w-fit select-none">
+  <label className="flex items-center gap-2 cursor-pointer group w-fit select-none">
     <div className="relative flex items-center">
       <input 
         type="checkbox" 
         checked={checked}
         onChange={(e) => onChange && onChange(e.target.checked)}
-        className="peer h-4 w-4 cursor-pointer appearance-none rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 checked:bg-primary checked:border-primary transition-colors"
+        className="peer h-3.5 w-3.5 cursor-pointer appearance-none rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 checked:bg-primary checked:border-primary transition-colors"
       />
       <span className="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-        <span className="material-symbols-outlined text-[14px]">check</span>
+        <span className="material-symbols-outlined text-[12px]">check</span>
       </span>
     </div>
-    <span className="text-[13px] font-bold text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
+    <span className="text-[11px] font-normal text-slate-600 dark:text-slate-400 transition-colors">
       {label}
     </span>
   </label>
@@ -86,21 +87,21 @@ export default function BackupDatabaseModal() {
       <div className="bg-white dark:bg-[#1e2230] w-full max-w-lg rounded shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
         
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-[#1e2230]">
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary">backup</span>
+        <div className="flex items-center justify-between px-6 py-1.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-[#1e2230] flex-shrink-0">
+          <h3 className="text-[13px] font-normal text-slate-900 dark:text-white flex items-center gap-2">
+            <span className="material-symbols-outlined text-primary text-[18px]">backup</span>
             Backup Database
           </h3>
           <button 
             onClick={() => dispatch(closeBackupDatabaseModal())}
             className="p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-400 dark:text-slate-500"
           >
-            <span className="material-symbols-outlined">close</span>
+            <span className="material-symbols-outlined text-[20px]">close</span>
           </button>
         </div>
 
         {/* Body */}
-        <div className="p-6 space-y-4 overflow-y-auto custom-scrollbar flex-1 bg-white dark:bg-[#1e2230]">
+        <div className="p-4 space-y-2.5 overflow-y-auto custom-scrollbar flex-1 bg-white dark:bg-[#1e2230]">
           <InputField 
             label="Database" 
             value={selectedDatabase || 'db1'} 
@@ -139,36 +140,44 @@ export default function BackupDatabaseModal() {
             onChange={(val) => setFormData({...formData, parallelBackup: val})}
           />
 
-          <div className="pt-2 space-y-3 font-medium">
-            <CheckboxItem 
-              label="Check Database Consistency" 
-              checked={formData.checkConsistency}
-              onChange={(val) => setFormData({...formData, checkConsistency: val})}
-            />
-            <CheckboxItem 
-              label="Delete Unnecessary log-achieves" 
-              checked={formData.deleteUnnecessary}
-              onChange={(val) => setFormData({...formData, deleteUnnecessary: val})}
-            />
-            <CheckboxItem 
-              label="Compress Backup Volumes" 
-              checked={formData.compress}
-              onChange={(val) => setFormData({...formData, compress: val})}
-            />
+          <div className="relative border border-slate-200 dark:border-slate-800 rounded-xl p-3 pt-4 mt-2">
+             <div className="absolute top-0 -translate-y-[55%] left-4 px-2 bg-white dark:bg-[#1e2230]">
+               <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300 leading-none">
+                 Options & Settings
+               </span>
+             </div>
+
+             <div className="space-y-4 px-4">
+                <CheckboxItem 
+                  label="Check Database Consistency" 
+                  checked={formData.checkConsistency}
+                  onChange={(val) => setFormData({...formData, checkConsistency: val})}
+                />
+                <CheckboxItem 
+                  label="Delete Unnecessary log-achieves" 
+                  checked={formData.deleteUnnecessary}
+                  onChange={(val) => setFormData({...formData, deleteUnnecessary: val})}
+                />
+                <CheckboxItem 
+                  label="Compress Backup Volumes" 
+                  checked={formData.compress}
+                  onChange={(val) => setFormData({...formData, compress: val})}
+                />
+             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 bg-slate-50 dark:bg-[#1e2230] flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800">
+        <div className="px-6 py-2 bg-slate-50 dark:bg-[#1e2230] flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
           <button 
             onClick={() => dispatch(closeBackupDatabaseModal())}
-            className="px-8 py-1.5 text-sm bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded border border-slate-200 dark:border-slate-700 transition-all font-medium"
+            className="px-6 py-1.5 text-xs bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded border border-slate-200 dark:border-slate-700 transition-all font-normal"
           >
             Cancel
           </button>
           <button 
             onClick={() => dispatch(closeBackupDatabaseModal())}
-            className="px-8 py-1.5 bg-primary hover:bg-primary/90 active:bg-primary/80 text-white text-sm rounded shadow transition-all flex items-center justify-center font-bold"
+            className="px-6 py-1.5 bg-primary hover:bg-primary/90 active:bg-primary/80 text-white text-xs rounded shadow transition-all flex items-center justify-center min-w-[100px] font-normal"
           >
             Backup
           </button>

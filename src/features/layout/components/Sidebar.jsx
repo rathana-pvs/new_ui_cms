@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchHosts, setSelectedHost, loginToHost, openDeleteHostModal, openEditHostModal, revokeHostLogin } from '../../host/hostSlice';
 import { fetchDatabaseStartInfo, setSelectedDatabase, startDatabase, stopDatabase, openUnloadDBModal, openLoadDBModal, openCheckDatabaseModal, openCompactDatabaseModal, openCopyDatabaseModal, openBackupDatabaseModal, openLockInfoModal } from '../../database/databaseSlice';
-import { fetchBrokerList } from '../../broker/brokerSlice';
+import { fetchBrokerList, startBroker, stopBroker } from '../../broker/brokerSlice';
 import { setActiveMainTab, closeHostTabs } from '../layoutSlice';
 import { SubMenu, MenuItem, MenuDivider } from '../../../components/common/DropdownMenu';
 import { useLayoutEffect } from 'react';
@@ -55,11 +55,12 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
   const [activeTab, setActiveTab] = useState('db');
   const [contextMenu, setContextMenu] = useState(null);
   const [dbContextMenu, setDbContextMenu] = useState(null);
+  const [brokerContextMenu, setBrokerContextMenu] = useState(null);
 
   const dispatch = useDispatch();
   const { hosts, selectedHostUid, loading: hostsLoading, authorizedHosts } = useSelector((state) => state.host);
   const { databases, activeDatabases, loading: dbLoading, actionLoading: dbActionLoading } = useSelector((state) => state.database);
-  const { brokers, loading: brokerLoading } = useSelector((state) => state.broker);
+  const { brokers, loading: brokerLoading, actionLoading: brokerActionLoading } = useSelector((state) => state.broker);
 
   useEffect(() => {
     dispatch(fetchHosts());
@@ -115,10 +116,28 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
     });
   };
 
+  const handleBrokerContextMenu = (e, brokerName, state) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setContextMenu(null);
+    setDbContextMenu(null);
+
+    const x = e.clientX;
+    const y = e.clientY;
+
+    setBrokerContextMenu({
+      mouseX: x,
+      mouseY: y,
+      broker: brokerName,
+      state: state
+    });
+  };
+
   useEffect(() => {
     const handleClick = () => {
       setContextMenu(null);
       setDbContextMenu(null);
+      setBrokerContextMenu(null);
     };
     document.addEventListener('click', handleClick);
     return () => document.removeEventListener('click', handleClick);
@@ -281,7 +300,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
             {/* Section 3: Tree View */}
             <div className="flex-1 overflow-y-auto px-4 pb-4 relative">
               {/* Loading overlay for start/stop operations */}
-              {dbActionLoading && (
+              {(dbActionLoading || brokerActionLoading) && (
                 <div className="absolute inset-0 bg-white/60 dark:bg-slate-900/60 z-10 flex items-center justify-center backdrop-blur-[1px]">
                   <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-4 py-2 rounded-lg shadow-lg border border-slate-200 dark:border-slate-800">
                     <svg className="animate-spin h-4 w-4 text-primary" viewBox="0 0 24 24">
@@ -323,7 +342,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
                                   onContextMenu={(e) => handleDbContextMenu(e, db.dbname, isActive)}
                                 >
                                   <span className="material-symbols-outlined text-[18px] text-slate-400 group-open:rotate-90 transition-transform">chevron_right</span>
-                                  <span className={`material-symbols-outlined text-[18px] ${isActive ? 'text-accent-green' : 'text-slate-400'}`}>
+                                  <span className={`material-symbols-outlined text-[18px] ${isActive ? 'text-accent-green' : 'text-accent-red'}`}>
                                     database
                                   </span>
                                   <span className="text-[13px] font-medium">{db.dbname}</span>
@@ -358,13 +377,14 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
                           brokers.map((broker) => {
                             const isOn = broker.state === 'ON';
                             return (
-                              <a
-                                key={broker.name}
-                                className="flex items-center gap-1.5 px-3 py-1.5 text-[13px] text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer select-none"
-                              >
-                                <span className={`material-symbols-outlined text-[18px] ${isOn ? 'text-accent-green' : 'text-slate-400'}`}>hub</span>
-                                <span className="font-medium">{broker.name} ({broker.port})</span>
-                              </a>
+                                <a
+                                  key={broker.name}
+                                  className="flex items-center gap-1.5 px-3 py-1.5 text-[13px] text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer select-none"
+                                  onContextMenu={(e) => handleBrokerContextMenu(e, broker.name, broker.state)}
+                                >
+                                  <span className={`material-symbols-outlined text-[18px] ${isOn ? 'text-accent-green' : 'text-accent-red'}`}>hub</span>
+                                  <span className="font-medium">{broker.name} ({broker.port})</span>
+                                </a>
                             );
                           })
                         )
@@ -610,6 +630,52 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
 
           <MenuDivider />
           <MenuItem icon="tune" iconColor="text-accent-purple" label="Properties" />
+        </ContextMenuWrapper>
+      )}
+
+      {/* Broker Context Menu */}
+      {brokerContextMenu && (
+        <ContextMenuWrapper 
+          key={`broker-ctx-${brokerContextMenu.mouseX}-${brokerContextMenu.mouseY}`}
+          x={brokerContextMenu.mouseX} 
+          y={brokerContextMenu.mouseY} 
+          onClose={() => setBrokerContextMenu(null)}
+        >
+          <div className="px-3 py-1.5 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-0.5 border-b border-slate-200 dark:border-slate-800">
+            {brokerContextMenu.broker}
+          </div>
+          {brokerContextMenu.state === 'ON' ? (
+            <button 
+              className="w-full text-left px-4 py-2 text-sm text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 transition-colors"
+              onClick={() => {
+                dispatch(stopBroker({ hostUid: selectedHostUid, brokerName: brokerContextMenu.broker }));
+                setBrokerContextMenu(null);
+              }}
+            >
+              <span className="material-symbols-outlined text-[18px] text-accent-red">stop</span>
+              Stop Broker
+            </button>
+          ) : (
+            <button 
+              className="w-full text-left px-4 py-2 text-sm text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 transition-colors"
+              onClick={() => {
+                dispatch(startBroker({ hostUid: selectedHostUid, brokerName: brokerContextMenu.broker }));
+                setBrokerContextMenu(null);
+              }}
+            >
+              <span className="material-symbols-outlined text-[18px] text-accent-green">play_arrow</span>
+              Start Broker
+            </button>
+          )}
+          <div className="h-px bg-slate-100 dark:bg-slate-700 my-1"></div>
+          <button className="w-full text-left px-4 py-2 text-sm text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 transition-colors">
+            <span className="material-symbols-outlined text-[18px] text-accent-blue">info</span>
+            Status
+          </button>
+          <button className="w-full text-left px-4 py-2 text-sm text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 transition-colors">
+            <span className="material-symbols-outlined text-[18px] text-accent-purple">tune</span>
+            Properties
+          </button>
         </ContextMenuWrapper>
       )}
     </>

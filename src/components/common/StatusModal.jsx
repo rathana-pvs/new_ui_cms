@@ -15,12 +15,12 @@ export default function StatusModal() {
   const iconColor = isSuccess ? 'text-emerald-500' : isError ? 'text-rose-500' : 'text-blue-500';
   const bgColor = isSuccess ? 'bg-emerald-50 dark:bg-emerald-500/10' : isError ? 'bg-rose-50 dark:bg-rose-500/10' : 'bg-blue-50 dark:bg-blue-500/10';
   
-  // Refined button colors - removing harsh shadows
+  // Refined button colors - matching professional tone
   const btnClasses = isSuccess 
-    ? 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20' 
+    ? 'bg-emerald-500 hover:bg-emerald-600' 
     : isError 
-      ? 'bg-rose-500 hover:bg-rose-600 shadow-rose-500/20' 
-      : 'bg-blue-500 hover:bg-blue-600 shadow-blue-500/20';
+      ? 'bg-rose-500 hover:bg-rose-600' 
+      : 'bg-primary hover:bg-primary/90';
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 animate-in fade-in duration-200">
@@ -31,38 +31,38 @@ export default function StatusModal() {
       ></div>
       
       {/* Modal Content */}
-      <div className="relative bg-white dark:bg-slate-900 rounded-lg shadow-2xl w-full max-w-sm border border-slate-200 dark:border-slate-800/50 overflow-hidden transform transition-all z-10 p-8 flex flex-col items-center text-center animate-in zoom-in-95 duration-200">
+      <div className="relative bg-white dark:bg-[#1e2230] rounded shadow-2xl w-full max-w-sm border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all z-10 p-6 flex flex-col items-center text-center animate-in zoom-in-95 duration-200">
         
         {/* Close Button Top Right */}
         <button 
           onClick={() => dispatch(closeStatusModal())}
-          className="absolute top-4 right-4 p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-400 group"
+          className="absolute top-2 right-2 p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-400 group"
         >
-          <span className="material-symbols-outlined text-[20px] group-hover:text-slate-600 dark:group-hover:text-slate-200">close</span>
+          <span className="material-symbols-outlined text-[18px] group-hover:text-slate-600 dark:group-hover:text-slate-200">close</span>
         </button>
 
-        {/* Animated Icon Container */}
-        <div className={`w-20 h-20 ${bgColor} rounded-full flex items-center justify-center mb-6 animate-in zoom-in motion-safe:duration-500 delay-100`}>
-          <div className="w-14 h-14 rounded-full bg-white dark:bg-slate-900 shadow-sm flex items-center justify-center">
-            <span className={`material-symbols-outlined text-4xl ${iconColor}`}>
+        {/* Icon Container */}
+        <div className={`w-14 h-14 ${bgColor} rounded-full flex items-center justify-center mb-4 animate-in zoom-in duration-300`}>
+          <div className="w-10 h-10 rounded-full bg-white dark:bg-[#1e2230] shadow-sm flex items-center justify-center">
+            <span className={`material-symbols-outlined text-2xl ${iconColor}`}>
               {icon}
             </span>
           </div>
         </div>
 
-        <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">
-          {title || (isSuccess ? 'Success!' : isError ? 'Error Occurred' : 'Information')}
+        <h3 className="text-[15px] font-normal text-slate-900 dark:text-white mb-2">
+          {title || (isSuccess ? 'Success' : isError ? 'Error' : 'Information')}
         </h3>
         
-        <p className="text-[15px] text-slate-500 dark:text-slate-400 mb-8 leading-relaxed font-medium">
+        <p className="text-[12px] text-slate-500 dark:text-slate-400 mb-6 leading-relaxed font-normal">
           {message}
         </p>
 
         <button 
-          className={`w-full py-3.5 rounded-2xl text-white font-bold text-[15px] transition-all active:scale-[0.97] shadow-xl hover:shadow-2xl ${btnClasses}`}
+          className={`px-8 py-1.5 rounded text-white text-xs font-normal transition-all active:scale-[0.98] ${btnClasses}`}
           onClick={() => dispatch(closeStatusModal())}
         >
-          {isSuccess ? 'Great' : isError ? 'I Understand' : 'Close'}
+          {isSuccess ? 'Confirm' : isError ? 'Close' : 'Close'}
         </button>
       </div>
     </div>
