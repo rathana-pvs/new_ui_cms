@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { hostApi } from '../../host/hostApi';
-import { showStatusModal } from '../../layout/layoutSlice';
+import { showStatusModal, setTabDirty } from '../../layout/layoutSlice';
 
 export default function CubridConfigEditor({ hostUid, confname }) {
+  const tabId = `edit_config:${hostUid}:${confname}`;
   const dispatch = useDispatch();
   const { hosts } = useSelector((state) => state.host);
   const currentHost = hosts.find(h => h.uid === hostUid);
@@ -25,6 +26,7 @@ export default function CubridConfigEditor({ hostUid, confname }) {
       setContent(lines.join('\n'));
       setOriginalContent(lines.join('\n'));
       setHasChanges(false);
+      dispatch(setTabDirty({ tabId, isDirty: false }));
     } catch (err) {
       console.error('Failed to fetch config:', err);
       dispatch(showStatusModal({ 
@@ -44,6 +46,7 @@ export default function CubridConfigEditor({ hostUid, confname }) {
   const handleContentChange = (e) => {
     setContent(e.target.value);
     setHasChanges(true);
+    dispatch(setTabDirty({ tabId, isDirty: true }));
   };
 
   const syncScroll = (e) => {
@@ -56,6 +59,7 @@ export default function CubridConfigEditor({ hostUid, confname }) {
   const handleUndo = () => {
     setContent(originalContent);
     setHasChanges(false);
+    dispatch(setTabDirty({ tabId, isDirty: false }));
   };
 
   const handleSave = async () => {
@@ -68,6 +72,7 @@ export default function CubridConfigEditor({ hostUid, confname }) {
       await hostApi.setHostConfig(hostUid, payload);
       setOriginalContent(content);
       setHasChanges(false);
+      dispatch(setTabDirty({ tabId, isDirty: false }));
       dispatch(showStatusModal({ 
         type: 'success', 
         title: 'Config saved', 

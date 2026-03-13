@@ -7,9 +7,12 @@ import hostReducer from '../features/host/hostSlice';
 import userReducer from '../features/user/userSlice';
 import authReducer from '../features/auth/authSlice';
 
+import appBarReducer from '../features/layout/appBarSlice';
+
 const combinedReducer = combineReducers({
   auth: authReducer,
   layout: layoutReducer,
+  appBar: appBarReducer,
   server: serverReducer,
   database: databaseReducer,
   broker: brokerReducer,

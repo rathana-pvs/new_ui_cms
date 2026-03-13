@@ -51,7 +51,6 @@ export default function RegisterPage() {
     }
   };
 
-  // Password strength
   const getPasswordStrength = () => {
     if (!password) return { level: 0, label: '', color: '' };
     let score = 0;
@@ -61,223 +60,182 @@ export default function RegisterPage() {
     if (/[0-9]/.test(password)) score++;
     if (/[^A-Za-z0-9]/.test(password)) score++;
 
-    if (score <= 1) return { level: 1, label: 'Weak', color: 'bg-accent-red' };
-    if (score <= 2) return { level: 2, label: 'Fair', color: 'bg-accent-orange' };
-    if (score <= 3) return { level: 3, label: 'Good', color: 'bg-accent-yellow' };
-    return { level: 4, label: 'Strong', color: 'bg-accent-green' };
+    if (score <= 1) return { level: 1, label: 'Standard', color: 'bg-rose-500' };
+    if (score <= 2) return { level: 2, label: 'Average', color: 'bg-amber-500' };
+    if (score <= 3) return { level: 3, label: 'Secure', color: 'bg-blue-500' };
+    return { level: 4, label: 'Highly Secure', color: 'bg-emerald-500' };
   };
 
   const strength = getPasswordStrength();
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-bk-main relative overflow-hidden font-sans">
+    <div className="min-h-screen flex bg-white dark:bg-bk-main font-sans selection:bg-bk-yellow/30">
+      
+      {/* Left Panel: Branding */}
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-[#0a0a0a] border-r border-white/5">
+        <div className="absolute inset-0 z-0 opacity-40">
+           <div className="absolute top-[30%] left-[20%] w-[350px] h-[350px] bg-emerald-500/10 rounded-full blur-[100px] animate-pulse"></div>
+           <div className="absolute bottom-[10%] left-[5%] w-[300px] h-[300px] bg-bk-yellow/5 rounded-full blur-[120px]"></div>
+           <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] opacity-20"></div>
+        </div>
 
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-bk-yellow/5 blur-3xl"></div>
-        <div className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-bk-yellow/5 blur-3xl"></div>
+        <div className="relative z-10 w-full flex flex-col justify-between p-20">
+          <div>
+            <Link to="/login" className="flex items-center gap-4 mb-14 group w-fit transition-all hover:translate-x-[-4px]">
+              <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center border border-white/10 group-hover:bg-white group-hover:border-white transition-all">
+                <span className="material-symbols-outlined text-slate-400 group-hover:text-bk-side">arrow_back</span>
+              </div>
+              <span className="text-sm font-black text-slate-400 group-hover:text-white uppercase tracking-widest">Back to Login</span>
+            </Link>
 
-        <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] rounded-full bg-bk-yellow/2 blur-3xl"></div>
+            <div className="flex items-center gap-4 mb-10">
+               <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center p-2 shadow-xl shadow-white/5">
+                 <img src="/cubrid-logo.png" alt="CUBRID" className="object-contain" />
+               </div>
+               <h3 className="text-xl font-bold text-white tracking-widest uppercase italic">Registration</h3>
+            </div>
+
+            <h2 className="text-5xl font-black text-white leading-[1.1] mb-8 tracking-tighter">
+              Build your <span className="text-bk-yellow">Data Foundation</span> <br/>
+              on solid ground.
+            </h2>
+            <p className="text-lg text-slate-400 font-light leading-relaxed max-w-lg mb-12">
+              Join the official CUBRID community. Experience a powerful, 3-tier architecture designed specifically for modern web application performance.
+            </p>
+            
+            <div className="grid grid-cols-2 gap-6">
+              {[
+                { label: 'Architecture', val: '3-Tier' },
+                { label: 'License', val: 'Open Source' },
+                { label: 'Performance', val: 'MVCC' },
+                { label: 'Security', val: 'Enterprise' }
+              ].map((stat, i) => (
+                <div key={i} className="p-5 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-bk-yellow/30 transition-colors">
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">{stat.label}</p>
+                  <p className="text-lg font-bold text-white">{stat.val}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="text-[10px] font-bold text-slate-700 uppercase tracking-[0.3em]">
+            CUBRID RELATIONAL DATABASE MANAGEMENT SYSTEM
+          </div>
+        </div>
       </div>
 
-
-      <div className="w-full max-w-md mx-4 relative z-10">
-        {/* Logo & Title */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-bk-yellow/10 mb-4">
-            <span className="material-symbols-outlined text-bk-yellow text-3xl" style={{ fontVariationSettings: "'wght' 300" }}>person_add</span>
+      {/* Right Panel: Register Form */}
+      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-8 sm:p-12 md:p-16 relative bg-slate-50 dark:bg-bk-main overflow-y-auto">
+        
+        <div className="w-full max-w-sm space-y-10 py-10">
+          <div className="space-y-4">
+            <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Register</h1>
+            <p className="text-slate-500 dark:text-slate-400 font-medium leading-relaxed">Create your administrative account to start managing your data clusters.</p>
           </div>
 
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-            Create Account
-          </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Register a new CUBRID Manager account
-          </p>
-        </div>
-
-        {/* Register Card */}
-        <div className="bg-white dark:bg-bk-side rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-black/40 border border-slate-200/60 dark:border-slate-800 p-8">
-
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Username */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                Username
-              </label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 text-[20px]" style={{ fontVariationSettings: "'wght' 300" }}>
-                  person
-                </span>
-                <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => { setUsername(e.target.value); clearFieldError('username'); }}
-                  className={`w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border ${errors.username ? 'border-accent-red focus:ring-accent-red/20' : 'border-slate-200 dark:border-slate-800 focus:ring-bk-yellow/20'} bg-slate-50 dark:bg-bk-main/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:border-bk-yellow/50 transition-all`}
-                  placeholder="Choose a username"
-                />
-              </div>
-
-              {errors.username && (
-                <p className="mt-1.5 text-xs text-accent-red flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[14px]">error</span>
-                  {errors.username}
-                </p>
-              )}
-            </div>
-
-            {/* Password */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                Password
-              </label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 text-[20px]" style={{ fontVariationSettings: "'wght' 300" }}>
-                  lock
-                </span>
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => { setPassword(e.target.value); clearFieldError('password'); }}
-                  className={`w-full pl-10 pr-12 py-2.5 text-sm rounded-xl border ${errors.password ? 'border-accent-red focus:ring-accent-red/20' : 'border-slate-200 dark:border-slate-800 focus:ring-bk-yellow/20'} bg-slate-50 dark:bg-bk-main/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:border-bk-yellow/50 transition-all`}
-                  placeholder="Create a password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-bk-yellow transition-colors"
-                >
-                  <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'wght' 300" }}>
-                    {showPassword ? 'visibility_off' : 'visibility'}
-                  </span>
-                </button>
-              </div>
-
-              {/* Password Strength */}
-              {password && (
-                <div className="mt-2">
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4].map((i) => (
-                      <div
-                        key={i}
-                        className={`h-1 flex-1 rounded-full transition-all ${i <= strength.level ? strength.color : 'bg-slate-200 dark:bg-slate-700'}`}
-                      />
-                    ))}
-                  </div>
-                  <p className={`text-xs mt-1 ${strength.level <= 1 ? 'text-accent-red' : strength.level <= 2 ? 'text-accent-orange' : strength.level <= 3 ? 'text-accent-yellow' : 'text-accent-green'}`}>
-                    {strength.label}
-                  </p>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-4">
+              {/* Username */}
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Username</label>
+                <div className="relative group">
+                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[20px] text-slate-400 group-focus-within:text-bk-yellow transition-colors">person_pin</span>
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => { setUsername(e.target.value); clearFieldError('username'); }}
+                    className={`w-full pl-12 pr-4 py-3.5 bg-white dark:bg-bk-side border-2 ${errors.username ? 'border-rose-500' : 'border-transparent group-focus-within:border-bk-yellow/50'} rounded-2xl outline-none shadow-sm transition-all dark:text-white text-sm`}
+                    placeholder="Pick a unique name"
+                  />
                 </div>
-              )}
-              {errors.password && (
-                <p className="mt-1.5 text-xs text-accent-red flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[14px]">error</span>
-                  {errors.password}
-                </p>
-              )}
-            </div>
-
-            {/* Confirm Password */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                Confirm Password
-              </label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 text-[20px]" style={{ fontVariationSettings: "'wght' 300" }}>
-                  lock_reset
-                </span>
-                <input
-                  type={showConfirm ? 'text' : 'password'}
-                  value={confirmPassword}
-                  onChange={(e) => { setConfirmPassword(e.target.value); clearFieldError('confirmPassword'); }}
-                  className={`w-full pl-10 pr-12 py-2.5 text-sm rounded-xl border ${errors.confirmPassword ? 'border-accent-red focus:ring-accent-red/20' : confirmPassword && password === confirmPassword ? 'border-accent-green focus:ring-accent-green/20' : 'border-slate-200 dark:border-slate-800 focus:ring-bk-yellow/20'} bg-slate-50 dark:bg-bk-main/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:border-bk-yellow/50 transition-all`}
-                  placeholder="Confirm your password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirm(!showConfirm)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-bk-yellow transition-colors"
-                >
-                  <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'wght' 300" }}>
-                    {showConfirm ? 'visibility_off' : 'visibility'}
-                  </span>
-                </button>
+                {errors.username && <p className="text-[11px] text-rose-500 font-medium ml-1 flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">error</span>{errors.username}</p>}
               </div>
 
-              {confirmPassword && password === confirmPassword && !errors.confirmPassword && (
-                <p className="mt-1.5 text-xs text-accent-green flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[14px]">check_circle</span>
-                  Passwords match
-                </p>
-              )}
-              {errors.confirmPassword && (
-                <p className="mt-1.5 text-xs text-accent-red flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[14px]">error</span>
-                  {errors.confirmPassword}
-                </p>
-              )}
+              {/* Password */}
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Password</label>
+                <div className="relative group">
+                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[20px] text-slate-400 group-focus-within:text-bk-yellow transition-colors">fingerprint</span>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => { setPassword(e.target.value); clearFieldError('password'); }}
+                    className={`w-full pl-12 pr-12 py-3.5 bg-white dark:bg-bk-side border-2 ${errors.password ? 'border-rose-500' : 'border-transparent group-focus-within:border-bk-yellow/50'} rounded-2xl outline-none shadow-sm transition-all dark:text-white text-sm`}
+                    placeholder="Create security keys"
+                  />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                    <span className="material-symbols-outlined text-[20px]">{showPassword ? 'visibility_off' : 'visibility'}</span>
+                  </button>
+                </div>
+                
+                {password && (
+                  <div className="px-1 pt-1 animate-in fade-in duration-300">
+                    <div className="flex gap-1.5 h-1">
+                      {[1, 2, 3, 4].map((i) => (
+                        <div key={i} className={`flex-1 rounded-full transition-all duration-500 ${i <= strength.level ? strength.color : 'bg-slate-200 dark:bg-white/5'}`}></div>
+                      ))}
+                    </div>
+                    <p className="text-[9px] font-black uppercase tracking-widest mt-2 text-slate-400">Security: <span className={strength.level >= 3 ? 'text-emerald-500' : 'text-rose-500'}>{strength.label}</span></p>
+                  </div>
+                )}
+                {errors.password && <p className="text-[11px] text-rose-500 font-medium ml-1 flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">error</span>{errors.password}</p>}
+              </div>
+
+              {/* Confirm Password */}
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Confirm Security</label>
+                <div className="relative group">
+                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[20px] text-slate-400 group-focus-within:text-bk-yellow transition-colors">verified</span>
+                  <input
+                    type={showConfirm ? 'text' : 'password'}
+                    value={confirmPassword}
+                    onChange={(e) => { setConfirmPassword(e.target.value); clearFieldError('confirmPassword'); }}
+                    className={`w-full pl-12 pr-12 py-3.5 bg-white dark:bg-bk-side border-2 ${errors.confirmPassword ? 'border-rose-500' : confirmPassword && password === confirmPassword ? 'border-emerald-500/50' : 'border-transparent group-focus-within:border-bk-yellow/50'} rounded-2xl outline-none shadow-sm transition-all dark:text-white text-sm`}
+                    placeholder="Repeat keys"
+                  />
+                   <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                    <span className="material-symbols-outlined text-[20px]">{showConfirm ? 'visibility_off' : 'visibility'}</span>
+                  </button>
+                </div>
+                {confirmPassword && password === confirmPassword && !errors.confirmPassword && (
+                   <div className="flex items-center gap-1 text-[11px] text-emerald-500 font-bold ml-1 animate-in fade-in transition-all">
+                      <span className="material-symbols-outlined text-[14px]">verified</span>
+                      <span>Ready to sync</span>
+                   </div>
+                )}
+                {errors.confirmPassword && <p className="text-[11px] text-rose-500 font-medium ml-1 flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">error</span>{errors.confirmPassword}</p>}
+              </div>
             </div>
 
-            {/* API Error */}
+            <div className="pt-4">
+               <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-4 bg-slate-900 dark:bg-bk-yellow text-white dark:text-bk-side font-black rounded-2xl shadow-xl hover:shadow-2xl transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 relative overflow-hidden group"
+              >
+                {loading ? (
+                  <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                ) : (
+                  <>
+                    <span className="uppercase tracking-widest text-xs">Create Master Account</span>
+                    <span className="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">person_add_alt_1</span>
+                  </>
+                )}
+              </button>
+            </div>
+
             {apiError && (
-              <div className="flex items-center gap-2 px-4 py-3 text-sm text-accent-red bg-accent-red/10 border border-accent-red/20 rounded-xl">
-                <span className="material-symbols-outlined text-[18px]">error</span>
-                {apiError}
+              <div className="p-4 bg-rose-50 dark:bg-rose-500/10 border border-rose-100 dark:border-rose-500/20 rounded-2xl flex items-center gap-3">
+                <span className="material-symbols-outlined text-rose-500 text-[20px]">report</span>
+                <p className="text-xs text-rose-600 dark:text-rose-400 font-bold leading-relaxed">{apiError}</p>
               </div>
             )}
-
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-2.5 px-4 bg-bk-yellow hover:bg-bk-yellow/90 text-bk-side text-sm font-bold rounded-xl shadow-lg shadow-bk-yellow/10 hover:shadow-bk-yellow/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
-            >
-              {loading ? (
-                <>
-                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                  Creating account...
-                </>
-              ) : (
-                <>
-                  <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'wght' 500" }}>person_add</span>
-                  Create Account
-                </>
-              )}
-            </button>
-
           </form>
 
-          {/* Divider */}
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-200 dark:border-slate-700"></div>
-            </div>
-            <div className="relative flex justify-center">
-              <span className="bg-white dark:bg-slate-900 px-3 text-xs text-slate-400">or</span>
-            </div>
-          </div>
-
-          {/* Back to Login */}
-          <p className="text-center text-sm text-slate-500 dark:text-slate-400">
-            Already have an account?{' '}
-            <Link
-              to="/login"
-              className="font-bold text-bk-yellow hover:underline transition-all inline-flex items-center gap-1"
-            >
-              <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'wght' 300" }}>arrow_back</span>
-              Back to login
-            </Link>
+          <p className="text-center text-xs text-slate-500 dark:text-slate-400 leading-relaxed max-w-[280px] mx-auto">
+            By joining, you agree to the CUBRID Open Source <a href="#" className="underline font-bold text-slate-900 dark:text-white hover:text-bk-yellow transition-colors">Project Terms</a> and data processing policies.
           </p>
-
         </div>
-
-        {/* Footer */}
-        <p className="text-center text-xs text-slate-400 dark:text-slate-500 mt-6">
-          © 2026 CUBRID. All rights reserved.
-        </p>
       </div>
     </div>
   );

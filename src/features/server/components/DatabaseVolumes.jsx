@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useSelector } from 'react-redux';
-import { databaseApi } from '../../database/databaseApi';
+import { useEffect, useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchDatabaseVolumes } from '../../database/databaseSlice';
 
 const getSizeFormat = (size) => {
   if (size >= 1024 ** 3) {
@@ -51,58 +51,42 @@ const getLogColumn = (dbSpace, type) => {
 };
 
 export default function DatabaseVolumes({ hostUid }) {
+  const dispatch = useDispatch();
   const { authorizedHosts } = useSelector((state) => state.host);
-  const { activeDatabases } = useSelector((state) => state.database);
-  const [volumeData, setVolumeData] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const { activeDatabases, volumes, volumesLoading: loading } = useSelector((state) => state.database);
 
   const fetchVolumes = useCallback(async () => {
     if (!hostUid || !authorizedHosts.includes(hostUid) || activeDatabases.length === 0) {
-      setVolumeData([]);
       return;
     }
-
-    setLoading(true);
-    try {
-      const allRequest = activeDatabases.map(dbname => 
-        databaseApi.getVolumeInfo(hostUid, dbname)
-      );
-
-      const responses = await Promise.all(allRequest);
-      const tempData = responses.map((res) => {
-        const result = res;
-        let permanent = { display: '-', pct: 0 };
-        let temporary = { display: '-', pct: 0 };
-        let activeLog = '-';
-        let archiveLog = '-';
-
-        if (result && result.spaceinfo) {
-          permanent = getVolumeColumn(result, 'PERMANENT');
-          temporary = getVolumeColumn(result, 'TEMPORARY');
-          activeLog = getLogColumn(result, 'Active_log');
-          archiveLog = getLogColumn(result, 'Archive_log');
-        }
-
-        return {
-          db: result.dbname,
-          permanent,
-          temporary,
-          activeLog,
-          archiveLog,
-        };
-      });
-
-      setVolumeData(tempData);
-    } catch (err) {
-      console.error('Failed to fetch volume info:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [hostUid, activeDatabases]);
+    dispatch(fetchDatabaseVolumes({ hostUid, activeDatabases }));
+  }, [hostUid, authorizedHosts, activeDatabases, dispatch]);
 
   useEffect(() => {
     fetchVolumes();
   }, [fetchVolumes]);
+
+  const volumeData = volumes.map((result) => {
+    let permanent = { display: '-', pct: 0 };
+    let temporary = { display: '-', pct: 0 };
+    let activeLog = '-';
+    let archiveLog = '-';
+
+    if (result && result.spaceinfo) {
+      permanent = getVolumeColumn(result, 'PERMANENT');
+      temporary = getVolumeColumn(result, 'TEMPORARY');
+      activeLog = getLogColumn(result, 'Active_log');
+      archiveLog = getLogColumn(result, 'Archive_log');
+    }
+
+    return {
+      db: result.dbname,
+      permanent,
+      temporary,
+      activeLog,
+      archiveLog,
+    };
+  });
 
   return (
     <details className="group border border-slate-200 dark:border-slate-800 rounded-lg shadow-sm bg-white dark:bg-bk-side overflow-hidden" open>

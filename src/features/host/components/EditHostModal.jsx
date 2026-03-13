@@ -114,29 +114,29 @@ export default function EditHostModal() {
           </button>
         </div>
 
-        {/* Body - Denser Technical Grid */}
+        {/* Body - Denser Grid */}
         <div className="p-5 space-y-5 max-h-[70vh] overflow-y-auto custom-scrollbar">
           
           {/* Section 1 */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Host identity</span>
+              <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Credentials</span>
               <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
             </div>
             
             <div className="space-y-1.5">
-              <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5">Alias / host name</label>
+              <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5">Host friendly name</label>
               <div className="relative group/field">
                 <input 
                   type="text" 
                   name="alias"
                   value={formData.alias}
                   onChange={handleChange}
-                  className={`w-full h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border ${errors.alias ? 'border-rose-500/50' : 'border-slate-200 dark:border-slate-800'} rounded focus:outline-none focus:border-bk-yellow/50 text-[12px] text-slate-900 dark:text-slate-100 transition-all font-medium placeholder:text-slate-400 dark:placeholder:text-slate-600 tracking-tight`} 
+                  className={`w-full h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border ${errors.alias ? 'border-rose-500/50' : 'border-slate-200 dark:border-slate-800'} rounded focus:outline-none focus:border-bk-yellow/50 text-[12px] text-slate-900 dark:text-slate-100 transition-all font-medium placeholder:text-slate-400 dark:placeholder:text-slate-600`} 
                   placeholder="My server" 
                   disabled={loading}
                 />
-                {errors.alias && <p className="mt-1 text-[9px] text-rose-500 font-medium tracking-tight">{errors.alias}</p>}
+                {errors.alias && <p className="mt-1 text-[9px] text-rose-500 font-medium tracking-tight whitespace-nowrap">{errors.alias}</p>}
               </div>
             </div>
           </div>
@@ -144,34 +144,40 @@ export default function EditHostModal() {
           {/* Section 2 */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Networking</span>
+              <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Host identity</span>
               <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
             </div>
 
             <div className="grid grid-cols-4 gap-3">
               <div className="col-span-3 space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5">Network address</label>
-                <input 
-                  type="text" 
-                  name="address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  className={`w-full h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border ${errors.address ? 'border-rose-500/50' : 'border-slate-200 dark:border-slate-800'} rounded focus:outline-none focus:border-bk-yellow/50 text-[12px] text-slate-900 dark:text-slate-100 font-medium placeholder:text-slate-400 dark:placeholder:text-slate-600 tracking-tight`} 
-                  placeholder="localhost" 
-                  disabled={loading}
-                />
+                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5">IP address / domain</label>
+                <div className="relative group/field">
+                  <input 
+                    type="text" 
+                    name="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    className={`w-full h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border ${errors.address ? 'border-rose-500/50' : 'border-slate-200 dark:border-slate-800'} rounded focus:outline-none focus:border-bk-yellow/50 text-[12px] text-slate-900 dark:text-slate-100 transition-all font-medium placeholder:text-slate-400 dark:placeholder:text-slate-600 tracking-tight`} 
+                    placeholder="localhost" 
+                    disabled={loading}
+                  />
+                  {errors.address && <p className="mt-1 text-[9px] text-rose-500 font-medium tracking-tight whitespace-nowrap">{errors.address}</p>}
+                </div>
               </div>
               <div className="space-y-1.5">
                 <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5">Port</label>
-                <input 
-                  type="text" 
-                  name="port"
-                  value={formData.port}
-                  onChange={handleChange}
-                  className={`w-full h-9 px-2 bg-slate-50 dark:bg-bk-main/30 border ${errors.port ? 'border-rose-500/50' : 'border-slate-200 dark:border-slate-800'} rounded focus:outline-none focus:border-bk-yellow/50 text-[13px] text-slate-900 dark:text-slate-100 font-medium text-center placeholder:text-slate-400 dark:placeholder:text-slate-600`} 
-                  placeholder="8001" 
-                  disabled={loading}
-                />
+                <div className="relative group/field">
+                  <input 
+                    type="text" 
+                    name="port"
+                    value={formData.port}
+                    onChange={handleChange}
+                    className={`w-full h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border ${errors.port ? 'border-rose-500/50' : 'border-slate-200 dark:border-slate-800'} rounded focus:outline-none focus:border-bk-yellow/50 text-[12px] text-slate-900 dark:text-slate-100 font-medium text-left placeholder:text-slate-400 dark:placeholder:text-slate-600`} 
+                    placeholder="8001" 
+                    disabled={loading}
+                  />
+                  {errors.port && <p className="mt-1 text-[9px] text-rose-500 font-medium tracking-tight whitespace-nowrap">{errors.port}</p>}
+                </div>
               </div>
             </div>
           </div>
@@ -179,39 +185,43 @@ export default function EditHostModal() {
           {/* Section 3 */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Credentials</span>
+              <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Manager access</span>
               <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">Username</label>
-                <input 
-                  type="text" 
-                  name="id"
-                  value={formData.id}
-                  onChange={handleChange}
-                  className={`w-full h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border ${errors.id ? 'border-rose-500/50' : 'border-slate-200 dark:border-slate-800'} rounded focus:outline-none focus:border-bk-yellow/50 text-[12px] text-slate-900 dark:text-slate-100 font-medium placeholder:text-slate-400 dark:placeholder:text-slate-600 tracking-tight`} 
-                  placeholder="admin" 
-                  disabled={loading}
-                />
-                {errors.id && <p className="mt-1 text-[9px] text-rose-500 font-medium tracking-tight">{errors.id}</p>}
+                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5">Admin username</label>
+                <div className="relative group/field">
+                  <input 
+                    type="text" 
+                    name="id"
+                    value={formData.id}
+                    onChange={handleChange}
+                    className={`w-full h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border ${errors.id ? 'border-rose-500/50' : 'border-slate-200 dark:border-slate-800'} rounded focus:outline-none focus:border-bk-yellow/50 text-[12px] text-slate-900 dark:text-slate-100 font-medium placeholder:text-slate-400 dark:placeholder:text-slate-600 tracking-tight`} 
+                    placeholder="admin" 
+                    disabled={loading}
+                  />
+                  {errors.id && <p className="mt-1 text-[9px] text-rose-500 font-medium tracking-tight whitespace-nowrap">{errors.id}</p>}
+                </div>
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center justify-between h-4">
+                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center justify-between">
                   <span>Passcode</span>
                   <span className="text-[8px] text-slate-400 font-normal italic normal-case tracking-normal">(optional)</span>
                 </label>
-                <input 
-                  type="password" 
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className={`w-full h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border ${errors.password ? 'border-rose-500/50' : 'border-slate-200 dark:border-slate-800'} rounded focus:outline-none focus:border-bk-yellow/50 text-[13px] text-slate-900 dark:text-slate-100 font-medium placeholder:text-slate-400 dark:placeholder:text-slate-600`} 
-                  placeholder="••••••••" 
-                  disabled={loading}
-                />
-                {errors.password && <p className="mt-1 text-[9px] text-rose-500 font-medium tracking-tight">{errors.password}</p>}
+                <div className="relative group/field">
+                  <input 
+                    type="password" 
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className={`w-full h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border ${errors.password ? 'border-rose-500/50' : 'border-slate-200 dark:border-slate-800'} rounded focus:outline-none focus:border-bk-yellow/50 text-[12px] text-slate-900 dark:text-slate-100 font-medium placeholder:text-slate-400 dark:placeholder:text-slate-600`} 
+                    placeholder="••••••••" 
+                    disabled={loading}
+                  />
+                  {errors.password && <p className="mt-1 text-[9px] text-rose-500 font-medium tracking-tight whitespace-nowrap">{errors.password}</p>}
+                </div>
               </div>
             </div>
           </div>

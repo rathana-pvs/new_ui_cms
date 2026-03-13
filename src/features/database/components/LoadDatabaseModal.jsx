@@ -6,6 +6,10 @@ import { databaseApi } from '../databaseApi';
 import LoadingOverlay from '../../../components/common/LoadingOverlay';
 import ErrorOverlay from '../../../components/common/ErrorOverlay';
 
+import LoadConfigSection from './load/LoadConfigSection';
+import LoadSourceSection from './load/LoadSourceSection';
+import LoadOptionsSection from './load/LoadOptionsSection';
+
 export default function LoadDatabaseModal() {
   const dispatch = useDispatch();
   const { isLoadDBModalOpen, selectedDatabase } = useSelector((state) => state.database);
@@ -217,205 +221,29 @@ export default function LoadDatabaseModal() {
         {/* Body */}
         <div className="p-5 space-y-6 overflow-y-auto custom-scrollbar flex-1 max-h-[75vh]">
           
-          {/* Section: Configuration */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Profile context</span>
-              <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">Target database</label>
-                <div className="w-full h-9 px-3 flex items-center bg-slate-100 dark:bg-bk-main/10 border border-slate-100 dark:border-white/5 rounded text-[12px] font-medium text-slate-400 truncate cursor-default">
-                  {formData.targetDbName}
-                </div>
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">DB Authority</label>
-                <input 
-                  type="text" 
-                  name="dbUsername"
-                  value={formData.dbUsername}
-                  onChange={handleInputChange}
-                  className="w-full h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border border-slate-200 dark:border-slate-800 rounded focus:outline-none focus:border-bk-yellow/50 text-[12px] text-slate-900 dark:text-slate-100 font-medium"
-                />
-              </div>
-            </div>
-          </div>
+          <LoadConfigSection 
+            formData={formData} 
+            handleInputChange={handleInputChange} 
+          />
 
-          {/* Section: Source Selection */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Source parameters</span>
-              <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
-            </div>
+          <LoadSourceSection 
+            radio={radio}
+            setRadio={setRadio}
+            selectedUnload={selectedUnload}
+            handleUnloadSelectChange={handleUnloadSelectChange}
+            unloadList={unloadList}
+            dataSource={dataSource}
+            handleTableCheckboxChange={handleTableCheckboxChange}
+            formData={formData}
+            handleCheckBoxChange={handleCheckBoxChange}
+            handleUnloadPathChange={handleUnloadPathChange}
+          />
 
-            <div className="space-y-4">
-              {/* Option 1: Pre-defined source */}
-              <div className="space-y-3">
-                <label className="flex items-center gap-3 cursor-pointer group w-fit">
-                  <div className="relative flex items-center">
-                    <input 
-                      type="radio" 
-                      name="radioOption" 
-                      checked={radio === 0}
-                      onChange={() => setRadio(0)}
-                      className="peer w-4 h-4 appearance-none rounded-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 checked:border-bk-yellow transition-all cursor-pointer"
-                    />
-                    <div className="absolute w-2 h-2 bg-bk-yellow rounded-full left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
-                  </div>
-                  <span className={`text-[11px] font-medium tracking-wide transition-colors ${radio === 0 ? 'text-slate-700 dark:text-slate-200' : 'text-slate-400'}`}>Pre-defined backup volumes</span>
-                </label>
-
-                <div className={`space-y-3 transition-all ${radio !== 0 ? 'opacity-30 grayscale pointer-events-none' : ''}`}>
-                  <div className="relative pl-7">
-                    <select 
-                        value={selectedUnload}
-                        onChange={(e) => handleUnloadSelectChange(e.target.value)}
-                        className="w-full h-9 px-3 pr-8 bg-slate-50 dark:bg-bk-main/30 border border-slate-200 dark:border-slate-800 rounded focus:outline-none focus:border-bk-yellow/50 text-[12px] text-slate-900 dark:text-slate-100 font-medium appearance-none transition-all"
-                    >
-                        {unloadList.map(db => (
-                            <option key={db.dbname} value={db.dbname}>{db.dbname}</option>
-                        ))}
-                    </select>
-                    <span className="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-lg">expand_more</span>
-                  </div>
-
-                  <div className="border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden bg-slate-50/20 dark:bg-bk-main/30 ml-7">
-                    <table className="w-full text-left text-[11px] border-collapse">
-                      <thead className="bg-slate-50/80 dark:bg-bk-main/50 text-[10px] font-medium text-slate-400 tracking-wide border-b border-slate-100 dark:border-slate-800">
-                        <tr>
-                          <th className="px-3 py-2">Flag</th>
-                          <th className="px-3 py-2">Volume path</th>
-                          <th className="px-3 py-2 text-right">Timestamp</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-                        {dataSource.map(row => (
-                          <tr key={row.key} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-all cursor-pointer" onClick={() => handleTableCheckboxChange(!row.checked, row.key)}>
-                            <td className="px-3 py-2">
-                                <input 
-                                  type="checkbox" 
-                                  className="h-3.5 w-3.5 cursor-pointer rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-bk-main text-bk-yellow focus:ring-bk-yellow/50 accent-bk-yellow transition-all" 
-                                  checked={row.checked} 
-                                  readOnly
-                                />
-                            </td>
-                            <td className="px-3 py-2 font-mono text-[10px] text-slate-500 max-w-[280px] truncate">{row.path}</td>
-                            <td className="px-3 py-2 text-right font-mono text-[10px] text-slate-400">{row.date}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-
-              {/* Option 2: Custom path */}
-              <div className="space-y-3 pt-2 border-t border-slate-50 dark:border-white/5">
-                <label className="flex items-center gap-3 cursor-pointer group w-fit">
-                  <div className="relative flex items-center">
-                    <input 
-                      type="radio" 
-                      name="radioOption" 
-                      checked={radio === 1}
-                      onChange={() => setRadio(1)}
-                      className="peer w-4 h-4 appearance-none rounded-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 checked:border-bk-yellow transition-all cursor-pointer"
-                    />
-                    <div className="absolute w-2 h-2 bg-bk-yellow rounded-full left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
-                  </div>
-                  <span className={`text-[11px] font-medium tracking-wide transition-colors ${radio === 1 ? 'text-slate-700 dark:text-slate-200' : 'text-slate-400'}`}>Manual volume paths</span>
-                </label>
-
-                <div className={`space-y-2 pl-7 transition-all ${radio !== 1 ? 'opacity-30 grayscale pointer-events-none' : ''}`}>
-                  {['schema', 'object', 'index', 'trigger'].map(type => (
-                    <div key={type} className="flex items-center gap-3 group">
-                      <div className="w-32 shrink-0 flex items-center gap-2.5">
-                          <input 
-                            type="checkbox"
-                            checked={formData.checkBoxes[type]}
-                            onChange={(e) => handleCheckBoxChange(type, e.target.checked)}
-                            className="h-3.5 w-3.5 cursor-pointer rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-bk-main text-bk-yellow focus:ring-bk-yellow/50 accent-bk-yellow transition-all"
-                          />
-                        <span className="text-[10px] font-medium text-slate-400 tracking-wide">Load {type}</span>
-                      </div>
-                      <input 
-                        type="text"
-                        value={formData.unloadFiles[type]}
-                        onChange={(e) => handleUnloadPathChange(type, e.target.value)}
-                        disabled={!formData.checkBoxes[type]}
-                        placeholder="/absolute/path/to/file"
-                        className={`flex-1 h-8 px-3 rounded text-[11px] border transition-all outline-none font-medium
-                          ${!formData.checkBoxes[type]
-                            ? 'bg-slate-50 dark:bg-bk-main/10 border-slate-100 dark:border-slate-800 text-slate-300 cursor-not-allowed'
-                            : 'bg-white dark:bg-bk-main/30 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:border-bk-yellow/50'}`}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Section: Load Option */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Load behaviors</span>
-              <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-x-6 gap-y-2 px-1">
-              {[
-                  { id: 'checkoption', label: 'Verify syntax before load' },
-                  { id: 'nolog', label: "Suppress log generation" },
-                  { id: 'oiduse', label: "Ignore object identifiers (OID)" },
-                  { id: 'statisticsuse', label: "Skip statistics update" },
-              ].map(opt => (
-                <label key={opt.id} className="flex items-center gap-2.5 cursor-pointer group">
-                  <input 
-                    type="checkbox"
-                    checked={formData.checkBoxes[opt.id]}
-                    onChange={(e) => handleCheckBoxChange(opt.id, e.target.checked)}
-                    className="h-3.5 w-3.5 cursor-pointer rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-bk-main text-bk-yellow focus:ring-bk-yellow/50 accent-bk-yellow transition-all"
-                  />
-                  <span className="text-[11px] font-medium text-slate-500 group-hover:text-slate-700 dark:text-slate-400 dark:group-hover:text-slate-200 transition-colors tracking-tight">{opt.label}</span>
-                </label>
-              ))}
-            </div>
-
-            <div className="space-y-2 pt-2 border-t border-slate-50 dark:border-white/5">
-              {[
-                  { id: 'estimated', label: 'Estimated instance count', type: 'number', placeholder: '0' },
-                  { id: 'period', label: 'Periodic commit threshold', type: 'number', placeholder: '1000' },
-                  { id: 'errorcontrolfile', label: 'Error control definition', type: 'text' },
-                  { id: 'ignoreclassfile', label: 'Excluded table definition', type: 'text' },
-              ].map(item => (
-                <div key={item.id} className="flex items-center gap-3 group">
-                  <div className="w-52 shrink-0 flex items-center gap-2.5">
-                      <input 
-                        type="checkbox"
-                        checked={formData.checkBoxes[item.id]}
-                        onChange={(e) => handleCheckBoxChange(item.id, e.target.checked)}
-                        className="h-3.5 w-3.5 cursor-pointer rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-bk-main text-bk-yellow focus:ring-bk-yellow/50 accent-bk-yellow transition-all"
-                      />
-                    <label className={`text-[10px] font-medium tracking-wide transition-colors ${formData.checkBoxes[item.id] ? 'text-slate-600 dark:text-slate-300' : 'text-slate-400 dark:text-slate-500'}`}>{item.label}</label>
-                  </div>
-                  <input 
-                    type={item.type}
-                    value={formData.values[item.id]}
-                    onChange={(e) => handleValueChange(item.id, e.target.value)}
-                    disabled={!formData.checkBoxes[item.id]}
-                    placeholder={item.placeholder || ""}
-                    className={`flex-1 h-8 px-3 rounded text-[11px] border transition-all outline-none font-medium
-                      ${!formData.checkBoxes[item.id]
-                        ? 'bg-slate-50 dark:bg-bk-main/10 border-slate-100 dark:border-slate-800 text-slate-300 cursor-not-allowed'
-                        : 'bg-white dark:bg-bk-main/30 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:border-bk-yellow/50'}`}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
+          <LoadOptionsSection 
+            formData={formData}
+            handleCheckBoxChange={handleCheckBoxChange}
+            handleValueChange={handleValueChange}
+          />
         </div>
         
         {/* Footer */}

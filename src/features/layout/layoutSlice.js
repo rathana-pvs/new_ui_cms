@@ -12,6 +12,7 @@ const initialState = {
   isResizing: false,
   activeMainTab: null,
   openTabs: [],
+  dirtyTabs: [], // Tracks tab IDs with unsaved changes
   statusModal: {
     isOpen: false,
     type: 'success', // success, error, info
@@ -57,9 +58,20 @@ const layoutSlice = createSlice({
       }
       state.activeMainTab = tabId;
     },
+    setTabDirty: (state, action) => {
+      const { tabId, isDirty } = action.payload;
+      if (isDirty) {
+        if (!state.dirtyTabs.includes(tabId)) {
+          state.dirtyTabs.push(tabId);
+        }
+      } else {
+        state.dirtyTabs = state.dirtyTabs.filter(id => id !== tabId);
+      }
+    },
     closeTab: (state, action) => {
       const tabId = action.payload;
       state.openTabs = state.openTabs.filter(tab => tab !== tabId);
+      state.dirtyTabs = state.dirtyTabs.filter(id => id !== tabId);
       
       // If we closed the active tab, switch to another one
       if (state.activeMainTab === tabId) {
@@ -72,9 +84,9 @@ const layoutSlice = createSlice({
     },
     closeHostTabs: (state, action) => {
       const hostUid = action.payload;
-      // Close the host tab, and realistically if we disconnect we'd also close db tabs for that host. 
-      // Since db tabs are just 'db:dbname', we might as well close all db tabs or clear everything.
-      state.openTabs = state.openTabs.filter(tab => tab !== `host:${hostUid}` && !tab.startsWith('db:'));
+      const tabsToClose = state.openTabs.filter(tab => tab === `host:${hostUid}` || tab.startsWith('db:'));
+      state.openTabs = state.openTabs.filter(tab => !tabsToClose.includes(tab));
+      state.dirtyTabs = state.dirtyTabs.filter(id => !tabsToClose.includes(id));
       
       if (!state.openTabs.includes(state.activeMainTab)) {
         if (state.openTabs.length > 0) {
@@ -83,6 +95,17 @@ const layoutSlice = createSlice({
           state.activeMainTab = null;
         }
       }
+    },
+    closeOtherTabs: (state, action) => {
+      const keepTabId = action.payload;
+      state.openTabs = state.openTabs.filter(tab => tab === keepTabId);
+      state.dirtyTabs = state.dirtyTabs.filter(id => id === keepTabId);
+      state.activeMainTab = keepTabId;
+    },
+    closeAllTabs: (state) => {
+      state.openTabs = [];
+      state.dirtyTabs = [];
+      state.activeMainTab = null;
     },
     showStatusModal: (state, action) => {
       state.statusModal = {
@@ -105,8 +128,11 @@ export const {
   setSidebarCollapsed,
   setIsResizing,
   setActiveMainTab,
+  setTabDirty,
   openTab,
   closeTab,
+  closeOtherTabs,
+  closeAllTabs,
   closeHostTabs,
   showStatusModal,
   closeStatusModal,

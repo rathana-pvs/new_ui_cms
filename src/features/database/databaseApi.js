@@ -47,4 +47,12 @@ export const databaseApi = {
   removeAutoStart: (hostUid, payload) => {
     return apiClient.delete(`/${hostUid}/database/auto-start`, { data: payload });
   },
+
+  deleteDatabase: (hostUid, dbname, payload) => {
+    return apiClient.delete(`/${hostUid}/database/${dbname}`, { data: payload });
+  },
+
+  loginDatabase: (hostUid, dbname, payload) => {
+    return apiClient.post(`/${hostUid}/database/users/login/${dbname}`, payload);
+  },
 };

@@ -1,9 +1,93 @@
-export default function Breadcrumb({ activeTab, onTabChange, openTabs = [], onCloseTab, labels = {} }) {
+import { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { SubMenu, MenuItem, MenuDivider } from '../../../components/common/DropdownMenu';
+import ConfirmModal from '../../../components/common/ConfirmModal';
+import ContextMenuWrapper from '../../../components/common/ContextMenuWrapper';
+
+
+import TabItem from './TabItem';
+
+export default function Breadcrumb({ activeTab, onTabChange, openTabs = [], onCloseTab, onCloseOthers, onCloseAll, labels = {} }) {
+  const [contextMenu, setContextMenu] = useState(null);
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, onConfirm: null, message: '' });
+  const { dirtyTabs } = useSelector((state) => state.layout);
+
+  useEffect(() => {
+    const handleClickOutside = () => setContextMenu(null);
+    window.addEventListener('click', handleClickOutside);
+    window.addEventListener('scroll', handleClickOutside, true);
+    return () => {
+      window.removeEventListener('click', handleClickOutside);
+      window.removeEventListener('scroll', handleClickOutside, true);
+    };
+  }, []);
+
+  const handleCloseTab = (tabId, queue = []) => {
+    if (dirtyTabs.includes(tabId)) {
+      onTabChange(tabId); // Switch to the dirty tab so user sees contents
+      setConfirmModal({
+        isOpen: true,
+        title: 'Discard Changes?',
+        message: `You have unsaved changes in "${labels[tabId] || tabId}". If you close it, your changes will be lost.`,
+        onConfirm: () => {
+          onCloseTab(tabId);
+          if (queue.length > 1) {
+            const nextQueue = queue.slice(1);
+            setConfirmModal({ ...confirmModal, isOpen: false });
+            // Small timeout to allow modal to cycle
+            setTimeout(() => handleCloseTab(nextQueue[0], nextQueue), 100);
+          }
+        }
+      });
+    } else {
+      onCloseTab(tabId);
+      if (queue.length > 1) {
+        const nextQueue = queue.slice(1);
+        handleCloseTab(nextQueue[0], nextQueue);
+      }
+    }
+  };
+
+  const handleCloseOthers = (tabId) => {
+    const others = openTabs.filter(tid => tid !== tabId);
+    const dirtyOthers = others.filter(tid => dirtyTabs.includes(tid));
+    const cleanOthers = others.filter(tid => !dirtyTabs.includes(tid));
+
+    // Immediately close clean tabs
+    cleanOthers.forEach(tid => onCloseTab(tid));
+
+    if (dirtyOthers.length > 0) {
+      handleCloseTab(dirtyOthers[0], dirtyOthers);
+    }
+  };
+
+  const handleCloseAll = () => {
+    const dirtyOnes = openTabs.filter(tid => dirtyTabs.includes(tid));
+    const cleanOnes = openTabs.filter(tid => !dirtyTabs.includes(tid));
+
+    // Immediately close clean tabs
+    cleanOnes.forEach(tid => onCloseTab(tid));
+
+    if (dirtyOnes.length > 0) {
+      handleCloseTab(dirtyOnes[0], dirtyOnes);
+    }
+  };
+
+  const handleContextMenu = (e, tabId) => {
+    e.preventDefault();
+    setContextMenu({
+      x: e.clientX,
+      y: e.clientY,
+      tabId
+    });
+  };
+
   const getTabIcon = (id) => {
     if (id.startsWith('host:')) return 'dns';
     if (id.startsWith('db:')) return 'database';
     if (id.startsWith('edit_config:')) return 'settings_applications';
     if (id.startsWith('broker_config:')) return 'table_rows';
+    if (id.startsWith('log:')) return 'description';
     return 'description';
   };
 
@@ -17,45 +101,68 @@ export default function Breadcrumb({ activeTab, onTabChange, openTabs = [], onCl
   };
 
   return (
-    <div className="bg-slate-50 dark:bg-bk-main border-b border-slate-200 dark:border-slate-800 font-sans">
-
+    <div className="bg-slate-50 dark:bg-bk-main border-b border-slate-200 dark:border-slate-800 font-sans relative">
       <div className="flex overflow-x-auto scrollbar-hide">
-        {openTabs.map((tabId) => {
-          const isActive = activeTab === tabId;
-          return (
-            <div 
-              key={tabId}
-              className={`group flex items-center gap-2 px-5 py-2.5 border-r border-slate-200 dark:border-slate-800 font-medium text-[12px] tracking-wide cursor-pointer min-w-[140px] transition-all whitespace-nowrap relative ${
-                isActive 
-                  ? 'bg-white dark:bg-bk-side text-slate-800 dark:text-bk-yellow' 
-                  : 'bg-slate-100 dark:bg-bk-main text-slate-500 hover:bg-slate-50 dark:hover:bg-white/5'
-              }`}
-
-              onClick={() => onTabChange(tabId)}
-            >
-              {/* Active indicator line */}
-              {isActive && <div className="absolute top-0 left-0 right-0 h-[3px] bg-bk-yellow shadow-[0_0_8px_rgba(255,193,7,0.4)]"></div>}
-              
-              <span className={`material-symbols-outlined text-[16px] ${isActive ? 'text-bk-yellow' : 'opacity-60 text-slate-400'}`} style={{ fontVariationSettings: isActive ? "'wght' 500" : "'wght' 300" }}>
-                {getTabIcon(tabId)}
-              </span>
-              <span className="truncate flex-1">
-                {getTabLabel(tabId)}
-              </span>
-              <div 
-                className={`flex items-center justify-center p-1 ml-2 rounded hover:bg-slate-200 dark:hover:bg-white/10 transition-colors ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onCloseTab(tabId);
-                }}
-              >
-                <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'wght' 300" }}>close</span>
-              </div>
-            </div>
-          );
-        })}
+        {openTabs.map((tabId) => (
+          <TabItem
+            key={tabId}
+            tabId={tabId}
+            isActive={activeTab === tabId}
+            isDirty={dirtyTabs.includes(tabId)}
+            label={getTabLabel(tabId)}
+            icon={getTabIcon(tabId)}
+            onClick={() => onTabChange(tabId)}
+            onClose={() => handleCloseTab(tabId)}
+            onContextMenu={(e) => handleContextMenu(e, tabId)}
+          />
+        ))}
       </div>
+
+      {contextMenu && (
+        <ContextMenuWrapper 
+          x={contextMenu.x} 
+          y={contextMenu.y} 
+          onClose={() => setContextMenu(null)}
+        >
+          <MenuItem 
+            icon="close" 
+            label="Close Tab" 
+            onClick={() => {
+              handleCloseTab(contextMenu.tabId);
+              setContextMenu(null);
+            }} 
+          />
+          <MenuItem 
+            icon="close_fullscreen" 
+            label="Close Other Tabs" 
+            onClick={() => {
+              handleCloseOthers(contextMenu.tabId);
+              setContextMenu(null);
+            }} 
+          />
+          <MenuItem 
+            icon="tab_close" 
+            label="Close All Tabs" 
+            onClick={() => {
+              handleCloseAll();
+              setContextMenu(null);
+            }} 
+          />
+          <MenuDivider />
+          <MenuItem 
+            icon="refresh" 
+            label="Reload Tab" 
+            onClick={() => setContextMenu(null)}
+          />
+        </ContextMenuWrapper>
+      )}
+ 
+      <ConfirmModal 
+        isOpen={confirmModal.isOpen}
+        message={confirmModal.message}
+        onConfirm={confirmModal.onConfirm}
+        onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
+      />
     </div>
   );
 }
-

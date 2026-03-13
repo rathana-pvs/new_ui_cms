@@ -5,6 +5,10 @@ import { databaseApi } from '../databaseApi';
 import LoadingOverlay from '../../../components/common/LoadingOverlay';
 import ErrorOverlay from '../../../components/common/ErrorOverlay';
 
+import UnloadConfigSection from './unload/UnloadConfigSection';
+import UnloadContentSection from './unload/UnloadContentSection';
+import UnloadAdvancedOptions from './unload/UnloadAdvancedOptions';
+
 export default function UnloadDatabaseModal() {
   const dispatch = useDispatch();
   const { isUnloadDBModalOpen, selectedDatabase, databases, activeDatabases } = useSelector((state) => state.database);
@@ -38,7 +42,6 @@ export default function UnloadDatabaseModal() {
     loFileDirectory: ''
   });
 
-  const [showPassword, setShowPassword] = useState(false);
   const [dynamicTables, setDynamicTables] = useState([]);
   const [isTablesLoading, setIsTablesLoading] = useState(false);
   const [isUnloading, setIsUnloading] = useState(false);
@@ -195,229 +198,24 @@ export default function UnloadDatabaseModal() {
 
         {/* Body */}
         <div className="p-5 space-y-6 max-h-[75vh] overflow-y-auto custom-scrollbar flex-1">
-          
-          {/* Section: Source Information */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Target configuration</span>
-              <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">Database name</label>
-                <input 
-                  type="text" 
-                  value={formData.targetDbName}
-                  readOnly
-                  className="w-full h-9 px-3 bg-slate-100 dark:bg-bk-main/10 border border-slate-100 dark:border-slate-800/50 rounded text-[12px] text-slate-400 dark:text-slate-500 cursor-default font-medium outline-none"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">Target directory</label>
-                <input 
-                  type="text" 
-                  name="targetDirectory"
-                  value={formData.targetDirectory}
-                  onChange={handleInputChange}
-                  placeholder="e.g. /home/cubrid/backup"
-                  className="w-full h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border border-slate-200 dark:border-slate-800 rounded focus:outline-none focus:border-bk-yellow/50 text-[12px] text-slate-900 dark:text-slate-100 transition-all font-medium placeholder:text-slate-400"
-                />
-              </div>
-            </div>
+          <UnloadConfigSection 
+            formData={formData} 
+            handleInputChange={handleInputChange} 
+          />
 
-            <div className="grid grid-cols-2 gap-4 border-t border-slate-50 dark:border-white/5 pt-4">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">DB Username</label>
-                <input 
-                  type="text" 
-                  name="dbUsername"
-                  value={formData.dbUsername}
-                  onChange={handleInputChange}
-                  placeholder="dba"
-                  className="w-full h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border border-slate-200 dark:border-slate-800 rounded focus:outline-none focus:border-bk-yellow/50 text-[12px] text-slate-900 dark:text-slate-100 transition-all font-medium"
-                />
-              </div>
-              <div className="space-y-1.5 relative">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">DB Password</label>
-                <input 
-                  type={showPassword ? "text" : "password"} 
-                  name="dbPassword"
-                  value={formData.dbPassword}
-                  onChange={handleInputChange}
-                  placeholder="Password"
-                  className="w-full h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border border-slate-200 dark:border-slate-800 rounded focus:outline-none focus:border-bk-yellow/50 text-[12px] text-slate-900 dark:text-slate-100 transition-all font-medium pr-9"
-                />
-                <button 
-                  className="absolute right-2.5 bottom-1.5 text-slate-400 hover:text-bk-yellow dark:text-slate-500 dark:hover:text-bk-yellow transition-colors"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  <span className="material-symbols-outlined text-[18px]">
-                    {showPassword ? 'visibility_off' : 'visibility'}
-                  </span>
-                </button>
-              </div>
-            </div>
-          </div>
+          <UnloadContentSection 
+            formData={formData}
+            handleInputChange={handleInputChange}
+            handleSchemaChange={handleSchemaChange}
+            handleTableToggle={handleTableToggle}
+            dynamicTables={dynamicTables}
+            isTablesLoading={isTablesLoading}
+          />
 
-          {/* Section: Unload Content */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Unload parameters</span>
-              <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-slate-50/50 dark:bg-bk-main/20 p-3 rounded-xl border border-slate-100 dark:border-white/5 space-y-3">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="material-symbols-outlined text-[14px] text-bk-yellow">terminal</span>
-                  <span className="text-[10px] font-medium text-slate-600 dark:text-slate-400 tracking-wide">Objects</span>
-                </div>
-                <div className="space-y-2">
-                  {['All', 'Selected tables', 'Not include'].map(opt => (
-                    <label key={opt} className="flex items-center gap-2.5 cursor-pointer group">
-                      <div className="relative flex items-center">
-                        <input 
-                          type="radio" 
-                          name="schemaOption" 
-                          value={opt}
-                          checked={formData.schemaOption === opt}
-                          onChange={handleSchemaChange}
-                          className="peer w-3.5 h-3.5 appearance-none rounded-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 checked:border-bk-yellow transition-all cursor-pointer" 
-                        />
-                        <div className="absolute w-1.5 h-1.5 bg-bk-yellow rounded-full left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
-                      </div>
-                      <span className="text-[11px] font-medium text-slate-500 group-hover:text-slate-700 dark:text-slate-400 dark:group-hover:text-slate-200 transition-colors">Schema: {opt}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <div className="bg-slate-50/50 dark:bg-bk-main/20 p-3 rounded-xl border border-slate-100 dark:border-white/5 space-y-3">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="material-symbols-outlined text-[14px] text-bk-yellow">dataset</span>
-                  <span className="text-[10px] font-medium text-slate-600 dark:text-slate-400 tracking-wide">Data</span>
-                </div>
-                <div className="space-y-2">
-                  {['Selected tables', 'Not include'].map(opt => (
-                    <label key={opt} className="flex items-center gap-2.5 cursor-pointer group">
-                      <div className="relative flex items-center">
-                        <input 
-                          type="radio" 
-                          name="dataOption" 
-                          value={opt}
-                          checked={formData.dataOption === opt}
-                          onChange={handleInputChange}
-                          className="peer w-3.5 h-3.5 appearance-none rounded-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 checked:border-bk-yellow transition-all cursor-pointer" 
-                        />
-                        <div className="absolute w-1.5 h-1.5 bg-bk-yellow rounded-full left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 transition-opacity"></div>
-                      </div>
-                      <span className="text-[11px] font-medium text-slate-500 group-hover:text-slate-700 dark:text-slate-400 dark:group-hover:text-slate-200 transition-colors">Data: {opt}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="border border-slate-200 dark:border-slate-800 rounded-lg bg-slate-50/30 dark:bg-bk-main/20 overflow-hidden flex flex-col">
-              <div className="px-3 py-1.5 bg-slate-50/80 dark:bg-bk-main/50 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 tracking-wide">Available classes</span>
-                <span className="text-[10px] text-slate-400 font-medium">{formData.selectedTables.length} selected</span>
-              </div>
-              <div className="max-h-[140px] overflow-y-auto p-2 custom-scrollbar">
-                {isTablesLoading ? (
-                  <div className="flex flex-col items-center justify-center py-6 gap-2">
-                    <div className="w-4 h-4 border-2 border-bk-yellow/20 border-t-bk-yellow rounded-full animate-spin"></div>
-                    <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 tracking-wide">Fetching schema...</span>
-                  </div>
-                ) : dynamicTables.length === 0 ? (
-                  <div className="py-6 text-center text-[11px] text-slate-400 dark:text-slate-500 italic">No classes found in this database.</div>
-                ) : (
-                  <div className="grid grid-cols-2 gap-1 px-1">
-                    {dynamicTables.map(table => (
-                      <label key={table} className="flex items-center gap-2 px-2 py-1.5 hover:bg-white dark:hover:bg-white/5 rounded active:scale-[0.99] transition-all cursor-pointer group">
-                        <input 
-                          type="checkbox" 
-                          checked={formData.selectedTables.includes(table)}
-                          onChange={() => handleTableToggle(table)}
-                          className="h-3.5 w-3.5 cursor-pointer rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-bk-main text-bk-yellow focus:ring-bk-yellow/50 accent-bk-yellow transition-all" 
-                        />
-                        <span className="text-[11px] font-medium text-slate-500 group-hover:text-slate-900 dark:text-slate-400 dark:group-hover:text-slate-200 truncate">{table}</span>
-                      </label>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Section: Advanced Options */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Advanced options</span>
-              <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-x-6 gap-y-2 px-1">
-              {[
-                { label: 'As dba', name: 'asDba' },
-                { label: 'Split schema files', name: 'splitSchema' },
-                { label: 'Class Only', name: 'classOnly' },
-                { label: 'Skip index detail', name: 'skipIndex' },
-                { label: 'Use delimited identifier', name: 'useDelimitedIdentifier' },
-                { label: 'Include referenced tables', name: 'includeReferencedTables', disabled: formData.schemaOption === 'Not include' },
-              ].map(opt => (
-                <label key={opt.name} className={`flex items-center gap-2.5 ${opt.disabled ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'} group`}>
-                  <input 
-                    type="checkbox" 
-                    name={opt.name}
-                    checked={formData[opt.name]}
-                    onChange={handleInputChange}
-                    disabled={opt.disabled}
-                    className="h-3.5 w-3.5 cursor-pointer rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-bk-main text-bk-yellow focus:ring-bk-yellow/50 accent-bk-yellow transition-all" 
-                  />
-                  <span className="text-[11px] font-medium text-slate-500 group-hover:text-slate-700 dark:text-slate-400 dark:group-hover:text-slate-200 transition-colors">{opt.label}</span>
-                </label>
-              ))}
-            </div>
-
-            <div className="space-y-2 pt-2 border-t border-slate-50 dark:border-white/5">
-              {[
-                { label: 'Output file prefix', name: 'prefixOutputFile', useName: 'usePrefixOutputFile', type: 'text', placeholder: 'prefix_' },
-                { label: 'Hash file path', name: 'fileForHash', useName: 'useFileForHash', type: 'text' },
-                { label: 'Cached pages limit', name: 'cachedPages', useName: 'useCachedPages', type: 'number', placeholder: '0' },
-                { label: 'Instances estimate', name: 'estimateInstances', useName: 'useEstimateInstances', type: 'number', placeholder: '1000' },
-                { label: 'LO file directory', name: 'loFileDirectory', useName: 'useLoFileDirectory', type: 'text' },
-              ].map(field => (
-                <div key={field.name} className="flex items-center gap-3 group">
-                  <div className="w-48 shrink-0 flex items-center gap-2.5">
-                    <input 
-                      type="checkbox" 
-                      name={field.useName}
-                      checked={formData[field.useName]}
-                      onChange={handleInputChange}
-                      className="h-3.5 w-3.5 cursor-pointer rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-bk-main text-bk-yellow focus:ring-bk-yellow/50 accent-bk-yellow transition-all" 
-                    />
-                    <label className={`text-[10px] font-medium tracking-tight transition-colors ${formData[field.useName] ? 'text-slate-600 dark:text-slate-300' : 'text-slate-400 dark:text-slate-500'}`}>{field.label}</label>
-                  </div>
-                  <div className="flex-1">
-                    <input 
-                      type={field.type} 
-                      name={field.name}
-                      value={formData[field.name]}
-                      onChange={handleInputChange}
-                      placeholder={field.placeholder || ''}
-                      disabled={!formData[field.useName]}
-                      className={`w-full h-8 px-3 rounded text-[12px] border transition-all outline-none font-medium
-                        ${!formData[field.useName] 
-                          ? 'bg-slate-50 dark:bg-bk-main/10 border-slate-100 dark:border-slate-800 text-slate-300 dark:text-slate-600 cursor-not-allowed' 
-                          : 'bg-white dark:bg-bk-main/30 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:border-bk-yellow/50'}`}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <UnloadAdvancedOptions 
+            formData={formData}
+            handleInputChange={handleInputChange}
+          />
         </div>
         
         {/* Footer */}

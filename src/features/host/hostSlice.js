@@ -163,6 +163,19 @@ export const loginToHost = createAsyncThunk(
   }
 );
 
+// Async thunk to fetch host environment (which contains the version)
+export const fetchHostEnv = createAsyncThunk(
+  'host/fetchHostEnv',
+  async (hostUid, { rejectWithValue }) => {
+    try {
+      const response = await hostApi.getHostEnv(hostUid);
+      return { hostUid, env: response };
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || `Failed to fetch environment for ${hostUid}`);
+    }
+  }
+);
+
 const initialState = {
   isAddHostModalOpen: false,
   isDeleteHostModalOpen: false,
@@ -174,6 +187,7 @@ const initialState = {
   serverVersionHostUid: null,
   hosts: [],
   authorizedHosts: [], // Array of hostUids that have active forwarded sessions
+  hostEnvs: {}, // Cache of environment info (version, paths, etc) indexed by hostUid
   selectedHostUid: null,
   loading: false,
   isLoggingIntoHost: false,
@@ -336,6 +350,10 @@ const hostSlice = createSlice({
         state.isServiceOperating = false;
         state.serviceOperationType = null;
         state.error = action.payload;
+      })
+      .addCase(fetchHostEnv.fulfilled, (state, action) => {
+        const { hostUid, env } = action.payload;
+        state.hostEnvs[hostUid] = env;
       });
   },
 });

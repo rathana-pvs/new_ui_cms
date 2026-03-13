@@ -13,4 +13,19 @@ export const brokerApi = {
   stopBroker: (hostUid, brokerName) => {
     return apiClient.post(`/${hostUid}/broker/stop/${brokerName}`);
   },
+  getBrokerLogs: (hostUid, brokerName) => {
+    return apiClient.get(`/${hostUid}/log/broker/${brokerName}`);
+  },
+  viewLog: (hostUid, logParams) => {
+    return apiClient.post(`/${hostUid}/log/view`, logParams);
+  },
+  getAdminLogs: (hostUid) => {
+    return apiClient.get(`/${hostUid}/log/admin`);
+  },
+  getCMSLogs: (hostUid) => {
+    return apiClient.get(`/${hostUid}/log/cms`);
+  },
+  getDatabaseLogs: (hostUid, dbname) => {
+    return apiClient.get(`/${hostUid}/log/database/${dbname}`);
+  },
 };

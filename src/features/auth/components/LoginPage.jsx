@@ -18,7 +18,6 @@ export default function LoginPage() {
     const errs = {};
     if (!username.trim()) errs.username = 'Username is required';
     if (!password) errs.password = 'Password is required';
-    else if (password.length < 4) errs.password = 'Password must be at least 4 characters';
     return errs;
   };
 
@@ -35,7 +34,6 @@ export default function LoginPage() {
     try {
       const response = await authApi.login(username, password);
       const token = response?.token;
-
       dispatch(loginSuccess({ token, user: { id: username } }));
       navigate('/');
     } catch (err) {
@@ -46,172 +44,171 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-bk-main relative overflow-hidden font-sans">
-
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-bk-yellow/5 blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full bg-bk-yellow/5 blur-3xl"></div>
-
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-bk-yellow/2 blur-3xl"></div>
-      </div>
-
-
-      <div className="w-full max-w-md mx-4 relative z-10">
-        {/* Logo & Title */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-bk-yellow/10 mb-4">
-            <span className="material-symbols-outlined text-bk-yellow text-3xl" style={{ fontVariationSettings: "'wght' 300" }}>database</span>
-          </div>
-
-          <h1 className="text-2xl font-medium text-slate-900 dark:text-white tracking-tight">
-            Cubrid Manager
-          </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Sign in to your account
-          </p>
+    <div className="min-h-screen flex bg-white dark:bg-bk-main font-sans selection:bg-bk-yellow/30">
+      
+      {/* Left Panel: Hero & Branding */}
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-[#0a0a0a] border-r border-white/5">
+        {/* Background Animation/Image */}
+        <div className="absolute inset-0 z-0 opacity-40">
+           <div className="absolute top-[20%] left-[10%] w-[300px] h-[300px] bg-sky-500/20 rounded-full blur-[120px] animate-pulse"></div>
+           <div className="absolute bottom-[20%] right-[10%] w-[400px] h-[400px] bg-bk-yellow/10 rounded-full blur-[150px]"></div>
+           <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
         </div>
 
-        {/* Login Card */}
-        <div className="bg-white dark:bg-bk-side rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-black/40 border border-slate-200/60 dark:border-slate-800 p-8">
+        {/* Brand Content */}
+        <div className="relative z-10 w-full flex flex-col justify-between p-20">
+          <div>
+            <div className="flex items-center gap-4 mb-12 group cursor-pointer">
+              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-2xl transition-transform group-hover:scale-110">
+                <img src="/cubrid-logo.png" alt="CUBRID" className="w-8 h-8 object-contain" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-white tracking-tight">CUBRID <span className="text-bk-yellow/80 font-light">Manager</span></h2>
+                <p className="text-[10px] text-slate-500 uppercase tracking-[0.2em] font-bold">Enterprise Database Suite</p>
+              </div>
+            </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Username */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                Username
-              </label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 text-[20px]" style={{ fontVariationSettings: "'wght' 300" }}>
-                  person
-                </span>
-                <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => { setUsername(e.target.value); if (errors.username) setErrors({ ...errors, username: '' }); }}
-                  className={`w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border ${errors.username ? 'border-accent-red focus:ring-accent-red/20' : 'border-slate-200 dark:border-slate-800 focus:ring-bk-yellow/20'} bg-slate-50 dark:bg-bk-main/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:border-bk-yellow/50 transition-all`}
-                  placeholder="Enter your username"
-                />
+            <h1 className="text-6xl font-black text-white leading-[1.1] mb-8 tracking-tighter">
+              The Bridge to <br/>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-bk-yellow via-yellow-200 to-white">Unlimited Data.</span>
+            </h1>
+            
+            <p className="text-xl text-slate-400 font-light leading-relaxed max-w-lg mb-12">
+              Optimized for Online Transaction Processing (OLTP). CUBRID is an open-source, relational database management system with unique object extensions.
+            </p>
+
+            <div className="space-y-6">
+              {[
+                { title: 'High Availability', desc: 'Automatic failover and heartbeat monitoring for 24/7 uptime.' },
+                { title: 'Full Scalability', desc: '3-tier architecture separating app, broker, and server layers.' },
+                { title: 'True Open Source', desc: 'Powerful SQL-based RDBMS designed for web services.' }
+              ].map((item, i) => (
+                <div key={i} className="flex gap-4 p-4 rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-all group">
+                  <div className="w-10 h-10 rounded-xl bg-bk-yellow/10 flex items-center justify-center shrink-0 group-hover:bg-bk-yellow transition-colors">
+                    <span className="material-symbols-outlined text-bk-yellow group-hover:text-bk-side">{['bolt', 'layers', 'code'][i]}</span>
+                  </div>
+                  <div>
+                    <h4 className="text-white font-bold text-sm tracking-wide">{item.title}</h4>
+                    <p className="text-slate-500 text-xs mt-1 leading-relaxed">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between text-[11px] text-slate-600 font-medium">
+             <div className="flex gap-6">
+                <a href="https://www.cubrid.org" target="_blank" rel="noreferrer" className="hover:text-bk-yellow transition-colors">Official Website</a>
+                <a href="https://github.com/CUBRID" target="_blank" rel="noreferrer" className="hover:text-bk-yellow transition-colors">GitHub</a>
+             </div>
+             <span>Build v12.4.0-Final</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Panel: Login Form */}
+      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-8 sm:p-12 md:p-16 bg-white dark:bg-bk-main relative overflow-hidden">
+        
+        {/* Subtle background decoration for form side */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-bk-yellow/5 rounded-full blur-[100px] pointer-events-none"></div>
+
+        <div className="w-full max-w-sm space-y-10 relative z-10">
+          <div className="space-y-3">
+            <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Login</h2>
+            <p className="text-slate-500 dark:text-slate-400 font-medium">Access your database environment.</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-5">
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Username</label>
+                <div className="relative group">
+                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[20px] text-slate-400 group-focus-within:text-bk-yellow transition-colors">account_circle</span>
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => { setUsername(e.target.value); if (errors.username) setErrors({ ...errors, username: '' }); }}
+                    className={`w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-bk-side border-2 ${errors.username ? 'border-rose-500' : 'border-transparent group-focus-within:border-bk-yellow/50'} rounded-2xl outline-none shadow-sm transition-all dark:text-white placeholder:text-slate-400 text-sm`}
+                    placeholder="Enter username"
+                  />
+                </div>
+                {errors.username && <p className="text-[11px] text-rose-500 font-medium ml-1 flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">error</span>{errors.username}</p>}
               </div>
 
-              {errors.username && (
-                <p className="mt-1.5 text-xs text-accent-red flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[14px]">error</span>
-                  {errors.username}
-                </p>
-              )}
-            </div>
-
-            {/* Password */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                Password
-              </label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 text-[20px]" style={{ fontVariationSettings: "'wght' 300" }}>
-                  lock
-                </span>
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => { setPassword(e.target.value); if (errors.password) setErrors({ ...errors, password: '' }); }}
-                  className={`w-full pl-10 pr-12 py-2.5 text-sm rounded-xl border ${errors.password ? 'border-accent-red focus:ring-accent-red/20' : 'border-slate-200 dark:border-slate-800 focus:ring-bk-yellow/20'} bg-slate-50 dark:bg-bk-main/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:border-bk-yellow/50 transition-all`}
-                  placeholder="Enter your password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-bk-yellow transition-colors"
-                >
-                  <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'wght' 300" }}>
-                    {showPassword ? 'visibility_off' : 'visibility'}
-                  </span>
-                </button>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between px-1">
+                  <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-none">Password</label>
+                  <Link to="/forgot-password" size="sm" className="text-[10px] font-bold text-bk-yellow hover:text-bk-yellow/80 transition-colors uppercase tracking-widest">Forgot?</Link>
+                </div>
+                <div className="relative group">
+                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[20px] text-slate-400 group-focus-within:text-bk-yellow transition-colors">lock_open</span>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => { setPassword(e.target.value); if (errors.password) setErrors({ ...errors, password: '' }); }}
+                    className={`w-full pl-12 pr-12 py-4 bg-slate-50 dark:bg-bk-side border-2 ${errors.password ? 'border-rose-500' : 'border-transparent group-focus-within:border-bk-yellow/50'} rounded-2xl outline-none shadow-sm transition-all dark:text-white text-sm`}
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">{showPassword ? 'visibility_off' : 'visibility'}</span>
+                  </button>
+                </div>
+                {errors.password && <p className="text-[11px] text-rose-500 font-medium ml-1 flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">error</span>{errors.password}</p>}
               </div>
-
-              {errors.password && (
-                <p className="mt-1.5 text-xs text-accent-red flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[14px]">error</span>
-                  {errors.password}
-                </p>
-              )}
             </div>
 
-            {/* Remember & Forgot */}
-            <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 cursor-pointer group">
-                <input type="checkbox" className="w-4 h-4 rounded border-slate-300 dark:border-slate-700 text-bk-yellow focus:ring-bk-yellow/30 bg-white dark:bg-bk-main cursor-pointer" />
-                <span className="text-sm text-slate-600 dark:text-slate-400 group-hover:text-bk-yellow transition-colors">Remember me</span>
-              </label>
-              <Link
-                to="/forgot-password"
-                className="text-sm font-medium text-slate-500 hover:text-bk-yellow transition-colors"
-              >
-                Forgot password?
-              </Link>
-
+            <div className="flex items-center gap-3 group cursor-pointer w-fit select-none">
+              <input type="checkbox" id="remember" className="peer sr-only" />
+              <div onClick={() => document.getElementById('remember').click()} className="w-5 h-5 rounded-md border-2 border-slate-200 dark:border-white/10 peer-checked:bg-bk-yellow peer-checked:border-bk-yellow flex items-center justify-center transition-all bg-white dark:bg-bk-side">
+                <span className="material-symbols-outlined text-bk-side text-[14px] font-bold opacity-0 peer-checked:opacity-100 transition-opacity">check</span>
+              </div>
+              <label htmlFor="remember" className="text-xs font-bold text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors cursor-pointer uppercase tracking-widest">Remember device</label>
             </div>
 
-            {/* API Error */}
             {apiError && (
-              <div className="flex items-center gap-2 px-4 py-3 text-sm text-accent-red bg-accent-red/10 border border-accent-red/20 rounded-xl">
-                <span className="material-symbols-outlined text-[18px]">error</span>
-                {apiError}
+              <div className="p-4 bg-rose-50 dark:bg-rose-500/10 border border-rose-100 dark:border-rose-500/20 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+                <span className="material-symbols-outlined text-rose-500 text-[20px]">error_outline</span>
+                <p className="text-xs text-rose-600 dark:text-rose-400 font-bold">{apiError}</p>
               </div>
             )}
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 px-4 bg-bk-yellow hover:bg-bk-yellow/90 text-bk-side text-sm font-medium rounded-xl shadow-lg shadow-bk-yellow/10 hover:shadow-bk-yellow/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full py-4 bg-slate-900 dark:bg-bk-yellow text-white dark:text-bk-side font-black rounded-2xl shadow-xl hover:shadow-2xl transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 group relative overflow-hidden"
             >
               {loading ? (
-                <>
-                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                  Signing in...
-                </>
+                <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
               ) : (
                 <>
-                  <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'wght' 500" }}>login</span>
-                  Sign in
+                  <span className="uppercase tracking-widest text-xs">Authorize Access</span>
+                  <span className="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">login</span>
                 </>
               )}
             </button>
-
           </form>
 
-          {/* Divider */}
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-200 dark:border-slate-800"></div>
-              </div>
-              <div className="relative flex justify-center">
-                <span className="bg-white dark:bg-bk-side px-3 text-xs text-slate-500 tracking-wide font-medium">or</span>
-              </div>
-            </div>
-
-
-          {/* Register Link */}
-          <p className="text-center text-sm text-slate-500 dark:text-slate-400">
-            Don't have an account?{' '}
-            <Link
-              to="/register"
-              className="font-medium text-bk-yellow hover:underline transition-all"
-            >
-              Create account
-            </Link>
-          </p>
-
+          <div className="pt-6 text-center">
+            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+              New to CUBRID?{' '}
+              <Link to="/register" className="font-black text-slate-900 dark:text-bk-yellow hover:underline decoration-2 underline-offset-4">Create Account</Link>
+            </p>
+          </div>
         </div>
 
-        {/* Footer */}
-        <p className="text-center text-xs text-slate-400 dark:text-slate-500 mt-6">
-          © 2026 CUBRID. All rights reserved.
-        </p>
+        {/* Legal links */}
+        <div className="absolute bottom-12 flex items-center gap-8 opacity-40 hover:opacity-100 transition-opacity duration-500">
+           <img src="/cubrid-logo.png" alt="CUBRID logo" className="h-5 object-contain dark:brightness-0 dark:invert" />
+           <div className="flex gap-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+              <a href="#" className="hover:text-bk-yellow transition-colors">Terms</a>
+              <a href="#" className="hover:text-bk-yellow transition-colors">Privacy</a>
+              <a href="#" className="hover:text-bk-yellow transition-colors">About</a>
+           </div>
+        </div>
       </div>
     </div>
   );

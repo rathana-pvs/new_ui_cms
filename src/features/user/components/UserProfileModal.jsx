@@ -1,80 +1,132 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import LoadingOverlay from '../../../components/common/LoadingOverlay';
 import ErrorOverlay from '../../../components/common/ErrorOverlay';
+import { updateAccount, fetchUser } from '../../auth/authSlice';
+import { authApi } from '../../auth/authApi';
 
 export default function UserProfileModal({ isOpen, onClose }) {
-  const [isEditing, setIsEditing] = useState(false);
+  const { user } = useSelector((state) => state.auth);
+  const [editMode, setEditMode] = useState(null); // 'profile' | 'password' | null
+  
   const [profile, setProfile] = useState({
-    fullName: 'Admin User',
-    email: 'admin@cubrid.org',
-    role: 'Database Administrator',
-    phone: '+82-10-1234-5678',
-    department: 'Engineering',
-    timezone: 'Asia/Seoul',
+    id: user?.id || '',
+    department: user?.department || '',
   });
+
   const [editProfile, setEditProfile] = useState({ ...profile });
+  const [passwords, setPasswords] = useState({
+    oldPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+
+  useEffect(() => {
+    if (user) {
+      const newProfile = {
+        id: user.id || '',
+        department: user.department || ''
+      };
+      setProfile(newProfile);
+      if (!editMode) {
+        setEditProfile(newProfile);
+      }
+    }
+  }, [user]);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const dispatch = useDispatch();
+  const globalLoading = useSelector(state => state.auth.loading);
+  const globalError = useSelector(state => state.auth.error);
+
   if (!isOpen) return null;
 
-  const handleSave = () => {
-    if (!editProfile.fullName || !editProfile.email) {
-      setError("Full name and email are mandatory fields.");
-      return;
-    }
-    setLoading(true);
+  const handleSave = async () => {
     setError(null);
-    setTimeout(() => {
-      if (editProfile.email.includes('error')) {
+
+    try {
+      if (editMode === 'password') {
+        if (!passwords.oldPassword || !passwords.newPassword || !passwords.confirmPassword) {
+          setError("Please fill in all password fields.");
+          return;
+        }
+        if (passwords.newPassword !== passwords.confirmPassword) {
+          setError("New passwords do not match.");
+          return;
+        }
+
+        setLoading(true);
+        await authApi.updatePassword(passwords.oldPassword, passwords.newPassword);
+        setPasswords({ oldPassword: '', newPassword: '', confirmPassword: '' });
+        setEditMode(null);
         setLoading(false);
-        setError("Network connection lost. Please verify your internet settings and try again.");
-      } else {
-        setProfile({ ...editProfile });
-        setIsEditing(false);
+      } else if (editMode === 'profile') {
+        setLoading(true);
+        const resultAction = await dispatch(updateAccount({ department: editProfile.department }));
+        if (updateAccount.fulfilled.match(resultAction)) {
+          await dispatch(fetchUser()); // Refresh data from server
+          setEditMode(null);
+        } else {
+          setError(resultAction.payload || "Failed to update profile");
+        }
         setLoading(false);
       }
-    }, 1500);
+    } catch (err) {
+      setError(err.response?.data?.message || "An unexpected error occurred");
+      setLoading(false);
+    }
   };
 
   const handleCancel = () => {
     setEditProfile({ ...profile });
-    setIsEditing(false);
+    setPasswords({ oldPassword: '', newPassword: '', confirmPassword: '' });
+    setEditMode(null);
+    setError(null);
   };
 
-  const handleChange = (field, value) => {
+  const handleProfileChange = (field, value) => {
     setEditProfile(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handlePasswordChange = (field, value) => {
+    setPasswords(prev => ({ ...prev, [field]: value }));
   };
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-300 font-sans">
-      <div className="bg-white dark:bg-bk-side w-full max-w-[480px] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col relative">
+      <div className="bg-white dark:bg-bk-side w-full max-w-[400px] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col relative">
         
         {/* Subtle Top Accent */}
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-bk-yellow/60"></div>
 
         {/* Standard Overlays */}
         <LoadingOverlay 
-            isVisible={loading} 
-            title="Updating profile" 
-            subtitle="Saving preference changes..." 
+            isVisible={loading || globalLoading} 
+            title={editMode === 'password' ? "Updating password" : loading ? "Saving changes" : "Loading profile"} 
+            subtitle="Processing request..." 
         />
         <ErrorOverlay 
-          isVisible={!!error} 
-          error={error} 
-          onRetry={handleSave}
-          onClose={() => setError(null)}
+          isVisible={!!error || !!globalError} 
+          error={error || globalError} 
+          onRetry={error ? handleSave : () => dispatch(fetchUser())}
+          onClose={() => {
+            if (error) setError(null);
+          }}
         />
 
-        {/* Header - Compact */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
-              <span className="material-symbols-outlined text-bk-yellow text-xl">account_circle</span>
+              <span className="material-symbols-outlined text-bk-yellow text-xl">
+                {editMode === 'password' ? 'key' : 'account_circle'}
+              </span>
             </div>
-            <div>
-              <h3 className="text-[12px] font-medium text-slate-900 dark:text-white leading-none tracking-wide">User profile</h3>
-            </div>
+            <h3 className="text-[14px] font-semibold text-slate-900 dark:text-white leading-none tracking-tight">
+              {editMode === 'password' ? 'Change password' : 'Account info'}
+            </h3>
           </div>
           <button 
             disabled={loading}
@@ -85,170 +137,103 @@ export default function UserProfileModal({ isOpen, onClose }) {
           </button>
         </div>
 
-        {/* Body - Technical Grid */}
-        <div className="p-5 space-y-5 max-h-[70vh] overflow-y-auto custom-scrollbar">
-          
-          {/* Section 1: Basic Information */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Identity & Role</span>
-              <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
+        {/* Body */}
+        <div className="p-6 space-y-5">
+          <div className="space-y-4">
+            <div className="space-y-1.5 text-slate-400">
+              <label className="text-[11px] font-semibold ml-0.5">User ID</label>
+              <div className="text-[13px] px-3 py-2 bg-slate-50/50 dark:bg-bk-main/20 rounded border border-slate-200/50 dark:border-slate-800/50 font-medium select-none cursor-not-allowed">
+                {profile.id}
+              </div>
             </div>
-            
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">Full name</label>
-              {isEditing ? (
+
+            {editMode === 'profile' ? (
+              <div className="space-y-1.5 animate-in slide-in-from-top-1">
+                <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 ml-0.5">Department</label>
                 <input 
                   type="text" 
-                  value={editProfile.fullName}
-                  onChange={(e) => handleChange('fullName', e.target.value)}
-                  className="w-full h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border border-slate-200 dark:border-slate-800 rounded focus:outline-none focus:border-bk-yellow/50 text-[13px] text-slate-900 dark:text-slate-100 transition-all font-medium placeholder:text-slate-400"
-                  placeholder="e.g. John Doe"
+                  value={editProfile.department}
+                  onChange={(e) => handleProfileChange('department', e.target.value)}
+                  className="w-full h-10 px-3 bg-white dark:bg-bk-main/50 border border-slate-200 dark:border-slate-700 rounded focus:outline-none focus:ring-1 focus:ring-bk-yellow/50 text-[13px] text-slate-900 dark:text-slate-100 transition-all font-medium"
                 />
-              ) : (
-                <p className="text-[13px] text-slate-700 dark:text-slate-200 px-3 py-1.5 bg-slate-50/50 dark:bg-bk-main/30 rounded border border-transparent dark:border-slate-800/50 font-medium">
-                  {profile.fullName}
-                </p>
-              )}
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">Role</label>
-                {isEditing ? (
-                  <input 
-                    type="text" 
-                    value={editProfile.role}
-                    onChange={(e) => handleChange('role', e.target.value)}
-                    className="w-full h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border border-slate-200 dark:border-slate-800 rounded focus:outline-none focus:border-bk-yellow/50 text-[13px] text-slate-900 dark:text-slate-100 transition-all font-medium"
-                  />
-                ) : (
-                  <p className="text-[13px] text-slate-700 dark:text-slate-200 px-3 py-1.5 bg-slate-50/50 dark:bg-bk-main/30 rounded border border-transparent dark:border-slate-800/50 font-medium">
-                    {profile.role}
-                  </p>
-                )}
               </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">Department</label>
-                {isEditing ? (
+            ) : editMode === 'password' ? (
+              <div className="space-y-4 animate-in slide-in-from-top-1">
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 ml-0.5">Old password</label>
                   <input 
-                    type="text" 
-                    value={editProfile.department}
-                    onChange={(e) => handleChange('department', e.target.value)}
-                    className="w-full h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border border-slate-200 dark:border-slate-800 rounded focus:outline-none focus:border-bk-yellow/50 text-[13px] text-slate-900 dark:text-slate-100 transition-all font-medium"
+                    type="password" 
+                    value={passwords.oldPassword}
+                    onChange={(e) => handlePasswordChange('oldPassword', e.target.value)}
+                    className="w-full h-10 px-3 bg-white dark:bg-bk-main/50 border border-slate-200 dark:border-slate-700 rounded focus:outline-none focus:ring-1 focus:ring-bk-yellow/50 text-[13px] text-slate-900 dark:text-slate-100 transition-all font-medium"
                   />
-                ) : (
-                  <p className="text-[13px] text-slate-700 dark:text-slate-200 px-3 py-1.5 bg-slate-50/50 dark:bg-bk-main/30 rounded border border-transparent dark:border-slate-800/50 font-medium">
-                    {profile.department}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Section 2: Contact & Regional */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Contact & regional</span>
-              <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
-            </div>
-            
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">Email address</label>
-              {isEditing ? (
-                <input 
-                  type="email" 
-                  value={editProfile.email}
-                  onChange={(e) => handleChange('email', e.target.value)}
-                  className="w-full h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border border-slate-200 dark:border-slate-800 rounded focus:outline-none focus:border-bk-yellow/50 text-[13px] text-slate-900 dark:text-slate-100 transition-all font-medium"
-                />
-              ) : (
-                <p className="text-[13px] text-slate-700 dark:text-slate-200 px-3 py-1.5 bg-slate-50/50 dark:bg-bk-main/30 rounded border border-transparent dark:border-slate-800/50 font-medium">
-                  {profile.email}
-                </p>
-              )}
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">Phone number</label>
-                {isEditing ? (
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 ml-0.5">New password</label>
                   <input 
-                    type="text" 
-                    value={editProfile.phone}
-                    onChange={(e) => handleChange('phone', e.target.value)}
-                    className="w-full h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border border-slate-200 dark:border-slate-800 rounded focus:outline-none focus:border-bk-yellow/50 text-[13px] text-slate-900 dark:text-slate-100 transition-all font-medium"
+                    type="password" 
+                    value={passwords.newPassword}
+                    onChange={(e) => handlePasswordChange('newPassword', e.target.value)}
+                    className="w-full h-10 px-3 bg-white dark:bg-bk-main/50 border border-slate-200 dark:border-slate-700 rounded focus:outline-none focus:ring-1 focus:ring-bk-yellow/50 text-[13px] text-slate-900 dark:text-slate-100 transition-all font-medium"
                   />
-                ) : (
-                  <p className="text-[13px] text-slate-700 dark:text-slate-200 px-3 py-1.5 bg-slate-50/50 dark:bg-bk-main/30 rounded border border-transparent dark:border-slate-800/50 font-medium">
-                    {profile.phone}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">Timezone</label>
-                {isEditing ? (
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 ml-0.5">Confirm password</label>
                   <input 
-                    type="text" 
-                    value={editProfile.timezone}
-                    onChange={(e) => handleChange('timezone', e.target.value)}
-                    className="w-full h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border border-slate-200 dark:border-slate-800 rounded focus:outline-none focus:border-bk-yellow/50 text-[13px] text-slate-900 dark:text-slate-100 transition-all font-medium"
+                    type="password" 
+                    value={passwords.confirmPassword}
+                    onChange={(e) => handlePasswordChange('confirmPassword', e.target.value)}
+                    className="w-full h-10 px-3 bg-white dark:bg-bk-main/50 border border-slate-200 dark:border-slate-700 rounded focus:outline-none focus:ring-1 focus:ring-bk-yellow/50 text-[13px] text-slate-900 dark:text-slate-100 transition-all font-medium"
                   />
-                ) : (
-                  <p className="text-[13px] text-slate-700 dark:text-slate-200 px-3 py-1.5 bg-slate-50/50 dark:bg-bk-main/30 rounded border border-transparent dark:border-slate-800/50 font-medium">
-                    {profile.timezone}
-                  </p>
-                )}
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 ml-0.5">Department</label>
+                <div className="text-[13px] text-slate-700 dark:text-slate-100 px-3 py-2 bg-slate-50/50 dark:bg-bk-main/30 rounded border border-slate-200/50 dark:border-slate-800/50 font-medium">
+                  {profile.department || 'Not assigned'}
+                </div>
+              </div>
+            )}
           </div>
         </div>
         
-        {/* Footer - Compressed */}
-        <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 backdrop-blur-sm flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
-          {isEditing ? (
+        {/* Footer */}
+        <div className="px-5 py-4 bg-slate-50 dark:bg-bk-main/80 flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
+          {editMode ? (
             <>
               <button 
                 disabled={loading}
-                className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-all"
+                className="px-4 py-2 text-[12px] font-medium text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
                 onClick={handleCancel}
               >
-                Discard
+                Cancel
               </button>
               <button 
                 disabled={loading}
-                className="px-6 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center gap-2 min-w-[120px] disabled:opacity-50"
+                className="px-6 py-2 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[12px] font-bold rounded shadow-sm transition-all"
                 onClick={handleSave}
               >
-                {loading ? (
-                  <div className="w-3 h-3 border-2 border-bk-side/30 border-t-bk-side rounded-full animate-spin"></div>
-                ) : (
-                  <>
-                    <span className="material-symbols-outlined text-[16px]">save_as</span>
-                    <span>Save changes</span>
-                  </>
-                )}
+                {editMode === 'password' ? 'Update password' : 'Save changes'}
               </button>
             </>
           ) : (
-            <>
+            <div className="flex gap-2.5 w-full">
               <button 
-                className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-all"
-                onClick={onClose}
-              >
-                Close
-              </button>
-              <button 
-                className="px-6 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center gap-2 min-w-[120px]"
-                onClick={() => {
-                  setEditProfile({ ...profile });
-                  setIsEditing(true);
-                }}
+                className="flex-1 px-4 py-2 bg-white dark:bg-bk-main/50 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-[11px] font-bold rounded hover:bg-slate-50 dark:hover:bg-bk-main/80 transition-all flex items-center justify-center gap-2"
+                onClick={() => setEditMode('profile')}
               >
                 <span className="material-symbols-outlined text-[16px]">edit_note</span>
-                <span>Modify profile</span>
+                <span>Modify info</span>
               </button>
-            </>
+              <button 
+                className="flex-1 px-4 py-2 bg-white dark:bg-bk-main/50 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-[11px] font-bold rounded hover:bg-slate-50 dark:hover:bg-bk-main/80 transition-all flex items-center justify-center gap-2"
+                onClick={() => setEditMode('password')}
+              >
+                <span className="material-symbols-outlined text-[16px]">lock_reset</span>
+                <span>Change password</span>
+              </button>
+            </div>
           )}
         </div>
       </div>

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { toggleTheme, toggleSidebar, setIsResizing, setActiveMainTab, closeTab } from '../features/layout/layoutSlice';
+import { toggleTheme, toggleSidebar, setIsResizing, setActiveMainTab, closeTab, closeOtherTabs, closeAllTabs } from '../features/layout/layoutSlice';
 import { openAddHostModal, closeAddHostModal, setSelectedHost } from '../features/host/hostSlice';
 import { setSelectedDatabase } from '../features/database/databaseSlice';
 import Sidebar from '../features/layout/components/Sidebar';
@@ -15,6 +15,7 @@ import CubridConfigEditor from '../features/server/components/CubridConfigEditor
 import BrokerConfigEditor from '../features/server/components/BrokerConfigEditor';
 import UnloadDatabaseModal from '../features/database/components/UnloadDatabaseModal';
 import LoadDatabaseModal from '../features/database/components/LoadDatabaseModal';
+import DeleteDatabaseModal from '../features/database/components/DeleteDatabaseModal';
 import CheckDatabaseModal from '../features/database/components/CheckDatabaseModal';
 import CompactDatabaseModal from '../features/database/components/CompactDatabaseModal';
 import CopyDatabaseModal from '../features/database/components/CopyDatabaseModal';
@@ -27,8 +28,12 @@ import EditHostModal from '../features/host/components/EditHostModal';
 import ServerVersionModal from '../features/host/components/ServerVersionModal';
 import LoginPage from '../features/auth/components/LoginPage';
 import RegisterPage from '../features/auth/components/RegisterPage';
+import ForgotPasswordPage from '../features/auth/components/ForgotPasswordPage';
 import StatusModal from '../components/common/StatusModal';
 import LoadingOverlay from '../components/common/LoadingOverlay';
+import LogViewer from '../features/broker/components/LogViewer';
+import CMSLogViewer from '../features/broker/components/CMSLogViewer';
+import MonitoringProvider from '../features/layout/components/MonitoringProvider';
 
 function DashboardLayout() {
   const dispatch = useDispatch();
@@ -48,6 +53,14 @@ function DashboardLayout() {
       acc[tabId] = `Edit ${tabId.split(':')[2]}`;
     } else if (tabId.startsWith('broker_config:')) {
       acc[tabId] = 'Broker Config';
+    } else if (tabId.startsWith('log:')) {
+      const parts = tabId.split(':');
+      const path = parts[parts.length - 1];
+      acc[tabId] = path.split('/').pop();
+    } else if (tabId.startsWith('cms-access:')) {
+      acc[tabId] = 'Manager Access';
+    } else if (tabId.startsWith('cms-error:')) {
+      acc[tabId] = 'Manager Error';
     }
     return acc;
   }, {});
@@ -74,105 +87,132 @@ function DashboardLayout() {
   }, [theme]);
 
   return (
-    <div className={`flex h-screen overflow-hidden ${isResizing ? 'select-none' : ''}`}>
-      <Sidebar
-        isCollapsed={isSidebarCollapsed}
-        onToggleCollapse={() => dispatch(toggleSidebar())}
-        onResizeChange={(val) => dispatch(setIsResizing(val))}
-        onAddHost={() => dispatch(openAddHostModal())}
-      />
+    <MonitoringProvider>
+      <div className={`flex h-screen overflow-hidden ${isResizing ? 'select-none' : ''}`}>
+        <Sidebar
+          isCollapsed={isSidebarCollapsed}
+          onToggleCollapse={() => dispatch(toggleSidebar())}
+          onResizeChange={(val) => dispatch(setIsResizing(val))}
+          onAddHost={() => dispatch(openAddHostModal())}
+        />
 
-      <main className="flex-1 flex flex-col bg-background-light dark:bg-bk-main overflow-hidden">
+        <main className="flex-1 flex flex-col bg-background-light dark:bg-bk-main overflow-hidden">
 
-        <Header theme={theme} toggleTheme={() => dispatch(toggleTheme())} />
-        <div className="flex-shrink-0 bg-slate-50 dark:bg-bk-main">
+          <Header theme={theme} toggleTheme={() => dispatch(toggleTheme())} />
+          <div className="flex-shrink-0 bg-slate-50 dark:bg-bk-main">
 
-          <Breadcrumb
-            activeTab={activeMainTab}
-            openTabs={openTabs}
-            labels={tabLabels}
-            onTabChange={(tabId) => dispatch(setActiveMainTab(tabId))}
-            onCloseTab={(tab) => dispatch(closeTab(tab))}
-          />
-        </div>
-
-
-        {openTabs.length === 0 ? (
-          <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-slate-50 dark:bg-bk-main font-sans">
-            <div className="w-24 h-24 bg-slate-100 dark:bg-bk-side rounded-full flex items-center justify-center mb-6 shadow-xl shadow-black/20">
-              <span className="material-symbols-outlined text-5xl text-slate-400 dark:text-bk-yellow/40" style={{ fontVariationSettings: "'wght' 200" }}>database</span>
-            </div>
-            <h3 className="text-xl font-medium text-slate-700 dark:text-bk-yellow tracking-tight">Cubrid Manager</h3>
-            <p className="text-slate-500 dark:text-slate-400 mt-2 max-w-xs text-sm leading-relaxed">
-              Select a host or database from the sidebar to start exploring your data.
-            </p>
+            <Breadcrumb
+              activeTab={activeMainTab}
+              openTabs={openTabs}
+              labels={tabLabels}
+              onTabChange={(tabId) => dispatch(setActiveMainTab(tabId))}
+              onCloseTab={(tab) => dispatch(closeTab(tab))}
+              onCloseOthers={(tabId) => dispatch(closeOtherTabs(tabId))}
+              onCloseAll={() => dispatch(closeAllTabs())}
+            />
           </div>
 
-        ) : (
-          openTabs.map((tabId) => {
-            const isActive = tabId === activeMainTab;
-            const isHost = tabId.startsWith('host:');
-            const isDb = tabId.startsWith('db:');
-            const isEditConfig = tabId.startsWith('edit_config:');
-            const isBrokerConfig = tabId.startsWith('broker_config:');
-            const resourceId = tabId.split(':')[1];
 
-            return (
-              <div key={tabId} className={`flex-1 flex flex-col overflow-hidden ${isActive ? '' : 'hidden'}`}>
-                {isHost && <ServerContent hostUid={resourceId} />}
-                {isDb && <DemoDBContent dbname={resourceId} />}
-                {isEditConfig && (
-                  <CubridConfigEditor
-                    hostUid={resourceId}
-                    confname={tabId.split(':')[2]}
-                  />
-                )}
-                {isBrokerConfig && (
-                  <BrokerConfigEditor
-                    hostUid={resourceId}
-                  />
-                )}
+          {openTabs.length === 0 ? (
+            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-slate-50 dark:bg-bk-main font-sans">
+              <div className="w-24 h-24 bg-slate-100 dark:bg-bk-side rounded-full flex items-center justify-center mb-6 shadow-xl shadow-black/20">
+                <span className="material-symbols-outlined text-5xl text-slate-400 dark:text-bk-yellow/40" style={{ fontVariationSettings: "'wght' 200" }}>database</span>
               </div>
-            );
-          })
-        )}
+              <h3 className="text-xl font-medium text-slate-700 dark:text-bk-yellow tracking-tight">Cubrid Manager</h3>
+              <p className="text-slate-500 dark:text-slate-400 mt-2 max-w-xs text-sm leading-relaxed">
+                Select a host or database from the sidebar to start exploring your data.
+              </p>
+            </div>
 
-        <Footer />
-      </main>
+          ) : (
+            openTabs.map((tabId) => {
+              const isActive = tabId === activeMainTab;
+              const isHost = tabId.startsWith('host:');
+              const isDb = tabId.startsWith('db:');
+              const isEditConfig = tabId.startsWith('edit_config:');
+              const isBrokerConfig = tabId.startsWith('broker_config:');
+              const isLogViewer = tabId.startsWith('log:');
+              const isCmsAccessLog = tabId.startsWith('cms-access:');
+              const isCmsErrorLog = tabId.startsWith('cms-error:');
 
-      <AddHostModal
-        isOpen={isAddHostModalOpen}
-        onClose={() => dispatch(closeAddHostModal())}
-      />
-      <DeleteHostModal />
-      <EditHostModal />
-      <ServerVersionModal />
+              const resourceId = tabId.split(':')[1];
 
-      <UnloadDatabaseModal />
-      <LoadDatabaseModal />
-      <CheckDatabaseModal />
-      <CompactDatabaseModal />
-      <CopyDatabaseModal />
-      <BackupDatabaseModal />
-      <LockInformationModal />
-      <UnloadResultModal />
-      <TransactionInfoModal />
-      <StatusModal />
+              return (
+                <div key={tabId} className={`flex-1 flex flex-col overflow-hidden ${isActive ? '' : 'hidden'}`}>
+                  {isHost && <ServerContent hostUid={resourceId} />}
+                  {isDb && <DemoDBContent dbname={resourceId} />}
+                  {isEditConfig && (
+                    <CubridConfigEditor
+                      hostUid={resourceId}
+                      confname={tabId.split(':')[2]}
+                    />
+                  )}
+                  {isBrokerConfig && (
+                    <BrokerConfigEditor
+                      hostUid={resourceId}
+                    />
+                  )}
+                  {isLogViewer && (
+                    <LogViewer
+                      hostUid={tabId.split(':')[1]}
+                      path={tabId.split(':').slice(2).join(':')}
+                    />
+                  )}
+                  {isCmsAccessLog && (
+                    <CMSLogViewer
+                      hostUid={tabId.split(':')[1]}
+                      type="access"
+                    />
+                  )}
+                  {isCmsErrorLog && (
+                    <CMSLogViewer
+                      hostUid={tabId.split(':')[1]}
+                      type="error"
+                    />
+                  )}
+                </div>
+              );
+            })
+          )}
 
-      <LoadingOverlay 
-        isVisible={isServiceOperating || dbActionLoading || brokerActionLoading} 
-        title={
-          isServiceOperating 
-            ? (serviceOperationType === 'start' ? 'Starting CUBRID Service' : 'Stopping CUBRID Service')
-            : (dbActionLoading ? 'Database Action' : 'Broker Action')
-        }
-        subtitle={
-          isServiceOperating
-            ? (serviceProgressMessage || `Please wait while we ${serviceOperationType === 'start' ? 'start' : 'stop'} all brokers and databases...`)
-            : "Processing your request, please wait..."
-        }
-      />
-    </div>
+          <Footer />
+        </main>
+
+        <AddHostModal
+          isOpen={isAddHostModalOpen}
+          onClose={() => dispatch(closeAddHostModal())}
+        />
+        <DeleteHostModal />
+        <EditHostModal />
+        <ServerVersionModal />
+
+        <UnloadDatabaseModal />
+        <LoadDatabaseModal />
+        <DeleteDatabaseModal />
+        <CheckDatabaseModal />
+        <CompactDatabaseModal />
+        <CopyDatabaseModal />
+        <BackupDatabaseModal />
+        <LockInformationModal />
+        <UnloadResultModal />
+        <TransactionInfoModal />
+        <StatusModal />
+
+        <LoadingOverlay 
+          isVisible={isServiceOperating || dbActionLoading || brokerActionLoading} 
+          title={
+            isServiceOperating 
+              ? (serviceOperationType === 'start' ? 'Starting CUBRID Service' : 'Stopping CUBRID Service')
+              : (dbActionLoading ? 'Database Action' : 'Broker Action')
+          }
+          subtitle={
+            isServiceOperating
+              ? (serviceProgressMessage || `Please wait while we ${serviceOperationType === 'start' ? 'start' : 'stop'} all brokers and databases...`)
+              : "Processing your request, please wait..."
+          }
+        />
+      </div>
+    </MonitoringProvider>
   );
 }
 
@@ -186,6 +226,7 @@ function App() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route
         path="/*"
         element={
