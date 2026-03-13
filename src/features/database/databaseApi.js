@@ -55,4 +55,7 @@ export const databaseApi = {
   loginDatabase: (hostUid, dbname, payload) => {
     return apiClient.post(`/${hostUid}/database/users/login/${dbname}`, payload);
   },
+  addBackupSchedule: (hostUid, dbname, payload) => {
+    return apiClient.post(`/${hostUid}/database/backup-schedule/${dbname}`, payload);
+  },
 };

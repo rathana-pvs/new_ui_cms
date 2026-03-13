@@ -67,6 +67,33 @@ export const deleteDatabase = createAsyncThunk(
   }
 );
 
+export const addBackupSchedule = createAsyncThunk(
+  'database/addBackupSchedule',
+  async ({ hostUid, dbname, payload }, { rejectWithValue }) => {
+    try {
+      const response = await databaseApi.addBackupSchedule(hostUid, dbname, payload);
+      return response;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.response?.data?.error || `Failed to add backup schedule for ${dbname}`);
+    }
+  }
+);
+
+export const fetchDatabaseClasses = createAsyncThunk(
+  'database/fetchDatabaseClasses',
+  async ({ hostUid, dbname, dbstatus }, { rejectWithValue }) => {
+    try {
+      const response = await databaseApi.getClassInfo(hostUid, dbname, dbstatus);
+      return { dbname, data: response };
+    } catch (err) {
+      return rejectWithValue({
+        dbname,
+        error: err.response?.data?.message || `Failed to fetch classes for ${dbname}`
+      });
+    }
+  }
+);
+
 // Helper to parse the shared response format
 const parseDbResponse = (state, payload) => {
   const newDbs = payload.dblist?.dbs || [];
@@ -102,6 +129,7 @@ const initialState = {
   isCompactDatabaseModalOpen: false,
   isCopyDatabaseModalOpen: false,
   isBackupDatabaseModalOpen: false,
+  isAddBackupPlanModalOpen: false,
   isLockInfoModalOpen: false,
   isUnloadResultModalOpen: false,
   isTransactionInfoModalOpen: false,
@@ -109,6 +137,9 @@ const initialState = {
   isDeleteDBModalOpen: false,
   killTransactionData: null,
   unloadResultData: null,
+  databaseClasses: {}, // { [dbname]: {} }
+  databaseClassesLoading: {},
+  databaseClassesError: {},
   volumes: [],
   loading: false,
   volumesLoading: false,
@@ -165,6 +196,14 @@ const databaseSlice = createSlice({
     },
     closeBackupDatabaseModal: (state) => {
       state.isBackupDatabaseModalOpen = false;
+    },
+    openAddBackupPlanModal: (state) => {
+      state.isAddBackupPlanModalOpen = true;
+      state.error = null;
+    },
+    closeAddBackupPlanModal: (state) => {
+      state.isAddBackupPlanModalOpen = false;
+      state.error = null;
     },
     openLockInfoModal: (state) => {
       state.isLockInfoModalOpen = true;
@@ -275,6 +314,33 @@ const databaseSlice = createSlice({
       .addCase(deleteDatabase.rejected, (state, action) => {
         state.actionLoading = false;
         state.error = action.payload;
+      })
+      // Fetch database classes
+      .addCase(fetchDatabaseClasses.pending, (state, action) => {
+        const { dbname } = action.meta.arg;
+        state.databaseClassesLoading[dbname] = true;
+        delete state.databaseClassesError[dbname];
+      })
+      .addCase(addBackupSchedule.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(addBackupSchedule.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(addBackupSchedule.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchDatabaseClasses.fulfilled, (state, action) => {
+        const { dbname, data } = action.payload;
+        state.databaseClassesLoading[dbname] = false;
+        state.databaseClasses[dbname] = data;
+      })
+      .addCase(fetchDatabaseClasses.rejected, (state, action) => {
+        const { dbname, error } = action.payload || action.meta.arg;
+        state.databaseClassesLoading[dbname] = false;
+        state.databaseClassesError[dbname] = error;
       });
   },
 });
@@ -294,6 +360,8 @@ export const {
   closeCopyDatabaseModal,
   openBackupDatabaseModal,
   closeBackupDatabaseModal,
+  openAddBackupPlanModal,
+  closeAddBackupPlanModal,
   openLockInfoModal,
   closeLockInfoModal,
   openUnloadResultModal,

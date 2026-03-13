@@ -1,0 +1,736 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { closeAddBackupPlanModal, addBackupSchedule } from '../databaseSlice';
+import { setSelectedHost } from '../../host/hostSlice';
+import { showStatusModal } from '../../layout/layoutSlice';
+
+const CustomSelect = ({ value, options, onChange, icon }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const selectedOption = options.find(opt => opt.value === value);
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full bg-slate-50 dark:bg-bk-main/40 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-[12px] text-slate-900 dark:text-white flex items-center justify-between hover:border-bk-yellow/50 transition-all font-medium h-[38px]"
+      >
+        <span className="flex items-center gap-2">
+          {icon && <span className="material-symbols-outlined text-[16px] text-slate-400">{icon}</span>}
+          {selectedOption ? selectedOption.label : 'Select...'}
+        </span>
+        <span className={`material-symbols-outlined text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180 text-bk-yellow' : ''}`}>expand_more</span>
+      </button>
+
+      {isOpen && (
+        <div className="absolute top-full left-0 right-0 mt-2 z-[250] bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl shadow-black/40 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 max-h-[300px] overflow-y-auto custom-scrollbar">
+          <div className="py-1">
+            {options.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => {
+                  onChange(opt.value);
+                  setIsOpen(false);
+                }}
+                className={`w-full px-4 py-2.5 text-left text-[12px] font-bold transition-all flex items-center justify-between group ${
+                  value === opt.value 
+                    ? 'bg-bk-yellow/10 text-bk-yellow' 
+                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5'
+                }`}
+              >
+                <span>{opt.label}</span>
+                {value === opt.value && (
+                  <span className="material-symbols-outlined text-[16px]">check_circle</span>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default function AddBackupPlanModal() {
+  const dispatch = useDispatch();
+  const { isAddBackupPlanModalOpen, selectedDatabase, loading, error } = useSelector((state) => state.database);
+  const { selectedHostUid } = useSelector((state) => state.host);
+  
+  const [formData, setFormData] = useState({
+    backupId: 'plan_1',
+    backupLevel: '0',
+    backupPath: `/home/cubrid/CUBRID/databases/${selectedDatabase || 'demodb'}/backup`,
+    periodType: 'Monthly',
+    periodDetail: [1],
+    backupTime: '12:30',
+    deleteArchive: false,
+    checkConsistency: false,
+    updateStatistics: false,
+    useCompression: false,
+    threads: 0,
+    backupsToKeep: 0,
+    onlineType: 'offline'
+  });
+
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [viewDate, setViewDate] = useState(new Date());
+
+  useEffect(() => {
+    if (isAddBackupPlanModalOpen && selectedDatabase) {
+      setFormData(prev => ({
+        ...prev,
+        backupPath: `/home/cubrid/CUBRID/databases/${selectedDatabase}/backup`,
+        backupId: `backup_${selectedDatabase}_${Date.now().toString().slice(-4)}`
+      }));
+    }
+  }, [isAddBackupPlanModalOpen, selectedDatabase]);
+
+  if (!isAddBackupPlanModalOpen) return null;
+
+  const handleInputChange = (field, value) => {
+    if (field === 'periodType') {
+      setFormData(prev => ({ 
+        ...prev, 
+        periodType: value,
+        periodDetail: value === 'Daily' ? [] : (value === 'Specific days' ? new Date().toISOString().split('T')[0] : [1])
+      }));
+    } else {
+      setFormData(prev => ({ ...prev, [field]: value }));
+    }
+  };
+
+  const toggleDay = (day) => {
+    setFormData(prev => ({
+      ...prev,
+      periodDetail: prev.periodDetail.includes(day)
+        ? prev.periodDetail.filter(d => d !== day)
+        : [...prev.periodDetail, day]
+    }));
+  };
+
+  const setBulkDays = (type) => {
+    let days = [];
+    switch(type) {
+      case 'all': days = Array.from({length: 31}, (_, i) => i + 1); break;
+      case 'clear': days = []; break;
+      case 'weekdays': 
+        // Logic for weekdays (assuming 1st is Monday for UI pattern, or just general pattern)
+        days = Array.from({length: 31}, (_, i) => i + 1).filter(d => (d % 7 !== 6 && d % 7 !== 0)); 
+        break;
+      case 'weekends':
+        days = Array.from({length: 31}, (_, i) => i + 1).filter(d => (d % 7 === 6 || d % 7 === 0));
+        break;
+      case 'mid': days = [1, 15, 30]; break;
+      case 'even': days = Array.from({length: 31}, (_, i) => i + 1).filter(d => d % 2 === 0); break;
+      case 'odd': days = Array.from({length: 31}, (_, i) => i + 1).filter(d => d % 2 !== 0); break;
+      default: days = [];
+    }
+    handleInputChange('periodDetail', days);
+  };
+
+  const isPresetActive = (type) => {
+    const current = [...formData.periodDetail].sort((a,b) => a-b);
+    const getDays = (t) => {
+      switch(t) {
+        case 'all': return Array.from({length: 31}, (_, i) => i + 1);
+        case 'weekdays': return Array.from({length: 31}, (_, i) => i + 1).filter(d => (d % 7 !== 6 && d % 7 !== 0));
+        case 'weekends': return Array.from({length: 31}, (_, i) => i + 1).filter(d => (d % 7 === 6 || d % 7 === 0));
+        case 'mid': return [1, 15, 30];
+        case 'even': return Array.from({length: 31}, (_, i) => i + 1).filter(d => d % 2 === 0);
+        case 'odd': return Array.from({length: 31}, (_, i) => i + 1).filter(d => d % 2 !== 0);
+        case 'clear': return [];
+        default: return null;
+      }
+    };
+    const target = getDays(type);
+    if (!target) return false;
+    return current.length === target.length && current.every((v, i) => v === target.sort((a,b) => a-b)[i]);
+  };
+
+  const handleSave = () => {
+    console.log('OK Button clicked - handleSave process starting...');
+    if (!selectedDatabase || !selectedHostUid) {
+      console.warn('Cannot save backup plan: Missing context.', { selectedDatabase, selectedHostUid });
+      return;
+    }
+
+    // Mapping formData to backend API format
+    const payload = {
+      backupid: formData.backupId,
+      level: formData.backupLevel,
+      path: formData.backupPath,
+      period_type: formData.periodType === 'Specific days' ? 'Specific' : formData.periodType,
+      period_date: Array.isArray(formData.periodDetail) ? formData.periodDetail.join(',') : formData.periodDetail,
+      time: formData.backupTime.replace(':', ''),
+      archivedel: formData.deleteArchive ? 'ON' : 'OFF',
+      updatestatus: formData.updateStatistics ? 'ON' : 'OFF',
+      zip: formData.useCompression ? 'y' : 'n',
+      check: formData.checkConsistency ? 'y' : 'n',
+      storeold: 'OFF',
+      mt: formData.threads,
+      bknum: formData.backupsToKeep,
+      onoff: formData.onlineType === 'online' ? 'ON' : 'OF',
+    };
+
+    console.log('Dispatching Add Backup Schedule with Payload:', payload);
+
+    dispatch(addBackupSchedule({ 
+      hostUid: selectedHostUid, 
+      dbname: selectedDatabase, 
+      payload 
+    })).unwrap()
+      .then(() => {
+        dispatch(closeAddBackupPlanModal());
+        dispatch(showStatusModal({
+          type: 'success',
+          title: 'Backup Scheduled',
+          message: 'Your backup plan has been scheduled safely. The database will now follow your automated routine perfectly.'
+        }));
+      });
+  };
+
+  return (
+    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-bk-main/60 backdrop-blur-sm animate-in fade-in duration-300 font-sans text-left">
+      <div className="bg-white dark:bg-bk-side w-full max-w-[700px] rounded-xl shadow-[0_10px_50px_rgba(0,0,0,0.3)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col relative text-left">
+        
+        {/* header - inside first div */}
+        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-bk-yellow via-amber-500 to-bk-yellow z-[310]"></div>
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
+              <span className="material-symbols-outlined text-bk-yellow text-2xl">backup_table</span>
+            </div>
+            <div>
+              <h3 className="text-[16px] font-bold text-slate-900 dark:text-white leading-tight uppercase tracking-tight">Add Backup Plan</h3>
+              <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Configure automated scheduled backups for <span className="text-bk-yellow font-bold uppercase">{selectedDatabase}</span></p>
+            </div>
+          </div>
+          <button 
+            onClick={() => dispatch(closeAddBackupPlanModal())}
+            className="w-8 h-8 rounded-lg hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
+          >
+            <span className="material-symbols-outlined text-xl group-hover:rotate-90 transition-transform">close</span>
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="p-6 space-y-8 overflow-y-auto custom-scrollbar max-h-[70vh]">
+          
+          {/* Error Message */}
+          {error && (
+            <div className="bg-rose-500/10 border border-rose-500/20 p-4 rounded-2xl flex items-center gap-4 animate-in slide-in-from-top-4 duration-300">
+               <div className="w-10 h-10 rounded-full bg-rose-500/20 flex items-center justify-center text-rose-500 shrink-0">
+                  <span className="material-symbols-outlined text-2xl font-black">error</span>
+               </div>
+               <div className="flex-1">
+                  <p className="text-[11px] font-black text-rose-500 uppercase tracking-widest mb-0.5">Submission Failed</p>
+                  <p className="text-[12px] font-medium text-rose-600/80 leading-relaxed">{error}</p>
+               </div>
+            </div>
+          )}
+          
+          {/* General Section */}
+          <section className="space-y-4">
+            <div className="flex items-center gap-3">
+               <span className="text-[10px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">General Settings</span>
+               <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800/50"></div>
+            </div>
+            <div className="grid grid-cols-12 gap-4">
+              <div className="col-span-6 space-y-1.5">
+                <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 ml-1 ">Backup ID</label>
+                <input 
+                  type="text" 
+                  value={formData.backupId}
+                  onChange={(e) => handleInputChange('backupId', e.target.value)}
+                  className="w-full bg-slate-50 dark:bg-bk-main/40 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-[12px] text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-bk-yellow/50 transition-all font-medium"
+                />
+              </div>
+              <div className="col-span-6 space-y-1.5">
+                <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 ml-1 ">Backup level</label>
+                <CustomSelect
+                  value={formData.backupLevel}
+                  onChange={(val) => handleInputChange('backupLevel', val)}
+                  options={[
+                    { value: '0', label: '0 (Full)' },
+                    { value: '1', label: '1 (First increment)' },
+                    { value: '2', label: '2 (Second increment)' }
+                  ]}
+                />
+              </div>
+              <div className="col-span-12 space-y-1.5">
+                <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 ml-1 ">Backup path</label>
+                <div className="flex gap-2">
+                  <input 
+                    type="text" 
+                    value={formData.backupPath}
+                    onChange={(e) => handleInputChange('backupPath', e.target.value)}
+                    className="flex-1 bg-slate-50 dark:bg-bk-main/40 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-[12px] text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-bk-yellow/50 transition-all font-medium"
+                  />
+                  <button className="px-4 py-2 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-slate-800 rounded-lg text-[11px] font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 transition-all">Browse</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Backup Period Section */}
+          <section className="space-y-4">
+            <div className="flex items-center gap-3">
+               <span className="text-[10px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">Backup Schedule</span>
+               <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800/50"></div>
+            </div>
+            <div className="space-y-4 p-5 bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded-2xl">
+              <div className="grid grid-cols-12 gap-6">
+                <div className="col-span-6 space-y-1.5">
+                  <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-2 ">
+                    <span className="material-symbols-outlined text-[14px]">event_repeat</span>
+                    Period type
+                  </label>
+                  <CustomSelect
+                    value={formData.periodType}
+                    onChange={(val) => handleInputChange('periodType', val)}
+                    options={[
+                      { value: 'Monthly', label: 'Monthly' },
+                      { value: 'Weekly', label: 'Weekly' },
+                      { value: 'Daily', label: 'Daily' },
+                      { value: 'Specific days', label: 'Specific days' }
+                    ]}
+                  />
+                </div>
+                <div className="col-span-6 space-y-1.5">
+                  <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-2 ">
+                    <span className="material-symbols-outlined text-[14px]">schedule</span>
+                    Backup time
+                  </label>
+                  <div className="relative">
+                    <button 
+                      onClick={() => setShowTimePicker(!showTimePicker)}
+                      className="w-full bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-[12px] text-slate-900 dark:text-white flex items-center justify-between hover:border-bk-yellow/50 transition-all font-medium"
+                    >
+                      <span className="flex items-center gap-2">
+                        {formData.backupTime}
+                      </span>
+                      <span className="material-symbols-outlined text-bk-yellow text-lg">history_toggle_off</span>
+                    </button>
+
+                    {showTimePicker && (
+                      <div className="absolute top-full left-0 mt-2 z-[210] w-[200px] bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl shadow-black/40 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                        <div className="flex divide-x divide-slate-100 dark:divide-slate-800 h-[220px]">
+                          {/* Hours Column */}
+                          <div className="flex-1 flex flex-col overflow-y-auto custom-scrollbar bg-slate-50/30 dark:bg-bk-main/20">
+                            <div className="px-2 py-1.5 text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center border-b border-slate-100 dark:border-slate-800 sticky top-0 bg-white dark:bg-bk-side z-10">Hour</div>
+                            {Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0')).map(h => {
+                              const currentH = formData.backupTime.split(':')[0];
+                              const isSelected = currentH === h;
+                              return (
+                                <button
+                                  key={h}
+                                  onClick={() => {
+                                    const m = formData.backupTime.split(':')[1];
+                                    handleInputChange('backupTime', `${h}:${m}`);
+                                  }}
+                                  className={`py-2 text-[12px] font-bold transition-all ${isSelected ? 'bg-bk-yellow text-bk-side' : 'text-slate-500 hover:bg-bk-yellow/10 hover:text-bk-yellow'}`}
+                                >
+                                  {h}
+                                </button>
+                              );
+                            })}
+                          </div>
+                          {/* Minutes Column */}
+                          <div className="flex-1 flex flex-col overflow-y-auto custom-scrollbar">
+                            <div className="px-2 py-1.5 text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center border-b border-slate-100 dark:border-slate-800 sticky top-0 bg-white dark:bg-bk-side z-10">Min</div>
+                            {Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0')).map(m => {
+                              // Optional: only show every 5 or 15 mins for better UX, or all 60.
+                              // User likely wants precision for backups.
+                              const currentM = formData.backupTime.split(':')[1];
+                              const isSelected = currentM === m;
+                              if (parseInt(m) % 5 !== 0 && !isSelected) return null; // Show every 5 mins filter for cleanliness
+                              return (
+                                <button
+                                  key={m}
+                                  onClick={() => {
+                                    const h = formData.backupTime.split(':')[0];
+                                    handleInputChange('backupTime', `${h}:${m}`);
+                                    setShowTimePicker(false);
+                                  }}
+                                  className={`py-2 text-[12px] font-bold transition-all ${isSelected ? 'bg-bk-yellow text-bk-side' : 'text-slate-500 hover:bg-bk-yellow/10 hover:text-bk-yellow'}`}
+                                >
+                                  {m}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                        <div className="p-2 bg-slate-50 dark:bg-bk-main/50 border-t border-slate-100 dark:border-slate-800 flex justify-center">
+                          <button 
+                            onClick={() => setShowTimePicker(false)}
+                            className="text-[10px] font-bold text-slate-500 uppercase tracking-tight hover:text-bk-yellow transition-colors"
+                          >
+                            Set Time
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                {formData.periodType !== 'Specific days' && (
+                  <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 ml-1 ">
+                    {formData.periodType === 'Monthly' && 'Period detail (Day of Month)'}
+                    {formData.periodType === 'Weekly' && 'Period detail (Day of Week)'}
+                    {formData.periodType === 'Daily' && 'Period detail'}
+                  </label>
+                )}
+                
+                {formData.periodType === 'Monthly' && (
+                  <div className="space-y-4">
+                    {/* Smart Presets Toolbar */}
+                    <div className="flex flex-wrap gap-2 px-1">
+                      {[
+                        { id: 'all', label: 'Select All', icon: 'select_all' },
+                        { id: 'clear', label: 'Clear', icon: 'backspace' },
+                        { id: 'weekdays', label: 'Weekdays', icon: 'work' },
+                        { id: 'weekends', label: 'Weekends', icon: 'beach_access' },
+                        { id: 'mid', label: '1st, 15th, 30th', icon: 'calendar_view_week' },
+                        { id: 'even', label: 'Even Days', icon: '2k' },
+                        { id: 'odd', label: 'Odd Days', icon: '1k' },
+                      ].map(preset => (
+                        <button
+                          key={preset.id}
+                          onClick={() => setBulkDays(preset.id)}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[10px] font-bold transition-all uppercase tracking-wider ${
+                            isPresetActive(preset.id)
+                              ? 'bg-bk-yellow border-bk-yellow text-bk-side shadow-lg shadow-bk-yellow/20'
+                              : 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:border-bk-yellow/40 hover:text-bk-yellow hover:bg-bk-yellow/5'
+                          }`}
+                        >
+                          <span className="material-symbols-outlined text-[14px]">{preset.icon}</span>
+                          {preset.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-xl p-5 overflow-hidden relative">
+                      {/* Decorative Background Icon */}
+                      <span className="absolute -bottom-6 -right-6 material-symbols-outlined text-[100px] text-slate-100 dark:text-white/[0.02] rotate-12 pointer-events-none">calendar_month</span>
+                      
+                      <div className="grid grid-cols-7 gap-3 relative z-10">
+                        {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
+                          <div key={`${d}-${i}`} className="text-center text-[11px] font-black text-slate-300 dark:text-slate-500 pb-2 tracking-widest">{d}</div>
+                        ))}
+                        {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
+                          <button
+                            key={day}
+                            onClick={() => toggleDay(day)}
+                            className={`group relative h-10 rounded-xl border text-[12px] font-bold transition-all flex items-center justify-center ${
+                              formData.periodDetail.includes(day)
+                                ? 'bg-gradient-to-br from-bk-yellow to-amber-500 border-bk-yellow text-bk-side shadow-[0_4px_15px_rgba(255,191,0,0.3)] translate-y-[-2px]'
+                                : 'bg-slate-50/50 dark:bg-bk-main/20 border-slate-100 dark:border-white/5 text-slate-500 hover:border-bk-yellow/50 hover:text-bk-yellow hover:bg-bk-yellow/5'
+                            }`}
+                          >
+                            {day}
+                            {formData.periodDetail.includes(day) && (
+                              <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-white rounded-full flex items-center justify-center shadow-lg animate-in zoom-in duration-300">
+                                <span className="material-symbols-outlined text-bk-yellow text-[10px] font-black">check</span>
+                              </div>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {formData.periodType === 'Weekly' && (
+                  <div className="bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-xl p-4 grid grid-cols-7 gap-3">
+                    {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, index) => {
+                      const dayValue = index + 1;
+                      return (
+                        <button
+                          key={day}
+                          onClick={() => toggleDay(dayValue)}
+                          className={`h-10 w-full rounded-lg border text-[11px] font-bold transition-all flex items-center justify-center ${
+                            formData.periodDetail.includes(dayValue)
+                              ? 'bg-bk-yellow border-bk-yellow text-bk-side shadow-lg shadow-bk-yellow/20 translate-y-[-1px]'
+                              : 'bg-slate-50/50 dark:bg-bk-main/20 border-slate-100 dark:border-white/5 text-slate-500 hover:border-bk-yellow/50 hover:text-bk-yellow'
+                          }`}
+                        >
+                          {day}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {formData.periodType === 'Daily' && (
+                  <div className="bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-xl p-5 flex items-center gap-3 text-emerald-500 bg-emerald-500/5">
+                    <span className="material-symbols-outlined text-lg">check_circle</span>
+                    <span className="text-[12px] font-medium tracking-tight">The backup will be performed every day at {formData.backupTime}.</span>
+                  </div>
+                )}
+
+                {formData.periodType === 'Specific days' && (
+                  <div className="bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-xl px-5 py-4 space-y-3">
+                    <div className="flex items-center gap-4">
+                      <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 w-12 ">Date:</label>
+                      <div className="relative flex-1">
+                        <button 
+                          onClick={() => setShowCalendar(!showCalendar)}
+                          className="w-full bg-slate-50 dark:bg-bk-main/40 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-2.5 text-[12px] text-slate-900 dark:text-white flex items-center justify-between hover:border-bk-yellow/50 transition-all font-medium"
+                        >
+                          <span>{formData.periodDetail || 'Select date'}</span>
+                          <span className="material-symbols-outlined text-bk-yellow text-lg">calendar_today</span>
+                        </button>
+
+                        {showCalendar && (
+                          <div className="absolute top-full left-0 mt-2 z-[200] w-[280px] bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl shadow-black/40 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                            {/* Calendar Header */}
+                            <div className="flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-bk-main/50 border-b border-slate-100 dark:border-slate-800">
+                              <button 
+                                onClick={() => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1))}
+                                className="w-7 h-7 rounded-lg hover:bg-slate-200 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 transition-colors"
+                              >
+                                <span className="material-symbols-outlined text-lg">chevron_left</span>
+                              </button>
+                              <span className="text-[12px] font-bold text-slate-900 dark:text-white tracking-tight">
+                                {viewDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
+                              </span>
+                              <button 
+                                onClick={() => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1))}
+                                className="w-7 h-7 rounded-lg hover:bg-slate-200 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 transition-colors"
+                              >
+                                <span className="material-symbols-outlined text-lg">chevron_right</span>
+                              </button>
+                            </div>
+
+                            {/* Calendar Body */}
+                            <div className="p-3">
+                              <div className="grid grid-cols-7 gap-1 mb-2">
+                                {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => (
+                                  <div key={day} className="h-7 flex items-center justify-center text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{day}</div>
+                                ))}
+                              </div>
+                              <div className="grid grid-cols-7 gap-1">
+                                {(() => {
+                                  const days = [];
+                                  const firstDay = new Date(viewDate.getFullYear(), viewDate.getMonth(), 1).getDay();
+                                  const daysInMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
+                                  const prevMonthDays = new Date(viewDate.getFullYear(), viewDate.getMonth(), 0).getDate();
+
+                                  // Pad start
+                                  for (let i = firstDay - 1; i >= 0; i--) {
+                                    days.push(<div key={`prev-${i}`} className="h-8 flex items-center justify-center text-[11px] text-slate-300 dark:text-slate-600 font-medium opacity-30 cursor-not-allowed">{prevMonthDays - i}</div>);
+                                  }
+
+                                  // Month days
+                                  for (let i = 1; i <= daysInMonth; i++) {
+                                    const dateStr = `${viewDate.getFullYear()}-${String(viewDate.getMonth() + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                                    const isSelected = formData.periodDetail === dateStr;
+                                    const isToday = new Date().toISOString().split('T')[0] === dateStr;
+
+                                    days.push(
+                                      <button
+                                        key={i}
+                                        onClick={() => {
+                                          handleInputChange('periodDetail', dateStr);
+                                          setShowCalendar(false);
+                                        }}
+                                        className={`h-8 w-full rounded-lg text-[11px] font-bold transition-all flex items-center justify-center relative ${
+                                          isSelected 
+                                            ? 'bg-bk-yellow text-bk-side shadow-lg shadow-bk-yellow/20 translate-y-[-1px]' 
+                                            : 'hover:bg-bk-yellow/10 hover:text-bk-yellow text-slate-700 dark:text-slate-300'
+                                        }`}
+                                      >
+                                        {i}
+                                        {isToday && !isSelected && (
+                                          <div className="absolute bottom-1 w-1 h-1 bg-bk-yellow rounded-full"></div>
+                                        )}
+                                      </button>
+                                    );
+                                  }
+                                  return days;
+                                })()}
+                              </div>
+                            </div>
+                            
+                            {/* Calendar Footer */}
+                            <div className="p-2 border-t border-slate-100 dark:border-slate-800 flex justify-between">
+                              <button 
+                                onClick={() => {
+                                  const today = new Date().toISOString().split('T')[0];
+                                  handleInputChange('periodDetail', today);
+                                  setViewDate(new Date());
+                                  setShowCalendar(false);
+                                }}
+                                className="text-[10px] font-bold text-bk-yellow px-2 py-1 hover:bg-bk-yellow/5 rounded-md transition-colors"
+                              >
+                                Today
+                              </button>
+                              <button 
+                                onClick={() => setShowCalendar(false)}
+                                className="text-[10px] font-bold text-slate-400 px-2 py-1 hover:bg-slate-100 dark:hover:bg-white/5 rounded-md transition-colors"
+                              >
+                                Close
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-slate-400 flex items-center gap-1.5 ml-16 leading-relaxed font-medium">
+                      <span className="material-symbols-outlined text-[13px] text-bk-yellow">stars</span>
+                      Single execution scheduled for <span className="text-slate-900 dark:text-slate-200 font-bold decoration-bk-yellow/30 underline underline-offset-4 decoration-2">{formData.periodDetail}</span>
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+
+          {/* Options Section */}
+          <section className="space-y-4">
+            <div className="flex items-center gap-3">
+               <span className="text-[10px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">Process Options</span>
+               <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800/50"></div>
+            </div>
+            <div className="grid grid-cols-2 gap-x-12 gap-y-4 p-5 bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded-2xl">
+              {[
+                { id: 'deleteArchive', label: 'Delete archive volumes', icon: 'auto_delete' },
+                { id: 'updateStatistics', label: 'Update statistics information', icon: 'analytics' },
+                { id: 'checkConsistency', label: 'Check database consistency', icon: 'rule' },
+                { id: 'useCompression', label: 'Use compression', icon: 'compress' },
+              ].map(opt => (
+                <label key={opt.id} className="flex items-center gap-3 group cursor-pointer">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-all ${formData[opt.id] ? 'bg-bk-yellow/10 border-bk-yellow/40 text-bk-yellow' : 'bg-white dark:bg-bk-side border-slate-200 dark:border-slate-800 text-slate-400'}`}>
+                    <span className="material-symbols-outlined text-[18px]">{opt.icon}</span>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-[11px] font-bold text-slate-700 dark:text-slate-300 group-hover:text-bk-yellow transition-colors">{opt.label}</p>
+                  </div>
+                  <div className="relative inline-flex items-center cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      className="sr-only peer"
+                      checked={formData[opt.id]}
+                      onChange={(e) => handleInputChange(opt.id, e.target.checked)}
+                    />
+                    <div className="w-8 h-4 bg-slate-200 dark:bg-slate-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-bk-yellow"></div>
+                  </div>
+                </label>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-2 gap-8 px-2">
+              <div className="space-y-1.5 text-left">
+                <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 ml-1 uppercase tracking-wider">Number of threads</label>
+                <div className="flex items-center gap-3">
+                  <button 
+                    onClick={() => handleInputChange('threads', Math.max(0, formData.threads - 1))}
+                    className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/5 flex items-center justify-center hover:bg-bk-yellow hover:text-bk-side transition-all"
+                  >-</button>
+                  <span className="w-8 text-center text-sm font-bold text-slate-900 dark:text-white">{formData.threads}</span>
+                  <button 
+                    onClick={() => handleInputChange('threads', formData.threads + 1)}
+                    className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/5 flex items-center justify-center hover:bg-bk-yellow hover:text-bk-side transition-all"
+                  >+</button>
+                </div>
+              </div>
+              <div className="space-y-1.5 text-left">
+                <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 ml-1 uppercase tracking-wider">Number of backups to keep</label>
+                <div className="flex items-center gap-3">
+                  <button 
+                    onClick={() => handleInputChange('backupsToKeep', Math.max(0, formData.backupsToKeep - 1))}
+                    className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/5 flex items-center justify-center hover:bg-bk-yellow hover:text-bk-side transition-all"
+                  >-</button>
+                  <span className="w-8 text-center text-sm font-bold text-slate-900 dark:text-white">{formData.backupsToKeep}</span>
+                  <button 
+                    onClick={() => handleInputChange('backupsToKeep', formData.backupsToKeep + 1)}
+                    className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/5 flex items-center justify-center hover:bg-bk-yellow hover:text-bk-side transition-all"
+                  >+</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Online/Offline Section */}
+          <section className="space-y-4">
+            <div className="flex items-center gap-3">
+               <span className="text-[10px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">Operation Mode</span>
+               <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800/50"></div>
+            </div>
+            <div className="grid grid-cols-1 gap-3 px-1">
+              <label className={`flex items-start gap-4 p-4 rounded-2xl border transition-all cursor-pointer ${formData.onlineType === 'online' ? 'bg-indigo-500/5 border-indigo-500/30' : 'bg-transparent border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'}`}>
+                <input 
+                  type="radio" 
+                  name="onlineType" 
+                  value="online"
+                  checked={formData.onlineType === 'online'}
+                  onChange={(e) => handleInputChange('onlineType', e.target.value)}
+                  className="mt-1 w-4 h-4 text-indigo-500 border-gray-300 focus:ring-indigo-500 accent-indigo-500"
+                />
+                <div className="flex-1 space-y-1">
+                  <p className="text-[12px] font-bold text-slate-800 dark:text-slate-200">Online backup</p>
+                  <p className="text-[10px] text-slate-500 leading-relaxed font-medium">Allows continuing database operations while the backup is being performed.</p>
+                </div>
+              </label>
+
+              <label className={`flex items-start gap-4 p-4 rounded-2xl border transition-all cursor-pointer ${formData.onlineType === 'offline' ? 'bg-orange-500/5 border-orange-500/30' : 'bg-transparent border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'}`}>
+                <input 
+                  type="radio" 
+                  name="onlineType" 
+                  value="offline"
+                  checked={formData.onlineType === 'offline'}
+                  onChange={(e) => handleInputChange('onlineType', e.target.value)}
+                  className="mt-1 w-4 h-4 text-orange-500 border-gray-300 focus:ring-orange-500 accent-orange-500"
+                />
+                <div className="flex-1 space-y-1">
+                  <p className="text-[12px] font-bold text-slate-800 dark:text-slate-200">Offline backup</p>
+                  <p className="text-[10px] text-slate-500 leading-relaxed font-medium">
+                    <span className="text-orange-500 font-bold">Notice:</span> Database will be <span className="underline">stopped</span> during backup operation and then restarted automatically.
+                  </p>
+                </div>
+              </label>
+            </div>
+          </section>
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-4 bg-slate-50 dark:bg-bk-main/80 backdrop-blur-sm flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800">
+          <button 
+            onClick={() => dispatch(closeAddBackupPlanModal())}
+            className="px-6 py-2 text-[12px] font-bold text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-all"
+          >
+            Cancel
+          </button>
+          <button 
+            onClick={handleSave}
+            disabled={loading}
+            className="px-8 flex items-center gap-2 py-2 bg-bk-yellow hover:bg-[#ffd700] active:scale-95 text-bk-side text-[12px] font-bold rounded-xl border border-bk-yellow/50 shadow-lg shadow-bk-yellow/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? (
+              <span className="w-4 h-4 border-2 border-bk-side/30 border-t-bk-side rounded-full animate-spin"></span>
+            ) : (
+              <span className="material-symbols-outlined text-[18px]">save</span>
+            )}
+            <span>OK</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -34,10 +34,13 @@ export default function ServerVersionModal() {
     <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-300 font-sans text-left">
       <div className="bg-white dark:bg-bk-side w-full max-w-[420px] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col relative text-left">
         
+        {/* Subtle Top Accent */}
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-bk-yellow/60"></div>
+
         <LoadingOverlay isVisible={loading} title="Fetching env..." />
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
               <span className="material-symbols-outlined text-bk-yellow text-xl">info</span>

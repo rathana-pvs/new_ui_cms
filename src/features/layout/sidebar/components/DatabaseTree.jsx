@@ -1,10 +1,13 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { setSelectedDatabase, setSelectedDatabaseSubItem } from '../../../database/databaseSlice';
+import { fetchDatabaseUsers } from '../../../user/userSlice';
 import { setActiveMainTab } from '../../layoutSlice';
 
-export default function DatabaseTree({ onContextMenu }) {
+export default function DatabaseTree({ onContextMenu, onUsersContextMenu, onUserContextMenu, onBackupPlanContextMenu }) {
   const dispatch = useDispatch();
   const { databases, activeDatabases, loading, selectedDatabase, selectedDatabaseSubItem } = useSelector((state) => state.database);
+  const { selectedHostUid } = useSelector((state) => state.host);
+  const { databaseUsers, databaseUsersLoading } = useSelector((state) => state.user);
 
   if (loading) {
     return (
@@ -56,7 +59,14 @@ export default function DatabaseTree({ onContextMenu }) {
             </summary>
             <div className="ml-[22px] border-l border-slate-200 dark:border-slate-800 space-y-0.5 py-1">
               {[
-                { id: 'Users', icon: 'group' },
+                { 
+                  id: 'Users', 
+                  icon: 'group',
+                  children: (databaseUsers[db.dbname] || []).map(u => ({
+                    id: typeof u === 'string' ? u : u.name,
+                    icon: 'person'
+                  }))
+                },
                 { 
                   id: 'Job automation', 
                   icon: 'bolt',
@@ -84,17 +94,31 @@ export default function DatabaseTree({ onContextMenu }) {
                 }
               ].map((item) => {
                 const isItemSelected = selectedDatabase === db.dbname && selectedDatabaseSubItem === item.id;
-                const hasChildren = item.children && item.children.length > 0;
+                const isExpandable = (item.children && (item.children.length > 0 || item.id === 'Users'));
+                const isLoading = item.id === 'Users' && databaseUsersLoading[db.dbname];
                 
-                if (hasChildren) {
+                if (isExpandable) {
                   return (
-                    <details key={item.id} className="group/nested">
+                    <details 
+                      key={item.id} 
+                      className="group/nested"
+                      onToggle={(e) => {
+                        if (e.target.open && item.id === 'Users' && selectedHostUid) {
+                          dispatch(fetchDatabaseUsers({ hostUid: selectedHostUid, dbname: db.dbname }));
+                        }
+                      }}
+                    >
                       <summary 
                         className={`flex items-center gap-2 px-3.5 py-1.5 w-full text-left transition-all group/item cursor-pointer list-none rounded-r-md relative select-none border-y border-r border-l-transparent
                           ${isItemSelected ? 'text-amber-600 dark:text-bk-yellow bg-bk-yellow/10 dark:bg-bk-yellow/5 border-bk-yellow/20 dark:border-bk-yellow/10' : 'text-slate-700 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow border-transparent'}`}
                         onClick={() => {
                           dispatch(setSelectedDatabase(db.dbname));
                           dispatch(setSelectedDatabaseSubItem(item.id));
+                        }}
+                        onContextMenu={(e) => {
+                          if (item.id === 'Users') {
+                            onUsersContextMenu(e, db.dbname);
+                          }
                         }}
                       >
                         <span className={`material-symbols-outlined text-[14px] group-open/nested:rotate-90 transition-transform ${isItemSelected ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500'}`}>chevron_right</span>
@@ -109,30 +133,49 @@ export default function DatabaseTree({ onContextMenu }) {
                         )}
                       </summary>
                       <div className="ml-4 border-l border-slate-100 dark:border-slate-800/50 mt-0.5 space-y-0.5">
-                        {item.children.map(child => {
-                          const isChildSelected = selectedDatabase === db.dbname && selectedDatabaseSubItem === child.id;
-                          return (
-                            <button
-                              key={child.id}
-                              className={`flex items-center gap-3 px-4 py-1.5 w-full text-left transition-all duration-200 group/child relative rounded-r-md select-none border border-transparent
-                                ${isChildSelected ? 'text-amber-600 dark:text-bk-yellow bg-bk-yellow/10 dark:bg-bk-yellow/5 font-medium border-bk-yellow/20 dark:border-bk-yellow/10' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow'}`}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                dispatch(setSelectedDatabase(db.dbname));
-                                dispatch(setSelectedDatabaseSubItem(child.id));
-                              }}
-                            >
-                              <span className={`material-symbols-outlined text-[15px]
-                                ${isChildSelected ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500 group-hover/child:text-amber-600 dark:group-hover/child:text-bk-yellow'}`}>
-                                {child.icon}
-                              </span>
-                              <span className="text-[10.5px] tracking-wide">{child.id}</span>
-                              {isChildSelected && (
-                                <div className="absolute left-[-1px] top-0 bottom-0 w-[2px] bg-amber-600 dark:bg-bk-yellow rounded-full"></div>
-                              )}
-                            </button>
-                          )
-                        })}
+                        {isLoading ? (
+                          <div className="px-4 py-2 flex items-center gap-2 text-[10px] text-slate-500">
+                            <svg className="animate-spin h-3 w-3 text-amber-500" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                            </svg>
+                            <span>Loading users...</span>
+                          </div>
+                        ) : item.children.length === 0 ? (
+                          <div className="px-4 py-1.5 text-[10px] text-slate-400 italic">No users found</div>
+                        ) : (
+                          item.children.map(child => {
+                            const isChildSelected = selectedDatabase === db.dbname && selectedDatabaseSubItem === child.id;
+                            return (
+                              <button
+                                key={child.id}
+                                className={`flex items-center gap-3 px-4 py-1.5 w-full text-left transition-all duration-200 group/child relative rounded-r-md select-none border border-transparent
+                                  ${isChildSelected ? 'text-amber-600 dark:text-bk-yellow bg-bk-yellow/10 dark:bg-bk-yellow/5 font-medium border-bk-yellow/20 dark:border-bk-yellow/10' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow'}`}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  dispatch(setSelectedDatabase(db.dbname));
+                                  dispatch(setSelectedDatabaseSubItem(child.id));
+                                }}
+                                onContextMenu={(e) => {
+                                  if (item.id === 'Users') {
+                                    onUserContextMenu(e, db.dbname, child.id);
+                                  } else if (child.id === 'Backup Plan') {
+                                    onBackupPlanContextMenu(e, db.dbname);
+                                  }
+                                }}
+                              >
+                                <span className={`material-symbols-outlined text-[15px]
+                                  ${isChildSelected ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500 group-hover/child:text-amber-600 dark:group-hover/child:text-bk-yellow'}`}>
+                                  {child.icon}
+                                </span>
+                                <span className="text-[10.5px] tracking-wide">{child.id}</span>
+                                {isChildSelected && (
+                                  <div className="absolute left-[-1px] top-0 bottom-0 w-[2px] bg-amber-600 dark:bg-bk-yellow rounded-full"></div>
+                                )}
+                              </button>
+                            )
+                          })
+                        )}
                       </div>
                     </details>
                   );

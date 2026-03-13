@@ -25,6 +25,57 @@ export const updatePreferences = createAsyncThunk(
   }
 );
 
+export const fetchDatabaseUsers = createAsyncThunk(
+  'user/fetchDatabaseUsers',
+  async ({ hostUid, dbname }, { rejectWithValue }) => {
+    try {
+      const response = await userApi.getDatabaseUsers(hostUid, dbname);
+      return { dbname, users: response.user || [] };
+    } catch (err) {
+      return rejectWithValue({ 
+        dbname, 
+        error: err.response?.data?.message || `Failed to fetch users for ${dbname}` 
+      });
+    }
+  }
+);
+
+export const createDatabaseUser = createAsyncThunk(
+  'user/createDatabaseUser',
+  async ({ hostUid, dbname, payload }, { rejectWithValue }) => {
+    try {
+      const response = await userApi.createDatabaseUser(hostUid, dbname, payload);
+      return { dbname, user: response };
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Failed to create user');
+    }
+  }
+);
+
+export const updateDatabaseUser = createAsyncThunk(
+  'user/updateDatabaseUser',
+  async ({ hostUid, dbname, userName, payload }, { rejectWithValue }) => {
+    try {
+      const response = await userApi.updateDatabaseUser(hostUid, dbname, userName, payload);
+      return { dbname, userName, user: response };
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Failed to update user');
+    }
+  }
+);
+
+export const dropDatabaseUser = createAsyncThunk(
+  'user/dropDatabaseUser',
+  async ({ hostUid, dbname, userName }, { rejectWithValue }) => {
+    try {
+      await userApi.dropDatabaseUser(hostUid, dbname, userName);
+      return { dbname, userName };
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Failed to drop user');
+    }
+  }
+);
+
 const initialState = {
   isProfileOpen: false,
   profile: {
@@ -39,7 +90,17 @@ const initialState = {
     dashboardInterval: 0,
     brokerStatusInterval: 0,
   },
+  databaseUsers: {}, // { [dbname]: [] }
+  databaseUsersLoading: {}, // { [dbname]: boolean }
+  databaseUsersError: {}, // { [dbname]: string }
+  isCreateUserModalOpen: false,
+  isEditUserModalOpen: false,
+  isDropUserModalOpen: false,
+  createUserDbName: null,
+  editUserData: null, // { dbname, user }
+  dropUserData: null, // { dbname, userName }
   preferencesLoading: false,
+  actionLoading: false,
   error: null,
 };
 
@@ -55,6 +116,30 @@ const userSlice = createSlice({
     },
     updateProfile: (state, action) => {
       state.profile = { ...state.profile, ...action.payload };
+    },
+    openCreateUserModal: (state, action) => {
+      state.isCreateUserModalOpen = true;
+      state.createUserDbName = action.payload; // dbname
+    },
+    closeCreateUserModal: (state) => {
+      state.isCreateUserModalOpen = false;
+      state.createUserDbName = null;
+    },
+    openEditUserModal: (state, action) => {
+      state.isEditUserModalOpen = true;
+      state.editUserData = action.payload; // { dbname, user }
+    },
+    closeEditUserModal: (state) => {
+      state.isEditUserModalOpen = false;
+      state.editUserData = null;
+    },
+    openDropUserModal: (state, action) => {
+      state.isDropUserModalOpen = true;
+      state.dropUserData = action.payload; // { dbname, userName }
+    },
+    closeDropUserModal: (state) => {
+      state.isDropUserModalOpen = false;
+      state.dropUserData = null;
     },
     clearUserError: (state) => {
       state.error = null;
@@ -83,6 +168,65 @@ const userSlice = createSlice({
       .addCase(updatePreferences.rejected, (state, action) => {
         state.preferencesLoading = false;
         state.error = action.payload;
+      })
+      .addCase(fetchDatabaseUsers.pending, (state, action) => {
+        const { dbname } = action.meta.arg;
+        state.databaseUsersLoading[dbname] = true;
+        delete state.databaseUsersError[dbname];
+      })
+      .addCase(fetchDatabaseUsers.fulfilled, (state, action) => {
+        const { dbname, users } = action.payload;
+        state.databaseUsersLoading[dbname] = false;
+        state.databaseUsers[dbname] = users;
+      })
+      .addCase(fetchDatabaseUsers.rejected, (state, action) => {
+        const { dbname, error } = action.payload || action.meta.arg;
+        state.databaseUsersLoading[dbname] = false;
+        state.databaseUsersError[dbname] = error;
+      })
+      // Create user
+      .addCase(createDatabaseUser.pending, (state) => {
+        state.actionLoading = true;
+        state.error = null;
+      })
+      .addCase(createDatabaseUser.fulfilled, (state, action) => {
+        state.actionLoading = false;
+        state.isCreateUserModalOpen = false;
+        // Optionally refetch users or update state manually
+      })
+      .addCase(createDatabaseUser.rejected, (state, action) => {
+        state.actionLoading = false;
+        state.error = action.payload;
+      })
+      // Update user
+      .addCase(updateDatabaseUser.pending, (state) => {
+        state.actionLoading = true;
+        state.error = null;
+      })
+      .addCase(updateDatabaseUser.fulfilled, (state, action) => {
+        state.actionLoading = false;
+        state.isEditUserModalOpen = false;
+      })
+      .addCase(updateDatabaseUser.rejected, (state, action) => {
+        state.actionLoading = false;
+        state.error = action.payload;
+      })
+      // Drop user
+      .addCase(dropDatabaseUser.pending, (state) => {
+        state.actionLoading = true;
+        state.error = null;
+      })
+      .addCase(dropDatabaseUser.fulfilled, (state, action) => {
+        state.actionLoading = false;
+        state.isDropUserModalOpen = false;
+        const { dbname, userName } = action.payload;
+        if (state.databaseUsers[dbname]) {
+          state.databaseUsers[dbname] = state.databaseUsers[dbname].filter(u => (typeof u === 'string' ? u : u.name) !== userName);
+        }
+      })
+      .addCase(dropDatabaseUser.rejected, (state, action) => {
+        state.actionLoading = false;
+        state.error = action.payload;
       });
   },
 });
@@ -91,6 +235,12 @@ export const {
   openProfileModal,
   closeProfileModal,
   updateProfile,
+  openCreateUserModal,
+  closeCreateUserModal,
+  openEditUserModal,
+  closeEditUserModal,
+  openDropUserModal,
+  closeDropUserModal,
   clearUserError,
 } = userSlice.actions;
 

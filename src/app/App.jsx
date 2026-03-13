@@ -4,6 +4,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { toggleTheme, toggleSidebar, setIsResizing, setActiveMainTab, closeTab, closeOtherTabs, closeAllTabs } from '../features/layout/layoutSlice';
 import { openAddHostModal, closeAddHostModal, setSelectedHost } from '../features/host/hostSlice';
 import { setSelectedDatabase } from '../features/database/databaseSlice';
+import { closeCreateUserModal, closeEditUserModal, closeDropUserModal } from '../features/user/userSlice';
 import Sidebar from '../features/layout/components/Sidebar';
 import Header from '../features/layout/components/Header';
 import Breadcrumb from '../features/layout/components/Breadcrumb';
@@ -20,6 +21,7 @@ import CheckDatabaseModal from '../features/database/components/CheckDatabaseMod
 import CompactDatabaseModal from '../features/database/components/CompactDatabaseModal';
 import CopyDatabaseModal from '../features/database/components/CopyDatabaseModal';
 import BackupDatabaseModal from '../features/database/components/BackupDatabaseModal';
+import AddBackupPlanModal from '../features/database/components/AddBackupPlanModal';
 import LockInformationModal from '../features/database/components/LockInformationModal';
 import UnloadResultModal from '../features/database/components/UnloadResultModal';
 import TransactionInfoModal from '../features/database/components/TransactionInfoModal';
@@ -33,12 +35,15 @@ import StatusModal from '../components/common/StatusModal';
 import LoadingOverlay from '../components/common/LoadingOverlay';
 import LogViewer from '../features/broker/components/LogViewer';
 import CMSLogViewer from '../features/broker/components/CMSLogViewer';
+import CreateUserModal from '../features/user/components/CreateUserModal';
+import DropUserModal from '../features/user/components/DropUserModal';
 import MonitoringProvider from '../features/layout/components/MonitoringProvider';
 
 function DashboardLayout() {
   const dispatch = useDispatch();
   const { theme, isSidebarCollapsed, isResizing, activeMainTab, openTabs } = useSelector((state) => state.layout);
   const { isAddHostModalOpen, hosts, isServiceOperating, serviceOperationType, serviceProgressMessage } = useSelector((state) => state.host);
+  const { isCreateUserModalOpen, createUserDbName, isEditUserModalOpen, editUserData, isDropUserModalOpen } = useSelector((state) => state.user);
   const { actionLoading: dbActionLoading } = useSelector((state) => state.database);
   const { actionLoading: brokerActionLoading } = useSelector((state) => state.broker);
 
@@ -193,9 +198,22 @@ function DashboardLayout() {
         <CompactDatabaseModal />
         <CopyDatabaseModal />
         <BackupDatabaseModal />
+        <AddBackupPlanModal />
         <LockInformationModal />
         <UnloadResultModal />
         <TransactionInfoModal />
+        <CreateUserModal 
+          isOpen={isCreateUserModalOpen} 
+          onClose={() => dispatch(closeCreateUserModal())} 
+          dbname={createUserDbName} 
+        />
+        <CreateUserModal 
+          isOpen={isEditUserModalOpen} 
+          onClose={() => dispatch(closeEditUserModal())} 
+          dbname={editUserData?.dbname} 
+          editingUser={editUserData?.userName}
+        />
+        <DropUserModal />
         <StatusModal />
 
         <LoadingOverlay 

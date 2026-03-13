@@ -20,6 +20,7 @@ import {
   openCompactDatabaseModal, 
   openCopyDatabaseModal, 
   openBackupDatabaseModal, 
+  openAddBackupPlanModal,
   openLockInfoModal, 
   openTransactionInfoModal,
   setSelectedDatabase,
@@ -32,6 +33,7 @@ import {
   setSelectedBroker
 } from '../../broker/brokerSlice';
 import { setActiveMainTab, openTab, closeHostTabs } from '../layoutSlice';
+import { fetchDatabaseUsers, openCreateUserModal, openEditUserModal, openDropUserModal } from '../../user/userSlice';
 import { SubMenu, MenuItem, MenuDivider } from '../../../components/common/DropdownMenu';
 import ContextMenuWrapper from '../../../components/common/ContextMenuWrapper';
 
@@ -53,6 +55,9 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
   const [contextMenu, setContextMenu] = useState(null);
   const [dbContextMenu, setDbContextMenu] = useState(null);
   const [brokerContextMenu, setBrokerContextMenu] = useState(null);
+  const [usersContextMenu, setUsersContextMenu] = useState(null);
+  const [userContextMenu, setUserContextMenu] = useState(null);
+  const [backupPlanContextMenu, setBackupPlanContextMenu] = useState(null);
 
   const dispatch = useDispatch();
   const { hosts, selectedHostUid, loading: hostsLoading, authorizedHosts, isLoggingIntoHost, hostAuthErrors } = useSelector((state) => state.host);
@@ -104,11 +109,44 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
     setBrokerContextMenu({ mouseX: e.clientX, mouseY: e.clientY, broker: brokerName, state });
   };
 
+  const handleUsersContextMenu = (e, dbName) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setContextMenu(null);
+    setDbContextMenu(null);
+    setBrokerContextMenu(null);
+    setUsersContextMenu({ mouseX: e.clientX, mouseY: e.clientY, db: dbName });
+  };
+
+  const handleUserContextMenu = (e, dbName, userName) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setContextMenu(null);
+    setDbContextMenu(null);
+    setBrokerContextMenu(null);
+    setUsersContextMenu(null);
+    setUserContextMenu({ mouseX: e.clientX, mouseY: e.clientY, db: dbName, user: userName });
+  };
+
+  const handleBackupPlanContextMenu = (e, dbName) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setContextMenu(null);
+    setDbContextMenu(null);
+    setBrokerContextMenu(null);
+    setUsersContextMenu(null);
+    setUserContextMenu(null);
+    setBackupPlanContextMenu({ mouseX: e.clientX, mouseY: e.clientY, db: dbName });
+  };
+
   useEffect(() => {
     const handleClick = () => {
       setContextMenu(null);
       setDbContextMenu(null);
       setBrokerContextMenu(null);
+      setUsersContextMenu(null);
+      setUserContextMenu(null);
+      setBackupPlanContextMenu(null);
     };
     document.addEventListener('click', handleClick);
     return () => document.removeEventListener('click', handleClick);
@@ -253,7 +291,14 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
                       <span className="h-px flex-1 bg-slate-200 dark:bg-slate-800"></span>
                     </p>
 
-                    {activeTab === 'db' && <DatabaseTree onContextMenu={handleDbContextMenu} />}
+                    {activeTab === 'db' && (
+                      <DatabaseTree 
+                        onContextMenu={handleDbContextMenu} 
+                        onUsersContextMenu={handleUsersContextMenu} 
+                        onUserContextMenu={handleUserContextMenu}
+                        onBackupPlanContextMenu={handleBackupPlanContextMenu}
+                      />
+                    )}
                     {activeTab === 'broker' && <BrokerTree hostUid={selectedHostUid} onContextMenu={handleBrokerContextMenu} />}
                     {activeTab === 'log' && <LogTree hostUid={selectedHostUid} />}
                   </div>
@@ -351,6 +396,99 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
             <MenuItem icon="play_arrow" iconColor="text-emerald-500" label="Start Broker" onClick={() => { dispatch(startBroker({ hostUid: selectedHostUid, brokerName: brokerContextMenu.broker })); setBrokerContextMenu(null); }} />
           )}
           <MenuDivider /><MenuItem icon="info" label="Status" /><MenuItem icon="tune" label="Properties" />
+        </ContextMenuWrapper>
+      )}
+
+      {usersContextMenu && (
+        <ContextMenuWrapper x={usersContextMenu.mouseX} y={usersContextMenu.mouseY} onClose={() => setUsersContextMenu(null)}>
+          <div className="px-4 py-2 text-[11px] font-medium text-slate-400 border-b border-slate-100 dark:border-white/5 mb-1">
+            Users: {usersContextMenu.db}
+          </div>
+          <MenuItem 
+            icon="person_add" 
+            label="Create DB User" 
+            onClick={() => {
+              dispatch(openCreateUserModal(usersContextMenu.db));
+              setUsersContextMenu(null);
+            }} 
+          />
+          <MenuItem 
+            icon="refresh" 
+            label="Refresh" 
+            onClick={() => {
+              dispatch(fetchDatabaseUsers({ hostUid: selectedHostUid, dbname: usersContextMenu.db }));
+              setUsersContextMenu(null);
+            }} 
+          />
+        </ContextMenuWrapper>
+      )}
+
+      {userContextMenu && (
+        <ContextMenuWrapper x={userContextMenu.mouseX} y={userContextMenu.mouseY} onClose={() => setUserContextMenu(null)}>
+          <div className="px-4 py-2 text-[11px] font-bold text-slate-700 dark:text-slate-200 border-b border-slate-100 dark:border-white/5 mb-1 flex items-center justify-between">
+            <span>{userContextMenu.user}</span>
+            <span className="material-symbols-outlined text-[16px] opacity-40">person</span>
+          </div>
+          <MenuItem 
+            icon="edit" 
+            label="Edit DB User" 
+            onClick={() => {
+              dispatch(openEditUserModal({ dbname: userContextMenu.db, userName: userContextMenu.user }));
+              setUserContextMenu(null);
+            }} 
+          />
+          <MenuItem 
+            icon="person_remove" 
+            iconColor="text-rose-500"
+            label="Drop DB User" 
+            onClick={() => {
+              dispatch(openDropUserModal({ dbname: userContextMenu.db, userName: userContextMenu.user }));
+              setUserContextMenu(null);
+            }} 
+          />
+          <MenuDivider />
+          <MenuItem 
+            icon="refresh" 
+            label="Refresh" 
+            onClick={() => {
+              dispatch(fetchDatabaseUsers({ hostUid: selectedHostUid, dbname: userContextMenu.db }));
+              setUserContextMenu(null);
+            }} 
+          />
+        </ContextMenuWrapper>
+      )}
+      {backupPlanContextMenu && (
+        <ContextMenuWrapper x={backupPlanContextMenu.mouseX} y={backupPlanContextMenu.mouseY} onClose={() => setBackupPlanContextMenu(null)}>
+          <div className="px-4 py-2 text-[11px] font-bold text-slate-700 dark:text-slate-200 border-b border-slate-100 dark:border-white/5 mb-1 flex items-center justify-between">
+            <span>Backup Plan</span>
+            <span className="material-symbols-outlined text-[16px] opacity-40">backup</span>
+          </div>
+          <MenuItem 
+            icon="add_circle" 
+            label="Add Backup Plan" 
+            onClick={() => {
+              dispatch(setSelectedDatabase(backupPlanContextMenu.db));
+              dispatch(openAddBackupPlanModal());
+              setBackupPlanContextMenu(null);
+            }} 
+          />
+          <MenuItem 
+            icon="history" 
+            label="Auto Backup Log" 
+            onClick={() => {
+              console.log('Auto Backup Log for:', backupPlanContextMenu.db);
+              setBackupPlanContextMenu(null);
+            }} 
+          />
+          <MenuDivider />
+          <MenuItem 
+            icon="refresh" 
+            label="Refresh" 
+            onClick={() => {
+              console.log('Refresh Backup Plan for:', backupPlanContextMenu.db);
+              setBackupPlanContextMenu(null);
+            }} 
+          />
         </ContextMenuWrapper>
       )}
     </>
