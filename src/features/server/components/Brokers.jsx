@@ -80,8 +80,12 @@ export default function Brokers({ hostUid }) {
                   <td className="px-4 py-3">{row.req}</td>
                   <td className="px-4 py-3">{row.tps}</td>
                   <td className="px-4 py-3">{row.qps}</td>
-                  <td className="px-4 py-3">{row.long_tran_time || row.long_tran || '0'}</td>
-                  <td className="px-4 py-3">{row.long_query_time || row.long_query || '0'}</td>
+                  <td className="px-4 py-3">
+                    {`${row.long_tran || '0'} / ${parseFloat(row.long_tran_time || 0) * 1000}`}
+                  </td>
+                  <td className="px-4 py-3">
+                    {`${row.long_query || '0'} / ${parseFloat(row.long_query_time || 0) * 1000}`}
+                  </td>
                   <td className="px-4 py-3">{row.error_query || '0'}</td>
                 </tr>
               ))

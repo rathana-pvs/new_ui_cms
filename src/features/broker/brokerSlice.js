@@ -25,7 +25,11 @@ export const fetchBrokerList = createAsyncThunk(
         as: item.as,
         jq: item.jq,
         req: item.req,
-        // Add more default fields if needed
+        long_tran: item.long_tran || '0',
+        long_tran_time: item.long_tran_time || '0',
+        long_query: item.long_query || '0',
+        long_query_time: item.long_query_time || '0',
+        error_query: item.error_query || '0',
       }));
 
       const responses = await Promise.all(

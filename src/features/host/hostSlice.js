@@ -195,6 +195,8 @@ const initialState = {
   serviceOperationType: null, // 'start' or 'stop'
   serviceProgressMessage: '',
   hostAuthErrors: {}, // { [hostUid]: errorMessage }
+  isImportExportModalOpen: false,
+  importExportMode: 'export', // 'import' or 'export'
   error: null,
 };
 
@@ -242,6 +244,13 @@ const hostSlice = createSlice({
     closeServerVersionModal: (state) => {
       state.isServerVersionModalOpen = false;
       state.serverVersionHostUid = null;
+    },
+    openImportExportModal: (state, action) => {
+      state.isImportExportModalOpen = true;
+      state.importExportMode = action.payload; // 'import' or 'export'
+    },
+    closeImportExportModal: (state) => {
+      state.isImportExportModalOpen = false;
     },
     clearHostError: (state) => {
       state.error = null;
@@ -369,6 +378,8 @@ export const {
   closeEditHostModal,
   openServerVersionModal,
   closeServerVersionModal,
+  openImportExportModal,
+  closeImportExportModal,
   clearHostError,
   setServiceProgressMessage,
 } = hostSlice.actions;

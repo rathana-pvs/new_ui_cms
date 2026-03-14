@@ -1,16 +1,24 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { DropdownMenu, SubMenu, MenuItem, MenuDivider } from '../../../components/common/DropdownMenu';
 import { openTab, showStatusModal } from '../layoutSlice';
-import { openAddHostModal, openEditHostModal, startService, stopService, openServerVersionModal } from '../../host/hostSlice';
+import { openAddHostModal, openEditHostModal, startService, stopService, openServerVersionModal, openImportExportModal } from '../../host/hostSlice';
 import { startDatabase, stopDatabase } from '../../database/databaseSlice';
 import { startBroker, stopBroker } from '../../broker/brokerSlice';
 import { setAboutCubrid } from '../appBarSlice';
 
 export default function HeaderMenu() {
   const dispatch = useDispatch();
-  const { selectedHostUid } = useSelector((state) => state.host);
+  const { hosts, selectedHostUid } = useSelector((state) => state.host);
   const { selectedDatabase, activeDatabases } = useSelector((state) => state.database);
   const { brokers, selectedBroker } = useSelector((state) => state.broker);
+
+  const handleExport = () => {
+    dispatch(openImportExportModal('export'));
+  };
+
+  const handleImport = () => {
+    dispatch(openImportExportModal('import'));
+  };
 
   return (
     <nav className="flex items-center gap-4 text-sm font-medium text-slate-600 dark:text-slate-400 font-sans">
@@ -26,8 +34,16 @@ export default function HeaderMenu() {
           disabled={!selectedHostUid}
           onClick={() => dispatch(openEditHostModal(selectedHostUid))}
         />
-        <MenuItem icon="file_upload" label="Export Host" href="#" />
-        <MenuItem icon="file_download" label="Import Host" href="#" />
+        <MenuItem
+          icon="file_upload"
+          label="Export Host"
+          onClick={handleExport}
+        />
+        <MenuItem
+          icon="file_download"
+          label="Import Host"
+          onClick={handleImport}
+        />
       </DropdownMenu>
 
       <DropdownMenu label="Tool" width="w-48">

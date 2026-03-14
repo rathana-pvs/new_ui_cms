@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { hostApi } from '../../host/hostApi';
 import { databaseApi } from '../../database/databaseApi';
+import { fetchHostEnv } from '../../host/hostSlice';
+import { fetchDatabaseStartInfo } from '../../database/databaseSlice';
+import { fetchBrokerList } from '../../broker/brokerSlice';
 import DatabaseVolumes from './DatabaseVolumes';
 import Brokers from './Brokers';
 import SystemInfo from './SystemInfo';
@@ -10,17 +13,26 @@ import SystemStatusSection from './server/SystemStatusSection';
 import DatabaseListSection from './server/DatabaseListSection';
 
 export default function ServerContent({ hostUid }) {
+  const dispatch = useDispatch();
   const { databases, activeDatabases } = useSelector((state) => state.database);
-  const { hosts } = useSelector((state) => state.host);
+  const { hosts, authorizedHosts } = useSelector((state) => state.host);
   const currentHost = hosts.find(h => h.uid === hostUid);
   const [autoStartDBs, setAutoStartDBs] = useState([]);
 
-  const systemStatus = [
-    { time: "Now", memory: "15.86GB / 31.09GB", memPct: 51, disk: "227.4GB", cpu: "10%", cpuPct: 10, tps: "39", qps: "4" },
-    { time: "5 min Avg", memory: "15.89GB / 31.09GB", memPct: 51.1, disk: "-", cpu: "11.5%", cpuPct: 11.5, tps: "32", qps: "2.25" },
-  ];
-
+  // Fetch all required dashboard data
   useEffect(() => {
+    if (!hostUid || !authorizedHosts.includes(hostUid)) return;
+
+    // 1. Fetch Databases & their active status
+    dispatch(fetchDatabaseStartInfo(hostUid));
+
+    // 2. Fetch Broker List
+    dispatch(fetchBrokerList(hostUid));
+
+    // 3. Fetch System Info (Environment)
+    dispatch(fetchHostEnv(hostUid));
+
+    // 4. Fetch Auto-start info from cubrid.conf (Matches d-cms logic)
     const fetchAutoStartInfo = async () => {
       try {
         const response = await hostApi.getHostConfig(hostUid, 'cubridconf');
@@ -47,21 +59,14 @@ export default function ServerContent({ hostUid }) {
           }
         }
         
-        if (serviceEnabled) {
-          setAutoStartDBs(servers);
-        } else {
-          setAutoStartDBs([]);
-        }
+        setAutoStartDBs(serviceEnabled ? servers : []);
       } catch (err) {
         console.error('Failed to fetch auto-start info:', err);
-        setAutoStartDBs([]);
       }
     };
     
-    if (hostUid) {
-      fetchAutoStartInfo();
-    }
-  }, [hostUid]);
+    fetchAutoStartInfo();
+  }, [hostUid, authorizedHosts, dispatch]);
 
   const handleAutoStartToggle = async (dbname, isCurrentlyAutoStart) => {
     try {
@@ -76,34 +81,23 @@ export default function ServerContent({ hostUid }) {
         await databaseApi.setAutoStart(hostUid, payload);
       }
 
-      // Refresh info
+      // Refresh auto-start list
       const response = await hostApi.getHostConfig(hostUid, 'cubridconf');
       const lines = response?.conflist?.[0]?.confdata || [];
-      
-      let serviceEnabled = false;
       let servers = [];
-      
+      let serviceEnabled = false;
       for (const line of lines) {
         const trimmed = line.trim();
-        if (trimmed.startsWith('#') || !trimmed) continue;
-        
         if (trimmed.startsWith('service=')) {
           const val = trimmed.split('=')[1] || '';
-          const services = val.split(',').map(s => s.trim().toLowerCase());
-          if (services.includes('server')) serviceEnabled = true;
+          if (val.split(',').map(s => s.trim().toLowerCase()).includes('server')) serviceEnabled = true;
         }
-        
         if (trimmed.startsWith('server=')) {
           const val = trimmed.split('=')[1] || '';
           servers = val.split(',').map(s => s.trim());
         }
       }
-      
-      if (serviceEnabled) {
-        setAutoStartDBs(servers);
-      } else {
-        setAutoStartDBs([]);
-      }
+      setAutoStartDBs(serviceEnabled ? servers : []);
     } catch (err) {
       console.error('Failed to update auto-start:', err);
     }
@@ -134,7 +128,7 @@ export default function ServerContent({ hostUid }) {
         <Brokers hostUid={hostUid} />
         
         {/* System Status Section */}
-        <SystemStatusSection systemStatus={systemStatus} />
+        <SystemStatusSection hostUid={hostUid} />
         
         {/* Databases Section */}
         <DatabaseListSection 

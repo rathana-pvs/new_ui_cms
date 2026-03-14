@@ -15,13 +15,16 @@ const getSizeFormat = (size) => {
 };
 
 const getVolumeColumn = (dbSpace, type) => {
+  if (!dbSpace || !dbSpace.spaceinfo) return { display: '-', pct: 0 };
   let totalPage = 0;
   let freePage = 0;
-  let pageSize = parseInt(dbSpace.pagesize);
+  let pageSize = parseInt(dbSpace.pagesize || 0);
+  if (pageSize === 0) return { display: '-', pct: 0 };
+
   for (const space of dbSpace.spaceinfo) {
     if (space.type === type) {
-      totalPage += parseInt(space.totalpage);
-      freePage += parseInt(space.freepage);
+      totalPage += parseInt(space.totalpage || 0);
+      freePage += parseInt(space.freepage || 0);
     }
   }
   if (totalPage > 0) {
@@ -71,12 +74,14 @@ export default function DatabaseVolumes({ hostUid }) {
     let temporary = { display: '-', pct: 0 };
     let activeLog = '-';
     let archiveLog = '-';
+    let storageFree = '-';
 
     if (result && result.spaceinfo) {
       permanent = getVolumeColumn(result, 'PERMANENT');
       temporary = getVolumeColumn(result, 'TEMPORARY');
       activeLog = getLogColumn(result, 'Active_log');
       archiveLog = getLogColumn(result, 'Archive_log');
+      storageFree = result.freespace ? getSizeFormat(parseInt(result.freespace) * 1024) : '-';
     }
 
     return {
@@ -85,6 +90,7 @@ export default function DatabaseVolumes({ hostUid }) {
       temporary,
       activeLog,
       archiveLog,
+      storageFree
     };
   });
 
@@ -106,16 +112,17 @@ export default function DatabaseVolumes({ hostUid }) {
           <thead>
             <tr className="text-slate-500 dark:text-slate-400 bg-slate-50/20 dark:bg-transparent border-b border-slate-200 dark:border-slate-800">
               <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Database</th>
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Permanent (U/T/F)</th>
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Temporary (U/T/F)</th>
+              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Permanent (U/T/F%)</th>
+              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Temporary (U/T/F%)</th>
               <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Active Log</th>
               <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Archive Log</th>
+              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Storage Free</th>
             </tr>
           </thead>
           <tbody className="font-mono">
             {volumeData.length === 0 ? (
               <tr>
-                <td colSpan="5" className="px-4 py-8 text-center text-slate-400 italic">
+                <td colSpan="6" className="px-4 py-8 text-center text-slate-400 italic">
                   {loading ? 'Loading volume data...' : 'No active databases found or information unavailable'}
                 </td>
               </tr>
@@ -145,6 +152,7 @@ export default function DatabaseVolumes({ hostUid }) {
                   </td>
                   <td className="px-4 py-3">{row.activeLog}</td>
                   <td className="px-4 py-3">{row.archiveLog}</td>
+                  <td className="px-4 py-3 opacity-80">{row.storageFree}</td>
                 </tr>
               ))
             )}

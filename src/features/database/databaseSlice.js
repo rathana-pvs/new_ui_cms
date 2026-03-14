@@ -135,6 +135,7 @@ const initialState = {
   isTransactionInfoModalOpen: false,
   isKillTransactionModalOpen: false,
   isDeleteDBModalOpen: false,
+  isDatabasePropertyModalOpen: false,
   killTransactionData: null,
   unloadResultData: null,
   databaseClasses: {}, // { [dbname]: {} }
@@ -238,6 +239,12 @@ const databaseSlice = createSlice({
     },
     closeDeleteDBModal: (state) => {
       state.isDeleteDBModalOpen = false;
+    },
+    openDatabasePropertyModal: (state) => {
+      state.isDatabasePropertyModalOpen = true;
+    },
+    closeDatabasePropertyModal: (state) => {
+      state.isDatabasePropertyModalOpen = false;
     },
   },
   extraReducers: (builder) => {
@@ -371,7 +378,9 @@ export const {
   openKillTransactionModal,
   closeKillTransactionModal,
   openDeleteDBModal,
-  closeDeleteDBModal
+  closeDeleteDBModal,
+  openDatabasePropertyModal,
+  closeDatabasePropertyModal
 } = databaseSlice.actions;
 
 export default databaseSlice.reducer;

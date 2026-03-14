@@ -9,11 +9,14 @@ import authReducer from '../features/auth/authSlice';
 
 import appBarReducer from '../features/layout/appBarSlice';
 
+import monitoringReducer from '../features/server/monitoringSlice';
+
 const combinedReducer = combineReducers({
   auth: authReducer,
   layout: layoutReducer,
   appBar: appBarReducer,
   server: serverReducer,
+  monitoring: monitoringReducer,
   database: databaseReducer,
   broker: brokerReducer,
   host: hostReducer,

@@ -38,6 +38,8 @@ import CMSLogViewer from '../features/broker/components/CMSLogViewer';
 import CreateUserModal from '../features/user/components/CreateUserModal';
 import DropUserModal from '../features/user/components/DropUserModal';
 import MonitoringProvider from '../features/layout/components/MonitoringProvider';
+import ImportExportHostModal from '../features/host/components/ImportExportHostModal';
+import DatabasePropertyModal from '../features/database/components/DatabasePropertyModal';
 
 function DashboardLayout() {
   const dispatch = useDispatch();
@@ -190,6 +192,7 @@ function DashboardLayout() {
         <DeleteHostModal />
         <EditHostModal />
         <ServerVersionModal />
+        <ImportExportHostModal />
 
         <UnloadDatabaseModal />
         <LoadDatabaseModal />
@@ -214,6 +217,7 @@ function DashboardLayout() {
           editingUser={editUserData?.userName}
         />
         <DropUserModal />
+        <DatabasePropertyModal />
         <StatusModal />
 
         <LoadingOverlay 

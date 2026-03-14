@@ -24,7 +24,8 @@ import {
   openLockInfoModal, 
   openTransactionInfoModal,
   setSelectedDatabase,
-  openDeleteDBModal
+  openDeleteDBModal,
+  openDatabasePropertyModal
 } from '../../database/databaseSlice';
 import { 
   fetchBrokerList, 
@@ -58,6 +59,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
   const [usersContextMenu, setUsersContextMenu] = useState(null);
   const [userContextMenu, setUserContextMenu] = useState(null);
   const [backupPlanContextMenu, setBackupPlanContextMenu] = useState(null);
+  const [dbRootContextMenu, setDbRootContextMenu] = useState(null);
 
   const dispatch = useDispatch();
   const { hosts, selectedHostUid, loading: hostsLoading, authorizedHosts, isLoggingIntoHost, hostAuthErrors } = useSelector((state) => state.host);
@@ -99,6 +101,18 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
     e.stopPropagation();
     setContextMenu(null);
     setDbContextMenu({ mouseX: e.clientX, mouseY: e.clientY, db: dbName, isActive });
+  };
+
+  const handleDbRootContextMenu = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setContextMenu(null);
+    setDbContextMenu(null);
+    setBrokerContextMenu(null);
+    setUsersContextMenu(null);
+    setUserContextMenu(null);
+    setBackupPlanContextMenu(null);
+    setDbRootContextMenu({ mouseX: e.clientX, mouseY: e.clientY });
   };
 
   const handleBrokerContextMenu = (e, brokerName, state) => {
@@ -147,6 +161,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
       setUsersContextMenu(null);
       setUserContextMenu(null);
       setBackupPlanContextMenu(null);
+      setDbRootContextMenu(null);
     };
     document.addEventListener('click', handleClick);
     return () => document.removeEventListener('click', handleClick);
@@ -294,6 +309,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
                     {activeTab === 'db' && (
                       <DatabaseTree 
                         onContextMenu={handleDbContextMenu} 
+                        onRootContextMenu={handleDbRootContextMenu}
                         onUsersContextMenu={handleUsersContextMenu} 
                         onUserContextMenu={handleUserContextMenu}
                         onBackupPlanContextMenu={handleBackupPlanContextMenu}
@@ -381,7 +397,16 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
             <MenuItem icon="swap_horiz" label="Transaction Info" onClick={() => { dispatch(setSelectedDatabase(dbContextMenu.db)); dispatch(openTransactionInfoModal()); setDbContextMenu(null); }} />
             <MenuItem icon="schema" label="Plan Dump" /><MenuItem icon="data_object" label="Param Dump" /><MenuItem icon="explore" label="OID Navigation" />
           </SubMenu>
-          <MenuDivider /><MenuItem icon="tune" label="Properties" />
+          <MenuDivider /><MenuItem icon="tune" label="Properties" onClick={() => { dispatch(setSelectedDatabase(dbContextMenu.db)); dispatch(openDatabasePropertyModal()); setDbContextMenu(null); }} />
+        </ContextMenuWrapper>
+      )}
+
+      {dbRootContextMenu && (
+        <ContextMenuWrapper x={dbRootContextMenu.mouseX} y={dbRootContextMenu.mouseY} onClose={() => setDbRootContextMenu(null)}>
+          <div className="px-4 py-2 text-[11px] font-medium text-slate-400 border-b border-slate-100 dark:border-white/5 mb-1">
+            Databases
+          </div>
+          <MenuItem icon="tune" label="Properties" onClick={() => { dispatch(setSelectedDatabase(null)); dispatch(openDatabasePropertyModal()); setDbRootContextMenu(null); }} />
         </ContextMenuWrapper>
       )}
 
