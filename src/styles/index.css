@@ -38,9 +38,24 @@
 }
 
 
+
 @layer utilities {
   .cursor-col-resize { cursor: col-resize; }
   .cursor-row-resize { cursor: row-resize; }
+  
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-slate-200 dark:bg-slate-700 rounded-full;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-bk-yellow;
+  }
 }
 
 

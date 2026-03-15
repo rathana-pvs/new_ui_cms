@@ -11,17 +11,21 @@ import Breadcrumb from '../features/layout/components/Breadcrumb';
 import Footer from '../features/layout/components/Footer';
 import AddHostModal from '../features/host/components/AddHostModal';
 import ServerContent from '../features/server/components/ServerContent';
-import DemoDBContent from '../features/database/components/DemoDBContent';
+import DatabaseDashboard from '../features/database/components/DatabaseDashboard';
 import CubridConfigEditor from '../features/server/components/CubridConfigEditor';
 import BrokerConfigEditor from '../features/server/components/BrokerConfigEditor';
 import UnloadDatabaseModal from '../features/database/components/UnloadDatabaseModal';
 import LoadDatabaseModal from '../features/database/components/LoadDatabaseModal';
 import DeleteDatabaseModal from '../features/database/components/DeleteDatabaseModal';
+import OptimizeDatabaseModal from '../features/database/components/OptimizeDatabaseModal';
 import CheckDatabaseModal from '../features/database/components/CheckDatabaseModal';
 import CompactDatabaseModal from '../features/database/components/CompactDatabaseModal';
 import CopyDatabaseModal from '../features/database/components/CopyDatabaseModal';
 import BackupDatabaseModal from '../features/database/components/BackupDatabaseModal';
 import AddBackupPlanModal from '../features/database/components/AddBackupPlanModal';
+import AutoBackupLogModal from '../features/database/components/AutoBackupLogModal';
+import DeleteBackupPlanModal from '../features/database/components/DeleteBackupPlanModal';
+
 import LockInformationModal from '../features/database/components/LockInformationModal';
 import UnloadResultModal from '../features/database/components/UnloadResultModal';
 import TransactionInfoModal from '../features/database/components/TransactionInfoModal';
@@ -40,6 +44,8 @@ import DropUserModal from '../features/user/components/DropUserModal';
 import MonitoringProvider from '../features/layout/components/MonitoringProvider';
 import ImportExportHostModal from '../features/host/components/ImportExportHostModal';
 import DatabasePropertyModal from '../features/database/components/DatabasePropertyModal';
+import RenameDatabaseModal from '../features/database/components/RenameDatabaseModal';
+import AddVolumeModal from '../features/database/components/AddVolumeModal';
 
 function DashboardLayout() {
   const dispatch = useDispatch();
@@ -147,7 +153,7 @@ function DashboardLayout() {
               return (
                 <div key={tabId} className={`flex-1 flex flex-col overflow-hidden ${isActive ? '' : 'hidden'}`}>
                   {isHost && <ServerContent hostUid={resourceId} />}
-                  {isDb && <DemoDBContent dbname={resourceId} />}
+                  {isDb && <DatabaseDashboard dbname={resourceId} />}
                   {isEditConfig && (
                     <CubridConfigEditor
                       hostUid={resourceId}
@@ -199,9 +205,13 @@ function DashboardLayout() {
         <DeleteDatabaseModal />
         <CheckDatabaseModal />
         <CompactDatabaseModal />
+        <OptimizeDatabaseModal />
         <CopyDatabaseModal />
         <BackupDatabaseModal />
         <AddBackupPlanModal />
+        <AutoBackupLogModal />
+        <DeleteBackupPlanModal />
+
         <LockInformationModal />
         <UnloadResultModal />
         <TransactionInfoModal />
@@ -218,6 +228,8 @@ function DashboardLayout() {
         />
         <DropUserModal />
         <DatabasePropertyModal />
+        <RenameDatabaseModal />
+        <AddVolumeModal />
         <StatusModal />
 
         <LoadingOverlay 

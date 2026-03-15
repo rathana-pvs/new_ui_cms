@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { DropdownMenu, SubMenu, MenuItem, MenuDivider } from '../../../components/common/DropdownMenu';
 import { openTab, showStatusModal } from '../layoutSlice';
 import { openAddHostModal, openEditHostModal, startService, stopService, openServerVersionModal, openImportExportModal } from '../../host/hostSlice';
-import { startDatabase, stopDatabase } from '../../database/databaseSlice';
+import { startDatabase, stopDatabase, openOptimizeDatabaseModal } from '../../database/databaseSlice';
 import { startBroker, stopBroker } from '../../broker/brokerSlice';
 import { setAboutCubrid } from '../appBarSlice';
 
@@ -64,26 +64,68 @@ export default function HeaderMenu() {
           icon="database"
           label="Start Database"
           disabled={!selectedDatabase || activeDatabases.includes(selectedDatabase)}
-          onClick={() => dispatch(startDatabase({ hostUid: selectedHostUid, dbname: selectedDatabase }))}
+          onClick={() => {
+            dispatch(startDatabase({ hostUid: selectedHostUid, dbname: selectedDatabase }))
+              .unwrap()
+              .then(() => {
+                dispatch(fetchDatabaseStartInfo(selectedHostUid));
+              })
+              .catch((err) => {
+                dispatch(showStatusModal({ type: 'error', title: 'Action Failed', message: err }));
+              });
+          }}
         />
         <MenuItem
           icon="database_off"
           label="Stop Database"
           disabled={!selectedDatabase || !activeDatabases.includes(selectedDatabase)}
-          onClick={() => dispatch(stopDatabase({ hostUid: selectedHostUid, dbname: selectedDatabase }))}
+          onClick={() => {
+            dispatch(stopDatabase({ hostUid: selectedHostUid, dbname: selectedDatabase }))
+              .unwrap()
+              .then(() => {
+                dispatch(fetchDatabaseStartInfo(selectedHostUid));
+              })
+              .catch((err) => {
+                dispatch(showStatusModal({ type: 'error', title: 'Action Failed', message: err }));
+              });
+          }}
+        />
+        <MenuItem
+          icon="auto_fix_high"
+          label="Optimize Database"
+          disabled={!selectedDatabase}
+          onClick={() => dispatch(openOptimizeDatabaseModal())}
         />
         <MenuDivider />
         <MenuItem
           icon="hub"
           label="Start Broker"
           disabled={!selectedBroker || brokers.find(b => b.name === selectedBroker)?.state === 'ON'}
-          onClick={() => dispatch(startBroker({ hostUid: selectedHostUid, brokerName: selectedBroker }))}
+          onClick={() => {
+            dispatch(startBroker({ hostUid: selectedHostUid, brokerName: selectedBroker }))
+              .unwrap()
+              .then(() => {
+                dispatch(fetchBrokerList(selectedHostUid));
+              })
+              .catch((err) => {
+                dispatch(showStatusModal({ type: 'error', title: 'Action Failed', message: err }));
+              });
+          }}
         />
         <MenuItem
           icon="hub"
           label="Stop Broker"
           disabled={!selectedBroker || brokers.find(b => b.name === selectedBroker)?.state !== 'ON'}
-          onClick={() => dispatch(stopBroker({ hostUid: selectedHostUid, brokerName: selectedBroker }))}
+          onClick={() => {
+            dispatch(stopBroker({ hostUid: selectedHostUid, brokerName: selectedBroker }))
+              .unwrap()
+              .then(() => {
+                dispatch(fetchBrokerList(selectedHostUid));
+              })
+              .catch((err) => {
+                dispatch(showStatusModal({ type: 'error', title: 'Action Failed', message: err }));
+              });
+          }}
         />
       </DropdownMenu>
 

@@ -69,7 +69,7 @@ export default function DatabaseVolumes({ hostUid }) {
     fetchVolumes();
   }, [fetchVolumes]);
 
-  const volumeData = volumes.map((result) => {
+  const volumeData = volumes?.map((result) => {
     let permanent = { display: '-', pct: 0 };
     let temporary = { display: '-', pct: 0 };
     let activeLog = '-';
@@ -92,7 +92,7 @@ export default function DatabaseVolumes({ hostUid }) {
       archiveLog,
       storageFree
     };
-  });
+  }) || [];
 
   return (
     <details className="group border border-slate-200 dark:border-slate-800 rounded-lg shadow-sm bg-white dark:bg-bk-side overflow-hidden" open>

@@ -5,10 +5,10 @@ export const databaseApi = {
     return apiClient.get(`/${hostUid}/database/start-info`);
   },
   startDatabase: (hostUid, dbname) => {
-    return apiClient.post(`/${hostUid}/database/start/${dbname}`);
+    return apiClient.post(`/${hostUid}/database/start/${encodeURIComponent(dbname)}`, {});
   },
   stopDatabase: (hostUid, dbname) => {
-    return apiClient.post(`/${hostUid}/database/stop/${dbname}`);
+    return apiClient.post(`/${hostUid}/database/stop/${encodeURIComponent(dbname)}`, {});
   },
   getVolumeInfo: (hostUid, dbname) => {
     return apiClient.get(`/${hostUid}/database/volume-info/${dbname}`);
@@ -30,6 +30,8 @@ export const databaseApi = {
   },
   compactDatabase: (hostUid, dbname, payload) =>
     apiClient.post(`/${hostUid}/database/compact/${dbname}`, payload),
+  optimizeDatabase: (hostUid, dbname, payload) =>
+    apiClient.post(`/${hostUid}/database/optimize/${encodeURIComponent(dbname)}`, payload),
 
   getLockInfo: (hostUid, dbname) =>
     apiClient.post(`/${hostUid}/database/lock/${dbname}`),
@@ -57,5 +59,35 @@ export const databaseApi = {
   },
   addBackupSchedule: (hostUid, dbname, payload) => {
     return apiClient.post(`/${hostUid}/database/backup-schedule/${dbname}`, payload);
+  },
+  editBackupSchedule: (hostUid, dbname, payload) => {
+    return apiClient.put(`/${hostUid}/database/backup-schedule/${dbname}`, payload);
+  },
+  getBackupSchedule: (hostUid, dbname) => {
+    return apiClient.get(`/${hostUid}/database/backup-schedule/${dbname}`);
+  },
+  deleteBackupSchedule: (hostUid, dbname, payload) => {
+    return apiClient.delete(`/${hostUid}/database/backup-schedule/${dbname}`, { data: payload });
+  },
+  renameDatabase: (hostUid, dbname, payload) => {
+    return apiClient.post(`/${hostUid}/database/rename/${encodeURIComponent(dbname)}`, payload);
+  },
+  getAddVolStatus: (hostUid, dbname) => {
+    return apiClient.get(`/${hostUid}/database/add-vol-status/${encodeURIComponent(dbname)}`);
+  },
+  addVolDb: (hostUid, dbname, payload) => {
+    return apiClient.post(`/${hostUid}/database/add-vol/${encodeURIComponent(dbname)}`, payload);
+  },
+  getAutoBackupLog: (hostUid) => {
+    return apiClient.post(`/${hostUid}/database/auto-backup-db-err-log`, {});
+  },
+  getQueryPlan: (hostUid, dbname) => {
+    return apiClient.get(`/${hostUid}/database/auto-exec-query/${encodeURIComponent(dbname)}`);
+  },
+  setAutoExecQuery: (hostUid, dbname, payload) => {
+    return apiClient.post(`/${hostUid}/database/auto-exec-query/${encodeURIComponent(dbname)}`, payload);
+  },
+  getQueryPlanLog: (hostUid) => {
+    return apiClient.post(`/${hostUid}/database/auto-exec-query-err-log`, {});
   },
 };

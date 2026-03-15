@@ -8,8 +8,8 @@ import MonitoringSettingsPopover from '../../user/components/MonitoringSettingsP
 import { DropdownMenu, SubMenu, MenuItem, MenuDivider } from '../../../components/common/DropdownMenu';
 import { openTab, showStatusModal } from '../layoutSlice';
 import { openAddHostModal, openEditHostModal, startService, stopService } from '../../host/hostSlice';
-import { startDatabase, stopDatabase } from '../../database/databaseSlice';
-import { startBroker, stopBroker } from '../../broker/brokerSlice';
+import { startDatabase, stopDatabase, fetchDatabaseStartInfo } from '../../database/databaseSlice';
+import { startBroker, stopBroker, fetchBrokerList } from '../../broker/brokerSlice';
 import { setAboutCubrid } from '../appBarSlice';
 import AboutModal from './AboutModal';
 import { openServerVersionModal } from '../../host/hostSlice';
@@ -20,6 +20,9 @@ export default function Header({ theme, toggleTheme }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const dispatch = useDispatch();
   const { user, isAuthenticated, loading: authLoading, error: authError } = useSelector((state) => state.auth);
+  const { selectedHostUid } = useSelector((state) => state.host);
+  const { selectedDatabase, activeDatabases } = useSelector((state) => state.database);
+  const { selectedBroker, brokers } = useSelector((state) => state.broker);
 
   useEffect(() => {
     if (isAuthenticated && !user) {
@@ -42,7 +45,31 @@ export default function Header({ theme, toggleTheme }) {
           <HeaderMenu />
           <div className="h-6 w-px bg-slate-200 dark:border-slate-800"></div>
           <div className="flex items-center gap-1.5 ml-2">
-            <button className="w-9 h-9 flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors group" title="Start">
+            <button 
+              className={`w-9 h-9 flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors group
+                ${(!selectedDatabase && !selectedBroker) ? 'opacity-30 cursor-not-allowed' : ''}`} 
+              title="Start Selected"
+              onClick={() => {
+                if (selectedDatabase && !activeDatabases.includes(selectedDatabase)) {
+                  dispatch(startDatabase({ hostUid: selectedHostUid, dbname: selectedDatabase }))
+                    .unwrap()
+                    .then(() => {
+                      dispatch(fetchDatabaseStartInfo(selectedHostUid));
+                    })
+                    .catch(err => dispatch(showStatusModal({ type: 'error', title: 'Start Failed', message: err })));
+                } else if (selectedBroker) {
+                  const broker = brokers.find(b => b.name === selectedBroker);
+                  if (broker && broker.state !== 'ON') {
+                    dispatch(startBroker({ hostUid: selectedHostUid, brokerName: selectedBroker }))
+                      .unwrap()
+                      .then(() => {
+                        dispatch(fetchBrokerList(selectedHostUid));
+                      })
+                      .catch(err => dispatch(showStatusModal({ type: 'error', title: 'Start Failed', message: err })));
+                  }
+                }
+              }}
+            >
               <span className="material-symbols-outlined text-slate-400 text-[20px] group-hover:text-bk-yellow transition-colors leading-none" style={{ fontVariationSettings: "'wght' 300" }}>play_arrow</span>
             </button>
             <button className="w-9 h-9 flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors group" title="Dashboard">

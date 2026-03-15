@@ -18,7 +18,7 @@ export default function DBVolumesSection({ volumes }) {
             </tr>
           </thead>
           <tbody className="font-mono">
-            {volumes.map((row, i) => (
+            {volumes?.map((row, i) => (
               <tr key={i} className="text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition-colors border-b border-slate-100 dark:border-slate-800">
                 <td className="px-4 py-3 font-sans font-medium">{row.name}</td>
                 <td className="px-4 py-3">{row.type}</td>

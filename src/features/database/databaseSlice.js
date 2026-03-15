@@ -67,6 +67,18 @@ export const deleteDatabase = createAsyncThunk(
   }
 );
 
+export const optimizeDatabase = createAsyncThunk(
+  'database/optimizeDatabase',
+  async ({ hostUid, dbname, payload }, { rejectWithValue }) => {
+    try {
+      const response = await databaseApi.optimizeDatabase(hostUid, dbname, payload);
+      return response;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.response?.data?.error || `Failed to optimize database ${dbname}`);
+    }
+  }
+);
+
 export const addBackupSchedule = createAsyncThunk(
   'database/addBackupSchedule',
   async ({ hostUid, dbname, payload }, { rejectWithValue }) => {
@@ -75,6 +87,102 @@ export const addBackupSchedule = createAsyncThunk(
       return response;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || err.response?.data?.error || `Failed to add backup schedule for ${dbname}`);
+    }
+  }
+);
+
+export const editBackupSchedule = createAsyncThunk(
+  'database/editBackupSchedule',
+  async ({ hostUid, dbname, payload }, { rejectWithValue }) => {
+    try {
+      const response = await databaseApi.editBackupSchedule(hostUid, dbname, payload);
+      return response;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.response?.data?.error || `Failed to edit backup schedule for ${dbname}`);
+    }
+  }
+);
+
+export const deleteBackupSchedule = createAsyncThunk(
+  'database/deleteBackupSchedule',
+  async ({ hostUid, dbname, payload }, { rejectWithValue }) => {
+    try {
+      const response = await databaseApi.deleteBackupSchedule(hostUid, dbname, payload);
+      return response;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.response?.data?.error || `Failed to delete backup schedule for ${dbname}`);
+    }
+  }
+);
+
+export const fetchBackupSchedule = createAsyncThunk(
+  'database/fetchBackupSchedule',
+  async ({ hostUid, dbname }, { rejectWithValue }) => {
+    try {
+      const response = await databaseApi.getBackupSchedule(hostUid, dbname);
+      return response;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.response?.data?.error || `Failed to fetch backup schedule for ${dbname}`);
+    }
+  }
+);
+
+export const renameDatabase = createAsyncThunk(
+  'database/renameDatabase',
+  async ({ hostUid, dbname, payload }, { rejectWithValue }) => {
+    try {
+      const response = await databaseApi.renameDatabase(hostUid, dbname, payload);
+      return response;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.response?.data?.error || `Failed to rename database ${dbname}`);
+    }
+  }
+);
+
+export const fetchAutoBackupLog = createAsyncThunk(
+  'database/fetchAutoBackupLog',
+  async ({ hostUid }, { rejectWithValue }) => {
+    try {
+      const response = await databaseApi.getAutoBackupLog(hostUid);
+      return response.error || [];
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Failed to fetch auto backup log');
+    }
+  }
+);
+
+export const fetchQueryPlan = createAsyncThunk(
+  'database/fetchQueryPlan',
+  async ({ hostUid, dbname }, { rejectWithValue }) => {
+    try {
+      const response = await databaseApi.getQueryPlan(hostUid, dbname);
+      return { dbname, data: response.planlist || [] };
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || `Failed to fetch query plan for ${dbname}`);
+    }
+  }
+);
+
+export const setAutoExecQuery = createAsyncThunk(
+  'database/setAutoExecQuery',
+  async ({ hostUid, dbname, payload }, { rejectWithValue }) => {
+    try {
+      const response = await databaseApi.setAutoExecQuery(hostUid, dbname, payload);
+      return response;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || `Failed to set query plan for ${dbname}`);
+    }
+  }
+);
+
+export const fetchQueryPlanLog = createAsyncThunk(
+  'database/fetchQueryPlanLog',
+  async ({ hostUid }, { rejectWithValue }) => {
+    try {
+      const response = await databaseApi.getQueryPlanLog(hostUid);
+      return response.error || [];
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Failed to fetch query plan log');
     }
   }
 );
@@ -94,27 +202,64 @@ export const fetchDatabaseClasses = createAsyncThunk(
   }
 );
 
+export const addVolume = createAsyncThunk(
+  'database/addVolume',
+  async ({ hostUid, dbname, payload }, { rejectWithValue }) => {
+    try {
+      const response = await databaseApi.addVolDb(hostUid, dbname, payload);
+      return response;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.response?.data?.error || `Failed to add volume to ${dbname}`);
+    }
+  }
+);
+
+export const fetchDashboardData = createAsyncThunk(
+  'database/fetchDashboardData',
+  async ({ hostUid, dbname }, { rejectWithValue }) => {
+    try {
+      const [volumeInfo, lockInfo] = await Promise.all([
+        databaseApi.getVolumeInfo(hostUid, dbname),
+        databaseApi.getLockInfo(hostUid, dbname)
+      ]);
+      return { dbname, volumeInfo, lockInfo };
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || `Failed to fetch dashboard data for ${dbname}`);
+    }
+  }
+);
+
 // Helper to parse the shared response format
 const parseDbResponse = (state, payload) => {
-  const newDbs = payload.dblist?.dbs || [];
-  const newActive = payload.activelist?.active?.map(d => d.dbname) || [];
+  // Only update if the payload actually contains the database info
+  // Some APIs might return success without the full list
+  const dbsFound = payload.dblist?.dbs;
+  const activeFound = payload.activelist?.active;
 
-  // Referential stability check: Only update if content changed
-  if (JSON.stringify(state.databases) !== JSON.stringify(newDbs)) {
-    state.databases = newDbs;
-  }
-  
-  if (JSON.stringify(state.activeDatabases) !== JSON.stringify(newActive)) {
-    state.activeDatabases = newActive;
+  if (dbsFound) {
+    const newDbs = dbsFound;
+    if (JSON.stringify(state.databases) !== JSON.stringify(newDbs)) {
+      state.databases = newDbs;
+    }
   }
 
-  const exists = state.databases.find(db => db.dbname === state.selectedDatabase);
-  if (!exists && state.databases.length > 0) {
-    state.selectedDatabase = state.databases[0].dbname;
-    state.selectedDatabaseSubItem = null;
-  } else if (state.databases.length === 0) {
-    state.selectedDatabase = null;
-    state.selectedDatabaseSubItem = null;
+  if (activeFound) {
+    const newActive = activeFound.map(d => d.dbname);
+    if (JSON.stringify(state.activeDatabases) !== JSON.stringify(newActive)) {
+      state.activeDatabases = newActive;
+    }
+  }
+
+  // Handle selectedDatabase re-validation only if we actually got databases
+  if (dbsFound) {
+    const exists = state.databases.find(db => db.dbname === state.selectedDatabase);
+    if (!exists && state.databases.length > 0) {
+      state.selectedDatabase = state.databases[0].dbname;
+      state.selectedDatabaseSubItem = null;
+    } else if (state.databases.length === 0) {
+      state.selectedDatabase = null;
+      state.selectedDatabaseSubItem = null;
+    }
   }
 };
 
@@ -129,18 +274,40 @@ const initialState = {
   isCompactDatabaseModalOpen: false,
   isCopyDatabaseModalOpen: false,
   isBackupDatabaseModalOpen: false,
+  isOptimizeDatabaseModalOpen: false,
   isAddBackupPlanModalOpen: false,
+  isEditBackupPlanModalOpen: false,
+  isDeleteBackupPlanModalOpen: false,
+  isAutoBackupLogModalOpen: false,
   isLockInfoModalOpen: false,
+  isAddQueryPlanModalOpen: false,
+  isAutoQueryLogModalOpen: false,
+  
+  autoBackupLogs: [],
+  queryPlanLogs: [],
+  logsLoading: false,
+  logsError: null,
+
   isUnloadResultModalOpen: false,
   isTransactionInfoModalOpen: false,
   isKillTransactionModalOpen: false,
-  isDeleteDBModalOpen: false,
   isDatabasePropertyModalOpen: false,
+  isRenameDatabaseModalOpen: false,
+  isAddVolumeModalOpen: false,
   killTransactionData: null,
   unloadResultData: null,
   databaseClasses: {}, // { [dbname]: {} }
   databaseClassesLoading: {},
   databaseClassesError: {},
+  backupSchedules: {}, // { [dbname]: [] }
+  backupSchedulesLoading: {},
+  queryPlans: {}, // { [dbname]: [] }
+  queryPlansLoading: {},
+  selectedBackupId: null,
+  selectedQueryPlanId: null,
+  dashboardData: {}, // { [dbname]: { volumes: [], spaceInfo: [], locks: [] } }
+  dashboardLoading: {},
+  dashboardError: {},
   volumes: [],
   loading: false,
   volumesLoading: false,
@@ -198,6 +365,12 @@ const databaseSlice = createSlice({
     closeBackupDatabaseModal: (state) => {
       state.isBackupDatabaseModalOpen = false;
     },
+    openOptimizeDatabaseModal: (state) => {
+      state.isOptimizeDatabaseModalOpen = true;
+    },
+    closeOptimizeDatabaseModal: (state) => {
+      state.isOptimizeDatabaseModalOpen = false;
+    },
     openAddBackupPlanModal: (state) => {
       state.isAddBackupPlanModalOpen = true;
       state.error = null;
@@ -205,6 +378,40 @@ const databaseSlice = createSlice({
     closeAddBackupPlanModal: (state) => {
       state.isAddBackupPlanModalOpen = false;
       state.error = null;
+    },
+    openEditBackupPlanModal: (state) => {
+      state.isEditBackupPlanModalOpen = true;
+      state.error = null;
+    },
+    closeEditBackupPlanModal: (state) => {
+      state.isEditBackupPlanModalOpen = false;
+      state.error = null;
+    },
+    openDeleteBackupPlanModal: (state) => {
+      state.isDeleteBackupPlanModalOpen = true;
+    },
+    closeDeleteBackupPlanModal: (state) => {
+      state.isDeleteBackupPlanModalOpen = false;
+    },
+    openAutoBackupLogModal: (state) => {
+      state.isAutoBackupLogModalOpen = true;
+    },
+    closeAutoBackupLogModal: (state) => {
+      state.isAutoBackupLogModalOpen = false;
+    },
+    openAddQueryPlanModal: (state) => {
+      state.isAddQueryPlanModalOpen = true;
+      state.error = null;
+    },
+    closeAddQueryPlanModal: (state) => {
+      state.isAddQueryPlanModalOpen = false;
+      state.error = null;
+    },
+    openAutoQueryLogModal: (state) => {
+      state.isAutoQueryLogModalOpen = true;
+    },
+    closeAutoQueryLogModal: (state) => {
+      state.isAutoQueryLogModalOpen = false;
     },
     openLockInfoModal: (state) => {
       state.isLockInfoModalOpen = true;
@@ -246,6 +453,30 @@ const databaseSlice = createSlice({
     closeDatabasePropertyModal: (state) => {
       state.isDatabasePropertyModalOpen = false;
     },
+    openRenameDatabaseModal: (state) => {
+      state.isRenameDatabaseModalOpen = true;
+    },
+    closeRenameDatabaseModal: (state) => {
+      state.isRenameDatabaseModalOpen = false;
+    },
+    openAddVolumeModal: (state) => {
+      state.isAddVolumeModalOpen = true;
+    },
+    closeAddVolumeModal: (state) => {
+      state.isAddVolumeModalOpen = false;
+    },
+    setSelectedBackupId: (state, action) => {
+      state.selectedBackupId = action.payload;
+    },
+    clearSelectedBackupId: (state) => {
+      state.selectedBackupId = null;
+    },
+    setSelectedQueryPlanId: (state, action) => {
+      state.selectedQueryPlanId = action.payload;
+    },
+    clearSelectedQueryPlanId: (state) => {
+      state.selectedQueryPlanId = null;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -339,6 +570,96 @@ const databaseSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+      .addCase(editBackupSchedule.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(editBackupSchedule.fulfilled, (state) => {
+        state.loading = false;
+        state.isEditBackupPlanModalOpen = false;
+      })
+      .addCase(editBackupSchedule.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchBackupSchedule.pending, (state, action) => {
+        const { dbname } = action.meta.arg;
+        state.backupSchedulesLoading[dbname] = true;
+        state.error = null;
+      })
+      .addCase(fetchBackupSchedule.fulfilled, (state, action) => {
+        const { dbname } = action.meta.arg;
+        state.backupSchedulesLoading[dbname] = false;
+        const data = action.payload;
+        // User provided format uses "backups" field
+        if (data && data.backups) {
+          state.backupSchedules[dbname] = Array.isArray(data.backups) 
+            ? data.backups 
+            : [data.backups];
+        } else if (data && data.backup_info) {
+          // Fallback for previous format just in case
+          state.backupSchedules[dbname] = Array.isArray(data.backup_info) 
+            ? data.backup_info 
+            : [data.backup_info];
+        } else {
+          state.backupSchedules[dbname] = [];
+        }
+      })
+      .addCase(fetchBackupSchedule.rejected, (state, action) => {
+        const { dbname } = action.meta.arg;
+        state.backupSchedulesLoading[dbname] = false;
+        state.error = action.payload;
+      })
+      .addCase(deleteBackupSchedule.pending, (state) => {
+        state.actionLoading = true;
+        state.error = null;
+      })
+      .addCase(deleteBackupSchedule.fulfilled, (state) => {
+        state.actionLoading = false;
+      })
+      .addCase(deleteBackupSchedule.rejected, (state, action) => {
+        state.actionLoading = false;
+        state.error = action.payload;
+      })
+      // Optimize database
+      .addCase(optimizeDatabase.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(optimizeDatabase.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(optimizeDatabase.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Rename database
+      .addCase(renameDatabase.pending, (state) => {
+        state.actionLoading = true;
+        state.error = null;
+      })
+      .addCase(renameDatabase.fulfilled, (state, action) => {
+        state.actionLoading = false;
+        state.isRenameDatabaseModalOpen = false;
+        parseDbResponse(state, action.payload);
+      })
+      .addCase(renameDatabase.rejected, (state, action) => {
+        state.actionLoading = false;
+        state.error = action.payload;
+      })
+      // Add volume
+      .addCase(addVolume.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(addVolume.fulfilled, (state) => {
+        state.loading = false;
+        state.isAddVolumeModalOpen = false;
+      })
+      .addCase(addVolume.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
       .addCase(fetchDatabaseClasses.fulfilled, (state, action) => {
         const { dbname, data } = action.payload;
         state.databaseClassesLoading[dbname] = false;
@@ -348,6 +669,79 @@ const databaseSlice = createSlice({
         const { dbname, error } = action.payload || action.meta.arg;
         state.databaseClassesLoading[dbname] = false;
         state.databaseClassesError[dbname] = error;
+      })
+      .addCase(fetchAutoBackupLog.pending, (state) => {
+        state.logsLoading = true;
+        state.logsError = null;
+      })
+      .addCase(fetchAutoBackupLog.fulfilled, (state, action) => {
+        state.logsLoading = false;
+        state.autoBackupLogs = action.payload;
+      })
+      .addCase(fetchAutoBackupLog.rejected, (state, action) => {
+        state.logsLoading = false;
+        state.logsError = action.payload;
+      })
+      // Fetch Query Plan
+      .addCase(fetchQueryPlan.pending, (state, action) => {
+        const { dbname } = action.meta.arg;
+        state.queryPlansLoading[dbname] = true;
+      })
+      .addCase(fetchQueryPlan.fulfilled, (state, action) => {
+        const { dbname, data } = action.payload;
+        state.queryPlansLoading[dbname] = false;
+        state.queryPlans[dbname] = data;
+      })
+      .addCase(fetchQueryPlan.rejected, (state, action) => {
+        const { dbname } = action.meta.arg;
+        state.queryPlansLoading[dbname] = false;
+      })
+      // Set Auto Exec Query
+      .addCase(setAutoExecQuery.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(setAutoExecQuery.fulfilled, (state) => {
+        state.loading = false;
+        state.isAddQueryPlanModalOpen = false;
+      })
+      .addCase(setAutoExecQuery.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Fetch Query Plan Log
+      .addCase(fetchQueryPlanLog.pending, (state) => {
+        state.logsLoading = true;
+        state.logsError = null;
+      })
+      .addCase(fetchQueryPlanLog.fulfilled, (state, action) => {
+        state.logsLoading = false;
+        state.queryPlanLogs = action.payload;
+      })
+      .addCase(fetchQueryPlanLog.rejected, (state, action) => {
+        state.logsLoading = false;
+        state.logsError = action.payload;
+      })
+      // Fetch Dashboard Data
+      .addCase(fetchDashboardData.pending, (state, action) => {
+        const { dbname } = action.meta.arg;
+        state.dashboardLoading[dbname] = true;
+        delete state.dashboardError[dbname];
+      })
+      .addCase(fetchDashboardData.fulfilled, (state, action) => {
+        const { dbname, volumeInfo, lockInfo } = action.payload;
+        state.dashboardLoading[dbname] = false;
+        
+        state.dashboardData[dbname] = {
+          volumes: volumeInfo.spaceinfo || [],
+          spaceInfo: volumeInfo.fileinfo || [],
+          locks: lockInfo.lockinfo?.[0]?.transaction || [] // Matches d-cms: dashboard shows transactions linked to locks
+        };
+      })
+      .addCase(fetchDashboardData.rejected, (state, action) => {
+        const { dbname } = action.meta.arg;
+        state.dashboardLoading[dbname] = false;
+        state.dashboardError[dbname] = action.payload;
       });
   },
 });
@@ -367,8 +761,16 @@ export const {
   closeCopyDatabaseModal,
   openBackupDatabaseModal,
   closeBackupDatabaseModal,
+  openOptimizeDatabaseModal,
+  closeOptimizeDatabaseModal,
   openAddBackupPlanModal,
   closeAddBackupPlanModal,
+  openEditBackupPlanModal,
+  closeEditBackupPlanModal,
+  openDeleteBackupPlanModal,
+  closeDeleteBackupPlanModal,
+  openAutoBackupLogModal,
+  closeAutoBackupLogModal,
   openLockInfoModal,
   closeLockInfoModal,
   openUnloadResultModal,
@@ -380,7 +782,18 @@ export const {
   openDeleteDBModal,
   closeDeleteDBModal,
   openDatabasePropertyModal,
-  closeDatabasePropertyModal
+  closeDatabasePropertyModal,
+  openRenameDatabaseModal,
+  closeRenameDatabaseModal,
+  openAddVolumeModal,
+  closeAddVolumeModal,
+  openAddQueryPlanModal,
+  closeAddQueryPlanModal,
+  openAutoQueryLogModal,
+  closeAutoQueryLogModal,
+  setSelectedBackupId,
+  clearSelectedBackupId,
+  setSelectedQueryPlanId
 } = databaseSlice.actions;
 
 export default databaseSlice.reducer;

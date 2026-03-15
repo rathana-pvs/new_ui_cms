@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { closeAddBackupPlanModal, addBackupSchedule } from '../databaseSlice';
-import { setSelectedHost } from '../../host/hostSlice';
+import { closeEditBackupPlanModal, editBackupSchedule, fetchBackupSchedule } from '../databaseSlice';
 import { showStatusModal } from '../../layout/layoutSlice';
 
 const CustomSelect = ({ value, options, onChange, icon }) => {
@@ -64,15 +63,15 @@ const CustomSelect = ({ value, options, onChange, icon }) => {
   );
 };
 
-export default function AddBackupPlanModal() {
+export default function EditBackupPlanModal() {
   const dispatch = useDispatch();
-  const { isAddBackupPlanModalOpen, selectedDatabase, loading, error } = useSelector((state) => state.database);
+  const { isEditBackupPlanModalOpen, selectedDatabase, selectedBackupId, loading, error } = useSelector((state) => state.database);
   const { selectedHostUid } = useSelector((state) => state.host);
   
   const [formData, setFormData] = useState({
-    backupId: 'plan_1',
+    backupId: '',
     backupLevel: '0',
-    backupPath: `/home/cubrid/CUBRID/databases/${selectedDatabase || 'demodb'}/backup`,
+    backupPath: '',
     periodType: 'Monthly',
     periodDetail: [1],
     backupTime: '12:30',
@@ -90,16 +89,38 @@ export default function AddBackupPlanModal() {
   const [viewDate, setViewDate] = useState(new Date());
 
   useEffect(() => {
-    if (isAddBackupPlanModalOpen && selectedDatabase) {
-      setFormData(prev => ({
-        ...prev,
-        backupPath: `/home/cubrid/CUBRID/databases/${selectedDatabase}/backup`,
-        backupId: `backup_${selectedDatabase}_${Date.now().toString().slice(-4)}`
-      }));
+    if (isEditBackupPlanModalOpen && selectedDatabase && selectedHostUid) {
+      dispatch(fetchBackupSchedule({ hostUid: selectedHostUid, dbname: selectedDatabase }))
+        .unwrap()
+        .then((data) => {
+          const backupData = data?.backups || data?.backup_info;
+          if (backupData) {
+            const plans = Array.isArray(backupData) ? backupData : [backupData];
+            const info = selectedBackupId ? plans.find(p => p.backupid === selectedBackupId) : plans[0];
+            
+            if (info) {
+              setFormData({
+                backupId: info.backupid || '',
+                backupLevel: info.level || '0',
+                backupPath: info.path || '',
+                periodType: info.period_type === 'Specific' ? 'Specific days' : info.period_type,
+                periodDetail: info.period_type === 'Specific' ? info.period_date : (info.period_date ? info.period_date.split(',').map(Number) : []),
+                backupTime: info.time ? `${info.time.slice(0, 2)}:${info.time.slice(2)}` : '12:30',
+                deleteArchive: info.archivedel === 'ON',
+                updateStatistics: info.updatestatus === 'ON',
+                useCompression: info.zip === 'y',
+                checkConsistency: info.check === 'y',
+                threads: parseInt(info.mt) || 0,
+                backupsToKeep: parseInt(info.bknum) || 0,
+                onlineType: info.onoff === 'ON' ? 'online' : 'offline'
+              });
+            }
+          }
+        });
     }
-  }, [isAddBackupPlanModalOpen, selectedDatabase]);
+  }, [isEditBackupPlanModalOpen, selectedDatabase, selectedHostUid, selectedBackupId, dispatch]);
 
-  if (!isAddBackupPlanModalOpen) return null;
+  if (!isEditBackupPlanModalOpen) return null;
 
   const handleInputChange = (field, value) => {
     if (field === 'periodType') {
@@ -114,11 +135,12 @@ export default function AddBackupPlanModal() {
   };
 
   const toggleDay = (day) => {
+    const details = Array.isArray(formData.periodDetail) ? formData.periodDetail : [];
     setFormData(prev => ({
       ...prev,
-      periodDetail: prev.periodDetail.includes(day)
-        ? prev.periodDetail.filter(d => d !== day)
-        : [...prev.periodDetail, day]
+      periodDetail: details.includes(day)
+        ? details.filter(d => d !== day)
+        : [...details, day]
     }));
   };
 
@@ -128,7 +150,6 @@ export default function AddBackupPlanModal() {
       case 'all': days = Array.from({length: 31}, (_, i) => i + 1); break;
       case 'clear': days = []; break;
       case 'weekdays': 
-        // Logic for weekdays (assuming 1st is Monday for UI pattern, or just general pattern)
         days = Array.from({length: 31}, (_, i) => i + 1).filter(d => (d % 7 !== 6 && d % 7 !== 0)); 
         break;
       case 'weekends':
@@ -143,7 +164,8 @@ export default function AddBackupPlanModal() {
   };
 
   const isPresetActive = (type) => {
-    const current = [...formData.periodDetail].sort((a,b) => a-b);
+    const details = Array.isArray(formData.periodDetail) ? formData.periodDetail : [];
+    const current = [...details].sort((a,b) => a-b);
     const getDays = (t) => {
       switch(t) {
         case 'all': return Array.from({length: 31}, (_, i) => i + 1);
@@ -162,13 +184,8 @@ export default function AddBackupPlanModal() {
   };
 
   const handleSave = () => {
-    console.log('OK Button clicked - handleSave process starting...');
-    if (!selectedDatabase || !selectedHostUid) {
-      console.warn('Cannot save backup plan: Missing context.', { selectedDatabase, selectedHostUid });
-      return;
-    }
+    if (!selectedDatabase || !selectedHostUid) return;
 
-    // Mapping formData to backend API format
     const payload = {
       backupid: formData.backupId,
       level: formData.backupLevel,
@@ -186,19 +203,17 @@ export default function AddBackupPlanModal() {
       onoff: formData.onlineType === 'online' ? 'ON' : 'OF',
     };
 
-    console.log('Dispatching Add Backup Schedule with Payload:', payload);
-
-    dispatch(addBackupSchedule({ 
+    dispatch(editBackupSchedule({ 
       hostUid: selectedHostUid, 
       dbname: selectedDatabase, 
       payload 
     })).unwrap()
       .then(() => {
-        dispatch(closeAddBackupPlanModal());
+        dispatch(closeEditBackupPlanModal());
         dispatch(showStatusModal({
           type: 'success',
-          title: 'Backup Scheduled',
-          message: 'Your backup plan has been scheduled safely. The database will now follow your automated routine perfectly.'
+          title: 'Schedule Updated',
+          message: 'The backup schedule has been successfully updated and re-optimized.'
         }));
       });
   };
@@ -207,7 +222,7 @@ export default function AddBackupPlanModal() {
     <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-bk-main/60 backdrop-blur-sm animate-in fade-in duration-300 font-sans text-left">
       <div className="bg-white dark:bg-bk-side w-full max-w-[700px] h-auto max-h-[90vh] rounded-xl shadow-[0_10px_50px_rgba(0,0,0,0.3)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col relative text-left">
         
-        {/* header - inside first div */}
+        {/* ribbon accent */}
         <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-bk-yellow via-amber-500 to-bk-yellow z-[310]"></div>
 
         {/* Header */}
@@ -217,12 +232,13 @@ export default function AddBackupPlanModal() {
               <span className="material-symbols-outlined text-bk-yellow text-xl">backup_table</span>
             </div>
             <div>
-              <h3 className="text-[12px] font-medium text-slate-900 dark:text-white leading-none tracking-wide">Add backup plan</h3>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Configure automated scheduled backups for <span className="text-bk-yellow font-medium uppercase">{selectedDatabase}</span></p>
+              <h3 className="text-[12px] font-medium text-slate-900 dark:text-white leading-none tracking-wide">Edit backup plan</h3>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Modify automated scheduled backup for <span className="text-bk-yellow font-medium uppercase">{selectedDatabase}</span></p>
             </div>
           </div>
           <button 
-            onClick={() => dispatch(closeAddBackupPlanModal())}
+            type="button"
+            onClick={() => dispatch(closeEditBackupPlanModal())}
             className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
           >
             <span className="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform">close</span>
@@ -232,14 +248,13 @@ export default function AddBackupPlanModal() {
         {/* Body */}
         <div className="p-5 space-y-5 overflow-y-auto custom-scrollbar max-h-[70vh] flex-1">
           
-          {/* Error Message */}
           {error && (
             <div className="bg-rose-500/10 border border-rose-500/20 p-4 rounded-2xl flex items-center gap-4 animate-in slide-in-from-top-4 duration-300">
                <div className="w-10 h-10 rounded-full bg-rose-500/20 flex items-center justify-center text-rose-500 shrink-0">
                   <span className="material-symbols-outlined text-2xl font-black">error</span>
                </div>
                <div className="flex-1">
-                  <p className="text-[11px] font-black text-rose-500 uppercase tracking-widest mb-0.5">Submission Failed</p>
+                  <p className="text-[11px] font-black text-rose-500 uppercase tracking-widest mb-0.5">Update Failed</p>
                   <p className="text-[12px] font-medium text-rose-600/80 leading-relaxed">{error}</p>
                </div>
             </div>
@@ -257,8 +272,8 @@ export default function AddBackupPlanModal() {
                 <input 
                   type="text" 
                   value={formData.backupId}
-                  onChange={(e) => handleInputChange('backupId', e.target.value)}
-                  className="w-full h-9 px-3 flex items-center bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded text-[12px] font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-bk-yellow/50 transition-all"
+                  disabled
+                  className="w-full h-9 px-3 flex items-center bg-slate-50/30 dark:bg-bk-main/10 border border-slate-100 dark:border-white/5 rounded text-[12px] text-slate-400 dark:text-slate-500 font-medium cursor-not-allowed italic"
                 />
               </div>
               <div className="col-span-6 space-y-1.5">
@@ -282,7 +297,7 @@ export default function AddBackupPlanModal() {
                     onChange={(e) => handleInputChange('backupPath', e.target.value)}
                     className="flex-1 h-9 px-3 flex items-center bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded text-[12px] font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-bk-yellow/50 transition-all"
                   />
-                  <button className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-all">Browse</button>
+                  <button type="button" className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-all">Browse</button>
                 </div>
               </div>
             </div>
@@ -319,6 +334,7 @@ export default function AddBackupPlanModal() {
                   </label>
                   <div className="relative">
                     <button 
+                      type="button"
                       onClick={() => setShowTimePicker(!showTimePicker)}
                       className="w-full h-9 px-3 flex items-center justify-between bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded text-[12px] font-medium text-slate-900 dark:text-white"
                     >
@@ -338,6 +354,7 @@ export default function AddBackupPlanModal() {
                               return (
                                 <button
                                   key={h}
+                                  type="button"
                                   onClick={() => {
                                     const m = formData.backupTime.split(':')[1];
                                     handleInputChange('backupTime', `${h}:${m}`);
@@ -353,14 +370,13 @@ export default function AddBackupPlanModal() {
                           <div className="flex-1 flex flex-col overflow-y-auto custom-scrollbar">
                             <div className="px-2 py-1.5 text-[9px] font-medium text-slate-400 uppercase tracking-widest text-center border-b border-slate-100 dark:border-slate-800 sticky top-0 bg-white dark:bg-bk-side z-10">Min</div>
                             {Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0')).map(m => {
-                              // Optional: only show every 5 or 15 mins for better UX, or all 60.
-                              // User likely wants precision for backups.
                               const currentM = formData.backupTime.split(':')[1];
                               const isSelected = currentM === m;
-                              if (parseInt(m) % 5 !== 0 && !isSelected) return null; // Show every 5 mins filter for cleanliness
+                              if (parseInt(m) % 5 !== 0 && !isSelected) return null;
                               return (
                                 <button
                                   key={m}
+                                  type="button"
                                   onClick={() => {
                                     const h = formData.backupTime.split(':')[0];
                                     handleInputChange('backupTime', `${h}:${m}`);
@@ -376,6 +392,7 @@ export default function AddBackupPlanModal() {
                         </div>
                         <div className="p-2 bg-slate-50/50 dark:bg-bk-main/50 border-t border-slate-100 dark:border-slate-800 flex justify-center">
                           <button 
+                            type="button"
                             onClick={() => setShowTimePicker(false)}
                             className="text-[10px] font-medium text-slate-500 uppercase tracking-tight hover:text-bk-yellow transition-colors"
                           >
@@ -389,29 +406,25 @@ export default function AddBackupPlanModal() {
               </div>
 
               <div className="space-y-2">
-                {formData.periodType !== 'Specific days' && (
-                  <label className="text-[11px] font-medium text-slate-500 dark:text-slate-400 ml-1 ">
+                {formData.periodType !== 'Specific days' && formData.periodType !== 'Daily' && (
+                  <label className="text-[11px] font-medium text-slate-500 dark:text-slate-400 ml-1">
                     {formData.periodType === 'Monthly' && 'Period detail (Day of Month)'}
                     {formData.periodType === 'Weekly' && 'Period detail (Day of Week)'}
-                    {formData.periodType === 'Daily' && 'Period detail'}
                   </label>
                 )}
                 
                 {formData.periodType === 'Monthly' && (
                   <div className="space-y-4">
-                    {/* Smart Presets Toolbar */}
                     <div className="flex flex-wrap gap-2 px-1">
                       {[
                         { id: 'all', label: 'Select All', icon: 'select_all' },
                         { id: 'clear', label: 'Clear', icon: 'backspace' },
                         { id: 'weekdays', label: 'Weekdays', icon: 'work' },
                         { id: 'weekends', label: 'Weekends', icon: 'beach_access' },
-                        { id: 'mid', label: '1st, 15th, 30th', icon: 'calendar_view_week' },
-                        { id: 'even', label: 'Even Days', icon: '2k' },
-                        { id: 'odd', label: 'Odd Days', icon: '1k' },
                       ].map(preset => (
                         <button
                           key={preset.id}
+                          type="button"
                           onClick={() => setBulkDays(preset.id)}
                           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[10px] font-medium transition-all uppercase tracking-wider ${
                             isPresetActive(preset.id)
@@ -426,9 +439,6 @@ export default function AddBackupPlanModal() {
                     </div>
 
                     <div className="bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded-2xl p-5 overflow-hidden relative">
-                      {/* Decorative Background Icon */}
-                      <span className="absolute -bottom-6 -right-6 material-symbols-outlined text-[100px] text-slate-100 dark:text-white/[0.02] rotate-12 pointer-events-none">calendar_month</span>
-                      
                       <div className="grid grid-cols-7 gap-3 relative z-10">
                         {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
                           <div key={`${d}-${i}`} className="text-center text-[10px] font-medium text-slate-300 dark:text-slate-500 pb-2 tracking-widest">{d}</div>
@@ -436,19 +446,15 @@ export default function AddBackupPlanModal() {
                         {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
                           <button
                             key={day}
+                            type="button"
                             onClick={() => toggleDay(day)}
                             className={`group relative h-9 rounded border text-[11px] font-medium transition-all flex items-center justify-center ${
-                              formData.periodDetail.includes(day)
+                              (Array.isArray(formData.periodDetail) && formData.periodDetail.includes(day))
                                 ? 'bg-gradient-to-br from-bk-yellow to-amber-500 border-bk-yellow text-bk-side shadow-[0_4px_15px_rgba(255,191,0,0.3)]'
                                 : 'bg-white dark:bg-bk-side border-slate-200 dark:border-slate-800 text-slate-500 hover:border-bk-yellow/50 hover:text-bk-yellow hover:bg-bk-yellow/5'
                             }`}
                           >
                             {day}
-                            {formData.periodDetail.includes(day) && (
-                              <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-white rounded-full flex items-center justify-center shadow-lg animate-in zoom-in duration-300">
-                                <span className="material-symbols-outlined text-bk-yellow text-[10px] font-black">check</span>
-                              </div>
-                            )}
                           </button>
                         ))}
                       </div>
@@ -463,9 +469,10 @@ export default function AddBackupPlanModal() {
                       return (
                         <button
                           key={day}
+                          type="button"
                           onClick={() => toggleDay(dayValue)}
                           className={`h-9 w-full rounded border text-[11px] font-medium transition-all flex items-center justify-center ${
-                            formData.periodDetail.includes(dayValue)
+                            (Array.isArray(formData.periodDetail) && formData.periodDetail.includes(dayValue))
                               ? 'bg-bk-yellow border-bk-yellow text-bk-side shadow-lg shadow-bk-yellow/20'
                               : 'bg-white dark:bg-bk-side border-slate-200 dark:border-slate-800 text-slate-500 hover:border-bk-yellow/50 hover:text-bk-yellow'
                           }`}
@@ -485,11 +492,12 @@ export default function AddBackupPlanModal() {
                 )}
 
                 {formData.periodType === 'Specific days' && (
-                  <div className="bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded px-5 py-4 space-y-3">
+                  <div className="bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-xl px-5 py-4 space-y-3">
                     <div className="flex items-center gap-4">
                       <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 w-12 ">Date:</label>
                       <div className="relative flex-1">
                         <button 
+                          type="button"
                           onClick={() => setShowCalendar(!showCalendar)}
                           className="w-full h-9 px-3 flex items-center justify-between bg-white dark:bg-bk-main border border-slate-200 dark:border-slate-800 rounded text-[12px] font-medium text-slate-900 dark:text-white"
                         >
@@ -499,9 +507,9 @@ export default function AddBackupPlanModal() {
 
                         {showCalendar && (
                           <div className="absolute top-full left-0 mt-2 z-[200] w-[280px] bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl shadow-black/40 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                            {/* Calendar Header */}
                             <div className="flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-bk-main/50 border-b border-slate-100 dark:border-slate-800">
                               <button 
+                                type="button"
                                 onClick={() => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1))}
                                 className="w-7 h-7 rounded-lg hover:bg-slate-200 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 transition-colors"
                               >
@@ -511,6 +519,7 @@ export default function AddBackupPlanModal() {
                                 {viewDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
                               </span>
                               <button 
+                                type="button"
                                 onClick={() => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1))}
                                 className="w-7 h-7 rounded-lg hover:bg-slate-200 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 transition-colors"
                               >
@@ -518,7 +527,6 @@ export default function AddBackupPlanModal() {
                               </button>
                             </div>
 
-                            {/* Calendar Body */}
                             <div className="p-3">
                               <div className="grid grid-cols-7 gap-1 mb-2">
                                 {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => (
@@ -530,36 +538,30 @@ export default function AddBackupPlanModal() {
                                   const days = [];
                                   const firstDay = new Date(viewDate.getFullYear(), viewDate.getMonth(), 1).getDay();
                                   const daysInMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
-                                  const prevMonthDays = new Date(viewDate.getFullYear(), viewDate.getMonth(), 0).getDate();
-
-                                  // Pad start
-                                  for (let i = firstDay - 1; i >= 0; i--) {
-                                    days.push(<div key={`prev-${i}`} className="h-8 flex items-center justify-center text-[11px] text-slate-300 dark:text-slate-600 font-medium opacity-30 cursor-not-allowed">{prevMonthDays - i}</div>);
+                                  
+                                  for (let i = 0; i < firstDay; i++) {
+                                    days.push(<div key={`empty-${i}`} className="h-8"></div>);
                                   }
 
-                                  // Month days
                                   for (let i = 1; i <= daysInMonth; i++) {
                                     const dateStr = `${viewDate.getFullYear()}-${String(viewDate.getMonth() + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
                                     const isSelected = formData.periodDetail === dateStr;
-                                    const isToday = new Date().toISOString().split('T')[0] === dateStr;
-
+                                    
                                     days.push(
                                       <button
                                         key={i}
+                                        type="button"
                                         onClick={() => {
                                           handleInputChange('periodDetail', dateStr);
                                           setShowCalendar(false);
                                         }}
-                                        className={`h-8 w-full rounded-lg text-[11px] font-medium transition-all flex items-center justify-center relative ${
+                                        className={`h-8 w-full rounded-lg text-[11px] font-medium transition-all flex items-center justify-center ${
                                           isSelected 
                                             ? 'bg-bk-yellow text-bk-side shadow-lg shadow-bk-yellow/20 translate-y-[-1px]' 
                                             : 'hover:bg-bk-yellow/10 hover:text-bk-yellow text-slate-700 dark:text-slate-300'
                                         }`}
                                       >
                                         {i}
-                                        {isToday && !isSelected && (
-                                          <div className="absolute bottom-1 w-1 h-1 bg-bk-yellow rounded-full"></div>
-                                        )}
                                       </button>
                                     );
                                   }
@@ -568,9 +570,9 @@ export default function AddBackupPlanModal() {
                               </div>
                             </div>
                             
-                            {/* Calendar Footer */}
                             <div className="p-2 border-t border-slate-100 dark:border-slate-800 flex justify-between">
                               <button 
+                                type="button"
                                 onClick={() => {
                                   const today = new Date().toISOString().split('T')[0];
                                   handleInputChange('periodDetail', today);
@@ -581,21 +583,12 @@ export default function AddBackupPlanModal() {
                               >
                                 Today
                               </button>
-                              <button 
-                                onClick={() => setShowCalendar(false)}
-                                className="text-[10px] font-medium text-slate-400 px-2 py-1 hover:bg-slate-100 dark:hover:bg-white/5 rounded-md transition-colors"
-                              >
-                                Close
-                              </button>
+                              <button type="button" onClick={() => setShowCalendar(false)} className="text-[10px] font-medium text-slate-400 px-2 py-1 hover:bg-slate-100 dark:hover:bg-white/5 rounded-md transition-colors">Close</button>
                             </div>
                           </div>
                         )}
                       </div>
                     </div>
-                    <p className="text-[10px] text-slate-400 flex items-center gap-1.5 ml-16 leading-relaxed font-medium">
-                      <span className="material-symbols-outlined text-[13px] text-bk-yellow">stars</span>
-                      Single execution scheduled for <span className="text-slate-900 dark:text-slate-200 font-medium decoration-bk-yellow/30 underline underline-offset-4 decoration-2">{formData.periodDetail}</span>
-                    </p>
                   </div>
                 )}
               </div>
@@ -640,11 +633,13 @@ export default function AddBackupPlanModal() {
                 <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4 uppercase tracking-wider">Number of threads</label>
                 <div className="flex items-center gap-3">
                   <button 
+                    type="button"
                     onClick={() => handleInputChange('threads', Math.max(0, formData.threads - 1))}
                     className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/5 flex items-center justify-center hover:bg-bk-yellow hover:text-bk-side transition-all"
                   >-</button>
                   <span className="w-8 text-center text-[12px] font-medium text-slate-900 dark:text-white">{formData.threads}</span>
                   <button 
+                    type="button"
                     onClick={() => handleInputChange('threads', formData.threads + 1)}
                     className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/5 flex items-center justify-center hover:bg-bk-yellow hover:text-bk-side transition-all"
                   >+</button>
@@ -654,11 +649,13 @@ export default function AddBackupPlanModal() {
                 <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4 uppercase tracking-wider">Number of backups to keep</label>
                 <div className="flex items-center gap-3">
                   <button 
+                    type="button"
                     onClick={() => handleInputChange('backupsToKeep', Math.max(0, formData.backupsToKeep - 1))}
                     className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/5 flex items-center justify-center hover:bg-bk-yellow hover:text-bk-side transition-all"
                   >-</button>
                   <span className="w-8 text-center text-[12px] font-medium text-slate-900 dark:text-white">{formData.backupsToKeep}</span>
                   <button 
+                    type="button"
                     onClick={() => handleInputChange('backupsToKeep', formData.backupsToKeep + 1)}
                     className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/5 flex items-center justify-center hover:bg-bk-yellow hover:text-bk-side transition-all"
                   >+</button>
@@ -667,38 +664,42 @@ export default function AddBackupPlanModal() {
             </div>
           </section>
 
-          {/* Online/Offline Section */}
-          <section className="space-y-3">
+          {/* Operation flags Section */}
+          <section className="space-y-3 px-1">
             <div className="flex items-center gap-2">
                <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Operation flags</span>
                <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
             </div>
-            <div className="grid grid-cols-1 gap-3 px-1">
+            <div className="grid grid-cols-1 gap-3">
               <label className={`flex items-start gap-4 p-4 rounded-xl border transition-all cursor-pointer ${formData.onlineType === 'online' ? 'bg-indigo-500/5 border-indigo-500/30' : 'bg-transparent border-slate-100 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5'}`}>
+                <div className={`mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${formData.onlineType === 'online' ? 'border-indigo-500' : 'border-slate-300 dark:border-slate-600'}`}>
+                  <div className={`w-2.5 h-2.5 rounded-full transition-all ${formData.onlineType === 'online' ? 'bg-indigo-500 scale-100' : 'bg-transparent scale-0'}`}></div>
+                </div>
                 <input 
                   type="radio" 
+                  className="sr-only" 
                   name="onlineType" 
-                  value="online"
-                  checked={formData.onlineType === 'online'}
-                  onChange={(e) => handleInputChange('onlineType', e.target.value)}
-                  className="mt-1 w-4 h-4 text-indigo-500 border-gray-300 focus:ring-indigo-500 accent-indigo-500"
+                  checked={formData.onlineType === 'online'} 
+                  onChange={() => handleInputChange('onlineType', 'online')} 
                 />
-                <div className="flex-1 space-y-1">
+                <div className="flex-1 space-y-1 text-left">
                   <p className="text-[12px] font-medium text-slate-800 dark:text-slate-200">Online backup</p>
                   <p className="text-[10px] text-slate-500 dark:text-slate-500 leading-relaxed font-medium">Allows continuing database operations while the backup is being performed.</p>
                 </div>
               </label>
 
               <label className={`flex items-start gap-4 p-4 rounded-xl border transition-all cursor-pointer ${formData.onlineType === 'offline' ? 'bg-orange-500/5 border-orange-500/30' : 'bg-transparent border-slate-100 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5'}`}>
+                <div className={`mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${formData.onlineType === 'offline' ? 'border-orange-500' : 'border-slate-300 dark:border-slate-600'}`}>
+                  <div className={`w-2.5 h-2.5 rounded-full transition-all ${formData.onlineType === 'offline' ? 'bg-orange-500 scale-100' : 'bg-transparent scale-0'}`}></div>
+                </div>
                 <input 
                   type="radio" 
+                  className="sr-only" 
                   name="onlineType" 
-                  value="offline"
-                  checked={formData.onlineType === 'offline'}
-                  onChange={(e) => handleInputChange('onlineType', e.target.value)}
-                  className="mt-1 w-4 h-4 text-orange-500 border-gray-300 focus:ring-orange-500 accent-orange-500"
+                  checked={formData.onlineType === 'offline'} 
+                  onChange={() => handleInputChange('onlineType', 'offline')} 
                 />
-                <div className="flex-1 space-y-1">
+                <div className="flex-1 space-y-1 text-left">
                   <p className="text-[12px] font-medium text-slate-800 dark:text-slate-200">Offline backup</p>
                   <p className="text-[10px] text-slate-500 dark:text-slate-500 leading-relaxed font-medium">
                     <span className="text-orange-500 font-medium">Notice:</span> Database will be <span className="underline">stopped</span> during backup operation and then restarted automatically.
@@ -712,15 +713,17 @@ export default function AddBackupPlanModal() {
         {/* Footer */}
         <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 backdrop-blur-sm flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
           <button 
+            type="button"
             disabled={loading}
-            className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-all"
-            onClick={() => dispatch(closeAddBackupPlanModal())}
+            className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-all text-left"
+            onClick={() => dispatch(closeEditBackupPlanModal())}
           >
             Discard
           </button>
           <button 
+            type="button"
             disabled={loading}
-            className="px-6 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center gap-2 min-w-[130px] disabled:opacity-50"
+            className="px-6 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center gap-2 min-w-[130px] disabled:opacity-50 text-left"
             onClick={handleSave}
           >
             {loading ? (

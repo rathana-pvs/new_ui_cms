@@ -5,12 +5,16 @@ import { fetchMonitoringData, clearMonitoring } from '../../monitoringSlice';
 export default function SystemStatusSection({ hostUid }) {
   const dispatch = useDispatch();
   const { currentStatus, averages, history, loading, error } = useSelector((state) => state.monitoring);
+  const { authorizedHosts } = useSelector((state) => state.host);
+  const isAuthorized = hostUid && authorizedHosts.includes(hostUid);
+  
   const [isStopped, setIsStopped] = useState(false);
   const pollTimer = useRef(null);
   const fetchCountRef = useRef(0);
 
   const startPolling = () => {
     if (pollTimer.current) clearTimeout(pollTimer.current);
+    if (!isAuthorized) return;
     setIsStopped(false);
     fetchCountRef.current = 0;
     dispatch(clearMonitoring());
@@ -20,6 +24,11 @@ export default function SystemStatusSection({ hostUid }) {
 
   const scheduleNext = (delay) => {
     pollTimer.current = setTimeout(() => {
+      if (!isAuthorized) {
+        setIsStopped(true);
+        return;
+      }
+      
       dispatch(fetchMonitoringData(hostUid));
       fetchCountRef.current += 1;
 
@@ -36,7 +45,10 @@ export default function SystemStatusSection({ hostUid }) {
   };
 
   useEffect(() => {
-    if (!hostUid) return;
+    if (!hostUid || !isAuthorized) {
+      if (pollTimer.current) clearTimeout(pollTimer.current);
+      return;
+    }
 
     // Initial fetch and start polling
     dispatch(fetchMonitoringData(hostUid));
@@ -45,7 +57,7 @@ export default function SystemStatusSection({ hostUid }) {
     return () => {
       if (pollTimer.current) clearTimeout(pollTimer.current);
     };
-  }, [hostUid, dispatch]);
+  }, [hostUid, isAuthorized, dispatch]);
 
   const formatBytes = (bytes) => {
     if (bytes === undefined || bytes === null || isNaN(bytes)) return '-';
