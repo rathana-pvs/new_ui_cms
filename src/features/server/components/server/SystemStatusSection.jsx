@@ -133,7 +133,7 @@ export default function SystemStatusSection({ hostUid }) {
                   <div className="flex flex-col gap-1 w-full max-w-[160px]">
                     <span className="text-[10px]">{row.memory}</span>
                     <div className="w-full bg-slate-200 dark:bg-slate-700/50 rounded-full h-1 overflow-hidden">
-                      <div className={`h-full rounded-full ${row.memPct > 80 ? 'bg-rose-500' : 'bg-bk-yellow'}`} style={{ width: `${row.memPct}%` }}></div>
+                      <div className={`h-full rounded-full transition-all duration-300 ${row.memPct > 80 ? 'bg-rose-500' : 'bg-bk-yellow'}`} style={{ width: `${row.memPct}%` }}></div>
                     </div>
                   </div>
                 </td>
@@ -142,7 +142,7 @@ export default function SystemStatusSection({ hostUid }) {
                   <div className="flex flex-col gap-1 w-full max-w-[80px]">
                     <span>{row.cpu}</span>
                     <div className="w-full bg-slate-200 dark:bg-slate-700/50 rounded-full h-1 overflow-hidden">
-                      <div className={`h-full rounded-full ${row.cpuPct > 80 ? 'bg-rose-500' : row.cpuPct > 50 ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ width: `${row.cpuPct}%` }}></div>
+                      <div className={`h-full rounded-full transition-all duration-300 ${row.cpuPct > 80 ? 'bg-rose-500' : row.cpuPct > 50 ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ width: `${row.cpuPct}%` }}></div>
                     </div>
                   </div>
                 </td>

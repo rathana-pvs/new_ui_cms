@@ -17,8 +17,8 @@ export default function DropUserModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-bk-main/60 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="bg-white dark:bg-bk-side w-full max-w-[400px] rounded-2xl shadow-2xl border border-slate-200 dark:border-white/5 overflow-hidden animate-in zoom-in-95 duration-300 text-left">
+    <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-bk-main/60 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-white dark:bg-bk-side w-full max-w-[400px] rounded-2xl shadow-2xl border border-slate-200 dark:border-white/5 overflow-hidden animate-in zoom-in-95 duration-200 text-left">
         <div className="p-6">
           <div className="w-12 h-12 rounded-full bg-rose-500/10 flex items-center justify-center mb-4">
             <span className="material-symbols-outlined text-rose-500 text-2xl">person_remove</span>

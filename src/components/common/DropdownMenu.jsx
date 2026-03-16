@@ -72,7 +72,7 @@ export function SubMenu({ icon, iconColor = '', label, children, width = 'w-56',
           className={`absolute ${position.y === 'bottom' ? 'top-0' : 'bottom-0'} 
             ${position.x === 'right' ? 'left-full ml-1' : 'right-full mr-1'} 
             ${width} bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-xl 
-            shadow-[0_4px_20px_rgba(0,0,0,0.15)] p-1.5 z-50 animate-in fade-in transition-all duration-300
+            shadow-[0_4px_20px_rgba(0,0,0,0.15)] p-1.5 z-50 animate-in fade-in transition-all duration-200
             ${isPositioned ? 'opacity-100 scale-100' : 'opacity-0 scale-95 origin-left'}`}
         >
           {/* Subtle Decorative Side Bar */}
@@ -131,7 +131,7 @@ export function DropdownMenu({ label, children, width = 'w-52' }) {
       <button className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium tracking-wide transition-all duration-200
         ${open ? 'text-bk-yellow bg-bk-yellow/5' : 'text-slate-600 dark:text-slate-400 hover:text-bk-yellow'}`}>
         <span>{label}</span>
-        <span className={`material-symbols-outlined text-[18px] transition-transform duration-300 ${open ? 'rotate-180 text-bk-yellow' : 'text-slate-400'}`}>
+        <span className={`material-symbols-outlined text-[18px] transition-transform duration-200 ${open ? 'rotate-180 text-bk-yellow' : 'text-slate-400'}`}>
           expand_more
         </span>
       </button>
@@ -141,7 +141,7 @@ export function DropdownMenu({ label, children, width = 'w-52' }) {
           ref={menuRef}
           className={`absolute ${align === 'left' ? 'left-0' : 'right-0'} top-full mt-2
             ${width} bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-xl 
-            shadow-[0_4px_25px_rgba(0,0,0,0.2)] p-1.5 z-50 animate-in fade-in transition-all duration-300
+            shadow-[0_4px_25px_rgba(0,0,0,0.2)] p-1.5 z-50 animate-in fade-in transition-all duration-200
             ${isPositioned ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 -translate-y-2 scale-95'}`}
         >
           {/* Subtle Top Accent */}
@@ -177,7 +177,7 @@ export function MenuItem({ icon, iconColor = '', label, onClick, href, disabled 
       
       {/* Decorative hover indicator */}
       {!disabled && (
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0 h-4 bg-bk-yellow transition-all duration-300 group-hover:w-[2px] rounded-r"></div>
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0 h-4 bg-bk-yellow transition-all duration-200 group-hover:w-[2px] rounded-r"></div>
       )}
     </>
   );

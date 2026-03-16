@@ -79,8 +79,8 @@ export default function EditHostModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-300 font-sans">
-      <div className="bg-white dark:bg-bk-side w-full max-w-[480px] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col relative">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans">
+      <div className="bg-white dark:bg-bk-side w-full max-w-[480px] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col relative">
         
         {/* Subtle Top Accent */}
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-bk-yellow/60"></div>
@@ -189,9 +189,11 @@ export default function EditHostModal() {
               <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5">Admin username</label>
+                <div className="flex items-center justify-between ml-0.5">
+                  <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Admin username</label>
+                </div>
                 <div className="relative group/field">
                   <input 
                     type="text" 
@@ -206,10 +208,10 @@ export default function EditHostModal() {
                 </div>
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center justify-between">
-                  <span>Passcode</span>
+                <div className="flex items-center justify-between ml-0.5">
+                  <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Passcode</label>
                   <span className="text-[8px] text-slate-400 font-normal italic normal-case tracking-normal">(optional)</span>
-                </label>
+                </div>
                 <div className="relative group/field">
                   <input 
                     type="password" 

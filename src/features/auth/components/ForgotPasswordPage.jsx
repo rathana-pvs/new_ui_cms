@@ -32,7 +32,7 @@ export default function ForgotPasswordPage() {
               <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center border border-white/10 group-hover:bg-white group-hover:border-white transition-all">
                 <span className="material-symbols-outlined text-slate-400 group-hover:text-bk-side">arrow_back</span>
               </div>
-              <span className="text-sm font-black text-slate-400 group-hover:text-white uppercase tracking-widest">Back to Login</span>
+              <span className="text-sm font-black text-slate-400 group-hover:text-white tracking-widest">Back to Login</span>
             </Link>
 
             <div className="flex items-center gap-4 mb-10">
@@ -78,7 +78,7 @@ export default function ForgotPasswordPage() {
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Email Address</label>
+                  <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-wider ml-1">Email Address</label>
                   <div className="relative group">
                     <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[20px] text-slate-400 group-focus-within:text-bk-yellow transition-colors">alternate_email</span>
                     <input
@@ -86,7 +86,7 @@ export default function ForgotPasswordPage() {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-12 pr-4 py-4 bg-white dark:bg-bk-side border-2 border-transparent group-focus-within:border-bk-yellow/50 rounded-2xl outline-none shadow-sm transition-all dark:text-white text-sm"
+                      className="w-full pl-12 pr-4 py-4 bg-white dark:bg-bk-side border-2 border-slate-100 dark:border-transparent group-focus-within:border-bk-yellow/50 rounded-2xl outline-none shadow-sm transition-all dark:text-white text-sm"
                       placeholder="admin@organization.com"
                     />
                   </div>
@@ -101,7 +101,7 @@ export default function ForgotPasswordPage() {
                     <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
                   ) : (
                     <>
-                      <span className="uppercase tracking-widest text-xs">Request Recovery Key</span>
+                      <span className="tracking-widest text-xs">Request Recovery Key</span>
                       <span className="material-symbols-outlined text-[20px] group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform">rocket_launch</span>
                     </>
                   )}
@@ -109,7 +109,7 @@ export default function ForgotPasswordPage() {
               </form>
             </>
           ) : (
-            <div className="text-center space-y-8 animate-in zoom-in-95 duration-500">
+            <div className="text-center space-y-8 animate-in zoom-in-95 duration-300">
                <div className="w-24 h-24 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto border border-emerald-500/20 shadow-2xl shadow-emerald-500/10">
                 <span className="material-symbols-outlined text-5xl text-emerald-500">mark_email_read</span>
               </div>
@@ -127,7 +127,7 @@ export default function ForgotPasswordPage() {
           )}
 
           <div className="pt-6 text-center">
-             <Link to="/login" className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+             <Link to="/login" className="inline-flex items-center gap-2 text-xs font-black tracking-[0.2em] text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
                 <span className="material-symbols-outlined text-[18px]">verified_user</span>
                 Authorize Login
              </Link>

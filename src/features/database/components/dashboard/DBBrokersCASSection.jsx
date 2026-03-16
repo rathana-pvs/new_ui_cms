@@ -1,4 +1,4 @@
-export default function DBBrokersCASSection({ brokersCAS }) {
+export default function DBBrokersCASSection({ brokersCAS, onViewSQLLog, onViewSlowQueryLog, onRestartCAS }) {
   return (
     <details className="group border border-slate-200 dark:border-slate-800 rounded-lg shadow-sm bg-white dark:bg-bk-side overflow-hidden" open>
       <summary className="flex items-center gap-2 px-3 py-2.5 cursor-pointer list-none hover:bg-slate-50 dark:hover:bg-white/5 transition-colors bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-slate-800 text-sm font-medium text-slate-900 dark:text-slate-200">
@@ -16,6 +16,7 @@ export default function DBBrokersCASSection({ brokersCAS }) {
               <th className="px-4 py-3 font-medium text-[10px] tracking-wide">LQS</th>
               <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Status</th>
               <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Last connection time</th>
+              <th className="px-4 py-3 font-medium text-[10px] tracking-wide text-center">Actions</th>
             </tr>
           </thead>
           <tbody className="font-mono">
@@ -39,13 +40,38 @@ export default function DBBrokersCASSection({ brokersCAS }) {
                     <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-50 text-amber-600 border border-amber-100 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-500/20">
                       <span className="relative flex h-1.5 w-1.5">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-500"></span>
                       </span>
                       Busy
                     </span>
                   )}
                 </td>
                 <td className="px-4 py-3 text-slate-500 dark:text-slate-400 font-sans">{row.lastConn}</td>
+                <td className="px-4 py-3">
+                   <div className="flex items-center justify-center gap-1">
+                      <button
+                        onClick={() => onRestartCAS?.(row)}
+                        className="w-7 h-7 flex items-center justify-center rounded border border-slate-200 dark:border-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400 hover:text-bk-yellow transition-all"
+                        title="Restart CAS"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">restart_alt</span>
+                      </button>
+                      <button
+                        onClick={() => onViewSQLLog?.(row)}
+                        className="w-7 h-7 flex items-center justify-center rounded border border-slate-200 dark:border-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400 hover:text-sky-500 transition-all"
+                        title="SQL Log"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">terminal</span>
+                      </button>
+                      <button
+                        onClick={() => onViewSlowQueryLog?.(row)}
+                        className="w-7 h-7 flex items-center justify-center rounded border border-slate-200 dark:border-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400 hover:text-rose-500 transition-all"
+                        title="Slow Query Log"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">timer_off</span>
+                      </button>
+                   </div>
+                </td>
               </tr>
             ))}
           </tbody>

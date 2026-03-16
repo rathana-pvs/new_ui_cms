@@ -4,7 +4,7 @@ const ErrorOverlay = ({ isVisible, error, title = "Operation Failed", onRetry, o
   if (!isVisible || !error) return null;
 
   return (
-    <div className="absolute inset-0 z-[200] flex flex-col items-center justify-center bg-white dark:bg-[#1e2230] animate-in fade-in duration-300 overflow-hidden">
+    <div className="absolute inset-0 z-[200] flex flex-col items-center justify-center bg-white dark:bg-[#1e2230] animate-in fade-in duration-200 overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none">
         <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>

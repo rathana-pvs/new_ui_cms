@@ -25,6 +25,9 @@ import BackupDatabaseModal from '../features/database/components/BackupDatabaseM
 import AddBackupPlanModal from '../features/database/components/AddBackupPlanModal';
 import AutoBackupLogModal from '../features/database/components/AutoBackupLogModal';
 import DeleteBackupPlanModal from '../features/database/components/DeleteBackupPlanModal';
+import DatabaseInfoModal from '../features/database/components/DatabaseInfoModal';
+import DatabasePlanDumpModal from '../features/database/components/DatabasePlanDumpModal';
+import CreateDatabaseModal from '../features/database/components/CreateDatabaseModal';
 
 import LockInformationModal from '../features/database/components/LockInformationModal';
 import UnloadResultModal from '../features/database/components/UnloadResultModal';
@@ -128,7 +131,7 @@ function DashboardLayout() {
 
           {openTabs.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-slate-50 dark:bg-bk-main font-sans">
-              <div className="w-24 h-24 bg-slate-100 dark:bg-bk-side rounded-full flex items-center justify-center mb-6 shadow-xl shadow-black/20">
+              <div className="w-24 h-24 bg-slate-100 dark:bg-bk-side rounded-full flex items-center justify-center mb-6 shadow-md border border-slate-200 dark:border-white/5">
                 <span className="material-symbols-outlined text-5xl text-slate-400 dark:text-bk-yellow/40" style={{ fontVariationSettings: "'wght' 200" }}>database</span>
               </div>
               <h3 className="text-xl font-medium text-slate-700 dark:text-bk-yellow tracking-tight">Cubrid Manager</h3>
@@ -211,6 +214,7 @@ function DashboardLayout() {
         <AddBackupPlanModal />
         <AutoBackupLogModal />
         <DeleteBackupPlanModal />
+        <CreateDatabaseModal />
 
         <LockInformationModal />
         <UnloadResultModal />
@@ -228,6 +232,8 @@ function DashboardLayout() {
         />
         <DropUserModal />
         <DatabasePropertyModal />
+        <DatabaseInfoModal />
+        <DatabasePlanDumpModal />
         <RenameDatabaseModal />
         <AddVolumeModal />
         <StatusModal />

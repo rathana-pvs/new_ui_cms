@@ -39,20 +39,24 @@ export default function BrokerTree({ hostUid, onContextMenu }) {
             }}
           >
             <summary
-              className={`flex items-center gap-1 px-3 py-1.5 cursor-pointer list-none rounded transition-all duration-200 select-none mb-0.5 group/sum border ${isBrokerSelected && !selectedBrokerSubItem ? 'bg-bk-yellow/10 dark:bg-bk-yellow/5 text-amber-600 dark:text-bk-yellow shadow-sm border-bk-yellow/20 dark:border-bk-yellow/10' : 'border-transparent text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow'}`}
+              className={`flex items-center gap-1 px-3 py-1.5 cursor-pointer list-none rounded-lg transition-all duration-200 select-none mb-1.5 group/sum border relative
+                ${isBrokerSelected && !selectedBrokerSubItem ? 'text-amber-600 dark:text-bk-yellow bg-bk-yellow/5 dark:bg-bk-yellow/5 font-medium border-bk-yellow/40 dark:border-bk-yellow/20' : 'bg-white/40 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:border-bk-yellow/30 hover:text-amber-600 dark:hover:text-bk-yellow'}`}
               onClick={() => {
                 dispatch(setSelectedBroker(broker.name));
                 dispatch(setSelectedBrokerSubItem(null));
               }}
               onContextMenu={(e) => onContextMenu(e, broker.name, broker.state)}
             >
-              <span className={`material-symbols-outlined text-[16px] group-open/broker:rotate-90 transition-transform ${isBrokerSelected ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500'}`} style={{ fontVariationSettings: "'wght' 300" }}>chevron_right</span>
-              <span className={`material-symbols-outlined transition-colors text-[16px] ${isBrokerSelected ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500 group-hover:text-amber-600 dark:group-hover:text-bk-yellow'}`} style={{ fontVariationSettings: "'wght' 300" }}>hub</span>
+              <span className={`material-symbols-outlined text-[16px] group-open/broker:rotate-90 transition-transform ${isBrokerSelected && !selectedBrokerSubItem ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500'}`} style={{ fontVariationSettings: "'wght' 300" }}>chevron_right</span>
+              <span className={`material-symbols-outlined transition-colors text-[16px] ${isBrokerSelected && !selectedBrokerSubItem ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500 group-hover:text-amber-600 dark:group-hover:text-bk-yellow'}`} style={{ fontVariationSettings: "'wght' 300" }}>hub</span>
               <div className="flex-1 min-w-0">
-                <span className={`text-[11.5px] font-medium transition-colors truncate block ${isBrokerSelected ? 'text-amber-600 dark:text-bk-yellow' : 'group-hover/sum:text-amber-600 dark:group-hover/sum:text-bk-yellow'}`}>
+                <span className={`text-[11.5px] font-medium transition-colors truncate block ${isBrokerSelected && !selectedBrokerSubItem ? 'text-amber-600 dark:text-bk-yellow' : 'group-hover/sum:text-amber-600 dark:group-hover/sum:text-bk-yellow'}`}>
                   {broker.name} <span className="opacity-50 font-normal ml-1">({broker.port})</span>
                 </span>
               </div>
+              {isBrokerSelected && !selectedBrokerSubItem && (
+                <div className="absolute left-[-1px] top-0 bottom-0 w-[2px] bg-amber-600 dark:bg-bk-yellow rounded-full shadow-[0_0_8px_rgba(217,119,6,0.4)]"></div>
+              )}
 
               {isOn ? (
                 <span className="inline-flex items-center gap-1.5 px-2 py-0.5 text-[9px] font-medium bg-emerald-50 text-emerald-600 border border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-500/20 rounded-full tracking-tighter">
@@ -73,8 +77,8 @@ export default function BrokerTree({ hostUid, onContextMenu }) {
             <div className="ml-[22px] border-l border-slate-200 dark:border-slate-800 space-y-0.5 py-1">
               <details className="group/nested">
                 <summary 
-                  className={`flex items-center gap-2 px-3.5 py-1.5 w-full text-left transition-all group/item cursor-pointer list-none rounded-r-md relative select-none border-y border-r border-l-transparent
-                    ${(isBrokerSelected && selectedBrokerSubItem === 'SQL Log') ? 'text-amber-600 dark:text-bk-yellow bg-bk-yellow/10 dark:bg-bk-yellow/5 border-bk-yellow/20 dark:border-bk-yellow/10' : 'text-slate-700 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow border-transparent'}`}
+                  className={`flex items-center gap-2 px-3.5 py-1.5 w-full text-left transition-all group/item cursor-pointer list-none rounded-r-md relative select-none border border-transparent
+                    ${(isBrokerSelected && selectedBrokerSubItem === 'SQL Log') ? 'text-amber-600 dark:text-bk-yellow font-medium' : 'text-slate-700 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow'}`}
                   onClick={() => {
                     dispatch(setSelectedBroker(broker.name));
                     dispatch(setSelectedBrokerSubItem('SQL Log'));
@@ -84,7 +88,7 @@ export default function BrokerTree({ hostUid, onContextMenu }) {
                   <span className={`material-symbols-outlined text-[16px] transition-colors
                     ${(isBrokerSelected && selectedBrokerSubItem === 'SQL Log') ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500 group-hover/item:text-amber-600 dark:group-hover/item:text-bk-yellow'}`} 
                     style={{ fontVariationSettings: "'wght' 300" }}>
-                    receipt_long
+                    history_edu
                   </span>
                   <span className="text-[11px] tracking-wide whitespace-nowrap">SQL Log</span>
                   {(isBrokerSelected && selectedBrokerSubItem === 'SQL Log') && (
@@ -100,8 +104,8 @@ export default function BrokerTree({ hostUid, onContextMenu }) {
                     return (
                       <button
                         key={idx}
-                        className={`flex items-center gap-3 px-4 py-1.5 w-full text-left transition-all duration-200 group/child relative rounded-r-md select-none border border-transparent
-                          ${isLogSelected ? 'text-amber-600 dark:text-bk-yellow bg-bk-yellow/10 dark:bg-bk-yellow/5 font-medium border-bk-yellow/20 dark:border-bk-yellow/10' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow'}`}
+                        className={`flex items-center gap-3 px-4 py-1.5 w-full text-left transition-all duration-200 group/child relative rounded-r-md select-none border
+                          ${isLogSelected ? 'text-amber-600 dark:text-bk-yellow font-medium border-transparent' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow border-transparent'}`}
                         onClick={(e) => {
                           e.stopPropagation();
                           dispatch(setSelectedBroker(broker.name));

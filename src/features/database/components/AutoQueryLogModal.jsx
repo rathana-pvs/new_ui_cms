@@ -27,8 +27,8 @@ export default function AutoQueryLogModal() {
   });
 
   return (
-    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-300 font-sans text-left">
-      <div className="bg-white dark:bg-bk-side w-full max-w-[800px] h-[600px] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.3)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col relative text-left">
+    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans text-left">
+      <div className="bg-white dark:bg-bk-side w-full max-w-[800px] h-[600px] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.3)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col relative text-left">
         
         {/* Subtle Top Accent */}
         <div className="absolute top-0 left-0 right-0 h-[2.5px] bg-sky-500/60"></div>
@@ -83,7 +83,7 @@ export default function AutoQueryLogModal() {
           </div>
 
           {logsError ? (
-            <div className="flex-1 flex flex-col items-center justify-center p-12 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="flex-1 flex flex-col items-center justify-center p-12 text-center animate-in fade-in slide-in-from-bottom-4 duration-300">
               <div className="w-16 h-16 rounded-full bg-rose-500/10 flex items-center justify-center mb-4 border border-rose-500/20">
                 <span className="material-symbols-outlined text-rose-500 text-3xl">error</span>
               </div>

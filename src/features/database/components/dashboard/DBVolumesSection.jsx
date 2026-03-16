@@ -1,9 +1,21 @@
 export default function DBVolumesSection({ volumes }) {
   return (
     <details className="group border border-slate-200 dark:border-slate-800 rounded-lg shadow-sm bg-white dark:bg-bk-side overflow-hidden" open>
-      <summary className="flex items-center gap-2 px-3 py-2.5 cursor-pointer list-none hover:bg-slate-50 dark:hover:bg-white/5 transition-colors bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-slate-800 text-sm font-medium text-slate-900 dark:text-slate-200">
-        <span className="material-symbols-outlined text-[16px] text-bk-yellow leading-none transition-transform group-open:rotate-180">expand_more</span>
-        <span>Volumes</span>
+      <summary className="flex items-center justify-between px-3 py-2 cursor-pointer list-none hover:bg-slate-50 dark:hover:bg-white/5 transition-colors bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-slate-800 text-sm font-medium text-slate-900 dark:text-slate-200">
+        <div className="flex items-center gap-2">
+          <span className="material-symbols-outlined text-[16px] text-bk-yellow leading-none transition-transform group-open:rotate-180">expand_more</span>
+          <span>Volumes</span>
+        </div>
+        <button 
+          className="flex items-center gap-1.5 px-3 py-1 rounded bg-bk-yellow hover:bg-[#ffd700] text-bk-side text-[10px] font-black uppercase tracking-tight shadow-sm transition-all active:scale-95"
+          onClick={(e) => {
+            e.preventDefault();
+            // dispatch(openAddVolumeModal()); 
+          }}
+        >
+          <span className="material-symbols-outlined text-[14px]">add_box</span>
+          <span>Add Volume</span>
+        </button>
       </summary>
       <div className="overflow-x-auto w-full">
         <table className="w-full text-left text-xs whitespace-nowrap font-sans">

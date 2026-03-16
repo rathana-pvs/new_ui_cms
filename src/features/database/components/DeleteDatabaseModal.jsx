@@ -119,8 +119,8 @@ export default function DeleteDatabaseModal() {
   if (!isDeleteDBModalOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-300 font-sans text-left">
-      <div className={`bg-white dark:bg-bk-side w-full ${step === 1 ? 'max-w-5xl' : (error ? 'max-w-[480px]' : 'max-w-[400px]')} rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col relative text-left transition-all`}>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans text-left">
+      <div className={`bg-white dark:bg-bk-side w-full ${step === 1 ? 'max-w-5xl' : (error ? 'max-w-[480px]' : 'max-w-[400px]')} rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col relative text-left transition-all`}>
         
         {/* Subtle Top Accent */}
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-rose-500/60"></div>
@@ -149,7 +149,7 @@ export default function DeleteDatabaseModal() {
         {/* Body */}
         <div className="p-5 space-y-5 flex-1 overflow-y-auto custom-scrollbar">
           {step === 1 && (
-            <div className="space-y-5 animate-in fade-in duration-300">
+            <div className="space-y-5 animate-in fade-in duration-200">
                <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500 uppercase">Target information</span>
@@ -222,7 +222,7 @@ export default function DeleteDatabaseModal() {
           )}
 
           {step === 2 && !error && !processing && (
-            <div className="flex flex-col items-center justify-center py-4 space-y-6 animate-in fade-in duration-300">
+            <div className="flex flex-col items-center justify-center py-4 space-y-6 animate-in fade-in duration-200">
               <div className="w-16 h-16 bg-rose-500/10 rounded-full flex items-center justify-center border border-rose-500/20 shadow-xl shadow-rose-500/5">
                 <span className="material-symbols-outlined text-3xl text-rose-500">lock</span>
               </div>
@@ -262,7 +262,7 @@ export default function DeleteDatabaseModal() {
           )}
 
           {step === 2 && processing && !error && (
-            <div className="flex flex-col items-center justify-center py-12 space-y-5 animate-in fade-in duration-300 min-h-[250px]">
+            <div className="flex flex-col items-center justify-center py-12 space-y-5 animate-in fade-in duration-200 min-h-[250px]">
               <div className="relative">
                 <div className="w-20 h-20 border-[3px] border-rose-500/10 border-t-rose-500 rounded-full animate-spin"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -276,7 +276,7 @@ export default function DeleteDatabaseModal() {
             </div>
           )}
 
-          {error && <div className="animate-in fade-in duration-300"><ModalErrorView error={error} /></div>}
+          {error && <div className="animate-in fade-in duration-200"><ModalErrorView error={error} /></div>}
         </div>
 
         {/* Footer */}

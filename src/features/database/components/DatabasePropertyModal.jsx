@@ -83,7 +83,7 @@ const CustomSelect = ({ value, options, onChange, disabled, width = 'w-[75px]' }
         className={`w-full h-full flex items-center justify-between px-3 bg-slate-50 dark:bg-bk-main/30 border ${disabled ? 'border-slate-100 dark:border-slate-800/50 opacity-30 shadow-none' : 'border-slate-200 dark:border-slate-800 hover:border-bk-yellow/50'} rounded transition-all text-[10px] font-bold text-slate-700 dark:text-slate-200 outline-none select-none`}
       >
         <span className="truncate">{value}</span>
-        <span className={`material-symbols-outlined text-[14px] transition-transform duration-300 ${isOpen ? 'rotate-180 text-bk-yellow' : 'text-slate-400'}`}>expand_more</span>
+        <span className={`material-symbols-outlined text-[14px] transition-transform duration-200 ${isOpen ? 'rotate-180 text-bk-yellow' : 'text-slate-400'}`}>expand_more</span>
       </button>
       {isOpen && !disabled && (
         <>
@@ -351,8 +351,8 @@ export default function DatabasePropertyModal() {
   if (!isDatabasePropertyModalOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-300 font-sans">
-      <div className="bg-white dark:bg-bk-side w-full max-w-[850px] shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden rounded-xl animate-in zoom-in-95 duration-300 flex flex-col relative h-[680px]">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans">
+      <div className="bg-white dark:bg-bk-side w-full max-w-[850px] shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden rounded-xl animate-in zoom-in-95 duration-200 flex flex-col relative h-[680px]">
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-bk-yellow/60"></div>
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
           <div className="flex items-center gap-2.5">
@@ -400,7 +400,7 @@ export default function DatabasePropertyModal() {
                 </div>
               ) : activeSidebar === 'Connection Information' ? (
                 /* Inline rendering for Connection Information View to ensure absolute stability */
-                <div key="connection-view" className="flex-1 flex flex-col gap-8 animate-in fade-in slide-in-from-right-2 duration-300">
+                <div key="connection-view" className="flex-1 flex flex-col gap-8 animate-in fade-in slide-in-from-right-2 duration-200">
                   <div className="space-y-6">
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">Connection Information</span>
@@ -430,7 +430,7 @@ export default function DatabasePropertyModal() {
                   </div>
                 </div>
               ) : activeTab === 'General' ? (
-                <div key="general-view" className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <div key="general-view" className="animate-in fade-in slide-in-from-bottom-2 duration-200">
                   {['data', 'sort', 'log'].map(prefix => {
                     const pagesKey = `${prefix}_buffer_pages`;
                     const sizeKey = `${prefix}_buffer_size`;
@@ -504,7 +504,7 @@ export default function DatabasePropertyModal() {
                   </div>
                 </div>
               ) : (
-                <div key="advanced-view" className="flex-1 flex flex-col min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <div key="advanced-view" className="flex-1 flex flex-col min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-200">
                   <div className="border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden bg-slate-50/20 dark:bg-bk-main/10 flex flex-col flex-1">
                     <div className="sticky top-0 bg-slate-100 dark:bg-bk-main flex border-b border-slate-200 dark:border-slate-800 z-10">
                       <div className="w-[240px] px-4 py-2.5 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Parameter Name</div>

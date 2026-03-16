@@ -136,7 +136,7 @@ export default function DatabaseVolumes({ hostUid }) {
                         <span className="font-mono opacity-80">{row.permanent.display}</span>
                       </div>
                       <div className="w-full bg-slate-200 dark:bg-slate-700/50 rounded-full h-1 overflow-hidden">
-                        <div className={`h-full rounded-full transition-all duration-500 ${row.permanent.pct > 80 ? 'bg-rose-500' : row.permanent.pct > 60 ? 'bg-amber-500' : 'bg-bk-yellow'}`} style={{ width: `${row.permanent.pct}%` }}></div>
+                        <div className={`h-full rounded-full transition-all duration-300 ${row.permanent.pct > 80 ? 'bg-rose-500' : row.permanent.pct > 60 ? 'bg-amber-500' : 'bg-bk-yellow'}`} style={{ width: `${row.permanent.pct}%` }}></div>
                       </div>
                     </div>
                   </td>
@@ -146,7 +146,7 @@ export default function DatabaseVolumes({ hostUid }) {
                         <span className="font-mono opacity-80">{row.temporary.display}</span>
                       </div>
                       <div className="w-full bg-slate-200 dark:bg-slate-700/50 rounded-full h-1 overflow-hidden">
-                        <div className={`h-full rounded-full transition-all duration-500 ${row.temporary.pct > 80 ? 'bg-rose-500' : 'bg-bk-yellow'}`} style={{ width: `${row.temporary.pct}%` }}></div>
+                        <div className={`h-full rounded-full transition-all duration-300 ${row.temporary.pct > 80 ? 'bg-rose-500' : 'bg-bk-yellow'}`} style={{ width: `${row.temporary.pct}%` }}></div>
                       </div>
                     </div>
                   </td>

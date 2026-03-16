@@ -17,12 +17,12 @@ export default function ConfirmModal({
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
+        className="absolute inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
         onClick={onClose}
       />
       
       {/* Modal Card */}
-      <div className="relative w-full max-w-[360px] bg-white dark:bg-bk-side rounded-[28px] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.35)] dark:shadow-[0_25px_60px_-12px_rgba(0,0,0,0.7)] border border-slate-200/50 dark:border-white/5 overflow-hidden animate-in zoom-in-95 fade-in duration-300">
+      <div className="relative w-full max-w-[360px] bg-white dark:bg-bk-side rounded-[28px] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.35)] dark:shadow-[0_25px_60px_-12px_rgba(0,0,0,0.7)] border border-slate-200/50 dark:border-white/5 overflow-hidden animate-in zoom-in-95 fade-in duration-200">
         
         {/* Top Decorative Graphic */}
         <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-amber-400 to-transparent opacity-60"></div>

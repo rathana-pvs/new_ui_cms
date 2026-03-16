@@ -8,11 +8,11 @@ export default function SidebarEmptyState() {
         <div className="relative mb-6">
           {/* Background circles for depth */}
           <div className="absolute inset-0 scale-[1.5] bg-slate-100 dark:bg-white/5 rounded-full blur-xl opacity-50"></div>
-          <div className="relative w-16 h-16 bg-white dark:bg-bk-side rounded-2xl flex items-center justify-center shadow-xl border border-slate-100 dark:border-white/5 rotate-3 transition-transform hover:rotate-0 duration-500">
+          <div className="relative w-16 h-16 bg-white dark:bg-bk-side rounded-2xl flex items-center justify-center shadow-md border border-slate-100 dark:border-white/5 transition-all">
             <span className="material-symbols-outlined text-3xl text-slate-400 dark:text-slate-500" style={{ fontVariationSettings: "'wght' 200" }}>account_tree</span>
           </div>
           {/* Floating smaller icon */}
-          <div className="absolute -top-2 -right-2 w-8 h-8 bg-bk-yellow rounded-lg flex items-center justify-center shadow-lg -rotate-12 transition-transform hover:rotate-0 duration-500 shadow-bk-yellow/20">
+          <div className="absolute -top-2 -right-2 w-8 h-8 bg-bk-yellow rounded-lg flex items-center justify-center shadow-md transition-all">
             <span className="material-symbols-outlined text-bk-side text-[18px]" style={{ fontVariationSettings: "'wght' 500" }}>dns</span>
           </div>
         </div>

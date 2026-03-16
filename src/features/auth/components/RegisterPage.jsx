@@ -60,10 +60,10 @@ export default function RegisterPage() {
     if (/[0-9]/.test(password)) score++;
     if (/[^A-Za-z0-9]/.test(password)) score++;
 
-    if (score <= 1) return { level: 1, label: 'Standard', color: 'bg-rose-500' };
-    if (score <= 2) return { level: 2, label: 'Average', color: 'bg-amber-500' };
-    if (score <= 3) return { level: 3, label: 'Secure', color: 'bg-blue-500' };
-    return { level: 4, label: 'Highly Secure', color: 'bg-emerald-500' };
+    if (score <= 1) return { level: 1, label: 'Standard', color: 'bg-rose-500', icon: 'shield_lock', text: 'text-rose-500' };
+    if (score <= 2) return { level: 2, label: 'Average', color: 'bg-amber-500', icon: 'lock', text: 'text-amber-500' };
+    if (score <= 3) return { level: 3, label: 'Secure', color: 'bg-blue-500', icon: 'verified', text: 'text-blue-500' };
+    return { level: 4, label: 'Highly Secure', color: 'bg-emerald-500', icon: 'workspace_premium', text: 'text-emerald-500' };
   };
 
   const strength = getPasswordStrength();
@@ -85,7 +85,7 @@ export default function RegisterPage() {
               <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center border border-white/10 group-hover:bg-white group-hover:border-white transition-all">
                 <span className="material-symbols-outlined text-slate-400 group-hover:text-bk-side">arrow_back</span>
               </div>
-              <span className="text-sm font-black text-slate-400 group-hover:text-white uppercase tracking-widest">Back to Login</span>
+              <span className="text-sm font-black text-slate-400 group-hover:text-white tracking-widest">Back to Login</span>
             </Link>
 
             <div className="flex items-center gap-4 mb-10">
@@ -105,14 +105,17 @@ export default function RegisterPage() {
             
             <div className="grid grid-cols-2 gap-6">
               {[
-                { label: 'Architecture', val: '3-Tier' },
-                { label: 'License', val: 'Open Source' },
-                { label: 'Performance', val: 'MVCC' },
-                { label: 'Security', val: 'Enterprise' }
+                { label: 'Architecture', val: '3-Tier', icon: 'hub' },
+                { label: 'License', val: 'Open Source', icon: 'verified_user' },
+                { label: 'Performance', val: 'MVCC', icon: 'speed' },
+                { label: 'Security', val: 'Enterprise', icon: 'security' }
               ].map((stat, i) => (
-                <div key={i} className="p-5 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-bk-yellow/30 transition-colors">
-                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">{stat.label}</p>
-                  <p className="text-lg font-bold text-white">{stat.val}</p>
+                <div key={i} className="p-5 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-bk-yellow/30 transition-all group">
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="material-symbols-outlined text-bk-yellow/40 group-hover:text-bk-yellow transition-colors text-[20px]">{stat.icon}</span>
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{stat.label}</p>
+                  </div>
+                  <p className="text-lg font-bold text-white tracking-tight">{stat.val}</p>
                 </div>
               ))}
             </div>
@@ -137,14 +140,14 @@ export default function RegisterPage() {
             <div className="space-y-4">
               {/* Username */}
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Username</label>
+                <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-wider ml-1">Username</label>
                 <div className="relative group">
                   <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[20px] text-slate-400 group-focus-within:text-bk-yellow transition-colors">person_pin</span>
                   <input
                     type="text"
                     value={username}
                     onChange={(e) => { setUsername(e.target.value); clearFieldError('username'); }}
-                    className={`w-full pl-12 pr-4 py-3.5 bg-white dark:bg-bk-side border-2 ${errors.username ? 'border-rose-500' : 'border-transparent group-focus-within:border-bk-yellow/50'} rounded-2xl outline-none shadow-sm transition-all dark:text-white text-sm`}
+                    className={`w-full pl-12 pr-4 py-3.5 bg-white dark:bg-bk-side border-2 ${errors.username ? 'border-rose-500' : 'border-slate-100 dark:border-transparent group-focus-within:border-bk-yellow/50'} rounded-2xl outline-none shadow-sm transition-all dark:text-white text-sm`}
                     placeholder="Pick a unique name"
                   />
                 </div>
@@ -153,14 +156,17 @@ export default function RegisterPage() {
 
               {/* Password */}
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Password</label>
+                <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-wider ml-1">Password</label>
                 <div className="relative group">
-                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[20px] text-slate-400 group-focus-within:text-bk-yellow transition-colors">fingerprint</span>
+                  <span className={`material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[20px] transition-colors
+                    ${strength.level > 0 && password ? strength.text : 'text-slate-400 group-focus-within:text-bk-yellow'}`}>
+                    {strength.level >= 3 ? 'verified_user' : 'fingerprint'}
+                  </span>
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => { setPassword(e.target.value); clearFieldError('password'); }}
-                    className={`w-full pl-12 pr-12 py-3.5 bg-white dark:bg-bk-side border-2 ${errors.password ? 'border-rose-500' : 'border-transparent group-focus-within:border-bk-yellow/50'} rounded-2xl outline-none shadow-sm transition-all dark:text-white text-sm`}
+                    className={`w-full pl-12 pr-12 py-3.5 bg-white dark:bg-bk-side border-2 ${errors.password ? 'border-rose-500' : 'border-slate-100 dark:border-transparent group-focus-within:border-bk-yellow/50'} rounded-2xl outline-none shadow-sm transition-all dark:text-white text-sm`}
                     placeholder="Create security keys"
                   />
                   <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
@@ -169,13 +175,18 @@ export default function RegisterPage() {
                 </div>
                 
                 {password && (
-                  <div className="px-1 pt-1 animate-in fade-in duration-300">
+                  <div className="px-1 pt-1 animate-in fade-in duration-200">
                     <div className="flex gap-1.5 h-1">
                       {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className={`flex-1 rounded-full transition-all duration-500 ${i <= strength.level ? strength.color : 'bg-slate-200 dark:bg-white/5'}`}></div>
+                        <div key={i} className={`flex-1 rounded-full transition-all duration-300 ${i <= strength.level ? strength.color : 'bg-slate-200 dark:bg-white/5'}`}></div>
                       ))}
                     </div>
-                    <p className="text-[9px] font-black uppercase tracking-widest mt-2 text-slate-400">Security: <span className={strength.level >= 3 ? 'text-emerald-500' : 'text-rose-500'}>{strength.label}</span></p>
+                    <p className="text-[9px] font-black uppercase tracking-widest mt-2 text-slate-400 flex items-center gap-1.5">
+                      Security: <span className={`flex items-center gap-1 ${strength.text}`}>
+                        <span className="material-symbols-outlined text-[12px]">{strength.icon}</span>
+                        {strength.label}
+                      </span>
+                    </p>
                   </div>
                 )}
                 {errors.password && <p className="text-[11px] text-rose-500 font-medium ml-1 flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">error</span>{errors.password}</p>}
@@ -183,14 +194,14 @@ export default function RegisterPage() {
 
               {/* Confirm Password */}
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Confirm Security</label>
+                <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-wider ml-1">Confirm Security</label>
                 <div className="relative group">
                   <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[20px] text-slate-400 group-focus-within:text-bk-yellow transition-colors">verified</span>
                   <input
                     type={showConfirm ? 'text' : 'password'}
                     value={confirmPassword}
                     onChange={(e) => { setConfirmPassword(e.target.value); clearFieldError('confirmPassword'); }}
-                    className={`w-full pl-12 pr-12 py-3.5 bg-white dark:bg-bk-side border-2 ${errors.confirmPassword ? 'border-rose-500' : confirmPassword && password === confirmPassword ? 'border-emerald-500/50' : 'border-transparent group-focus-within:border-bk-yellow/50'} rounded-2xl outline-none shadow-sm transition-all dark:text-white text-sm`}
+                    className={`w-full pl-12 pr-12 py-3.5 bg-white dark:bg-bk-side border-2 ${errors.confirmPassword ? 'border-rose-500' : confirmPassword && password === confirmPassword ? 'border-emerald-500/50' : 'border-slate-100 dark:border-transparent group-focus-within:border-bk-yellow/50'} rounded-2xl outline-none shadow-sm transition-all dark:text-white text-sm`}
                     placeholder="Repeat keys"
                   />
                    <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
@@ -217,8 +228,8 @@ export default function RegisterPage() {
                   <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
                 ) : (
                   <>
-                    <span className="uppercase tracking-widest text-xs">Create Master Account</span>
-                    <span className="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">person_add_alt_1</span>
+                    <span className="tracking-widest text-xs">Create Master Account</span>
+                    <span className="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">person_add</span>
                   </>
                 )}
               </button>
@@ -232,8 +243,15 @@ export default function RegisterPage() {
             )}
           </form>
 
-          <p className="text-center text-xs text-slate-500 dark:text-slate-400 leading-relaxed max-w-[280px] mx-auto">
-            By joining, you agree to the CUBRID Open Source <a href="#" className="underline font-bold text-slate-900 dark:text-white hover:text-bk-yellow transition-colors">Project Terms</a> and data processing policies.
+          <div className="pt-2 text-center">
+            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+              Already have an account?{' '}
+              <Link to="/login" className="font-black text-slate-900 dark:text-bk-yellow hover:underline decoration-2 underline-offset-4">Login</Link>
+            </p>
+          </div>
+
+          <p className="text-center text-[10px] text-slate-500/60 dark:text-slate-400/40 leading-relaxed max-w-[280px] mx-auto pt-4">
+            By joining, you agree to the CUBRID Open Source <a href="#" className="underline font-bold text-slate-900/40 dark:text-white/40 hover:text-bk-yellow transition-colors">Project Terms</a> and data processing policies.
           </p>
         </div>
       </div>

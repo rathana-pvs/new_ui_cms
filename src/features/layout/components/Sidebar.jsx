@@ -31,10 +31,15 @@ import {
   openDatabasePropertyModal,
   openRenameDatabaseModal,
   openAddVolumeModal,
+  openDatabaseInfoModal,
+  openPlanDumpModal,
+  openCreateDatabaseModal,
   openEditBackupPlanModal,
   fetchBackupSchedule,
   openAddQueryPlanModal,
   openAutoQueryLogModal,
+  openSetAutomationVolumeModal,
+  openAutoVolumeLogModal,
   fetchQueryPlan,
   setSelectedBackupId,
   setSelectedQueryPlanId
@@ -60,6 +65,8 @@ import LogTree from '../sidebar/components/LogTree';
 import SidebarEmptyState from '../sidebar/components/SidebarEmptyState';
 import AddQueryPlanModal from '../../database/components/AddQueryPlanModal';
 import AutoQueryLogModal from '../../database/components/AutoQueryLogModal';
+import SetAutomationVolumeModal from '../../database/components/SetAutomationVolumeModal';
+import AutoVolumeLogModal from '../../database/components/AutoVolumeLogModal';
 
 // Internal Sidebar Components
 
@@ -319,7 +326,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
                 <div className="flex-1 overflow-y-auto px-4 pb-4 relative min-h-[200px]">
                   {/* States Overlay */}
                   {isLoggingIntoHost && (
-                    <div className="absolute inset-0 bg-white/80 dark:bg-bk-side/80 z-[210] flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-300">
+                    <div className="absolute inset-0 bg-white/80 dark:bg-bk-side/80 z-[210] flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-200">
                       <div className="w-16 h-16 border-4 border-bk-yellow/10 border-t-bk-yellow rounded-full animate-spin mb-6"></div>
                       <h3 className="text-sm font-medium text-slate-900 dark:text-bk-yellow mb-1 tracking-wide">Host login</h3>
                       <p className="text-[11px] text-slate-500">Establishing secure session...</p>
@@ -327,7 +334,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
                   )}
 
                   {!isLoggingIntoHost && hostAuthErrors[selectedHostUid] && (
-                    <div className="absolute inset-0 bg-white dark:bg-bk-side z-[210] flex flex-col items-center justify-center p-6 text-center animate-in zoom-in-95 duration-300">
+                    <div className="absolute inset-0 bg-white dark:bg-bk-side z-[210] flex flex-col items-center justify-center p-6 text-center animate-in zoom-in-95 duration-200">
                       <span className="material-symbols-outlined text-rose-500 text-3xl mb-4 bg-rose-500/10 p-4 rounded-full border border-rose-500/20">error</span>
                       <h3 className="text-sm font-medium text-rose-500 mb-2">Connection failed</h3>
                       <p className="text-[11px] text-slate-500 mb-6">{hostAuthErrors[selectedHostUid]}</p>
@@ -376,10 +383,10 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
 
         <div className="p-4 border-t border-slate-200 dark:border-slate-800">
           <button
-            className="flex w-full items-center justify-center gap-2 bg-gradient-to-r from-bk-yellow to-[#ffd700] hover:from-[#ffd700] hover:to-bk-yellow text-bk-side px-4 py-2 rounded-lg text-xs font-black shadow-md hover:shadow-lg transition-all active:scale-[0.96] group"
+            className="flex w-full items-center justify-center gap-2 bg-bk-yellow hover:bg-[#ffd700] text-bk-side px-4 py-2 rounded-lg text-xs font-black transition-colors group"
             onClick={onAddHost}
           >
-            <span className="material-symbols-outlined text-[18px] group-hover:rotate-90 transition-transform duration-300">add_circle</span>
+            <span className="material-symbols-outlined text-[18px] group-hover:rotate-90 transition-transform duration-200">add_circle</span>
             <span className="tracking-wide">Add Host</span>
           </button>
         </div>
@@ -463,7 +470,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
             <MenuItem icon="auto_fix_high" label="Optimize Database" onClick={() => { dispatch(setSelectedDatabase(dbContextMenu.db)); dispatch(openOptimizeDatabaseModal()); setDbContextMenu(null); }} />
             <MenuItem icon="content_copy" label="Copy Database" disabled={dbContextMenu.isActive} onClick={() => { dispatch(setSelectedDatabase(dbContextMenu.db)); dispatch(openCopyDatabaseModal()); setDbContextMenu(null); }} />
             <MenuDivider />
-            <MenuItem icon="add_circle" iconColor="text-accent-green" label="Create Database" />
+            <MenuItem icon="add_circle" iconColor="text-accent-green" label="Create Database" onClick={() => { dispatch(openCreateDatabaseModal()); setDbContextMenu(null); }} />
             <MenuItem
               icon="drive_file_rename_outline"
               iconColor="text-accent-orange"
@@ -480,7 +487,25 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
           <SubMenu icon="info" label="Database Info" width="w-52">
             <MenuItem icon="lock_open" label="Lock Information" onClick={() => { dispatch(setSelectedDatabase(dbContextMenu.db)); dispatch(openLockInfoModal()); setDbContextMenu(null); }} />
             <MenuItem icon="swap_horiz" label="Transaction Info" onClick={() => { dispatch(setSelectedDatabase(dbContextMenu.db)); dispatch(openTransactionInfoModal()); setDbContextMenu(null); }} />
-            <MenuItem icon="schema" label="Plan Dump" /><MenuItem icon="data_object" label="Param Dump" /><MenuItem icon="explore" label="OID Navigation" />
+            <MenuItem 
+              icon="data_object" 
+              label="Param Dump" 
+              onClick={() => { 
+                dispatch(setSelectedDatabase(dbContextMenu.db)); 
+                dispatch(openDatabaseInfoModal()); 
+                setDbContextMenu(null); 
+              }} 
+            />
+            <MenuItem 
+              icon="schema" 
+              label="Plan Dump" 
+              onClick={() => { 
+                dispatch(setSelectedDatabase(dbContextMenu.db)); 
+                dispatch(openPlanDumpModal()); 
+                setDbContextMenu(null); 
+              }} 
+            />
+            <MenuItem icon="explore" label="OID Navigation" />
           </SubMenu>
           <MenuDivider /><MenuItem icon="tune" label="Properties" onClick={() => { dispatch(setSelectedDatabase(dbContextMenu.db)); dispatch(openDatabasePropertyModal()); setDbContextMenu(null); }} />
         </ContextMenuWrapper>
@@ -649,6 +674,34 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
               setSpaceContextMenu(null);
             }}
           />
+          <MenuItem
+            icon="settings_suggest"
+            label="Set Automation Volume"
+            onClick={() => {
+              dispatch(setSelectedDatabase(spaceContextMenu.db));
+              dispatch(openSetAutomationVolumeModal());
+              setSpaceContextMenu(null);
+            }}
+          />
+          <MenuItem
+            icon="history_edu"
+            label="Auto Volume Log"
+            onClick={() => {
+              dispatch(setSelectedDatabase(spaceContextMenu.db));
+              dispatch(openAutoVolumeLogModal());
+              setSpaceContextMenu(null);
+            }}
+          />
+          <MenuDivider />
+          <MenuItem
+            icon="visibility"
+            label="View Database"
+            onClick={() => {
+              dispatch(setSelectedDatabase(spaceContextMenu.db));
+              dispatch(setActiveMainTab('db:' + spaceContextMenu.db));
+              setSpaceContextMenu(null);
+            }}
+          />
           <MenuDivider />
           <MenuItem
             icon="refresh"
@@ -730,6 +783,8 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
       )}
       <AutoQueryLogModal />
       <AddQueryPlanModal />
+      <SetAutomationVolumeModal />
+      <AutoVolumeLogModal />
     </>
   );
 }

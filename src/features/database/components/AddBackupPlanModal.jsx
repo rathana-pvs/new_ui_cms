@@ -204,8 +204,8 @@ export default function AddBackupPlanModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-bk-main/60 backdrop-blur-sm animate-in fade-in duration-300 font-sans text-left">
-      <div className="bg-white dark:bg-bk-side w-full max-w-[700px] h-auto max-h-[90vh] rounded-xl shadow-[0_10px_50px_rgba(0,0,0,0.3)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col relative text-left">
+    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-bk-main/60 backdrop-blur-sm animate-in fade-in duration-200 font-sans text-left">
+      <div className="bg-white dark:bg-bk-side w-full max-w-[700px] h-auto max-h-[90vh] rounded-xl shadow-[0_10px_50px_rgba(0,0,0,0.3)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col relative text-left">
         
         {/* header - inside first div */}
         <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-bk-yellow via-amber-500 to-bk-yellow z-[310]"></div>
@@ -234,7 +234,7 @@ export default function AddBackupPlanModal() {
           
           {/* Error Message */}
           {error && (
-            <div className="bg-rose-500/10 border border-rose-500/20 p-4 rounded-2xl flex items-center gap-4 animate-in slide-in-from-top-4 duration-300">
+            <div className="bg-rose-500/10 border border-rose-500/20 p-4 rounded-2xl flex items-center gap-4 animate-in slide-in-from-top-4 duration-200">
                <div className="w-10 h-10 rounded-full bg-rose-500/20 flex items-center justify-center text-rose-500 shrink-0">
                   <span className="material-symbols-outlined text-2xl font-black">error</span>
                </div>
@@ -445,7 +445,7 @@ export default function AddBackupPlanModal() {
                           >
                             {day}
                             {formData.periodDetail.includes(day) && (
-                              <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-white rounded-full flex items-center justify-center shadow-lg animate-in zoom-in duration-300">
+                              <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-white rounded-full flex items-center justify-center shadow-lg animate-in zoom-in duration-200">
                                 <span className="material-symbols-outlined text-bk-yellow text-[10px] font-black">check</span>
                               </div>
                             )}

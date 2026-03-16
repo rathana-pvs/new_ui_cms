@@ -4,7 +4,7 @@ const LoadingOverlay = ({ isVisible, title = "Processing", subtitle = "Please wa
   if (!isVisible) return null;
 
   return (
-    <div className="absolute inset-0 z-[200] flex flex-col items-center justify-center bg-[#1e2230] animate-in fade-in duration-500 overflow-hidden">
+    <div className="absolute inset-0 z-[200] flex flex-col items-center justify-center bg-[#1e2230] animate-in fade-in duration-300 overflow-hidden">
       {/* Ambient Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
       

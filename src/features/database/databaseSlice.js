@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { databaseApi } from './databaseApi';
+import { brokerApi } from '../broker/brokerApi';
 
 export const fetchDatabaseStartInfo = createAsyncThunk(
   'database/fetchDatabaseStartInfo',
@@ -216,15 +217,116 @@ export const addVolume = createAsyncThunk(
 
 export const fetchDashboardData = createAsyncThunk(
   'database/fetchDashboardData',
-  async ({ hostUid, dbname }, { rejectWithValue }) => {
+    async ({ hostUid, dbname }, { rejectWithValue }) => {
+    if (!hostUid || !dbname) return rejectWithValue('Missing hostUid or dbname');
     try {
-      const [volumeInfo, lockInfo] = await Promise.all([
+      // 1. Fetch core DB stats
+      const [volumeInfo, lockInfo, statDumpRaw, brokerList] = await Promise.all([
         databaseApi.getVolumeInfo(hostUid, dbname),
-        databaseApi.getLockInfo(hostUid, dbname)
+        databaseApi.getLockInfo(hostUid, dbname),
+        databaseApi.getStatDump(hostUid, dbname),
+        brokerApi.getBrokerList(hostUid)
       ]);
-      return { dbname, volumeInfo, lockInfo };
+
+      // 2. Fetch CAS info for each broker to find processes serving this DB
+      const brokersCAS = [];
+      const actualBrokerList = brokerList?.[0]?.broker || [];
+      
+      const brokerDetails = await Promise.all(
+        actualBrokerList.map(b => {
+          if (!b?.name) return Promise.resolve(null);
+          return brokerApi.getBrokerStatus(hostUid, b.name).catch(() => null);
+        })
+      );
+
+      brokerDetails.forEach((status, idx) => {
+        if (!status || !status.asinfo) return;
+        const brokerName = actualBrokerList[idx]?.name;
+        
+        status.asinfo.forEach(cas => {
+          if (cas.as_dbname?.toLowerCase() === dbname.toLowerCase()) {
+            brokersCAS.push({
+              broker: brokerName,
+              id: cas.as_id,
+              pid: cas.as_pid,
+              qps: cas.as_num_query,
+              lqs: cas.as_long_query,
+              status: cas.as_status,
+              lastConn: cas.as_lct
+            });
+          }
+        });
+      });
+
+      return { 
+        dbname, 
+        volumeInfo, 
+        lockInfo, 
+        statDump: statDumpRaw, // It is already flat properties
+        brokersCAS 
+      };
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || `Failed to fetch dashboard data for ${dbname}`);
+    }
+  }
+);
+
+export const fetchDatabaseParamDump = createAsyncThunk(
+  'database/fetchDatabaseParamDump',
+  async ({ hostUid, dbname, both }, { rejectWithValue }) => {
+    try {
+      const response = await databaseApi.getParamDump(hostUid, dbname, both);
+      return { dbname, data: response };
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.response?.data?.error || `Failed to fetch parameter dump for ${dbname}`);
+    }
+  }
+);
+
+export const fetchDatabasePlanDump = createAsyncThunk(
+  'database/fetchDatabasePlanDump',
+  async ({ hostUid, dbname, plandrop }, { rejectWithValue }) => {
+    try {
+      const response = await databaseApi.getPlanDump(hostUid, dbname, plandrop);
+      return { dbname, data: response };
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.response?.data?.error || `Failed to fetch plan dump for ${dbname}`);
+    }
+  }
+);
+
+export const fetchAutoVolumeLog = createAsyncThunk(
+  'database/fetchAutoVolumeLog',
+  async ({ hostUid }, { rejectWithValue }) => {
+    try {
+      const response = await databaseApi.getAutoVolumeLog(hostUid);
+      return response.logs || [];
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Failed to fetch auto volume log');
+    }
+  }
+);
+
+export const fetchAutoVolumeConfig = createAsyncThunk(
+  'database/fetchAutoVolumeConfig',
+  async ({ hostUid, dbname }, { rejectWithValue }) => {
+    try {
+      const response = await databaseApi.getAutoVolumeConfig(hostUid, dbname);
+      return { dbname, data: response };
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Failed to fetch auto volume config');
+    }
+  }
+);
+
+export const updateAutoVolumeConfig = createAsyncThunk(
+  'database/updateAutoVolumeConfig',
+  async ({ hostUid, dbname, payload }, { rejectWithValue }) => {
+    try {
+      const response = await databaseApi.setAutoVolumeConfig(hostUid, dbname, payload);
+      return response;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Failed to update auto volume config');
     }
   }
 );
@@ -282,9 +384,22 @@ const initialState = {
   isLockInfoModalOpen: false,
   isAddQueryPlanModalOpen: false,
   isAutoQueryLogModalOpen: false,
+  isSetAutomationVolumeModalOpen: false,
+  isAutoVolumeLogModalOpen: false,
+  isDatabaseInfoModalOpen: false,
+  databaseInfoData: {}, // { [dbname]: {} }
+  databaseInfoLoading: false,
+  databaseInfoError: null,
+  isPlanDumpModalOpen: false,
+  planDumpData: {}, // { [dbname]: [] }
+  planDumpLoading: false,
+  planDumpError: null,
   
   autoBackupLogs: [],
   queryPlanLogs: [],
+  autoVolumeLogs: [],
+  autoVolumeConfig: {}, // { [dbname]: {} }
+  autoVolumeLoading: false,
   logsLoading: false,
   logsError: null,
 
@@ -309,6 +424,7 @@ const initialState = {
   dashboardLoading: {},
   dashboardError: {},
   volumes: [],
+  isCreateDatabaseModalOpen: false,
   loading: false,
   volumesLoading: false,
   actionLoading: false, // Separate loading for start/stop operations
@@ -427,6 +543,23 @@ const databaseSlice = createSlice({
       state.isUnloadResultModalOpen = false;
       state.unloadResultData = null;
     },
+    openDatabaseInfoModal: (state, action) => {
+      state.isDatabaseInfoModalOpen = true;
+      if (action.payload) state.selectedDatabase = action.payload;
+    },
+    closeDatabaseInfoModal: (state) => {
+      state.isDatabaseInfoModalOpen = false;
+      state.databaseInfoError = null;
+    },
+    openPlanDumpModal: (state, action) => {
+      state.isPlanDumpModalOpen = true;
+      state.planDumpError = null;
+      if (action.payload) state.selectedDatabase = action.payload;
+    },
+    closePlanDumpModal: (state) => {
+      state.isPlanDumpModalOpen = false;
+      state.planDumpError = null;
+    },
     openTransactionInfoModal: (state) => {
       state.isTransactionInfoModalOpen = true;
     },
@@ -476,6 +609,24 @@ const databaseSlice = createSlice({
     },
     clearSelectedQueryPlanId: (state) => {
       state.selectedQueryPlanId = null;
+    },
+    openCreateDatabaseModal: (state) => {
+      state.isCreateDatabaseModalOpen = true;
+    },
+    closeCreateDatabaseModal: (state) => {
+      state.isCreateDatabaseModalOpen = false;
+    },
+    openSetAutomationVolumeModal: (state) => {
+      state.isSetAutomationVolumeModalOpen = true;
+    },
+    closeSetAutomationVolumeModal: (state) => {
+      state.isSetAutomationVolumeModalOpen = false;
+    },
+    openAutoVolumeLogModal: (state) => {
+      state.isAutoVolumeLogModalOpen = true;
+    },
+    closeAutoVolumeLogModal: (state) => {
+      state.isAutoVolumeLogModalOpen = false;
     }
   },
   extraReducers: (builder) => {
@@ -729,19 +880,84 @@ const databaseSlice = createSlice({
         delete state.dashboardError[dbname];
       })
       .addCase(fetchDashboardData.fulfilled, (state, action) => {
-        const { dbname, volumeInfo, lockInfo } = action.payload;
+        const { dbname, volumeInfo, lockInfo, statDump, brokersCAS } = action.payload;
         state.dashboardLoading[dbname] = false;
         
         state.dashboardData[dbname] = {
           volumes: volumeInfo.spaceinfo || [],
           spaceInfo: volumeInfo.fileinfo || [],
-          locks: lockInfo.lockinfo?.[0]?.transaction || [] // Matches d-cms: dashboard shows transactions linked to locks
+          locks: lockInfo.lockinfo?.[0]?.transaction || [],
+          performance: statDump || {},
+          brokersCAS: brokersCAS || []
         };
       })
       .addCase(fetchDashboardData.rejected, (state, action) => {
         const { dbname } = action.meta.arg;
         state.dashboardLoading[dbname] = false;
         state.dashboardError[dbname] = action.payload;
+      })
+      .addCase(fetchDatabaseParamDump.pending, (state) => {
+        state.databaseInfoLoading = true;
+        state.databaseInfoError = null;
+      })
+      .addCase(fetchDatabaseParamDump.fulfilled, (state, action) => {
+        const { dbname, data } = action.payload;
+        state.databaseInfoLoading = false;
+        state.databaseInfoData[dbname] = data;
+      })
+      .addCase(fetchDatabaseParamDump.rejected, (state, action) => {
+        state.databaseInfoLoading = false;
+        state.databaseInfoError = action.payload;
+      })
+      // Plan Dump
+      .addCase(fetchDatabasePlanDump.pending, (state) => {
+        state.planDumpLoading = true;
+        state.planDumpError = null;
+      })
+      .addCase(fetchDatabasePlanDump.fulfilled, (state, action) => {
+        const { dbname, data } = action.payload;
+        state.planDumpLoading = false;
+        state.planDumpData[dbname] = data;
+      })
+      .addCase(fetchDatabasePlanDump.rejected, (state, action) => {
+        state.planDumpLoading = false;
+        state.planDumpError = action.payload;
+      })
+      // Auto Volume Log
+      .addCase(fetchAutoVolumeLog.pending, (state) => {
+        state.logsLoading = true;
+        state.logsError = null;
+      })
+      .addCase(fetchAutoVolumeLog.fulfilled, (state, action) => {
+        state.logsLoading = false;
+        state.autoVolumeLogs = action.payload;
+      })
+      .addCase(fetchAutoVolumeLog.rejected, (state, action) => {
+        state.logsLoading = false;
+        state.logsError = action.payload;
+      })
+      // Auto Volume Config
+      .addCase(fetchAutoVolumeConfig.pending, (state) => {
+        state.autoVolumeLoading = true;
+      })
+      .addCase(fetchAutoVolumeConfig.fulfilled, (state, action) => {
+        const { dbname, data } = action.payload;
+        state.autoVolumeLoading = false;
+        state.autoVolumeConfig[dbname] = data;
+      })
+      .addCase(fetchAutoVolumeConfig.rejected, (state) => {
+        state.autoVolumeLoading = false;
+      })
+      // Update Auto Volume Config
+      .addCase(updateAutoVolumeConfig.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(updateAutoVolumeConfig.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(updateAutoVolumeConfig.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
@@ -787,13 +1003,23 @@ export const {
   closeRenameDatabaseModal,
   openAddVolumeModal,
   closeAddVolumeModal,
+  openDatabaseInfoModal,
+  closeDatabaseInfoModal,
+  openPlanDumpModal,
+  closePlanDumpModal,
   openAddQueryPlanModal,
   closeAddQueryPlanModal,
   openAutoQueryLogModal,
   closeAutoQueryLogModal,
   setSelectedBackupId,
   clearSelectedBackupId,
-  setSelectedQueryPlanId
+  setSelectedQueryPlanId,
+  openCreateDatabaseModal,
+  closeCreateDatabaseModal,
+  openSetAutomationVolumeModal,
+  closeSetAutomationVolumeModal,
+  openAutoVolumeLogModal,
+  closeAutoVolumeLogModal
 } = databaseSlice.actions;
 
 export default databaseSlice.reducer;

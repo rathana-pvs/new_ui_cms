@@ -294,8 +294,8 @@ export default function CreateUserModal({ isOpen, onClose, dbname, editingUser }
     .filter(u => u.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-300 font-sans text-left">
-      <div className="bg-white dark:bg-bk-side w-full max-w-[840px] h-[680px] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col relative text-left">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans text-left">
+      <div className="bg-white dark:bg-bk-side w-full max-w-[840px] h-[680px] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col relative text-left">
         
         {/* Subtle Top Accent */}
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-bk-yellow/60"></div>
@@ -346,7 +346,7 @@ export default function CreateUserModal({ isOpen, onClose, dbname, editingUser }
         {/* Body */}
         <div className="p-5 space-y-6 flex-1 overflow-y-auto custom-scrollbar">
           {activeTab === 'general' ? (
-            <div className="space-y-6 animate-in fade-in slide-in-from-top-1 duration-300">
+            <div className="space-y-6 animate-in fade-in slide-in-from-top-1 duration-200">
               {/* Basic Identity section */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
@@ -506,7 +506,7 @@ export default function CreateUserModal({ isOpen, onClose, dbname, editingUser }
                       </div>
                       <div className="flex-1 overflow-y-auto p-1.5 custom-scrollbar">
                          {formData.groups.length > 0 ? (
-                           <div className="flex flex-wrap gap-1.5 animate-in fade-in duration-300">
+                           <div className="flex flex-wrap gap-1.5 animate-in fade-in duration-200">
                              {formData.groups.map(group => (
                                <div 
                                  key={group.name} 
@@ -549,7 +549,7 @@ export default function CreateUserModal({ isOpen, onClose, dbname, editingUser }
                       </div>
                       <div className="flex-1 overflow-y-auto p-1.5 custom-scrollbar">
                         {formData.members.length > 0 ? (
-                           <div className="flex flex-wrap gap-1.5 animate-in fade-in duration-300">
+                           <div className="flex flex-wrap gap-1.5 animate-in fade-in duration-200">
                              {formData.members.map(member => (
                                <div 
                                  key={member.name}
@@ -585,7 +585,7 @@ export default function CreateUserModal({ isOpen, onClose, dbname, editingUser }
               </div>
             </div>
           ) : (
-            <div className="space-y-6 animate-in fade-in slide-in-from-top-1 duration-300">
+            <div className="space-y-6 animate-in fade-in slide-in-from-top-1 duration-200">
               {/* Unauthorized section */}
               {/* Unauthorized section - Modern Master-Detail Dashboard */}
               <div className="flex bg-slate-50/50 dark:bg-bk-main/20 border border-slate-200 dark:border-white/5 rounded-2xl overflow-hidden h-[450px]">
@@ -679,9 +679,9 @@ export default function CreateUserModal({ isOpen, onClose, dbname, editingUser }
                                   <span className={`text-[10px] font-bold ${objectAuths[selectedObjectId]?.[perm] ? 'text-blue-500' : 'text-slate-400'}`}>{perm}</span>
                                   <button 
                                     onClick={() => togglePermission(selectedObjectId, perm)}
-                                    className={`w-8 h-4 rounded-full relative transition-all duration-300 ${objectAuths[selectedObjectId]?.[perm] ? 'bg-blue-500' : 'bg-slate-200 dark:bg-white/10'}`}
+                                    className={`w-8 h-4 rounded-full relative transition-all duration-200 ${objectAuths[selectedObjectId]?.[perm] ? 'bg-blue-500' : 'bg-slate-200 dark:bg-white/10'}`}
                                   >
-                                    <div className={`absolute top-1 w-2 h-2 rounded-full bg-white transition-all duration-300 ${objectAuths[selectedObjectId]?.[perm] ? 'left-5' : 'left-1'}`}></div>
+                                    <div className={`absolute top-1 w-2 h-2 rounded-full bg-white transition-all duration-200 ${objectAuths[selectedObjectId]?.[perm] ? 'left-5' : 'left-1'}`}></div>
                                   </button>
                                 </div>
                                 <span className="text-[8px] text-slate-400 font-medium leading-tight">Allow user to {perm.toLowerCase()} records in the table.</span>
@@ -705,9 +705,9 @@ export default function CreateUserModal({ isOpen, onClose, dbname, editingUser }
                                 </div>
                                 <button 
                                   onClick={() => togglePermission(selectedObjectId, perm)}
-                                  className={`w-8 h-4 rounded-full relative transition-all duration-300 ${objectAuths[selectedObjectId]?.[perm] ? 'bg-amber-500' : 'bg-slate-200 dark:bg-white/10'}`}
+                                  className={`w-8 h-4 rounded-full relative transition-all duration-200 ${objectAuths[selectedObjectId]?.[perm] ? 'bg-amber-500' : 'bg-slate-200 dark:bg-white/10'}`}
                                 >
-                                  <div className={`absolute top-1 w-2 h-2 rounded-full bg-white transition-all duration-300 ${objectAuths[selectedObjectId]?.[perm] ? 'left-5' : 'left-1'}`}></div>
+                                  <div className={`absolute top-1 w-2 h-2 rounded-full bg-white transition-all duration-200 ${objectAuths[selectedObjectId]?.[perm] ? 'left-5' : 'left-1'}`}></div>
                                 </button>
                               </div>
                             ))}
@@ -726,9 +726,9 @@ export default function CreateUserModal({ isOpen, onClose, dbname, editingUser }
                                 <span className={`text-[9px] font-bold ${objectAuths[selectedObjectId]?.[perm] ? 'text-indigo-500' : 'text-slate-400'}`}>{perm}</span>
                                 <button 
                                   onClick={() => togglePermission(selectedObjectId, perm)}
-                                  className={`w-7 h-3.5 rounded-full relative transition-all duration-300 ${objectAuths[selectedObjectId]?.[perm] ? 'bg-indigo-500' : 'bg-slate-200 dark:bg-white/10'}`}
+                                  className={`w-7 h-3.5 rounded-full relative transition-all duration-200 ${objectAuths[selectedObjectId]?.[perm] ? 'bg-indigo-500' : 'bg-slate-200 dark:bg-white/10'}`}
                                 >
-                                  <div className={`absolute top-0.5 w-2.5 h-2.5 rounded-full bg-white transition-all duration-300 ${objectAuths[selectedObjectId]?.[perm] ? 'left-4' : 'left-0.5'}`}></div>
+                                  <div className={`absolute top-0.5 w-2.5 h-2.5 rounded-full bg-white transition-all duration-200 ${objectAuths[selectedObjectId]?.[perm] ? 'left-4' : 'left-0.5'}`}></div>
                                 </button>
                               </div>
                             ))}

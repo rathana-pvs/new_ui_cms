@@ -51,16 +51,22 @@ export default function DatabaseTree({
         return (
           <details key={db.dbname} className="group">
             <summary
-              className={`flex items-center gap-1 px-3 py-1.5 cursor-pointer list-none rounded transition-all duration-200 select-none mb-0.5 group/sum border ${db.dbname === selectedDatabase ? 'bg-bk-yellow/10 dark:bg-bk-yellow/5 text-amber-600 dark:text-bk-yellow shadow-sm border-bk-yellow/20 dark:border-bk-yellow/10' : 'border-transparent text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow'}`}
-              onClick={() => dispatch(setSelectedDatabase(db.dbname))}
+              className={`flex items-center gap-1 px-3 py-1.5 cursor-pointer list-none rounded-lg transition-all duration-200 select-none mb-1.5 group/sum border relative ${db.dbname === selectedDatabase && !selectedDatabaseSubItem ? 'bg-bk-yellow/5 text-amber-600 dark:text-bk-yellow border-bk-yellow/40 dark:border-bk-yellow/20' : 'bg-white/40 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:border-bk-yellow/30 hover:text-amber-600 dark:hover:text-bk-yellow'}`}
+              onClick={() => {
+                dispatch(setSelectedDatabase(db.dbname));
+                dispatch(setSelectedDatabaseSubItem(null));
+              }}
               onDoubleClick={() => dispatch(setActiveMainTab('db:' + db.dbname))}
               onContextMenu={(e) => onContextMenu(e, db.dbname, isActive)}
             >
-              <span className={`material-symbols-outlined text-[16px] group-open:rotate-90 transition-transform ${db.dbname === selectedDatabase ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500'}`} style={{ fontVariationSettings: "'wght' 300" }}>chevron_right</span>
-              <span className={`material-symbols-outlined text-[16px] ${db.dbname === selectedDatabase ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500'}`} style={{ fontVariationSettings: "'wght' 300" }}>
+              <span className={`material-symbols-outlined text-[16px] group-open:rotate-90 transition-transform ${db.dbname === selectedDatabase && !selectedDatabaseSubItem ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500'}`} style={{ fontVariationSettings: "'wght' 300" }}>chevron_right</span>
+              <span className={`material-symbols-outlined text-[16px] ${db.dbname === selectedDatabase && !selectedDatabaseSubItem ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500'}`} style={{ fontVariationSettings: "'wght' 300" }}>
                 database
               </span>
-              <span className={`text-[11.5px] font-medium transition-colors flex-1 ${db.dbname === selectedDatabase ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-700 dark:text-slate-200 group-hover/sum:text-amber-600 dark:group-hover/sum:text-bk-yellow'}`}>{db.dbname}</span>
+              <span className={`text-[11.5px] font-medium transition-colors flex-1 ${db.dbname === selectedDatabase && !selectedDatabaseSubItem ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-700 dark:text-slate-200 group-hover/sum:text-amber-600 dark:group-hover/sum:text-bk-yellow'}`}>{db.dbname}</span>
+              {db.dbname === selectedDatabase && !selectedDatabaseSubItem && (
+                <div className="absolute left-[-1px] top-0 bottom-0 w-[2px] bg-amber-600 dark:bg-bk-yellow rounded-full"></div>
+              )}
 
               {isActive ? (
                 <span className="inline-flex items-center gap-1.5 px-2 py-0.5 text-[9px] font-medium bg-emerald-50 text-emerald-600 border border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-500/20 rounded-full tracking-tighter">
@@ -129,8 +135,8 @@ export default function DatabaseTree({
                       }}
                     >
                       <summary 
-                        className={`flex items-center gap-2 px-3.5 py-1.5 w-full text-left transition-all group/item cursor-pointer list-none rounded-r-md relative select-none border-y border-r border-l-transparent
-                          ${isItemSelected ? 'text-amber-600 dark:text-bk-yellow bg-bk-yellow/10 dark:bg-bk-yellow/5 border-bk-yellow/20 dark:border-bk-yellow/10' : 'text-slate-700 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow border-transparent'}`}
+                        className={`flex items-center gap-2 px-3.5 py-1.5 w-full text-left transition-all group/item cursor-pointer list-none rounded-r-md relative select-none border border-transparent
+                          ${isItemSelected ? 'text-amber-600 dark:text-bk-yellow font-medium' : 'text-slate-700 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow'}`}
                         onClick={() => {
                           dispatch(setSelectedDatabase(db.dbname));
                           dispatch(setSelectedDatabaseSubItem(item.id));
@@ -188,7 +194,7 @@ export default function DatabaseTree({
                                 >
                                   <summary
                                     className={`flex items-center gap-3 px-4 py-1.5 w-full text-left transition-all duration-200 group/child relative rounded-r-md select-none border border-transparent cursor-pointer list-none
-                                      ${isChildSelected ? 'text-amber-600 dark:text-bk-yellow bg-bk-yellow/10 dark:bg-bk-yellow/5 font-medium border-bk-yellow/20 dark:border-bk-yellow/10' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow'}`}
+                                      ${isChildSelected ? 'text-amber-600 dark:text-bk-yellow font-medium' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow'}`}
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       dispatch(setSelectedDatabase(db.dbname));
@@ -222,7 +228,7 @@ export default function DatabaseTree({
                                           <button
                                             key={planId}
                                             className={`flex items-center gap-3 px-4 py-1.5 w-full text-left transition-all duration-200 group/plan relative rounded-r-md select-none border border-transparent
-                                              ${isPlanSelected ? 'text-amber-600 dark:text-bk-yellow bg-bk-yellow/10 dark:bg-bk-yellow/5 font-medium border-bk-yellow/20 dark:border-bk-yellow/10' : 'text-slate-500 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow'}`}
+                                              ${isPlanSelected ? 'text-amber-600 dark:text-bk-yellow bg-bk-yellow/5 dark:bg-bk-yellow/5 font-medium' : 'text-slate-500 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow'}`}
                                             onClick={(e) => {
                                               e.stopPropagation();
                                               dispatch(setSelectedDatabase(db.dbname));
@@ -260,7 +266,7 @@ export default function DatabaseTree({
                                 >
                                   <summary
                                     className={`flex items-center gap-3 px-4 py-1.5 w-full text-left transition-all duration-200 group/child relative rounded-r-md select-none border border-transparent cursor-pointer list-none
-                                      ${isChildSelected ? 'text-amber-600 dark:text-bk-yellow bg-bk-yellow/10 dark:bg-bk-yellow/5 font-medium border-bk-yellow/20 dark:border-bk-yellow/10' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow'}`}
+                                      ${isChildSelected ? 'text-amber-600 dark:text-bk-yellow font-medium' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow'}`}
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       dispatch(setSelectedDatabase(db.dbname));
@@ -294,7 +300,7 @@ export default function DatabaseTree({
                                           <button
                                             key={qId}
                                             className={`flex items-center gap-3 px-4 py-1.5 w-full text-left transition-all duration-200 group/plan relative rounded-r-md select-none border border-transparent
-                                              ${isQSelected ? 'text-amber-600 dark:text-bk-yellow bg-bk-yellow/10 dark:bg-bk-yellow/5 font-medium border-bk-yellow/20 dark:border-bk-yellow/10' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow'}`}
+                                              ${isQSelected ? 'text-amber-600 dark:text-bk-yellow bg-bk-yellow/5 dark:bg-bk-yellow/5 font-medium' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow'}`}
                                             onClick={(e) => {
                                               e.stopPropagation();
                                               dispatch(setSelectedDatabase(db.dbname));
@@ -322,7 +328,7 @@ export default function DatabaseTree({
                               <button
                                 key={child.id}
                                 className={`flex items-center gap-3 px-4 py-1.5 w-full text-left transition-all duration-200 group/child relative rounded-r-md select-none border border-transparent
-                                  ${isChildSelected ? 'text-amber-600 dark:text-bk-yellow bg-bk-yellow/10 dark:bg-bk-yellow/5 font-medium border-bk-yellow/20 dark:border-bk-yellow/10' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow'}`}
+                                  ${isChildSelected ? 'text-amber-600 dark:text-bk-yellow bg-bk-yellow/5 dark:bg-bk-yellow/5 font-medium' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow'}`}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   dispatch(setSelectedDatabase(db.dbname));
@@ -356,13 +362,13 @@ export default function DatabaseTree({
                 }
 
                 return (
-                  <button
-                    key={item.id}
-                    className={`flex items-center gap-3 px-3.5 py-1.5 w-full text-left transition-all group/item relative rounded-r-md select-none
-                      ${isItemSelected 
-                        ? 'text-amber-600 dark:text-bk-yellow font-medium bg-bk-yellow/10 dark:bg-bk-yellow/5' 
-                        : 'text-slate-700 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow'}`}
-                    onClick={(e) => {
+                    <button
+                      key={item.id}
+                      className={`flex items-center gap-3 px-3.5 py-1.5 w-full text-left transition-all group/item relative rounded-r-md select-none border border-transparent
+                        ${isItemSelected 
+                          ? 'text-amber-600 dark:text-bk-yellow bg-bk-yellow/5 dark:bg-bk-yellow/5 font-medium' 
+                          : 'text-slate-700 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow'}`}
+                      onClick={(e) => {
                       e.stopPropagation();
                       dispatch(setSelectedDatabase(db.dbname));
                       dispatch(setSelectedDatabaseSubItem(item.id));

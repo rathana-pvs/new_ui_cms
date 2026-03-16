@@ -58,7 +58,7 @@ const ClassSelect = ({ value, userClasses, systemClasses, onChange, disabled, is
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           {isLoading && <div className="w-3 h-3 border-2 border-bk-yellow/30 border-t-bk-yellow rounded-full animate-spin"></div>}
-          <span className={`material-symbols-outlined text-lg transition-transform duration-300 ${isOpen ? 'rotate-180 text-bk-yellow' : 'text-slate-400'}`}>
+          <span className={`material-symbols-outlined text-lg transition-transform duration-200 ${isOpen ? 'rotate-180 text-bk-yellow' : 'text-slate-400'}`}>
             expand_more
           </span>
         </div>
@@ -270,8 +270,8 @@ export default function OptimizeDatabaseModal() {
   const totalTables = classesData.userclass.length + classesData.systemclass.length;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-300 font-sans text-left">
-      <div className="bg-white dark:bg-bk-side w-full max-w-[440px] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col relative text-left">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans text-left">
+      <div className="bg-white dark:bg-bk-side w-full max-w-[440px] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col relative text-left">
         
         {/* Subtle Top Accent */}
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-bk-yellow/60"></div>

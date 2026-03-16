@@ -9,8 +9,8 @@ export default function AboutModal() {
   if (!isAboutCubridOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="bg-white dark:bg-bk-side w-full max-w-[420px] rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-slate-200 dark:border-white/10 overflow-hidden animate-in zoom-in-95 duration-300">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-white dark:bg-bk-side w-full max-w-[420px] rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-slate-200 dark:border-white/10 overflow-hidden animate-in zoom-in-95 duration-200">
         
         {/* Decorative Header */}
         <div className="h-24 bg-gradient-to-r from-bk-main to-slate-900 relative flex items-center justify-center overflow-hidden">

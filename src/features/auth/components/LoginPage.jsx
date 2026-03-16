@@ -121,14 +121,14 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-5">
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Username</label>
+                <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-wider ml-1">Username</label>
                 <div className="relative group">
                   <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[20px] text-slate-400 group-focus-within:text-bk-yellow transition-colors">account_circle</span>
                   <input
                     type="text"
                     value={username}
                     onChange={(e) => { setUsername(e.target.value); if (errors.username) setErrors({ ...errors, username: '' }); }}
-                    className={`w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-bk-side border-2 ${errors.username ? 'border-rose-500' : 'border-transparent group-focus-within:border-bk-yellow/50'} rounded-2xl outline-none shadow-sm transition-all dark:text-white placeholder:text-slate-400 text-sm`}
+                    className={`w-full pl-12 pr-4 py-4 bg-white dark:bg-bk-side border-2 ${errors.username ? 'border-rose-500' : 'border-slate-100 dark:border-transparent group-focus-within:border-bk-yellow/50'} rounded-2xl outline-none shadow-sm transition-all dark:text-white placeholder:text-slate-400 text-sm`}
                     placeholder="Enter username"
                   />
                 </div>
@@ -137,8 +137,8 @@ export default function LoginPage() {
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between px-1">
-                  <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-none">Password</label>
-                  <Link to="/forgot-password" size="sm" className="text-[10px] font-bold text-bk-yellow hover:text-bk-yellow/80 transition-colors uppercase tracking-widest">Forgot?</Link>
+                  <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-wider leading-none">Password</label>
+                  <Link to="/forgot-password" size="sm" className="text-[10px] font-bold text-bk-yellow hover:text-bk-yellow/80 transition-colors tracking-widest">Forgot?</Link>
                 </div>
                 <div className="relative group">
                   <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[20px] text-slate-400 group-focus-within:text-bk-yellow transition-colors">lock_open</span>
@@ -146,7 +146,7 @@ export default function LoginPage() {
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => { setPassword(e.target.value); if (errors.password) setErrors({ ...errors, password: '' }); }}
-                    className={`w-full pl-12 pr-12 py-4 bg-slate-50 dark:bg-bk-side border-2 ${errors.password ? 'border-rose-500' : 'border-transparent group-focus-within:border-bk-yellow/50'} rounded-2xl outline-none shadow-sm transition-all dark:text-white text-sm`}
+                    className={`w-full pl-12 pr-12 py-4 bg-white dark:bg-bk-side border-2 ${errors.password ? 'border-rose-500' : 'border-slate-100 dark:border-transparent group-focus-within:border-bk-yellow/50'} rounded-2xl outline-none shadow-sm transition-all dark:text-white text-sm`}
                     placeholder="••••••••"
                   />
                   <button
@@ -166,7 +166,7 @@ export default function LoginPage() {
               <div onClick={() => document.getElementById('remember').click()} className="w-5 h-5 rounded-md border-2 border-slate-200 dark:border-white/10 peer-checked:bg-bk-yellow peer-checked:border-bk-yellow flex items-center justify-center transition-all bg-white dark:bg-bk-side">
                 <span className="material-symbols-outlined text-bk-side text-[14px] font-bold opacity-0 peer-checked:opacity-100 transition-opacity">check</span>
               </div>
-              <label htmlFor="remember" className="text-xs font-bold text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors cursor-pointer uppercase tracking-widest">Remember device</label>
+              <label htmlFor="remember" className="text-xs font-bold text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors cursor-pointer tracking-wide">Remember device</label>
             </div>
 
             {apiError && (
@@ -185,7 +185,7 @@ export default function LoginPage() {
                 <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
               ) : (
                 <>
-                  <span className="uppercase tracking-widest text-xs">Authorize Access</span>
+                  <span className="tracking-widest text-xs">Authorize Access</span>
                   <span className="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">login</span>
                 </>
               )}
@@ -201,7 +201,7 @@ export default function LoginPage() {
         </div>
 
         {/* Legal links */}
-        <div className="absolute bottom-12 flex items-center gap-8 opacity-40 hover:opacity-100 transition-opacity duration-500">
+        <div className="absolute bottom-12 flex items-center gap-8 opacity-40 hover:opacity-100 transition-opacity duration-300">
            <img src="/cubrid-logo.png" alt="CUBRID logo" className="h-5 object-contain dark:brightness-0 dark:invert" />
            <div className="flex gap-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
               <a href="#" className="hover:text-bk-yellow transition-colors">Terms</a>

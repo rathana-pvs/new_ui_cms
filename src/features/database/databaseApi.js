@@ -90,4 +90,22 @@ export const databaseApi = {
   getQueryPlanLog: (hostUid) => {
     return apiClient.post(`/${hostUid}/database/auto-exec-query-err-log`, {});
   },
+  getStatDump: (hostUid, dbname) => {
+    return apiClient.get(`/${hostUid}/cms-config/stat-dump/${encodeURIComponent(dbname)}`);
+  },
+  getParamDump: (hostUid, dbname, both = 'n') => {
+    return apiClient.get(`/${hostUid}/cms-config/param-dump/${encodeURIComponent(dbname)}?both=${both}`);
+  },
+  getPlanDump: (hostUid, dbname, plandrop = 'n') => {
+    return apiClient.get(`/${hostUid}/cms-config/plan-dump/${encodeURIComponent(dbname)}?plandrop=${plandrop}`);
+  },
+  getAutoVolumeConfig: (hostUid, dbname) => {
+    return apiClient.get(`/${hostUid}/database/auto-add-vol/${encodeURIComponent(dbname)}`);
+  },
+  setAutoVolumeConfig: (hostUid, dbname, payload) => {
+    return apiClient.post(`/${hostUid}/database/auto-add-vol/${encodeURIComponent(dbname)}`, payload);
+  },
+  getAutoVolumeLog: (hostUid) => {
+    return apiClient.post(`/${hostUid}/database/auto-add-vol-log`, {});
+  },
 };
