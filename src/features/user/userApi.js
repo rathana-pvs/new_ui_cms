@@ -8,7 +8,7 @@ export const userApi = {
     return apiClient.put('/user/preferences', preferences);
   },
   getDatabaseUsers: (hostUid, dbname) => {
-    return apiClient.get(`/${hostUid}/database/users/${dbname}`);
+    return apiClient.get(`/${hostUid}/database/users/info/${dbname}`);
   },
   createDatabaseUser: (hostUid, dbname, payload) => {
     return apiClient.post(`/${hostUid}/database/users/${dbname}`, payload);

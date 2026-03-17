@@ -28,4 +28,10 @@ export const brokerApi = {
   getDatabaseLogs: (hostUid, dbname) => {
     return apiClient.get(`/${hostUid}/log/database/${dbname}`);
   },
+  getBrokerConfig: (hostUid, confname = 'brokerconf') => {
+    return apiClient.get(`/${hostUid}/cms-config/all-sys-param`, { params: { confname } });
+  },
+  updateBrokerConfig: (hostUid, confname, confdata) => {
+    return apiClient.post(`/${hostUid}/cms-config/set-sys-param`, { confname, confdata });
+  },
 };

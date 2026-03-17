@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { closeBackupDatabaseModal } from '../databaseSlice';
 import LoadingOverlay from '../../../components/common/LoadingOverlay';
 import ErrorOverlay from '../../../components/common/ErrorOverlay';
+import SelectField from '../../../components/common/SelectField';
 
 export default function BackupDatabaseModal() {
   const dispatch = useDispatch();
@@ -127,16 +128,15 @@ export default function BackupDatabaseModal() {
               <div className="space-y-1.5">
                 <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">Backup level</label>
                 <div className="relative">
-                  <select
+                  <SelectField
                     value={formData.backupLevel}
-                    onChange={(e) => handleInputChange('backupLevel', e.target.value)}
-                    className="w-full h-9 px-3 pr-8 bg-slate-50 dark:bg-bk-main/30 border border-slate-200 dark:border-slate-800 rounded focus:outline-none focus:border-bk-yellow/50 text-[12px] text-slate-900 dark:text-slate-100 font-medium appearance-none transition-all"
-                  >
-                    <option value="level 0">Level 0 (Full)</option>
-                    <option value="level 1">Level 1 (Incremental)</option>
-                    <option value="level 2">Level 2 (Differential)</option>
-                  </select>
-                  <span className="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-lg">expand_more</span>
+                    onChange={(val) => handleInputChange('backupLevel', val)}
+                    options={[
+                      { value: 'level 0', label: 'Level 0 (Full)' },
+                      { value: 'level 1', label: 'Level 1 (Incremental)' },
+                      { value: 'level 2', label: 'Level 2 (Differential)' }
+                    ]}
+                  />
                 </div>
               </div>
             </div>

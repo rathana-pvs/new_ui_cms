@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { createDatabaseUser, updateDatabaseUser, fetchDatabaseUsers } from '../userSlice';
+import { createDatabaseUser, updateDatabaseUser, fetchDatabaseUsers, clearUserError } from '../userSlice';
 import { fetchDatabaseClasses } from '../../database/databaseSlice';
+import LoadingOverlay from '../../../components/common/LoadingOverlay';
+import ErrorOverlay from '../../../components/common/ErrorOverlay';
 
 const PERM_MAPPING = {
   'Select': 1,
@@ -41,9 +43,9 @@ export default function CreateUserModal({ isOpen, onClose, dbname, editingUser }
   const dispatch = useDispatch();
   const isEditMode = !!editingUser;
   const { selectedHostUid } = useSelector((state) => state.host);
-  const databaseUsers = useSelector((state) => state.user.databaseUsers[dbname] || []);
-  const loading = useSelector((state) => state.user.databaseUsersLoading[dbname]);
-  
+  const { databaseUsers: allUsers, databaseUsersLoading, error: userError, actionLoading } = useSelector((state) => state.user);
+  const databaseUsers = allUsers[dbname] || [];
+  const loading = databaseUsersLoading[dbname];
   const { databaseClasses, databaseClassesLoading, activeDatabases } = useSelector((state) => state.database);
   const currentDbClasses = databaseClasses[dbname];
   const isClassesLoading = databaseClassesLoading[dbname];
@@ -236,6 +238,15 @@ export default function CreateUserModal({ isOpen, onClose, dbname, editingUser }
     setObjectAuths(prev => ({ ...prev, [objId]: allFalse }));
   };
 
+  const handleClearError = () => {
+    dispatch(clearUserError());
+  };
+
+  const handleClose = () => {
+    handleClearError();
+    onClose();
+  };
+
   const handleSave = () => {
     if (!formData.name) return;
 
@@ -300,6 +311,19 @@ export default function CreateUserModal({ isOpen, onClose, dbname, editingUser }
         {/* Subtle Top Accent */}
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-bk-yellow/60"></div>
 
+        <LoadingOverlay 
+          isVisible={actionLoading} 
+          title={isEditMode ? "Updating user" : "Creating user"} 
+          subtitle="Processing security protocols..." 
+        />
+        
+        <ErrorOverlay 
+          isVisible={!!userError} 
+          error={userError} 
+          onRetry={handleSave}
+          onClose={handleClearError}
+        />
+
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
           <div className="flex items-center gap-2.5">
@@ -316,7 +340,7 @@ export default function CreateUserModal({ isOpen, onClose, dbname, editingUser }
             </div>
           </div>
           <button 
-            onClick={onClose}
+            onClick={handleClose}
             className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
           >
             <span className="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform">close</span>
@@ -746,16 +770,23 @@ export default function CreateUserModal({ isOpen, onClose, dbname, editingUser }
         <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 backdrop-blur-sm flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
           <button 
             className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-all"
-            onClick={onClose}
+            onClick={handleClose}
           >
             Discard
           </button>
           <button 
-            className="px-8 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center gap-2 min-w-[120px]"
+            disabled={actionLoading}
+            className="px-8 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center gap-2 min-w-[120px] disabled:opacity-50"
             onClick={handleSave}
           >
-            <span className="material-symbols-outlined text-[16px]">check_circle</span>
-            <span>{isEditMode ? 'Update Account' : 'Create Account'}</span>
+            {actionLoading ? (
+              <div className="w-4 h-4 border-2 border-bk-side/30 border-t-bk-side rounded-full animate-spin"></div>
+            ) : (
+              <>
+                <span className="material-symbols-outlined text-[16px]">check_circle</span>
+                <span>{isEditMode ? 'Update Account' : 'Create Account'}</span>
+              </>
+            )}
           </button>
         </div>
       </div>

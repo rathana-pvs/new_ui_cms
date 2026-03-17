@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { closeKillTransactionModal } from '../databaseSlice';
 import { databaseApi } from '../databaseApi';
 import LoadingOverlay from '../../../components/common/LoadingOverlay';
+import SelectField from '../../../components/common/SelectField';
 
 export default function KillTransactionModal({ onTransactionKilled }) {
   const dispatch = useDispatch();
@@ -123,16 +124,16 @@ export default function KillTransactionModal({ onTransactionKilled }) {
             </div>
 
             <div className="relative">
-              <select
+              <SelectField
                 value={killType}
-                onChange={(e) => setKillType(e.target.value)}
-                className="w-full h-10 px-3 pr-10 bg-slate-50 dark:bg-bk-main/30 border border-slate-200 dark:border-slate-800 rounded focus:outline-none focus:border-rose-500/50 text-[12px] text-slate-900 dark:text-slate-100 font-medium appearance-none transition-all cursor-pointer shadow-sm"
-              >
-                <option value="i">Kill only the selected transaction handle</option>
-                <option value="h">Kill all transactions from this client host</option>
-                <option value="p">Kill all transactions from this program name</option>
-              </select>
-              <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xl">expand_more</span>
+                onChange={(val) => setKillType(val)}
+                options={[
+                  { value: 'i', label: 'Kill only the selected transaction handle' },
+                  { value: 'h', label: 'Kill all transactions from this client host' },
+                  { value: 'p', label: 'Kill all transactions from this program name' }
+                ]}
+                triggerClassName="focus:border-rose-500/50"
+              />
             </div>
             <p className="px-1 text-[10px] text-slate-400 italic">This action will immediately abort the database connection and roll back any uncommitted changes.</p>
           </div>

@@ -1,3 +1,5 @@
+import SelectField from '../../../../components/common/SelectField';
+
 export default function LoadSourceSection({ 
   radio, 
   setRadio, 
@@ -36,16 +38,13 @@ export default function LoadSourceSection({
 
           <div className={`space-y-3 transition-all ${radio !== 0 ? 'opacity-30 grayscale pointer-events-none' : ''}`}>
             <div className="relative pl-7">
-              <select 
-                  value={selectedUnload}
-                  onChange={(e) => handleUnloadSelectChange(e.target.value)}
-                  className="w-full h-9 px-3 pr-8 bg-slate-50 dark:bg-bk-main/30 border border-slate-200 dark:border-slate-800 rounded focus:outline-none focus:border-bk-yellow/50 text-[12px] text-slate-900 dark:text-slate-100 font-medium appearance-none transition-all"
-              >
-                  {unloadList.map(db => (
-                      <option key={db.dbname} value={db.dbname}>{db.dbname}</option>
-                  ))}
-              </select>
-              <span className="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-lg">expand_more</span>
+              <SelectField
+                value={selectedUnload}
+                onChange={(val) => handleUnloadSelectChange(val)}
+                disabled={radio !== 0}
+                placeholder="Select database source"
+                options={unloadList.map(db => ({ value: db.dbname, label: db.dbname }))}
+              />
             </div>
 
             <div className="border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden bg-slate-50/20 dark:bg-bk-main/30 ml-7">

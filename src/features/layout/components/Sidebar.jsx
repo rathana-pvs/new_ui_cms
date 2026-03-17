@@ -48,7 +48,8 @@ import {
   fetchBrokerList,
   startBroker,
   stopBroker,
-  setSelectedBroker
+  setSelectedBroker,
+  openBrokerPropertyModal
 } from '../../broker/brokerSlice';
 import { setActiveMainTab, openTab, closeHostTabs, showStatusModal } from '../layoutSlice';
 import { fetchDatabaseUsers, openCreateUserModal, openEditUserModal, openDropUserModal } from '../../user/userSlice';
@@ -83,12 +84,13 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
   const [dbRootContextMenu, setDbRootContextMenu] = useState(null);
   const [spaceContextMenu, setSpaceContextMenu] = useState(null);
   const [queryPlanContextMenu, setQueryPlanContextMenu] = useState(null);
+  const [brokerRootContextMenu, setBrokerRootContextMenu] = useState(null);
 
   const [backupItemContextMenu, setBackupItemContextMenu] = useState(null);
 
   const dispatch = useDispatch();
   const { hosts, selectedHostUid, loading: hostsLoading, authorizedHosts, isLoggingIntoHost, hostAuthErrors } = useSelector((state) => state.host);
-  const { databases, actionLoading: dbActionLoading } = useSelector((state) => state.database);
+  const { databases, activeDatabases, actionLoading: dbActionLoading } = useSelector((state) => state.database);
   const { actionLoading: brokerActionLoading } = useSelector((state) => state.broker);
 
   useEffect(() => {
@@ -105,6 +107,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
     setDbRootContextMenu(null);
     setSpaceContextMenu(null);
     setQueryPlanContextMenu(null);
+    setBrokerRootContextMenu(null);
 
     setBackupItemContextMenu(null);
   }, []);
@@ -189,6 +192,13 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
     e.stopPropagation();
     closeAllContextMenus();
     setQueryPlanContextMenu({ mouseX: e.clientX, mouseY: e.clientY, db: dbName });
+  };
+
+  const handleBrokerRootContextMenu = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    closeAllContextMenus();
+    setBrokerRootContextMenu({ mouseX: e.clientX, mouseY: e.clientY });
   };
 
 
@@ -321,7 +331,12 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
           <div className="flex-1 flex flex-col overflow-hidden mt-1" id="tree-section-container">
             {selectedHostUid ? (
               <>
-                <TreeTabHeader activeTab={activeTab} setActiveTab={setActiveTab} />
+                <TreeTabHeader 
+                  activeTab={activeTab} 
+                  setActiveTab={setActiveTab} 
+                  onDbTabContextMenu={handleDbRootContextMenu} 
+                  onBrokerTabContextMenu={handleBrokerRootContextMenu}
+                />
 
                 <div className="flex-1 overflow-y-auto px-4 pb-4 relative min-h-[200px]">
                   {/* States Overlay */}
@@ -516,7 +531,143 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
           <div className="px-4 py-2 text-[11px] font-medium text-slate-400 border-b border-slate-100 dark:border-white/5 mb-1">
             Databases
           </div>
+          <MenuItem
+            icon="play_circle"
+            iconColor="text-emerald-500"
+            label="Start All Databases"
+            onClick={() => {
+              databases.forEach(db => {
+                if (!activeDatabases.includes(db.dbname)) {
+                  dispatch(startDatabase({ hostUid: selectedHostUid, dbname: db.dbname }));
+                }
+              });
+              setDbRootContextMenu(null);
+            }}
+          />
+          <MenuItem
+            icon="stop_circle"
+            iconColor="text-rose-500"
+            label="Stop All Databases"
+            onClick={() => {
+              activeDatabases.forEach(dbname => {
+                dispatch(stopDatabase({ hostUid: selectedHostUid, dbname }));
+              });
+              setDbRootContextMenu(null);
+            }}
+          />
+          <MenuItem
+            icon="restart_alt"
+            iconColor="text-amber-500"
+            label="Restart All Databases"
+            onClick={async () => {
+              const currentActive = [...activeDatabases];
+              for (const dbname of currentActive) {
+                await dispatch(stopDatabase({ hostUid: selectedHostUid, dbname })).unwrap();
+              }
+              for (const dbname of currentActive) {
+                await dispatch(startDatabase({ hostUid: selectedHostUid, dbname })).unwrap();
+              }
+              setDbRootContextMenu(null);
+            }}
+          />
+          <MenuDivider />
+          <MenuItem
+            icon="add_circle"
+            iconColor="text-emerald-500"
+            label="Create Database"
+            onClick={() => {
+              dispatch(openCreateDatabaseModal());
+              setDbRootContextMenu(null);
+            }}
+          />
+          <MenuItem
+            icon="refresh"
+            label="Refresh"
+            onClick={() => {
+              dispatch(fetchDatabaseStartInfo(selectedHostUid));
+              setDbRootContextMenu(null);
+            }}
+          />
+          <MenuDivider />
           <MenuItem icon="tune" label="Properties" onClick={() => { dispatch(setSelectedDatabase(null)); dispatch(openDatabasePropertyModal()); setDbRootContextMenu(null); }} />
+        </ContextMenuWrapper>
+      )}
+
+      {brokerRootContextMenu && (
+        <ContextMenuWrapper x={brokerRootContextMenu.mouseX} y={brokerRootContextMenu.mouseY} onClose={() => setBrokerRootContextMenu(null)}>
+          <div className="px-4 py-2 text-[11px] font-medium text-slate-400 border-b border-slate-100 dark:border-white/5 mb-1">
+            Brokers
+          </div>
+          <MenuItem
+            icon="play_circle"
+            iconColor="text-emerald-500"
+            label="Start All Brokers"
+            onClick={() => {
+              brokers.forEach(broker => {
+                if (broker.state !== 'ON') {
+                  dispatch(startBroker({ hostUid: selectedHostUid, brokerName: broker.name }));
+                }
+              });
+              setBrokerRootContextMenu(null);
+            }}
+          />
+          <MenuItem
+            icon="stop_circle"
+            iconColor="text-rose-500"
+            label="Stop All Brokers"
+            onClick={() => {
+              brokers.forEach(broker => {
+                if (broker.state === 'ON') {
+                  dispatch(stopBroker({ hostUid: selectedHostUid, brokerName: broker.name }));
+                }
+              });
+              setBrokerRootContextMenu(null);
+            }}
+          />
+          <MenuItem
+            icon="restart_alt"
+            iconColor="text-amber-500"
+            label="Restart All Brokers"
+            onClick={async () => {
+              const currentActive = brokers.filter(b => b.state === 'ON').map(b => b.name);
+              for (const name of currentActive) {
+                await dispatch(stopBroker({ hostUid: selectedHostUid, brokerName: name })).unwrap();
+              }
+              for (const name of currentActive) {
+                await dispatch(startBroker({ hostUid: selectedHostUid, brokerName: name })).unwrap();
+              }
+              setBrokerRootContextMenu(null);
+            }}
+          />
+          <MenuDivider />
+          <MenuItem
+            icon="settings"
+            label="Edit Broker Config"
+            onClick={() => {
+              if (selectedHostUid) {
+                dispatch(openTab(`broker_config:${selectedHostUid}`));
+              }
+              setBrokerRootContextMenu(null);
+            }}
+          />
+          <MenuItem
+            icon="info"
+            label="Show Status"
+            onClick={() => {
+              if (selectedHostUid) {
+                dispatch(openTab(`brokers_status:${selectedHostUid}`));
+              }
+              setBrokerRootContextMenu(null);
+            }}
+          />
+          <MenuItem
+            icon="refresh"
+            label="Refresh"
+            onClick={() => {
+              dispatch(fetchBrokerList(selectedHostUid));
+              setBrokerRootContextMenu(null);
+            }}
+          />
         </ContextMenuWrapper>
       )}
 
@@ -560,7 +711,25 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
               }}
             />
           )}
-          <MenuDivider /><MenuItem icon="info" label="Status" /><MenuItem icon="tune" label="Properties" />
+          <MenuDivider />
+          <MenuItem 
+            icon="info" 
+            label="Show Status" 
+            onClick={() => {
+              if (selectedHostUid) {
+                dispatch(openTab(`broker_status:${selectedHostUid}:${brokerContextMenu.broker}`));
+              }
+              setBrokerContextMenu(null);
+            }} 
+          />
+          <MenuItem 
+            icon="tune" 
+            label="Properties" 
+            onClick={() => { 
+                dispatch(openBrokerPropertyModal({ hostUid: selectedHostUid, brokerName: brokerContextMenu.broker }));
+                setBrokerContextMenu(null); 
+            }} 
+          />
         </ContextMenuWrapper>
       )}
 

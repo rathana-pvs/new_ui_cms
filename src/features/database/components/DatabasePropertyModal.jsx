@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { closeDatabasePropertyModal } from '../databaseSlice';
 import { hostApi } from '../../host/hostApi';
 import { brokerApi } from '../../broker/brokerApi';
+import SelectField from '../../../components/common/SelectField';
 
 // Metadata for CUBRID Advanced Parameters based on d-cms ConfConstants.java
 const ADVANCED_PARAMS_SCHEMA = [
@@ -72,57 +73,20 @@ const GENERAL_PARAMS_SCHEMA = {
 
 const GENERAL_PARAMS_KEYS = Object.keys(GENERAL_PARAMS_SCHEMA);
 
-const CustomSelect = ({ value, options, onChange, disabled, width = 'w-[75px]' }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  return (
-    <div className={`relative ${width} h-8`}>
-      <button
-        type="button"
-        disabled={disabled}
-        onClick={() => setIsOpen(!isOpen)}
-        className={`w-full h-full flex items-center justify-between px-3 bg-slate-50 dark:bg-bk-main/30 border ${disabled ? 'border-slate-100 dark:border-slate-800/50 opacity-30 shadow-none' : 'border-slate-200 dark:border-slate-800 hover:border-bk-yellow/50'} rounded transition-all text-[10px] font-bold text-slate-700 dark:text-slate-200 outline-none select-none`}
-      >
-        <span className="truncate">{value}</span>
-        <span className={`material-symbols-outlined text-[14px] transition-transform duration-200 ${isOpen ? 'rotate-180 text-bk-yellow' : 'text-slate-400'}`}>expand_more</span>
-      </button>
-      {isOpen && !disabled && (
-        <>
-          <div className="fixed inset-0 z-[110]" onClick={() => setIsOpen(false)}></div>
-          <div className="absolute right-0 top-full mt-1 min-w-full bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded shadow-2xl z-[120] overflow-hidden animate-in fade-in zoom-in-95 duration-200 py-1">
-            {options.map((opt) => (
-              <button
-                type="button"
-                key={opt}
-                onClick={() => {
-                  onChange(opt);
-                  setIsOpen(false);
-                }}
-                className={`w-full px-4 py-2 text-left text-[10px] font-bold transition-colors whitespace-nowrap ${value === opt ? 'bg-bk-yellow/10 text-bk-yellow font-black' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5'}`}
-              >
-                {opt}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-    </div>
-  );
-};
-
 const InputField = ({ label, paramKey, disabled, value, defaultValue, onChange, labelWidth = 'w-[140px]' }) => {
   const isModified = value !== undefined && value !== null;
   const displayValue = isModified ? value : defaultValue;
   
   return (
     <div className="flex items-center gap-4 mb-2.5 last:mb-0">
-      <label className={`${labelWidth} text-[10px] font-bold text-slate-500 dark:text-slate-400 tracking-tight`}>{label}</label>
+      <label className={`${labelWidth} text-[10px] font-medium text-slate-500 dark:text-slate-400 tracking-tight`}>{label}</label>
       <div className="flex-1 relative group/field">
         <input
           type="text"
           value={displayValue || ''}
           onChange={onChange}
           disabled={disabled}
-          className={`w-full h-8 px-3 bg-slate-50 dark:bg-bk-main/30 border ${disabled ? 'border-slate-100 dark:border-slate-800/50 opacity-30 shadow-none' : 'border-slate-200 dark:border-slate-800'} rounded focus:outline-none focus:border-bk-yellow/50 text-[11px] transition-all font-medium ${isModified ? 'text-bk-yellow font-bold' : 'text-slate-400 italic'}`}
+          className={`w-full h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border ${disabled ? 'border-slate-100 dark:border-slate-800/50 opacity-30 shadow-none' : 'border-slate-200 dark:border-slate-800'} rounded focus:outline-none focus:border-bk-yellow/50 text-[11px] transition-all font-medium ${isModified ? 'text-bk-yellow' : 'text-slate-400 italic'}`}
         />
       </div>
     </div>
@@ -352,15 +316,15 @@ export default function DatabasePropertyModal() {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans">
-      <div className="bg-white dark:bg-bk-side w-full max-w-[850px] shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden rounded-xl animate-in zoom-in-95 duration-200 flex flex-col relative h-[680px]">
+      <div className="bg-white dark:bg-bk-side w-full max-w-[700px] shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden rounded-xl animate-in zoom-in-95 duration-200 flex flex-col relative h-[600px]">
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-bk-yellow/60"></div>
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
               <span className="material-symbols-outlined text-bk-yellow text-xl">tune</span>
             </div>
-            <h3 className="text-[12px] font-medium text-slate-900 dark:text-white leading-none tracking-wide uppercase">
-              {activeSidebar === 'Connection Information' ? `${selectedDatabase} Connection` : (selectedDatabase ? `${selectedDatabase} Properties` : 'Server Properties')}
+            <h3 className="text-[12px] font-medium text-slate-900 dark:text-slate-100 leading-none tracking-wide text-left">
+              {(activeSidebar === 'Connection Information' ? `${selectedDatabase} CONNECTION` : (selectedDatabase ? `${selectedDatabase} PROPERTIES` : 'SERVER PROPERTIES')).toUpperCase()}
             </h3>
           </div>
           <button onClick={() => dispatch(closeDatabasePropertyModal())} className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center">
@@ -370,23 +334,23 @@ export default function DatabasePropertyModal() {
 
         <div className="flex flex-1 overflow-hidden">
           {/* Sidebar */}
-          <div className="w-56 bg-slate-50/30 dark:bg-bk-main/20 border-r border-slate-100 dark:border-slate-800/50 flex flex-col py-3 overflow-y-auto">
+          <div className="w-48 bg-slate-50/30 dark:bg-bk-main/20 border-r border-slate-100 dark:border-slate-800/50 flex flex-col py-2 overflow-y-auto">
             {(selectedDatabase ? ['Connection Information', 'Server Parameter'] : ['Server Parameter']).map(id => (
-              <button key={id} onClick={() => setActiveSidebar(id)} className={`flex items-center gap-3 px-5 py-2.5 text-[11px] font-medium transition-all relative group ${activeSidebar === id ? 'text-bk-yellow bg-bk-yellow/5' : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5'}`}>
-                <span className={`material-symbols-outlined text-[18px] ${activeSidebar === id ? 'text-bk-yellow' : 'text-slate-400 opacity-60'}`}>{id === 'Connection Information' ? 'settings_ethernet' : 'hub'}</span>
+              <button key={id} onClick={() => setActiveSidebar(id)} className={`flex items-center gap-2.5 px-4 py-2 text-[10px] font-medium transition-all relative group ${activeSidebar === id ? 'text-bk-yellow bg-bk-yellow/5' : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 uppercase tracking-wide'}`}>
+                <span className={`material-symbols-outlined text-[16px] ${activeSidebar === id ? 'text-bk-yellow' : 'text-slate-400 opacity-60'}`}>{id === 'Connection Information' ? 'settings_ethernet' : 'hub'}</span>
                 <span className="tracking-tight">{id}</span>
-                {activeSidebar === id && <div className="absolute left-0 top-2 bottom-2 w-[2px] bg-bk-yellow rounded-r"></div>}
+                {activeSidebar === id && <div className="absolute left-0 top-1.5 bottom-1.5 w-[2px] bg-bk-yellow rounded-r"></div>}
               </button>
             ))}
           </div>
 
           <div className="flex-1 flex flex-col bg-white dark:bg-transparent overflow-hidden">
             {activeSidebar === 'Server Parameter' && (
-              <div className="px-6 flex border-b border-slate-100 dark:border-slate-800 bg-slate-50/20 dark:bg-bk-main/10 flex-shrink-0">
+              <div className="px-4 flex border-b border-slate-100 dark:border-slate-800 bg-slate-50/20 dark:bg-bk-main/10 flex-shrink-0">
                 {['General', 'Advanced'].map(tab => (
-                  <button key={tab} onClick={() => setActiveTab(tab)} className={`px-6 py-3 text-[11px] font-medium transition-all relative ${activeTab === tab ? 'text-bk-yellow' : 'text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
+                  <button key={tab} onClick={() => setActiveTab(tab)} className={`px-5 py-2.5 text-[10px] uppercase font-medium transition-all relative ${activeTab === tab ? 'text-bk-yellow' : 'text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
                     {tab}
-                    {activeTab === tab && <div className="absolute bottom-0 left-4 right-4 h-[2px] bg-bk-yellow rounded-t-full shadow-[0_-2px_8px_rgba(252,211,77,0.3)]"></div>}
+                    {activeTab === tab && <div className="absolute bottom-0 left-3 right-3 h-[1.5px] bg-bk-yellow rounded-t-full"></div>}
                   </button>
                 ))}
               </div>
@@ -403,21 +367,29 @@ export default function DatabasePropertyModal() {
                 <div key="connection-view" className="flex-1 flex flex-col gap-8 animate-in fade-in slide-in-from-right-2 duration-200">
                   <div className="space-y-6">
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">Connection Information</span>
+                      <span className="text-[10px] font-medium tracking-widest text-slate-500 uppercase">Connection Information</span>
                       <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800"></div>
                     </div>
                     <div className="px-1 space-y-4">
                       <InputField label="Broker IP:" value={connectionInfo.brokerIp} onChange={(e) => setConnectionInfo({ ...connectionInfo, brokerIp: e.target.value })} />
                       <div className="flex items-center gap-4">
-                        <label className="w-[140px] text-[10px] font-bold text-slate-500 dark:text-slate-400 tracking-tight">Broker Port:</label>
+                        <label className="w-[140px] text-[10px] font-medium text-slate-500 dark:text-slate-400 tracking-tight">Broker Port:</label>
                         <div className="flex-1">
-                          <CustomSelect width="w-full" value={connectionInfo.brokerPort} options={brokers.map(b => b.label)} onChange={(val) => setConnectionInfo({ ...connectionInfo, brokerPort: val })} />
+                          <SelectField 
+                            value={connectionInfo.brokerPort} 
+                            options={brokers.map(b => ({ value: b.label, label: b.label }))} 
+                            onChange={(val) => setConnectionInfo({ ...connectionInfo, brokerPort: val })} 
+                          />
                         </div>
                       </div>
                       <div className="flex items-center gap-4">
-                        <label className="w-[140px] text-[10px] font-bold text-slate-500 dark:text-slate-400 tracking-tight">Character set:</label>
+                        <label className="w-[140px] text-[10px] font-medium text-slate-500 dark:text-slate-400 tracking-tight">Character set:</label>
                         <div className="flex-1">
-                          <CustomSelect width="w-full" value={connectionInfo.charset} options={['UTF-8', 'EUC-KR', 'ISO-8859-1', 'UHC']} onChange={(val) => setConnectionInfo({ ...connectionInfo, charset: val })} />
+                          <SelectField 
+                            value={connectionInfo.charset} 
+                            options={['UTF-8', 'EUC-KR', 'ISO-8859-1', 'UHC'].map(o => ({ value: o, label: o }))} 
+                            onChange={(val) => setConnectionInfo({ ...connectionInfo, charset: val })} 
+                          />
                         </div>
                       </div>
                     </div>
@@ -452,7 +424,7 @@ export default function DatabasePropertyModal() {
                               value={hasPages ? params[pagesKey] : GENERAL_PARAMS_SCHEMA[pagesKey] || ''} 
                               onChange={(e) => setParams({ ...params, [pagesKey]: e.target.value })} 
                               disabled={bufferSettings[prefix] !== 'pages'} 
-                              className={`flex-1 h-8 px-3 bg-slate-50 dark:bg-bk-main/30 border border-slate-200 dark:border-slate-800 rounded text-[11px] focus:outline-none ${hasPages ? 'text-bk-yellow font-bold' : 'text-slate-400 italic'}`}
+                              className={`flex-1 h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border border-slate-200 dark:border-slate-800 rounded text-[11px] focus:outline-none ${hasPages ? 'text-bk-yellow font-medium' : 'text-slate-400 italic'}`}
                             />
                           </div>
                           <div className="flex items-center gap-3">
@@ -464,9 +436,15 @@ export default function DatabasePropertyModal() {
                                  value={hasSize ? params[sizeKey] : (GENERAL_PARAMS_SCHEMA[sizeKey] ? GENERAL_PARAMS_SCHEMA[sizeKey].replace(/[A-Z]/g, '') : '')} 
                                  onChange={(e) => setParams({ ...params, [sizeKey]: e.target.value })} 
                                  disabled={bufferSettings[prefix] !== 'size'} 
-                                 className={`flex-1 h-8 px-3 bg-slate-50 dark:bg-bk-main/30 border border-slate-200 dark:border-slate-800 rounded text-[11px] focus:outline-none ${hasSize ? 'text-bk-yellow font-bold' : 'text-slate-400 italic'}`}
+                                 className={`flex-1 h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border border-slate-200 dark:border-slate-800 rounded text-[12px] focus:outline-none ${hasSize ? 'text-slate-100 font-medium' : 'text-slate-400 italic'}`}
                                />
-                               <CustomSelect value={units[prefix]} options={['KB', 'MB', 'GB', 'TB']} onChange={(val) => setUnits(u => ({ ...u, [prefix]: val }))} disabled={bufferSettings[prefix] !== 'size'}/>
+                               <SelectField 
+                                 value={units[prefix]} 
+                                 options={['KB', 'MB', 'GB', 'TB'].map(o => ({ value: o, label: o }))} 
+                                 onChange={(val) => setUnits(u => ({ ...u, [prefix]: val }))} 
+                                 disabled={bufferSettings[prefix] !== 'size'}
+                                 className="w-[85px]"
+                               />
                             </div>
                           </div>
                         </div>
@@ -481,22 +459,37 @@ export default function DatabasePropertyModal() {
                         <InputField label="deadlock_interval" value={params.deadlock_detection_interval_in_secs} defaultValue={GENERAL_PARAMS_SCHEMA.deadlock_detection_interval_in_secs} onChange={(e) => setParams({ ...params, deadlock_detection_interval_in_secs: e.target.value })} />
                         <InputField label="checkpoint_interval" value={params.checkpoint_interval_in_mins} defaultValue={GENERAL_PARAMS_SCHEMA.checkpoint_interval_in_mins} onChange={(e) => setParams({ ...params, checkpoint_interval_in_mins: e.target.value })} />
                         <div className="flex items-center gap-4 py-1.5">
-                          <label className="w-[140px] text-[10px] font-bold text-slate-500 dark:text-slate-400 tracking-tight">isolation_level</label>
+                          <label className="w-[140px] text-[10px] font-medium text-slate-500 dark:text-slate-400 tracking-tight">isolation_level</label>
                           <div className="flex-1">
-                            <CustomSelect width="w-full" value={params.isolation_level || GENERAL_PARAMS_SCHEMA.isolation_level} options={['TRAN_SERIALIZABLE','TRAN_REP_CLASS_REP_INSTANCE','TRAN_REP_CLASS_COMMIT_INSTANCE','TRAN_REP_CLASS_UNCOMMIT_INSTANCE','TRAN_COMMIT_CLASS_COMMIT_INSTANCE','TRAN_COMMIT_CLASS_UNCOMMIT_INSTANCE']} onChange={(val) => setParams({ ...params, isolation_level: val })}/>
+                            <SelectField 
+                              value={params.isolation_level || GENERAL_PARAMS_SCHEMA.isolation_level} 
+                              options={['TRAN_SERIALIZABLE','TRAN_REP_CLASS_REP_INSTANCE','TRAN_REP_CLASS_COMMIT_INSTANCE','TRAN_REP_CLASS_UNCOMMIT_INSTANCE','TRAN_COMMIT_CLASS_COMMIT_INSTANCE','TRAN_COMMIT_CLASS_UNCOMMIT_INSTANCE'].map(o => ({ value: o, label: o }))} 
+                              onChange={(val) => setParams({ ...params, isolation_level: val })}
+                              isHighlight={params.isolation_level !== undefined}
+                            />
                           </div>
                         </div>
                         <InputField label="max_clients" value={params.max_clients} defaultValue={GENERAL_PARAMS_SCHEMA.max_clients} onChange={(e) => setParams({ ...params, max_clients: e.target.value })} />
                         <div className="flex items-center gap-4 py-1.5">
-                          <label className="w-[140px] text-[10px] font-bold text-slate-500 dark:text-slate-400 tracking-tight">auto_restart_server</label>
+                          <label className="w-[140px] text-[10px] font-medium text-slate-500 dark:text-slate-400 tracking-tight">auto_restart_server</label>
                           <div className="flex-1">
-                            <CustomSelect width="w-full" value={params.auto_restart_server || GENERAL_PARAMS_SCHEMA.auto_restart_server} options={['yes', 'no']} onChange={(val) => setParams({ ...params, auto_restart_server: val })}/>
+                            <SelectField 
+                              value={params.auto_restart_server || GENERAL_PARAMS_SCHEMA.auto_restart_server} 
+                              options={['yes', 'no'].map(o => ({ value: o, label: o }))} 
+                              onChange={(val) => setParams({ ...params, auto_restart_server: val })}
+                              isHighlight={params.auto_restart_server !== undefined}
+                            />
                           </div>
                         </div>
                         <div className="flex items-center gap-4 py-1.5">
-                          <label className="w-[140px] text-[10px] font-bold text-slate-500 dark:text-slate-400 tracking-tight">replication</label>
+                          <label className="w-[140px] text-[10px] font-medium text-slate-500 dark:text-slate-400 tracking-tight">replication</label>
                           <div className="flex-1">
-                            <CustomSelect width="w-full" value={params.replication || GENERAL_PARAMS_SCHEMA.replication} options={['yes', 'no']} onChange={(val) => setParams({ ...params, replication: val })}/>
+                            <SelectField 
+                              value={params.replication || GENERAL_PARAMS_SCHEMA.replication} 
+                              options={['yes', 'no'].map(o => ({ value: o, label: o }))} 
+                              onChange={(val) => setParams({ ...params, replication: val })}
+                              isHighlight={params.replication !== undefined}
+                            />
                           </div>
                         </div>
                         <InputField label="cubrid_port_id" value={params.cubrid_port_id} defaultValue={GENERAL_PARAMS_SCHEMA.cubrid_port_id} onChange={(e) => setParams({ ...params, cubrid_port_id: e.target.value })} />
@@ -506,17 +499,17 @@ export default function DatabasePropertyModal() {
               ) : (
                 <div key="advanced-view" className="flex-1 flex flex-col min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-200">
                   <div className="border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden bg-slate-50/20 dark:bg-bk-main/10 flex flex-col flex-1">
-                    <div className="sticky top-0 bg-slate-100 dark:bg-bk-main flex border-b border-slate-200 dark:border-slate-800 z-10">
-                      <div className="w-[240px] px-4 py-2.5 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Parameter Name</div>
-                      <div className="w-[80px] px-4 py-2.5 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider border-l border-slate-200 dark:border-slate-800 text-center">Target</div>
-                      <div className="w-[110px] px-4 py-2.5 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider border-l border-slate-200 dark:border-slate-800 text-center">Type</div>
-                      <div className="flex-1 px-4 py-2.5 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider border-l border-slate-200 dark:border-slate-800">Value</div>
+                    <div className="sticky top-0 bg-slate-100 dark:bg-bk-main flex border-b border-slate-200 dark:border-slate-800 z-10 uppercase">
+                      <div className="w-[200px] px-4 py-2.5 text-[9px] font-medium text-slate-500 dark:text-slate-400 tracking-wide">PARAMETER</div>
+                      <div className="w-[70px] px-4 py-2.5 text-[9px] font-medium text-slate-500 dark:text-slate-400 tracking-wide border-l border-slate-200 dark:border-slate-800 text-center">TARGET</div>
+                      <div className="w-[90px] px-4 py-2.5 text-[9px] font-medium text-slate-500 dark:text-slate-400 tracking-wide border-l border-slate-200 dark:border-slate-800 text-center">TYPE</div>
+                      <div className="flex-1 px-4 py-2.5 text-[9px] font-medium text-slate-500 dark:text-slate-400 tracking-wide border-l border-slate-200 dark:border-slate-800">VALUE</div>
                     </div>
                     <div className="flex-1 overflow-y-auto custom-scrollbar">
                       {advancedData.map((item, idx) => (
                         <div key={item.key} className={`flex border-b border-slate-100 dark:border-slate-800/50 hover:bg-slate-50/50 dark:hover:bg-white/5 transition-colors group ${idx % 2 === 0 ? 'bg-white/40 dark:bg-transparent' : ''}`}>
                           <div className="w-[240px] px-4 py-2 flex items-center shrink-0">
-                            <span className={`text-[11px] font-medium truncate ${item.isModified ? 'text-bk-yellow' : 'text-slate-700 dark:text-slate-300'}`}>{item.key}</span>
+                            <span className={`text-[12px] font-medium truncate ${item.isModified ? 'text-bk-yellow' : 'text-slate-700 dark:text-slate-100'}`}>{item.key}</span>
                           </div>
                           <div className="w-[80px] px-4 py-2 flex items-center shrink-0 border-l border-slate-100 dark:border-slate-800/30 justify-center">
                             <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-bk-side text-[9px] font-medium text-slate-500 dark:text-slate-400">{item.scope}</span>
@@ -526,9 +519,16 @@ export default function DatabasePropertyModal() {
                           </div>
                           <div className="flex-1 px-4 py-1.5 flex items-center border-l border-slate-100 dark:border-slate-800/30">
                             {item.type.includes('yes|no') || item.type.includes('on|off') ? (
-                              <CustomSelect width="w-full" value={item.currentValue} options={item.type.includes('on|off') && item.type.includes('yes|no') ? (item.type.includes('replica') ? ['on', 'off', 'yes', 'no', 'replica'] : ['on', 'off', 'yes', 'no']) : item.type.includes('on|off') ? ['on', 'off'] : ['yes', 'no']} onChange={(val) => setParams({ ...params, [item.key]: val })}/>
+                              <SelectField 
+                                value={item.currentValue} 
+                                options={(item.type.includes('on|off') && item.type.includes('yes|no') 
+                                  ? (item.type.includes('replica') ? ['on', 'off', 'yes', 'no', 'replica'] : ['on', 'off', 'yes', 'no']) 
+                                  : item.type.includes('on|off') ? ['on', 'off'] : ['yes', 'no']).map(o => ({ value: o, label: o }))} 
+                                onChange={(val) => setParams({ ...params, [item.key]: val })}
+                                isHighlight={true}
+                              />
                             ) : (
-                              <input type="text" value={item.currentValue} onChange={(e) => setParams({ ...params, [item.key]: e.target.value })} className={`w-full h-8 px-2 bg-transparent border border-transparent hover:border-slate-200 dark:hover:border-slate-800 focus:border-bk-yellow/40 focus:bg-white dark:focus:bg-bk-main/50 rounded text-[11px] transition-all outline-none ${item.isModified ? 'text-bk-yellow font-bold' : 'text-slate-500 dark:text-slate-400 italic'}`}/>
+                              <input type="text" value={item.currentValue} onChange={(e) => setParams({ ...params, [item.key]: e.target.value })} className={`w-full h-9 px-2 bg-transparent border border-transparent hover:border-slate-200 dark:hover:border-slate-800 focus:border-bk-yellow/40 focus:bg-white dark:focus:bg-bk-main/50 rounded text-[11px] transition-all outline-none ${item.isModified ? 'text-bk-yellow font-medium' : 'text-slate-500 dark:text-slate-400 italic'}`}/>
                             )}
                           </div>
                         </div>
@@ -542,10 +542,10 @@ export default function DatabasePropertyModal() {
         </div>
 
         <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 backdrop-blur-sm flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
-          <button onClick={() => dispatch(closeDatabasePropertyModal())} className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-all">Discard</button>
-          <button onClick={handleApply} className="px-8 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center gap-2 min-w-[140px]">
+          <button onClick={() => dispatch(closeDatabasePropertyModal())} className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-all uppercase">DISCARD</button>
+          <button onClick={handleApply} className="px-6 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center gap-2 min-w-[140px] uppercase">
              <span className="material-symbols-outlined text-[16px]">save</span>
-             <span>Apply changes</span>
+             <span>APPLY CHANGES</span>
           </button>
         </div>
       </div>

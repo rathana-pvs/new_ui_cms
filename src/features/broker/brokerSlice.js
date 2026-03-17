@@ -9,9 +9,6 @@ export const fetchBrokerList = createAsyncThunk(
     const hostUid = typeof arg === 'string' ? arg : arg.hostUid;
     try {
       const response = await brokerApi.getBrokerList(hostUid);
-      // Logic based on requested snippet:
-      // Response structure might be res.result or [ { broker: [...] } ]
-      // We'll adapt to both or follow the snippet's expectation of .result
       const brokerList = response.result || (Array.isArray(response) ? response[0]?.broker : []);
       
       if (!brokerList) return [];
@@ -45,7 +42,6 @@ export const fetchBrokerList = createAsyncThunk(
 
       const dataSource = responses.map((r) => {
         if (!r.success) return null;
-        // Correctly navigate the new response structure: statusRes.data.asinfo[0]
         const result = r.statusRes?.asinfo?.[0];
         if (!result) return r.b;
 
@@ -60,6 +56,18 @@ export const fetchBrokerList = createAsyncThunk(
       return dataSource;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || 'Failed to fetch broker list');
+    }
+  }
+);
+
+export const fetchDetailedBrokerStatus = createAsyncThunk(
+  'broker/fetchDetailedBrokerStatus',
+  async ({ hostUid, brokerName }, { rejectWithValue }) => {
+    try {
+      const response = await brokerApi.getBrokerStatus(hostUid, brokerName);
+      return { brokerName, data: response };
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || `Failed to fetch status for broker ${brokerName}`);
     }
   }
 );
@@ -95,7 +103,6 @@ export const fetchBrokerLogs = createAsyncThunk(
   async ({ hostUid, brokerName }, { rejectWithValue }) => {
     try {
       const response = await brokerApi.getBrokerLogs(hostUid, brokerName);
-      // Data path: response.logfileinfo[0].logfile
       const logs = response.logfileinfo?.[0]?.logfile || [];
       return { brokerName, logs };
     } catch (err) {
@@ -152,10 +159,36 @@ export const fetchDatabaseLogs = createAsyncThunk(
   }
 );
 
+export const fetchBrokerConfig = createAsyncThunk(
+  'broker/fetchBrokerConfig',
+  async ({ hostUid }, { rejectWithValue }) => {
+    try {
+      const response = await brokerApi.getBrokerConfig(hostUid);
+      return { hostUid, data: response };
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Failed to fetch broker configuration');
+    }
+  }
+);
+
+export const updateBrokerConfig = createAsyncThunk(
+  'broker/updateBrokerConfig',
+  async ({ hostUid, confdata }, { dispatch, rejectWithValue }) => {
+    try {
+      await brokerApi.updateBrokerConfig(hostUid, 'brokerconf', confdata);
+      dispatch(fetchBrokerConfig({ hostUid }));
+      return { success: true };
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Failed to update broker configuration');
+    }
+  }
+);
+
 const initialState = {
   brokers: [],
   selectedBroker: null,
   selectedBrokerSubItem: null,
+  detailedStatus: {}, // { brokerName: { data: {}, loading: false, error: null } }
   logsByBroker: {}, // { brokerName: [logs] }
   viewingLogs: {}, // { path: { data: {}, loading: false, error: null } }
   adminLogsByHost: {}, // { hostUid: [logs] }
@@ -167,6 +200,12 @@ const initialState = {
   cmsLogsLoading: false,
   dbLogsByDbName: {}, // { dbname: [logs] }
   dbLogsLoading: false,
+  brokerConfig: {}, // { hostUid: { data: {}, loading: false, error: null } }
+  propertyModal: {
+    isOpen: false,
+    brokerName: null,
+    hostUid: null
+  },
   error: null,
 };
 
@@ -179,6 +218,16 @@ const brokerSlice = createSlice({
     },
     setSelectedBrokerSubItem: (state, action) => {
       state.selectedBrokerSubItem = action.payload;
+    },
+    openBrokerPropertyModal: (state, action) => {
+      state.propertyModal = {
+        isOpen: true,
+        brokerName: action.payload.brokerName,
+        hostUid: action.payload.hostUid
+      };
+    },
+    closeBrokerPropertyModal: (state) => {
+      state.propertyModal.isOpen = false;
     }
   },
   extraReducers: (builder) => {
@@ -192,13 +241,9 @@ const brokerSlice = createSlice({
       .addCase(fetchBrokerList.fulfilled, (state, action) => {
         state.loading = false;
         const newBrokers = action.payload;
-        
-        // Referential stability check
         if (JSON.stringify(state.brokers) !== JSON.stringify(newBrokers)) {
           state.brokers = newBrokers;
         }
-        
-        // Ensure selected broker still exists
         const exists = state.brokers.find(b => b.name === state.selectedBroker);
         if (!exists) state.selectedBroker = null;
       })
@@ -206,6 +251,24 @@ const brokerSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
         state.brokers = [];
+      })
+      .addCase(fetchDetailedBrokerStatus.pending, (state, action) => {
+        const { brokerName } = action.meta.arg;
+        if (!state.detailedStatus[brokerName]) {
+          state.detailedStatus[brokerName] = { data: {}, loading: true, error: null };
+        }
+        state.detailedStatus[brokerName].loading = true;
+        state.detailedStatus[brokerName].error = null;
+      })
+      .addCase(fetchDetailedBrokerStatus.fulfilled, (state, action) => {
+        const { brokerName, data } = action.payload;
+        state.detailedStatus[brokerName].loading = false;
+        state.detailedStatus[brokerName].data = data;
+      })
+      .addCase(fetchDetailedBrokerStatus.rejected, (state, action) => {
+        const { brokerName } = action.meta.arg;
+        state.detailedStatus[brokerName].loading = false;
+        state.detailedStatus[brokerName].error = action.payload;
       })
       .addCase(startBroker.pending, (state) => {
         state.actionLoading = true;
@@ -280,10 +343,34 @@ const brokerSlice = createSlice({
       })
       .addCase(fetchDatabaseLogs.rejected, (state) => {
         state.dbLogsLoading = false;
+      })
+      .addCase(fetchBrokerConfig.pending, (state, action) => {
+        const { hostUid } = action.meta.arg;
+        if (!state.brokerConfig[hostUid]) {
+          state.brokerConfig[hostUid] = { data: {}, loading: true, error: null };
+        } else {
+          state.brokerConfig[hostUid].loading = true;
+          state.brokerConfig[hostUid].error = null;
+        }
+      })
+      .addCase(fetchBrokerConfig.fulfilled, (state, action) => {
+        const { hostUid, data } = action.payload;
+        state.brokerConfig[hostUid].loading = false;
+        state.brokerConfig[hostUid].data = data;
+      })
+      .addCase(fetchBrokerConfig.rejected, (state, action) => {
+        const { hostUid } = action.meta.arg;
+        state.brokerConfig[hostUid].loading = false;
+        state.brokerConfig[hostUid].error = action.payload;
       });
   },
 });
 
-export const { setSelectedBroker, setSelectedBrokerSubItem } = brokerSlice.actions;
+export const { 
+  setSelectedBroker, 
+  setSelectedBrokerSubItem, 
+  openBrokerPropertyModal, 
+  closeBrokerPropertyModal 
+} = brokerSlice.actions;
 
 export default brokerSlice.reducer;

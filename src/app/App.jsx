@@ -42,6 +42,10 @@ import StatusModal from '../components/common/StatusModal';
 import LoadingOverlay from '../components/common/LoadingOverlay';
 import LogViewer from '../features/broker/components/LogViewer';
 import CMSLogViewer from '../features/broker/components/CMSLogViewer';
+import BrokerStatus from '../features/broker/components/BrokerStatus';
+import BrokerPropertyModal from '../features/broker/components/BrokerPropertyModal';
+import Brokers from '../features/server/components/Brokers';
+
 import CreateUserModal from '../features/user/components/CreateUserModal';
 import DropUserModal from '../features/user/components/DropUserModal';
 import MonitoringProvider from '../features/layout/components/MonitoringProvider';
@@ -77,7 +81,12 @@ function DashboardLayout() {
       acc[tabId] = 'Manager Access';
     } else if (tabId.startsWith('cms-error:')) {
       acc[tabId] = 'Manager Error';
+    } else if (tabId.startsWith('broker_status:')) {
+      acc[tabId] = `Status: ${tabId.split(':')[2]}`;
+    } else if (tabId.startsWith('brokers_status:')) {
+      acc[tabId] = 'Brokers Status';
     }
+
     return acc;
   }, {});
 
@@ -150,6 +159,9 @@ function DashboardLayout() {
               const isLogViewer = tabId.startsWith('log:');
               const isCmsAccessLog = tabId.startsWith('cms-access:');
               const isCmsErrorLog = tabId.startsWith('cms-error:');
+              const isBrokerStatus = tabId.startsWith('broker_status:');
+              const isBrokersStatus = tabId.startsWith('brokers_status:');
+
 
               const resourceId = tabId.split(':')[1];
 
@@ -186,6 +198,18 @@ function DashboardLayout() {
                       type="error"
                     />
                   )}
+                  {isBrokerStatus && (
+                    <BrokerStatus
+                      hostUid={tabId.split(':')[1]}
+                      brokerName={tabId.split(':')[2]}
+                    />
+                  )}
+                  {isBrokersStatus && (
+                    <div className="flex-1 overflow-y-auto p-4 bg-slate-50 dark:bg-bk-main">
+                      <Brokers hostUid={tabId.split(':')[1]} />
+                    </div>
+                  )}
+
                 </div>
               );
             })
@@ -235,6 +259,7 @@ function DashboardLayout() {
         <DatabaseInfoModal />
         <DatabasePlanDumpModal />
         <RenameDatabaseModal />
+        <BrokerPropertyModal />
         <AddVolumeModal />
         <StatusModal />
 

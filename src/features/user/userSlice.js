@@ -30,7 +30,13 @@ export const fetchDatabaseUsers = createAsyncThunk(
   async ({ hostUid, dbname }, { rejectWithValue }) => {
     try {
       const response = await userApi.getDatabaseUsers(hostUid, dbname);
-      return { dbname, users: response.user || [] };
+      // Map @name to name for UI consistency
+      const users = (response.user || []).map(u => ({
+        ...u,
+        name: u['@name'] || u.name,
+        id: u['@id'] || u.id
+      }));
+      return { dbname, users };
     } catch (err) {
       return rejectWithValue({ 
         dbname, 
@@ -221,7 +227,10 @@ const userSlice = createSlice({
         state.isDropUserModalOpen = false;
         const { dbname, userName } = action.payload;
         if (state.databaseUsers[dbname]) {
-          state.databaseUsers[dbname] = state.databaseUsers[dbname].filter(u => (typeof u === 'string' ? u : u.name) !== userName);
+          state.databaseUsers[dbname] = state.databaseUsers[dbname].filter(u => {
+            const currentName = typeof u === 'string' ? u : (u.name || u['@name']);
+            return currentName !== userName;
+          });
         }
       })
       .addCase(dropDatabaseUser.rejected, (state, action) => {

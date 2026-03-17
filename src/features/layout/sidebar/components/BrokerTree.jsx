@@ -45,6 +45,10 @@ export default function BrokerTree({ hostUid, onContextMenu }) {
                 dispatch(setSelectedBroker(broker.name));
                 dispatch(setSelectedBrokerSubItem(null));
               }}
+              onDoubleClick={(e) => {
+                e.preventDefault();
+                dispatch(openTab(`broker_status:${hostUid}:${broker.name}`));
+              }}
               onContextMenu={(e) => onContextMenu(e, broker.name, broker.state)}
             >
               <span className={`material-symbols-outlined text-[16px] group-open/broker:rotate-90 transition-transform ${isBrokerSelected && !selectedBrokerSubItem ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500'}`} style={{ fontVariationSettings: "'wght' 300" }}>chevron_right</span>

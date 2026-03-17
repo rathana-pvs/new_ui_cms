@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchBrokerList } from '../../broker/brokerSlice';
+import { openTab } from '../../layout/layoutSlice';
 
 export default function Brokers({ hostUid }) {
   const dispatch = useDispatch();
@@ -53,7 +54,13 @@ export default function Brokers({ hostUid }) {
               </tr>
             ) : (
               brokers.map((row) => (
-                <tr key={row.key} className="text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors border-b border-slate-100 dark:border-slate-800">
+                <tr 
+                  key={row.key} 
+                  className="text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors border-b border-slate-100 dark:border-slate-800 cursor-pointer"
+                  onDoubleClick={() => {
+                    dispatch(openTab(`broker_status:${hostUid}:${row.name}`));
+                  }}
+                >
                   <td className="px-4 py-3 font-sans font-medium">{row.name}</td>
                   <td className="px-4 py-3">
                     {row.state === 'ON' ? (

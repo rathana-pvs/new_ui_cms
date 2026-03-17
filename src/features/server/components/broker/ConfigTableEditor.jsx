@@ -1,3 +1,5 @@
+import SelectField from '../../../../components/common/SelectField';
+
 export default function ConfigTableEditor({ 
   sections, 
   allPropertyKeys, 
@@ -13,11 +15,11 @@ export default function ConfigTableEditor({
           <table className="min-w-full border-collapse">
             <thead>
               <tr className="bg-slate-50 dark:bg-white/5 text-[11px] text-slate-500 dark:text-slate-400">
-                <th className="px-4 py-2 text-left border border-slate-200 dark:border-slate-800 font-bold uppercase tracking-wider w-64 bg-slate-100/50 dark:bg-black/40">
+                <th className="px-4 py-2 text-left border border-slate-200 dark:border-slate-800 font-medium uppercase tracking-wider w-64 bg-slate-100/50 dark:bg-black/40">
                   Property name
                 </th>
                 {sections.map((sec, idx) => (
-                  <th key={idx} className="px-4 py-2 text-left border border-slate-200 dark:border-slate-800 font-bold uppercase tracking-wider min-w-[200px] bg-slate-100/50 dark:bg-black/40">
+                  <th key={idx} className="px-4 py-2 text-left border border-slate-200 dark:border-slate-800 font-medium uppercase tracking-wider min-w-[200px] bg-slate-100/50 dark:bg-black/40">
                     Broker#{idx}
                   </th>
                 ))}
@@ -31,7 +33,7 @@ export default function ConfigTableEditor({
                     (selectedCell.row === rowIdx) ? 'bg-emerald-500/5' : 'odd:bg-white dark:odd:bg-[#1a1c1e] even:bg-slate-50/30 dark:even:bg-white/[0.02]'
                   }`}
                 >
-                  <td className={`p-0 border border-slate-200 dark:border-slate-800 font-bold ${
+                  <td className={`p-0 border border-slate-200 dark:border-slate-800 font-medium ${
                     key === 'BROKER_NAME' ? 'bg-slate-50/50 dark:bg-black/20' : ''
                   }`}>
                     {key === 'BROKER_NAME' ? (
@@ -45,7 +47,7 @@ export default function ConfigTableEditor({
                         type="text"
                         value={key}
                         onChange={(e) => handleKeyChange(key, e.target.value)}
-                        className="w-full px-4 py-1.5 bg-transparent outline-none text-slate-700 dark:text-slate-300 font-bold transition-all"
+                        className="w-full px-4 py-1.5 bg-transparent outline-none text-slate-700 dark:text-slate-300 font-medium transition-all"
                         placeholder="Property Name"
                       />
                     )}
@@ -64,16 +66,16 @@ export default function ConfigTableEditor({
                         }`}
                       >
                         {isBoolean ? (
-                          <select 
+                          <SelectField 
                             value={currentValue.toUpperCase()}
-                            onChange={(e) => handleValueChange(colIdx, key, e.target.value)}
-                            className={`w-full px-4 py-1.5 bg-transparent outline-none transition-all appearance-none cursor-pointer font-bold ${
-                                isSelected ? 'text-slate-900 dark:text-white' : 'text-slate-800 dark:text-slate-400'
-                            }`}
-                          >
-                            <option value="ON" className="bg-white dark:bg-bk-side text-emerald-600">ON</option>
-                            <option value="OFF" className="bg-white dark:bg-bk-side text-rose-600">OFF</option>
-                          </select>
+                            onChange={(val) => handleValueChange(colIdx, key, val)}
+                            isHighlight={true}
+                            triggerClassName="!h-8 !border-0 bg-transparent"
+                            options={[
+                              { value: 'ON', label: 'ON' },
+                              { value: 'OFF', label: 'OFF' }
+                            ]}
+                          />
                         ) : (
                           <input 
                             type="text"
@@ -81,7 +83,7 @@ export default function ConfigTableEditor({
                             onChange={(e) => handleValueChange(colIdx, key, e.target.value)}
                             className={`w-full px-4 py-1.5 bg-transparent outline-none transition-all ${
                                 isSelected ? 'text-slate-900 dark:text-white' : 'text-slate-800 dark:text-slate-400'
-                            } ${key === 'BROKER_NAME' ? 'text-blue-600 dark:text-blue-400 font-bold italic' : ''}`}
+                            } ${key === 'BROKER_NAME' ? 'text-blue-600 dark:text-blue-400 font-medium italic' : ''}`}
                           />
                         )}
                         {isSelected && (
