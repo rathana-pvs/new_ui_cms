@@ -6,7 +6,10 @@ export default defineConfig({
   server: {
     host: '0.0.0.0', // Necessary for Tailscale/Docker
     port: 5173,
-    allowedHosts: true
+    allowedHosts: true,
+    watch: {
+      usePolling: true
+    }
   },
   preview: {
     host: '0.0.0.0',

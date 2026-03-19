@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { closeCopyDatabaseModal } from '../databaseSlice';
+import { closeCopyDatabaseModal, copyDatabase } from '../databaseSlice';
 import LoadingOverlay from '../../../components/common/LoadingOverlay';
 import ErrorOverlay from '../../../components/common/ErrorOverlay';
 
 export default function CopyDatabaseModal() {
   const dispatch = useDispatch();
-  const { isCopyDatabaseModalOpen, selectedDatabase } = useSelector((state) => state.database);
+  const { isCopyDatabaseModalOpen, selectedDatabase, actionLoading, error: sliceError } = useSelector((state) => state.database);
+  const { selectedHostUid } = useSelector((state) => state.host);
   
   const [formData, setFormData] = useState({
     destName: '',
@@ -16,8 +17,13 @@ export default function CopyDatabaseModal() {
     replaceExisting: false,
     deleteSource: false
   });
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (sliceError) {
+      setError(sliceError);
+    }
+  }, [sliceError]);
 
   if (!isCopyDatabaseModalOpen) return null;
 
@@ -30,17 +36,23 @@ export default function CopyDatabaseModal() {
       setError("Please provide a destination database name.");
       return;
     }
-    setLoading(true);
+    
     setError(null);
-    setTimeout(() => {
-      if (formData.destName.toLowerCase() === 'existing') {
-        setLoading(false);
-        setError("A database with this name already exists at the destination path.");
-      } else {
-        setLoading(false);
-        dispatch(closeCopyDatabaseModal());
-      }
-    }, 2000);
+    
+    const payload = {
+      srcdbname: selectedDatabase,
+      destname: formData.destName,
+      destpath: formData.destPath,
+      expath: formData.extPath,
+      logpath: formData.logPath,
+      replace: formData.replaceExisting ? 'y' : 'n',
+      unlink: formData.deleteSource ? 'y' : 'n'
+    };
+
+    dispatch(copyDatabase({ 
+      hostUid: selectedHostUid, 
+      payload 
+    }));
   };
 
   return (
@@ -51,7 +63,7 @@ export default function CopyDatabaseModal() {
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-bk-yellow/60"></div>
 
         <LoadingOverlay 
-            isVisible={loading} 
+            isVisible={actionLoading} 
             title="Duplicating database" 
             subtitle="Cloning volumes and migrating metadata..." 
         />
@@ -73,7 +85,7 @@ export default function CopyDatabaseModal() {
             </div>
           </div>
           <button 
-            disabled={loading}
+            disabled={actionLoading}
             onClick={() => dispatch(closeCopyDatabaseModal())}
             className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
           >
@@ -204,18 +216,18 @@ export default function CopyDatabaseModal() {
         {/* Footer */}
         <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 backdrop-blur-sm flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
           <button 
-            disabled={loading}
+            disabled={actionLoading}
             className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-all"
             onClick={() => dispatch(closeCopyDatabaseModal())}
           >
             Discard
           </button>
           <button 
-            disabled={loading}
+            disabled={actionLoading}
             className="px-6 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center gap-2 min-w-[120px] disabled:opacity-50"
             onClick={handleCopy}
           >
-            {loading ? (
+            {actionLoading ? (
               <div className="w-3 h-3 border-2 border-bk-side/30 border-t-bk-side rounded-full animate-spin"></div>
             ) : (
               <>

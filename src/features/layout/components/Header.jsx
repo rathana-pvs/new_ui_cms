@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { logout, fetchUser } from '../../auth/authSlice';
 import { fetchPreferences } from '../../user/userSlice';
 import UserProfileModal from '../../user/components/UserProfileModal';
-import MonitoringSettingsPopover from '../../user/components/MonitoringSettingsPopover';
 import { DropdownMenu, SubMenu, MenuItem, MenuDivider } from '../../../components/common/DropdownMenu';
 import { openTab, showStatusModal } from '../layoutSlice';
 import { openAddHostModal, openEditHostModal, startService, stopService } from '../../host/hostSlice';
@@ -75,7 +74,6 @@ export default function Header({ theme, toggleTheme }) {
             <button className="w-9 h-9 flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors group" title="Dashboard">
               <span className="material-symbols-outlined text-slate-400 text-[20px] group-hover:text-bk-yellow transition-colors leading-none" style={{ fontVariationSettings: "'wght' 300" }}>grid_view</span>
             </button>
-            <MonitoringSettingsPopover />
             <button className="w-9 h-9 flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors group" title="Refresh">
               <span className="material-symbols-outlined text-slate-400 text-[20px] group-hover:text-bk-yellow transition-colors leading-none" style={{ fontVariationSettings: "'wght' 300" }}>refresh</span>
             </button>

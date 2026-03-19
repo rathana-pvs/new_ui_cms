@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchDashboardData } from '../databaseSlice';
+import { openTab } from '../../layout/layoutSlice';
 import DBPerformanceSection from './dashboard/DBPerformanceSection';
 import DBVolumesSection from './dashboard/DBVolumesSection';
 import DBSpaceInfoSection from './dashboard/DBSpaceInfoSection';
@@ -208,6 +209,7 @@ export default function DatabaseDashboard({ dbname }) {
           >
             <span className="material-symbols-outlined text-[18px]">refresh</span>
           </button>
+
         </div>
       </div>
 

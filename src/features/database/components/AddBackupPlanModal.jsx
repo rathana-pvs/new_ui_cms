@@ -168,13 +168,31 @@ export default function AddBackupPlanModal() {
       return;
     }
 
+    // Convert period detail based on period type
+    let periodDateValue = '';
+    if (formData.periodType === 'Weekly') {
+      // Convert day numbers to day names (1=Monday, 7=Sunday)
+      const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+      const selectedDays = Array.isArray(formData.periodDetail) ? formData.periodDetail : [];
+      periodDateValue = selectedDays.map(dayNum => dayNames[dayNum - 1]).join(',');
+    } else if (formData.periodType === 'Monthly') {
+      // Monthly: comma-separated day numbers
+      periodDateValue = Array.isArray(formData.periodDetail) ? formData.periodDetail.join(',') : '';
+    } else if (formData.periodType === 'Daily') {
+      // Daily: empty string
+      periodDateValue = '';
+    } else if (formData.periodType === 'Specific days') {
+      // Specific days: date string
+      periodDateValue = formData.periodDetail || '';
+    }
+
     // Mapping formData to backend API format
     const payload = {
       backupid: formData.backupId,
       level: formData.backupLevel,
       path: formData.backupPath,
-      period_type: formData.periodType === 'Specific days' ? 'Specific' : formData.periodType,
-      period_date: Array.isArray(formData.periodDetail) ? formData.periodDetail.join(',') : formData.periodDetail,
+      period_type: formData.periodType === 'Specific days' ? 'Special' : formData.periodType,
+      period_date: periodDateValue,
       time: formData.backupTime.replace(':', ''),
       archivedel: formData.deleteArchive ? 'ON' : 'OFF',
       updatestatus: formData.updateStatistics ? 'ON' : 'OFF',

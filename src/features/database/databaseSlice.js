@@ -45,11 +45,16 @@ export const fetchDatabaseVolumes = createAsyncThunk(
     const { hostUid, activeDatabases } = arg;
     if (!activeDatabases || activeDatabases.length === 0) return [];
     try {
-      const allRequest = activeDatabases.map(dbname => 
+      const allRequest = activeDatabases.map(dbname =>
         databaseApi.getVolumeInfo(hostUid, dbname)
+          .catch(err => {
+            console.warn(`Failed to fetch volume info for ${dbname}:`, err);
+            return null; // Return null to represent a failed request within the array
+          })
       );
       const responses = await Promise.all(allRequest);
-      return responses;
+      // Filter out nulls (the ones that failed)
+      return responses.filter(res => res !== null);
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || 'Failed to fetch volume info');
     }
@@ -124,6 +129,18 @@ export const fetchBackupSchedule = createAsyncThunk(
       return response;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || err.response?.data?.error || `Failed to fetch backup schedule for ${dbname}`);
+    }
+  }
+);
+
+export const fetchDatabaseSpaceInfo = createAsyncThunk(
+  'database/fetchDatabaseSpaceInfo',
+  async ({ hostUid, dbname }, { rejectWithValue }) => {
+    try {
+      const response = await databaseApi.getVolumeInfo(hostUid, dbname);
+      return { dbname, data: response };
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || `Failed to fetch space info for ${dbname}`);
     }
   }
 );
@@ -217,7 +234,7 @@ export const addVolume = createAsyncThunk(
 
 export const fetchDashboardData = createAsyncThunk(
   'database/fetchDashboardData',
-    async ({ hostUid, dbname }, { rejectWithValue }) => {
+  async ({ hostUid, dbname }, { rejectWithValue }) => {
     if (!hostUid || !dbname) return rejectWithValue('Missing hostUid or dbname');
     try {
       // 1. Fetch core DB stats
@@ -231,7 +248,7 @@ export const fetchDashboardData = createAsyncThunk(
       // 2. Fetch CAS info for each broker to find processes serving this DB
       const brokersCAS = [];
       const actualBrokerList = brokerList?.[0]?.broker || [];
-      
+
       const brokerDetails = await Promise.all(
         actualBrokerList.map(b => {
           if (!b?.name) return Promise.resolve(null);
@@ -242,7 +259,7 @@ export const fetchDashboardData = createAsyncThunk(
       brokerDetails.forEach((status, idx) => {
         if (!status || !status.asinfo) return;
         const brokerName = actualBrokerList[idx]?.name;
-        
+
         status.asinfo.forEach(cas => {
           if (cas.as_dbname?.toLowerCase() === dbname.toLowerCase()) {
             brokersCAS.push({
@@ -258,12 +275,12 @@ export const fetchDashboardData = createAsyncThunk(
         });
       });
 
-      return { 
-        dbname, 
-        volumeInfo, 
-        lockInfo, 
+      return {
+        dbname,
+        volumeInfo,
+        lockInfo,
         statDump: statDumpRaw, // It is already flat properties
-        brokersCAS 
+        brokersCAS
       };
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || `Failed to fetch dashboard data for ${dbname}`);
@@ -331,6 +348,42 @@ export const updateAutoVolumeConfig = createAsyncThunk(
   }
 );
 
+export const copyDatabase = createAsyncThunk(
+  'database/copyDatabase',
+  async ({ hostUid, payload }, { rejectWithValue }) => {
+    try {
+      const response = await databaseApi.copyDatabase(hostUid, payload);
+      return response;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.response?.data?.error || `Failed to copy database`);
+    }
+  }
+);
+
+export const loginDatabase = createAsyncThunk(
+  'database/loginDatabase',
+  async ({ hostUid, dbname, payload = {} }, { rejectWithValue }) => {
+    try {
+      const response = await databaseApi.loginDatabase(hostUid, dbname, payload);
+      return { dbname, ...response };
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.response?.data?.error || `Failed to login to database ${dbname}`);
+    }
+  }
+);
+
+export const registerDatabase = createAsyncThunk(
+  'database/registerDatabase',
+  async ({ hostUid, dbname, payload }, { rejectWithValue }) => {
+    try {
+      const response = await databaseApi.registerDatabase(hostUid, dbname, payload);
+      return { dbname, response };
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.response?.data?.error || `Failed to register database ${dbname}`);
+    }
+  }
+);
+
 // Helper to parse the shared response format
 const parseDbResponse = (state, payload) => {
   // Only update if the payload actually contains the database info
@@ -355,10 +408,9 @@ const parseDbResponse = (state, payload) => {
   // Handle selectedDatabase re-validation only if we actually got databases
   if (dbsFound) {
     const exists = state.databases.find(db => db.dbname === state.selectedDatabase);
-    if (!exists && state.databases.length > 0) {
-      state.selectedDatabase = state.databases[0].dbname;
-      state.selectedDatabaseSubItem = null;
-    } else if (state.databases.length === 0) {
+    // Only clear selected database if it doesn't exist in the new list
+    // Don't auto-select the first database when switching hosts
+    if (!exists) {
       state.selectedDatabase = null;
       state.selectedDatabaseSubItem = null;
     }
@@ -394,7 +446,7 @@ const initialState = {
   planDumpData: {}, // { [dbname]: [] }
   planDumpLoading: false,
   planDumpError: null,
-  
+
   autoBackupLogs: [],
   queryPlanLogs: [],
   autoVolumeLogs: [],
@@ -423,8 +475,11 @@ const initialState = {
   dashboardData: {}, // { [dbname]: { volumes: [], spaceInfo: [], locks: [] } }
   dashboardLoading: {},
   dashboardError: {},
+  spaceInfo: {}, // { [dbname]: { volumes: [], summary: [], files: [] } }
+  spaceInfoLoading: {},
   volumes: [],
-  isCreateDatabaseModalOpen: false,
+  loggedInDatabases: [],
+  isLoginDatabaseModalOpen: false,
   loading: false,
   volumesLoading: false,
   actionLoading: false, // Separate loading for start/stop operations
@@ -627,6 +682,13 @@ const databaseSlice = createSlice({
     },
     closeAutoVolumeLogModal: (state) => {
       state.isAutoVolumeLogModalOpen = false;
+    },
+    openLoginDatabaseModal: (state, action) => {
+      state.isLoginDatabaseModalOpen = true;
+      if (action.payload) state.selectedDatabase = action.payload;
+    },
+    closeLoginDatabaseModal: (state) => {
+      state.isLoginDatabaseModalOpen = false;
     }
   },
   extraReducers: (builder) => {
@@ -744,13 +806,13 @@ const databaseSlice = createSlice({
         const data = action.payload;
         // User provided format uses "backups" field
         if (data && data.backups) {
-          state.backupSchedules[dbname] = Array.isArray(data.backups) 
-            ? data.backups 
+          state.backupSchedules[dbname] = Array.isArray(data.backups)
+            ? data.backups
             : [data.backups];
         } else if (data && data.backup_info) {
           // Fallback for previous format just in case
-          state.backupSchedules[dbname] = Array.isArray(data.backup_info) 
-            ? data.backup_info 
+          state.backupSchedules[dbname] = Array.isArray(data.backup_info)
+            ? data.backup_info
             : [data.backup_info];
         } else {
           state.backupSchedules[dbname] = [];
@@ -882,7 +944,7 @@ const databaseSlice = createSlice({
       .addCase(fetchDashboardData.fulfilled, (state, action) => {
         const { dbname, volumeInfo, lockInfo, statDump, brokersCAS } = action.payload;
         state.dashboardLoading[dbname] = false;
-        
+
         state.dashboardData[dbname] = {
           volumes: volumeInfo.spaceinfo || [],
           spaceInfo: volumeInfo.fileinfo || [],
@@ -895,6 +957,23 @@ const databaseSlice = createSlice({
         const { dbname } = action.meta.arg;
         state.dashboardLoading[dbname] = false;
         state.dashboardError[dbname] = action.payload;
+      })
+      .addCase(fetchDatabaseSpaceInfo.pending, (state, action) => {
+        const { dbname } = action.meta.arg;
+        state.spaceInfoLoading[dbname] = true;
+      })
+      .addCase(fetchDatabaseSpaceInfo.fulfilled, (state, action) => {
+        const { dbname, data } = action.payload;
+        state.spaceInfoLoading[dbname] = false;
+        state.spaceInfo[dbname] = {
+          volumes: data.spaceinfo || [],
+          summary: data.dbinfo || [],
+          files: data.fileinfo || []
+        };
+      })
+      .addCase(fetchDatabaseSpaceInfo.rejected, (state, action) => {
+        const { dbname } = action.meta.arg;
+        state.spaceInfoLoading[dbname] = false;
       })
       .addCase(fetchDatabaseParamDump.pending, (state) => {
         state.databaseInfoLoading = true;
@@ -958,14 +1037,58 @@ const databaseSlice = createSlice({
       .addCase(updateAutoVolumeConfig.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      // Copy database
+      .addCase(copyDatabase.pending, (state) => {
+        state.actionLoading = true;
+        state.error = null;
+      })
+      .addCase(copyDatabase.fulfilled, (state, action) => {
+        state.actionLoading = false;
+        state.isCopyDatabaseModalOpen = false;
+        parseDbResponse(state, action.payload);
+      })
+      .addCase(copyDatabase.rejected, (state, action) => {
+        state.actionLoading = false;
+        state.error = action.payload;
+      })
+      // Login database
+      .addCase(loginDatabase.pending, (state) => {
+        state.actionLoading = true;
+        state.error = null;
+      })
+      .addCase(loginDatabase.fulfilled, (state, action) => {
+        state.actionLoading = false;
+        state.isLoginDatabaseModalOpen = false;
+        const { dbname } = action.payload;
+        if (!state.loggedInDatabases.includes(dbname)) {
+          state.loggedInDatabases.push(dbname);
+        }
+      })
+      .addCase(loginDatabase.rejected, (state, action) => {
+        state.actionLoading = false;
+        state.error = action.payload;
+      })
+      // Register database
+      .addCase(registerDatabase.pending, (state) => {
+        state.actionLoading = true;
+        state.error = null;
+      })
+      .addCase(registerDatabase.fulfilled, (state, action) => {
+        state.actionLoading = false;
+        parseDbResponse(state, action.payload.response);
+      })
+      .addCase(registerDatabase.rejected, (state, action) => {
+        state.actionLoading = false;
+        state.error = action.payload;
       });
   },
 });
 
-export const { 
-  setSelectedDatabase, 
+export const {
+  setSelectedDatabase,
   setSelectedDatabaseSubItem,
-  openUnloadDBModal, 
+  openUnloadDBModal,
   closeUnloadDBModal,
   openLoadDBModal,
   closeLoadDBModal,
@@ -1019,7 +1142,9 @@ export const {
   openSetAutomationVolumeModal,
   closeSetAutomationVolumeModal,
   openAutoVolumeLogModal,
-  closeAutoVolumeLogModal
+  closeAutoVolumeLogModal,
+  openLoginDatabaseModal,
+  closeLoginDatabaseModal
 } = databaseSlice.actions;
 
 export default databaseSlice.reducer;

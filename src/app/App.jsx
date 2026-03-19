@@ -12,6 +12,9 @@ import Footer from '../features/layout/components/Footer';
 import AddHostModal from '../features/host/components/AddHostModal';
 import ServerContent from '../features/server/components/ServerContent';
 import DatabaseDashboard from '../features/database/components/DatabaseDashboard';
+import DatabaseSpaceMonitor from '../features/database/components/DatabaseSpaceMonitor';
+import VolumeInfoMonitor from '../features/database/components/VolumeInfoMonitor';
+import VolumeCategoryMonitor from '../features/database/components/VolumeCategoryMonitor';
 import CubridConfigEditor from '../features/server/components/CubridConfigEditor';
 import BrokerConfigEditor from '../features/server/components/BrokerConfigEditor';
 import UnloadDatabaseModal from '../features/database/components/UnloadDatabaseModal';
@@ -28,6 +31,8 @@ import DeleteBackupPlanModal from '../features/database/components/DeleteBackupP
 import DatabaseInfoModal from '../features/database/components/DatabaseInfoModal';
 import DatabasePlanDumpModal from '../features/database/components/DatabasePlanDumpModal';
 import CreateDatabaseModal from '../features/database/components/CreateDatabaseModal';
+import EditBackupPlanModal from '../features/database/components/EditBackupPlanModal';
+import LoginDatabaseModal from '../features/database/components/LoginDatabaseModal';
 
 import LockInformationModal from '../features/database/components/LockInformationModal';
 import UnloadResultModal from '../features/database/components/UnloadResultModal';
@@ -56,6 +61,7 @@ import AddVolumeModal from '../features/database/components/AddVolumeModal';
 
 function DashboardLayout() {
   const dispatch = useDispatch();
+  const { isLoginDatabaseModalOpen, selectedDatabase } = useSelector((state) => state.database);
   const { theme, isSidebarCollapsed, isResizing, activeMainTab, openTabs } = useSelector((state) => state.layout);
   const { isAddHostModalOpen, hosts, isServiceOperating, serviceOperationType, serviceProgressMessage } = useSelector((state) => state.host);
   const { isCreateUserModalOpen, createUserDbName, isEditUserModalOpen, editUserData, isDropUserModalOpen } = useSelector((state) => state.user);
@@ -85,6 +91,14 @@ function DashboardLayout() {
       acc[tabId] = `Status: ${tabId.split(':')[2]}`;
     } else if (tabId.startsWith('brokers_status:')) {
       acc[tabId] = 'Brokers Status';
+    } else if (tabId.startsWith('db_space:')) {
+      acc[tabId] = `Space: ${tabId.split(':')[2]}`;
+    } else if (tabId.startsWith('vol_info:')) {
+      const fullPath = tabId.split(':')[3];
+      acc[tabId] = `Volume: ${fullPath.split(/[\\/]/).pop()}`;
+    } else if (tabId.startsWith('vol_category:')) {
+      const category = tabId.split(':')[3];
+      acc[tabId] = `Volumes: ${category.replace(/_/g, ' ')}`;
     }
 
     return acc;
@@ -161,7 +175,7 @@ function DashboardLayout() {
               const isCmsErrorLog = tabId.startsWith('cms-error:');
               const isBrokerStatus = tabId.startsWith('broker_status:');
               const isBrokersStatus = tabId.startsWith('brokers_status:');
-
+              const isDbSpace = tabId.startsWith('db_space:');
 
               const resourceId = tabId.split(':')[1];
 
@@ -169,6 +183,22 @@ function DashboardLayout() {
                 <div key={tabId} className={`flex-1 flex flex-col overflow-hidden ${isActive ? '' : 'hidden'}`}>
                   {isHost && <ServerContent hostUid={resourceId} />}
                   {isDb && <DatabaseDashboard dbname={resourceId} />}
+                  {isDbSpace && (
+                    <DatabaseSpaceMonitor 
+                      hostUid={tabId.split(':')[1]} 
+                      dbname={tabId.split(':')[2]} 
+                    />
+                  )}
+                  {tabId.startsWith('vol_info:') && (
+                    <VolumeInfoMonitor tabId={tabId} />
+                  )}
+                  {tabId.startsWith('vol_category:') && (
+                    <VolumeCategoryMonitor 
+                      hostUid={tabId.split(':')[1]}
+                      dbname={tabId.split(':')[2]}
+                      category={tabId.split(':')[3]}
+                    />
+                  )}
                   {isEditConfig && (
                     <CubridConfigEditor
                       hostUid={resourceId}
@@ -238,7 +268,9 @@ function DashboardLayout() {
         <AddBackupPlanModal />
         <AutoBackupLogModal />
         <DeleteBackupPlanModal />
+        <EditBackupPlanModal />
         <CreateDatabaseModal />
+        <LoginDatabaseModal />
 
         <LockInformationModal />
         <UnloadResultModal />

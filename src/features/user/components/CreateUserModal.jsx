@@ -275,12 +275,10 @@ export default function CreateUserModal({ isOpen, onClose, dbname, editingUser }
       });
     } else {
       const createPayload = {
-        name: formData.name,
-        password: formData.password,
-        groups: formData.groups.map(g => g.name || g),
-        members: formData.members.map(m => m.name || m),
-        comment: formData.memo,
-        auths: authList.reduce((acc, curr) => ({ ...acc, [curr.classname]: curr.auth }), {})
+        username: formData.name,
+        userpass: formData.password,
+        groups: { group: formData.groups.map(g => g.name || g) },
+        authorization: authList
       };
 
       dispatch(createDatabaseUser({ 

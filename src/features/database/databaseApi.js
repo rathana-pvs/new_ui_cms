@@ -43,11 +43,11 @@ export const databaseApi = {
     apiClient.post(`/${hostUid}/database/kill-transaction/${dbname}`, payload),
 
   setAutoStart: (hostUid, payload) => {
-    return apiClient.post(`/${hostUid}/database/auto-start`, payload);
+    return apiClient.post(`/${hostUid}/database/auto-start/set`, payload);
   },
 
   removeAutoStart: (hostUid, payload) => {
-    return apiClient.delete(`/${hostUid}/database/auto-start`, { data: payload });
+    return apiClient.delete(`/${hostUid}/database/auto-start/remove`, { data: payload });
   },
 
   deleteDatabase: (hostUid, dbname, payload) => {
@@ -56,6 +56,9 @@ export const databaseApi = {
 
   loginDatabase: (hostUid, dbname, payload) => {
     return apiClient.post(`/${hostUid}/database/users/login/${dbname}`, payload);
+  },
+  registerDatabase: (hostUid, dbname, payload) => {
+    return apiClient.post(`/${hostUid}/database/register/${dbname}`, payload);
   },
   addBackupSchedule: (hostUid, dbname, payload) => {
     return apiClient.post(`/${hostUid}/database/backup-schedule/${dbname}`, payload);
@@ -106,6 +109,9 @@ export const databaseApi = {
     return apiClient.post(`/${hostUid}/database/auto-add-vol/${encodeURIComponent(dbname)}`, payload);
   },
   getAutoVolumeLog: (hostUid) => {
-    return apiClient.post(`/${hostUid}/database/auto-add-vol-log`, {});
+    return apiClient.get(`/${hostUid}/database/auto-add-vol-log`, {});
+  },
+  copyDatabase: (hostUid, payload) => {
+    return apiClient.post(`/${hostUid}/database/copydb`, payload);
   },
 };

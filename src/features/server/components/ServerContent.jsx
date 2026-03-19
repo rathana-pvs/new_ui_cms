@@ -11,6 +11,7 @@ import SystemInfo from './SystemInfo';
 
 import SystemStatusSection from './server/SystemStatusSection';
 import DatabaseListSection from './server/DatabaseListSection';
+import MonitoringSettingsPopover from '../../user/components/MonitoringSettingsPopover';
 
 export default function ServerContent({ hostUid }) {
   const dispatch = useDispatch();
@@ -112,11 +113,14 @@ export default function ServerContent({ hostUid }) {
   return (
     <div className="flex-1 overflow-y-auto bg-slate-50 dark:bg-bk-main">
       {/* Top Breadcrumb Bar */}
-      <div className="flex items-center gap-2 px-3 py-2 text-xs text-slate-500 border-b border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-bk-side/50">
+      <div className="flex items-center justify-between px-3 py-2 text-xs text-slate-500 border-b border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-bk-side/50">
         <span className="font-medium text-slate-900 dark:text-bk-yellow tracking-wide flex items-center gap-1.5 font-sans">
           <span className="material-symbols-outlined text-[14px]">dns</span>
           Host - {currentHost ? (currentHost.alias || currentHost.id) : 'unknown'}
         </span>
+        <div className="flex items-center gap-2">
+          <MonitoringSettingsPopover />
+        </div>
       </div>
 
       <div className="flex flex-col p-4 space-y-4">

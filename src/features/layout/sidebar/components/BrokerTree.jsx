@@ -33,7 +33,7 @@ export default function BrokerTree({ hostUid, onContextMenu }) {
             key={broker.name} 
             className="group/broker"
             onToggle={(e) => {
-              if (e.target.open && !logsByBroker[broker.name]) {
+              if (e.target.open && !logsByBroker[broker.name] && !logsLoading) {
                 dispatch(fetchBrokerLogs({ hostUid: hostUid, brokerName: broker.name }));
               }
             }}

@@ -9,7 +9,7 @@ export default function LogTree({ hostUid }) {
 
   return (
     <div className="space-y-1">
-      <details className="group/log-broker" open>
+      <details className="group/log-broker">
         <summary 
           className={`flex items-center gap-1 px-3 py-1.5 cursor-pointer list-none rounded-lg transition-all duration-200 select-none mb-1.5 group/sum border
             ${selectedBrokerSubItem === 'log-broker-root' ? 'bg-bk-yellow/5 text-amber-600 dark:text-bk-yellow border-bk-yellow/40 dark:border-bk-yellow/20' : 'bg-white/40 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:border-bk-yellow/30 hover:text-amber-600 dark:hover:text-bk-yellow'}`}
@@ -48,7 +48,7 @@ export default function LogTree({ hostUid }) {
           <details 
             className="group/log-error"
             onToggle={(e) => {
-              if (e.target.open) {
+              if (e.target.open && !logsLoading) {
                 brokers.forEach(broker => {
                   if (!logsByBroker[broker.name]) {
                     dispatch(fetchBrokerLogs({ hostUid: hostUid, brokerName: broker.name }));
@@ -119,7 +119,7 @@ export default function LogTree({ hostUid }) {
           <details 
             className="group/log-admin"
             onToggle={(e) => {
-              if (e.target.open && !adminLogsByHost[hostUid]) {
+              if (e.target.open && !adminLogsByHost[hostUid] && !adminLogsLoading) {
                 dispatch(fetchAdminLogs(hostUid));
               }
             }}
@@ -181,7 +181,7 @@ export default function LogTree({ hostUid }) {
       <details 
         className="group/log-manager"
         onToggle={(e) => {
-          if (e.target.open && !cmsLogsByHost[hostUid]) {
+          if (e.target.open && !cmsLogsByHost[hostUid] && !logsLoading) {
             dispatch(fetchCMSLogs(hostUid));
           }
         }}
@@ -253,8 +253,8 @@ export default function LogTree({ hostUid }) {
             <details 
               key={idx} 
               className="group/log-db"
-              onToggle={(e) => {
-                if (e.target.open && !dbLogsByDbName[db.dbname]) {
+               onToggle={(e) => {
+                if (e.target.open && !dbLogsByDbName[db.dbname] && !dbLogsLoading) {
                   dispatch(fetchDatabaseLogs({ hostUid: hostUid, dbname: db.dbname }));
                 }
               }}

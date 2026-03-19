@@ -11,7 +11,7 @@ export const userApi = {
     return apiClient.get(`/${hostUid}/database/users/info/${dbname}`);
   },
   createDatabaseUser: (hostUid, dbname, payload) => {
-    return apiClient.post(`/${hostUid}/database/users/${dbname}`, payload);
+    return apiClient.post(`/${hostUid}/database/users`, { ...payload, dbname });
   },
   updateDatabaseUser: (hostUid, dbname, userName, payload) => {
     return apiClient.put(`/${hostUid}/database/users/${dbname}/${userName}`, payload);

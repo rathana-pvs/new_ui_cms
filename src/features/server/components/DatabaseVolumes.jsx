@@ -68,7 +68,6 @@ export default function DatabaseVolumes({ hostUid }) {
   useEffect(() => {
     fetchVolumes();
   }, [fetchVolumes]);
-
   const volumeData = volumes?.map((result) => {
     let permanent = { display: '-', pct: 0 };
     let temporary = { display: '-', pct: 0 };

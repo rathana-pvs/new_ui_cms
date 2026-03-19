@@ -42,7 +42,8 @@ import {
   openAutoVolumeLogModal,
   fetchQueryPlan,
   setSelectedBackupId,
-  setSelectedQueryPlanId
+  setSelectedQueryPlanId,
+  openLoginDatabaseModal
 } from '../../database/databaseSlice';
 import {
   fetchBrokerList,
@@ -90,7 +91,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
 
   const dispatch = useDispatch();
   const { hosts, selectedHostUid, loading: hostsLoading, authorizedHosts, isLoggingIntoHost, hostAuthErrors } = useSelector((state) => state.host);
-  const { databases, activeDatabases, actionLoading: dbActionLoading } = useSelector((state) => state.database);
+  const { databases, activeDatabases, loggedInDatabases, actionLoading: dbActionLoading } = useSelector((state) => state.database);
   const { actionLoading: brokerActionLoading } = useSelector((state) => state.broker);
 
   useEffect(() => {
@@ -476,6 +477,16 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
               }}
             />
           )}
+          {dbContextMenu.isActive && !loggedInDatabases.includes(dbContextMenu.db) && (
+            <MenuItem
+              icon="login"
+              label="Login Database"
+              onClick={() => {
+                dispatch(openLoginDatabaseModal(dbContextMenu.db));
+                setDbContextMenu(null);
+              }}
+            />
+          )}
           <MenuDivider />
           <SubMenu icon="settings" label="Manage Database">
             <MenuItem icon="upload" label="Database Unload" onClick={() => { dispatch(setSelectedDatabase(dbContextMenu.db)); dispatch(openUnloadDBModal()); setDbContextMenu(null); }} />
@@ -501,6 +512,14 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
           </SubMenu>
           <SubMenu icon="info" label="Database Info" width="w-52">
             <MenuItem icon="lock_open" label="Lock Information" onClick={() => { dispatch(setSelectedDatabase(dbContextMenu.db)); dispatch(openLockInfoModal()); setDbContextMenu(null); }} />
+            <MenuItem 
+              icon="monitoring" 
+              label="Status Monitor" 
+              onClick={() => { 
+                dispatch(openTab(`db_status_monitor:${selectedHostUid}:${dbContextMenu.db}`));
+                setDbContextMenu(null); 
+              }} 
+            />
             <MenuItem icon="swap_horiz" label="Transaction Info" onClick={() => { dispatch(setSelectedDatabase(dbContextMenu.db)); dispatch(openTransactionInfoModal()); setDbContextMenu(null); }} />
             <MenuItem 
               icon="data_object" 
@@ -522,7 +541,16 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
             />
             <MenuItem icon="explore" label="OID Navigation" />
           </SubMenu>
-          <MenuDivider /><MenuItem icon="tune" label="Properties" onClick={() => { dispatch(setSelectedDatabase(dbContextMenu.db)); dispatch(openDatabasePropertyModal()); setDbContextMenu(null); }} />
+          <MenuItem icon="tune" label="Properties" onClick={() => { dispatch(setSelectedDatabase(dbContextMenu.db)); dispatch(openDatabasePropertyModal()); setDbContextMenu(null); }} />
+          <MenuDivider />
+          <MenuItem
+            icon="refresh"
+            label="Refresh"
+            onClick={() => {
+              dispatch(fetchDatabaseStartInfo(selectedHostUid));
+              setDbContextMenu(null);
+            }}
+          />
         </ContextMenuWrapper>
       )}
 
@@ -866,8 +894,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
             icon="visibility"
             label="View Database"
             onClick={() => {
-              dispatch(setSelectedDatabase(spaceContextMenu.db));
-              dispatch(setActiveMainTab('db:' + spaceContextMenu.db));
+              dispatch(setActiveMainTab(`db_space:${selectedHostUid}:${spaceContextMenu.db}`));
               setSpaceContextMenu(null);
             }}
           />
@@ -890,6 +917,16 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
             <span className="material-symbols-outlined text-[16px] opacity-40">event_note</span>
           </div>
 
+          <MenuItem
+            icon="edit"
+            label="Edit Backup Plan"
+            onClick={() => {
+              dispatch(setSelectedDatabase(backupItemContextMenu.db));
+              dispatch(setSelectedBackupId(backupItemContextMenu.planId));
+              dispatch(openEditBackupPlanModal());
+              setBackupItemContextMenu(null);
+            }}
+          />
           <MenuItem
             icon="delete_forever"
             iconColor="text-rose-500"

@@ -99,12 +99,39 @@ export default function EditBackupPlanModal() {
             const info = selectedBackupId ? plans.find(p => p.backupid === selectedBackupId) : plans[0];
             
             if (info) {
+              // Parse period detail based on period type
+              let periodDetail = [];
+              if (info.period_type === 'Special') {
+                // Specific days: date string
+                periodDetail = info.period_date || '';
+              } else if (info.period_type === 'Weekly' && info.period_date) {
+                // Weekly: convert day names to numbers (Monday=1, Sunday=7)
+                const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+                const dayNameMap = {
+                  'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4, 
+                  'Friday': 5, 'Saturday': 6, 'Sunday': 7
+                };
+                // Handle both comma-separated string and array
+                const days = Array.isArray(info.period_date) ? info.period_date : info.period_date.split(',');
+                periodDetail = days
+                  .map(day => day.trim())
+                  .filter(day => day && dayNames.includes(day))
+                  .map(day => dayNameMap[day]);
+              } else if (info.period_type === 'Monthly' && info.period_date) {
+                // Monthly: comma-separated day numbers
+                const days = Array.isArray(info.period_date) ? info.period_date : info.period_date.split(',');
+                periodDetail = days.map(Number).filter(day => !isNaN(day) && day >= 1 && day <= 31);
+              } else if (info.period_type === 'Daily') {
+                // Daily: empty array
+                periodDetail = [];
+              }
+
               setFormData({
                 backupId: info.backupid || '',
                 backupLevel: info.level || '0',
                 backupPath: info.path || '',
-                periodType: info.period_type === 'Specific' ? 'Specific days' : info.period_type,
-                periodDetail: info.period_type === 'Specific' ? info.period_date : (info.period_date ? info.period_date.split(',').map(Number) : []),
+                periodType: info.period_type === 'Special' ? 'Specific days' : info.period_type,
+                periodDetail: periodDetail,
                 backupTime: info.time ? `${info.time.slice(0, 2)}:${info.time.slice(2)}` : '12:30',
                 deleteArchive: info.archivedel === 'ON',
                 updateStatistics: info.updatestatus === 'ON',
@@ -186,12 +213,30 @@ export default function EditBackupPlanModal() {
   const handleSave = () => {
     if (!selectedDatabase || !selectedHostUid) return;
 
+    // Convert period detail based on period type
+    let periodDateValue = '';
+    if (formData.periodType === 'Weekly') {
+      // Convert day numbers to day names (1=Monday, 7=Sunday)
+      const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+      const selectedDays = Array.isArray(formData.periodDetail) ? formData.periodDetail : [];
+      periodDateValue = selectedDays.map(dayNum => dayNames[dayNum - 1]).join(',');
+    } else if (formData.periodType === 'Monthly') {
+      // Monthly: comma-separated day numbers
+      periodDateValue = Array.isArray(formData.periodDetail) ? formData.periodDetail.join(',') : '';
+    } else if (formData.periodType === 'Daily') {
+      // Daily: empty string
+      periodDateValue = '';
+    } else if (formData.periodType === 'Specific days') {
+      // Specific days: date string
+      periodDateValue = formData.periodDetail || '';
+    }
+
     const payload = {
       backupid: formData.backupId,
       level: formData.backupLevel,
       path: formData.backupPath,
-      period_type: formData.periodType === 'Specific days' ? 'Specific' : formData.periodType,
-      period_date: Array.isArray(formData.periodDetail) ? formData.periodDetail.join(',') : formData.periodDetail,
+      period_type: formData.periodType === 'Specific days' ? 'Special' : formData.periodType,
+      period_date: periodDateValue,
       time: formData.backupTime.replace(':', ''),
       archivedel: formData.deleteArchive ? 'ON' : 'OFF',
       updatestatus: formData.updateStatistics ? 'ON' : 'OFF',
@@ -210,6 +255,7 @@ export default function EditBackupPlanModal() {
     })).unwrap()
       .then(() => {
         dispatch(closeEditBackupPlanModal());
+        dispatch(fetchBackupSchedule({ hostUid: selectedHostUid, dbname: selectedDatabase }));
         dispatch(showStatusModal({
           type: 'success',
           title: 'Schedule Updated',
@@ -406,21 +452,26 @@ export default function EditBackupPlanModal() {
               </div>
 
               <div className="space-y-2">
-                {formData.periodType !== 'Specific days' && formData.periodType !== 'Daily' && (
-                  <label className="text-[11px] font-medium text-slate-500 dark:text-slate-400 ml-1">
+                {formData.periodType !== 'Specific days' && (
+                  <label className="text-[11px] font-medium text-slate-500 dark:text-slate-400 ml-1 ">
                     {formData.periodType === 'Monthly' && 'Period detail (Day of Month)'}
                     {formData.periodType === 'Weekly' && 'Period detail (Day of Week)'}
+                    {formData.periodType === 'Daily' && 'Period detail'}
                   </label>
                 )}
                 
                 {formData.periodType === 'Monthly' && (
                   <div className="space-y-4">
+                    {/* Smart Presets Toolbar */}
                     <div className="flex flex-wrap gap-2 px-1">
                       {[
                         { id: 'all', label: 'Select All', icon: 'select_all' },
                         { id: 'clear', label: 'Clear', icon: 'backspace' },
                         { id: 'weekdays', label: 'Weekdays', icon: 'work' },
                         { id: 'weekends', label: 'Weekends', icon: 'beach_access' },
+                        { id: 'mid', label: '1st, 15th, 30th', icon: 'calendar_view_week' },
+                        { id: 'even', label: 'Even Days', icon: '2k' },
+                        { id: 'odd', label: 'Odd Days', icon: '1k' },
                       ].map(preset => (
                         <button
                           key={preset.id}
@@ -439,6 +490,9 @@ export default function EditBackupPlanModal() {
                     </div>
 
                     <div className="bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded-2xl p-5 overflow-hidden relative">
+                      {/* Decorative Background Icon */}
+                      <span className="absolute -bottom-6 -right-6 material-symbols-outlined text-[100px] text-slate-100 dark:text-white/[0.02] rotate-12 pointer-events-none">calendar_month</span>
+                      
                       <div className="grid grid-cols-7 gap-3 relative z-10">
                         {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
                           <div key={`${d}-${i}`} className="text-center text-[10px] font-medium text-slate-300 dark:text-slate-500 pb-2 tracking-widest">{d}</div>
@@ -455,6 +509,11 @@ export default function EditBackupPlanModal() {
                             }`}
                           >
                             {day}
+                            {(Array.isArray(formData.periodDetail) && formData.periodDetail.includes(day)) && (
+                              <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-white rounded-full flex items-center justify-center shadow-lg animate-in zoom-in duration-200">
+                                <span className="material-symbols-outlined text-bk-yellow text-[10px] font-black">check</span>
+                              </div>
+                            )}
                           </button>
                         ))}
                       </div>
@@ -492,7 +551,7 @@ export default function EditBackupPlanModal() {
                 )}
 
                 {formData.periodType === 'Specific days' && (
-                  <div className="bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-xl px-5 py-4 space-y-3">
+                  <div className="bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded px-5 py-4 space-y-3">
                     <div className="flex items-center gap-4">
                       <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 w-12 ">Date:</label>
                       <div className="relative flex-1">
@@ -507,6 +566,7 @@ export default function EditBackupPlanModal() {
 
                         {showCalendar && (
                           <div className="absolute top-full left-0 mt-2 z-[200] w-[280px] bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl shadow-black/40 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                            {/* Calendar Header */}
                             <div className="flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-bk-main/50 border-b border-slate-100 dark:border-slate-800">
                               <button 
                                 type="button"
@@ -527,6 +587,7 @@ export default function EditBackupPlanModal() {
                               </button>
                             </div>
 
+                            {/* Calendar Body */}
                             <div className="p-3">
                               <div className="grid grid-cols-7 gap-1 mb-2">
                                 {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => (
@@ -538,15 +599,19 @@ export default function EditBackupPlanModal() {
                                   const days = [];
                                   const firstDay = new Date(viewDate.getFullYear(), viewDate.getMonth(), 1).getDay();
                                   const daysInMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
-                                  
-                                  for (let i = 0; i < firstDay; i++) {
-                                    days.push(<div key={`empty-${i}`} className="h-8"></div>);
+                                  const prevMonthDays = new Date(viewDate.getFullYear(), viewDate.getMonth(), 0).getDate();
+
+                                  // Pad start
+                                  for (let i = firstDay - 1; i >= 0; i--) {
+                                    days.push(<div key={`prev-${i}`} className="h-8 flex items-center justify-center text-[11px] text-slate-300 dark:text-slate-600 font-medium opacity-30 cursor-not-allowed">{prevMonthDays - i}</div>);
                                   }
 
+                                  // Month days
                                   for (let i = 1; i <= daysInMonth; i++) {
                                     const dateStr = `${viewDate.getFullYear()}-${String(viewDate.getMonth() + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
                                     const isSelected = formData.periodDetail === dateStr;
-                                    
+                                    const isToday = new Date().toISOString().split('T')[0] === dateStr;
+
                                     days.push(
                                       <button
                                         key={i}
@@ -555,13 +620,16 @@ export default function EditBackupPlanModal() {
                                           handleInputChange('periodDetail', dateStr);
                                           setShowCalendar(false);
                                         }}
-                                        className={`h-8 w-full rounded-lg text-[11px] font-medium transition-all flex items-center justify-center ${
+                                        className={`h-8 w-full rounded-lg text-[11px] font-medium transition-all flex items-center justify-center relative ${
                                           isSelected 
                                             ? 'bg-bk-yellow text-bk-side shadow-lg shadow-bk-yellow/20 translate-y-[-1px]' 
                                             : 'hover:bg-bk-yellow/10 hover:text-bk-yellow text-slate-700 dark:text-slate-300'
                                         }`}
                                       >
                                         {i}
+                                        {isToday && !isSelected && (
+                                          <div className="absolute bottom-1 w-1 h-1 bg-bk-yellow rounded-full"></div>
+                                        )}
                                       </button>
                                     );
                                   }
@@ -570,6 +638,7 @@ export default function EditBackupPlanModal() {
                               </div>
                             </div>
                             
+                            {/* Calendar Footer */}
                             <div className="p-2 border-t border-slate-100 dark:border-slate-800 flex justify-between">
                               <button 
                                 type="button"
@@ -583,12 +652,22 @@ export default function EditBackupPlanModal() {
                               >
                                 Today
                               </button>
-                              <button type="button" onClick={() => setShowCalendar(false)} className="text-[10px] font-medium text-slate-400 px-2 py-1 hover:bg-slate-100 dark:hover:bg-white/5 rounded-md transition-colors">Close</button>
+                              <button 
+                                type="button"
+                                onClick={() => setShowCalendar(false)}
+                                className="text-[10px] font-medium text-slate-400 px-2 py-1 hover:bg-slate-100 dark:hover:bg-white/5 rounded-md transition-colors"
+                              >
+                                Close
+                              </button>
                             </div>
                           </div>
                         )}
                       </div>
                     </div>
+                    <p className="text-[10px] text-slate-400 flex items-center gap-1.5 ml-16 leading-relaxed font-medium">
+                      <span className="material-symbols-outlined text-[13px] text-bk-yellow">stars</span>
+                      Single execution scheduled for <span className="text-slate-900 dark:text-slate-200 font-medium decoration-bk-yellow/30 underline underline-offset-4 decoration-2">{formData.periodDetail}</span>
+                    </p>
                   </div>
                 )}
               </div>
@@ -665,41 +744,37 @@ export default function EditBackupPlanModal() {
           </section>
 
           {/* Operation flags Section */}
-          <section className="space-y-3 px-1">
+          <section className="space-y-3">
             <div className="flex items-center gap-2">
                <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Operation flags</span>
                <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
             </div>
-            <div className="grid grid-cols-1 gap-3">
+            <div className="grid grid-cols-1 gap-3 px-1">
               <label className={`flex items-start gap-4 p-4 rounded-xl border transition-all cursor-pointer ${formData.onlineType === 'online' ? 'bg-indigo-500/5 border-indigo-500/30' : 'bg-transparent border-slate-100 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5'}`}>
-                <div className={`mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${formData.onlineType === 'online' ? 'border-indigo-500' : 'border-slate-300 dark:border-slate-600'}`}>
-                  <div className={`w-2.5 h-2.5 rounded-full transition-all ${formData.onlineType === 'online' ? 'bg-indigo-500 scale-100' : 'bg-transparent scale-0'}`}></div>
-                </div>
                 <input 
                   type="radio" 
-                  className="sr-only" 
                   name="onlineType" 
-                  checked={formData.onlineType === 'online'} 
-                  onChange={() => handleInputChange('onlineType', 'online')} 
+                  value="online"
+                  checked={formData.onlineType === 'online'}
+                  onChange={(e) => handleInputChange('onlineType', e.target.value)}
+                  className="mt-1 w-4 h-4 text-indigo-500 border-gray-300 focus:ring-indigo-500 accent-indigo-500"
                 />
-                <div className="flex-1 space-y-1 text-left">
+                <div className="flex-1 space-y-1">
                   <p className="text-[12px] font-medium text-slate-800 dark:text-slate-200">Online backup</p>
                   <p className="text-[10px] text-slate-500 dark:text-slate-500 leading-relaxed font-medium">Allows continuing database operations while the backup is being performed.</p>
                 </div>
               </label>
 
               <label className={`flex items-start gap-4 p-4 rounded-xl border transition-all cursor-pointer ${formData.onlineType === 'offline' ? 'bg-orange-500/5 border-orange-500/30' : 'bg-transparent border-slate-100 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5'}`}>
-                <div className={`mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${formData.onlineType === 'offline' ? 'border-orange-500' : 'border-slate-300 dark:border-slate-600'}`}>
-                  <div className={`w-2.5 h-2.5 rounded-full transition-all ${formData.onlineType === 'offline' ? 'bg-orange-500 scale-100' : 'bg-transparent scale-0'}`}></div>
-                </div>
                 <input 
                   type="radio" 
-                  className="sr-only" 
                   name="onlineType" 
-                  checked={formData.onlineType === 'offline'} 
-                  onChange={() => handleInputChange('onlineType', 'offline')} 
+                  value="offline"
+                  checked={formData.onlineType === 'offline'}
+                  onChange={(e) => handleInputChange('onlineType', e.target.value)}
+                  className="mt-1 w-4 h-4 text-orange-500 border-gray-300 focus:ring-orange-500 accent-orange-500"
                 />
-                <div className="flex-1 space-y-1 text-left">
+                <div className="flex-1 space-y-1">
                   <p className="text-[12px] font-medium text-slate-800 dark:text-slate-200">Offline backup</p>
                   <p className="text-[10px] text-slate-500 dark:text-slate-500 leading-relaxed font-medium">
                     <span className="text-orange-500 font-medium">Notice:</span> Database will be <span className="underline">stopped</span> during backup operation and then restarted automatically.
