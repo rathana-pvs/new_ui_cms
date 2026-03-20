@@ -26,7 +26,7 @@ export default function ConfigSourceEditor({ rawContent, handleSourceChange }) {
 
   return (
     <div className="flex-1 relative p-4 bg-slate-100 dark:bg-black/20">
-      <div className="h-full w-full bg-white dark:bg-[#1a1c1e] rounded-xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col">
+      <div className="h-full w-full bg-white dark:bg-[#1a1c1e] rounded-[6px] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col">
         <div className="flex items-center gap-1.5 px-4 py-2 bg-slate-50 dark:bg-white/5 border-b border-slate-100 dark:border-slate-800/50">
            <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 font-mono tracking-tight uppercase">cubrid_broker.conf</span>
         </div>

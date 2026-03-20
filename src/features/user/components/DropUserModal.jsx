@@ -1,9 +1,16 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { closeDropUserModal, dropDatabaseUser } from '../userSlice';
 
+// Import New Design System Components
+import Modal from '../../../components/ui/Layout/Modal';
+import Button from '../../../components/ui/Foundation/Button';
+import Typography from '../../../components/ui/Foundation/Typography';
+import Icon from '../../../components/ui/Foundation/Icon';
+import Alert from '../../../components/ui/Feedback/Alert';
+
 export default function DropUserModal() {
   const dispatch = useDispatch();
-  const { isDropUserModalOpen, dropUserData, actionLoading } = useSelector((state) => state.user);
+  const { isDropUserModalOpen, dropUserData, actionLoading, error } = useSelector((state) => state.user);
   const { selectedHostUid } = useSelector((state) => state.host);
 
   if (!isDropUserModalOpen || !dropUserData) return null;
@@ -16,40 +23,55 @@ export default function DropUserModal() {
     }));
   };
 
-  return (
-    <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-bk-main/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-bk-side w-full max-w-[400px] rounded-2xl shadow-2xl border border-slate-200 dark:border-white/5 overflow-hidden animate-in zoom-in-95 duration-200 text-left">
-        <div className="p-6">
-          <div className="w-12 h-12 rounded-full bg-rose-500/10 flex items-center justify-center mb-4">
-            <span className="material-symbols-outlined text-rose-500 text-2xl">person_remove</span>
-          </div>
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Drop Database User</h3>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
-            Are you sure you want to drop user <span className="font-bold text-slate-900 dark:text-white">"{dropUserData.userName}"</span> from database <span className="font-bold text-slate-900 dark:text-white">"{dropUserData.dbname}"</span>? This action cannot be undone.
-          </p>
+  const footer = (
+    <div className="flex gap-3 w-full">
+      <Button 
+        variant="ghost" 
+        className="flex-1"
+        onClick={() => dispatch(closeDropUserModal())}
+        disabled={actionLoading}
+      >
+        Cancel
+      </Button>
+      <Button 
+        variant="destructive" 
+        className="flex-1"
+        onClick={handleDrop}
+        loading={actionLoading}
+        icon="person_remove"
+      >
+        Drop User
+      </Button>
+    </div>
+  );
 
-          <div className="flex gap-3">
-            <button 
-              className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 transition-all"
-              onClick={() => dispatch(closeDropUserModal())}
-              disabled={actionLoading}
-            >
-              Cancel
-            </button>
-            <button 
-              className="flex-1 px-4 py-2.5 rounded-xl bg-rose-500 text-white text-sm font-bold hover:bg-rose-600 transition-all shadow-lg shadow-rose-500/20 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
-              onClick={handleDrop}
-              disabled={actionLoading}
-            >
-              {actionLoading ? (
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-              ) : (
-                'Drop User'
-              )}
-            </button>
+  return (
+    <Modal
+      isOpen={isDropUserModalOpen}
+      onClose={() => dispatch(closeDropUserModal())}
+      title="Drop Database User"
+      subtitle={`Permanently remove user from ${dropUserData.dbname}`}
+      icon="person_remove"
+      footer={footer}
+      maxWidth="max-w-[400px]"
+    >
+      <div className="space-y-4">
+        {error && <Alert variant="error" title="Drop Failed">{error}</Alert>}
+        
+        <div className="p-4 bg-destructive/5 border border-destructive/10 rounded-xl space-y-3">
+          <Typography variant="p" className="text-[13px] leading-relaxed">
+            Are you sure you want to drop user <span className="font-bold text-foreground">"{dropUserData.userName}"</span>?
+          </Typography>
+          <div className="flex items-center gap-2 p-2 bg-destructive/10 rounded-lg">
+             <Icon name="warning" size="sm" className="text-destructive" />
+             <Typography variant="caption" className="font-bold text-destructive uppercase tracking-tighter">This action cannot be undone</Typography>
           </div>
         </div>
+
+        <Typography variant="caption" className="block px-1 opacity-50 italic">
+          All associated privileges and object authorizations for this user will be purged from the system.
+        </Typography>
       </div>
-    </div>
+    </Modal>
   );
 }

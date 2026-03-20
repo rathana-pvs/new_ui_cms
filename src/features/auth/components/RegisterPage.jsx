@@ -82,14 +82,14 @@ export default function RegisterPage() {
         <div className="relative z-10 w-full flex flex-col justify-between p-20">
           <div>
             <Link to="/login" className="flex items-center gap-4 mb-14 group w-fit transition-all hover:translate-x-[-4px]">
-              <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center border border-white/10 group-hover:bg-white group-hover:border-white transition-all">
+              <div className="w-10 h-10 bg-white/5 rounded-[6px] flex items-center justify-center border border-white/10 group-hover:bg-white group-hover:border-white transition-all">
                 <span className="material-symbols-outlined text-slate-400 group-hover:text-bk-side">arrow_back</span>
               </div>
               <span className="text-sm font-black text-slate-400 group-hover:text-white tracking-widest">Back to Login</span>
             </Link>
 
             <div className="flex items-center gap-4 mb-10">
-               <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center p-2 shadow-xl shadow-white/5">
+               <div className="w-10 h-10 bg-white rounded-[6px] flex items-center justify-center p-2 shadow-xl shadow-white/5">
                  <img src="/cubrid-logo.png" alt="CUBRID" className="object-contain" />
                </div>
                <h3 className="text-xl font-bold text-white tracking-widest uppercase italic">Registration</h3>
@@ -110,7 +110,7 @@ export default function RegisterPage() {
                 { label: 'Performance', val: 'MVCC', icon: 'speed' },
                 { label: 'Security', val: 'Enterprise', icon: 'security' }
               ].map((stat, i) => (
-                <div key={i} className="p-5 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-bk-yellow/30 transition-all group">
+                <div key={i} className="p-5 rounded-[6px] bg-white/[0.03] border border-white/5 hover:border-bk-yellow/30 transition-all group">
                   <div className="flex items-center gap-3 mb-3">
                     <span className="material-symbols-outlined text-bk-yellow/40 group-hover:text-bk-yellow transition-colors text-[20px]">{stat.icon}</span>
                     <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{stat.label}</p>
@@ -147,7 +147,7 @@ export default function RegisterPage() {
                     type="text"
                     value={username}
                     onChange={(e) => { setUsername(e.target.value); clearFieldError('username'); }}
-                    className={`w-full pl-12 pr-4 py-3.5 bg-white dark:bg-bk-side border-2 ${errors.username ? 'border-rose-500' : 'border-slate-100 dark:border-transparent group-focus-within:border-bk-yellow/50'} rounded-2xl outline-none shadow-sm transition-all dark:text-white text-sm`}
+                    className={`w-full pl-12 pr-4 py-3.5 bg-white dark:bg-bk-side border-2 ${errors.username ? 'border-rose-500' : 'border-slate-100 dark:border-transparent group-focus-within:border-bk-yellow/50'} rounded-[6px] outline-none shadow-sm transition-all dark:text-white text-sm`}
                     placeholder="Pick a unique name"
                   />
                 </div>
@@ -166,7 +166,7 @@ export default function RegisterPage() {
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => { setPassword(e.target.value); clearFieldError('password'); }}
-                    className={`w-full pl-12 pr-12 py-3.5 bg-white dark:bg-bk-side border-2 ${errors.password ? 'border-rose-500' : 'border-slate-100 dark:border-transparent group-focus-within:border-bk-yellow/50'} rounded-2xl outline-none shadow-sm transition-all dark:text-white text-sm`}
+                    className={`w-full pl-12 pr-12 py-3.5 bg-white dark:bg-bk-side border-2 ${errors.password ? 'border-rose-500' : 'border-slate-100 dark:border-transparent group-focus-within:border-bk-yellow/50'} rounded-[6px] outline-none shadow-sm transition-all dark:text-white text-sm`}
                     placeholder="Create security keys"
                   />
                   <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
@@ -201,7 +201,7 @@ export default function RegisterPage() {
                     type={showConfirm ? 'text' : 'password'}
                     value={confirmPassword}
                     onChange={(e) => { setConfirmPassword(e.target.value); clearFieldError('confirmPassword'); }}
-                    className={`w-full pl-12 pr-12 py-3.5 bg-white dark:bg-bk-side border-2 ${errors.confirmPassword ? 'border-rose-500' : confirmPassword && password === confirmPassword ? 'border-emerald-500/50' : 'border-slate-100 dark:border-transparent group-focus-within:border-bk-yellow/50'} rounded-2xl outline-none shadow-sm transition-all dark:text-white text-sm`}
+                    className={`w-full pl-12 pr-12 py-3.5 bg-white dark:bg-bk-side border-2 ${errors.confirmPassword ? 'border-rose-500' : confirmPassword && password === confirmPassword ? 'border-emerald-500/50' : 'border-slate-100 dark:border-transparent group-focus-within:border-bk-yellow/50'} rounded-[6px] outline-none shadow-sm transition-all dark:text-white text-sm`}
                     placeholder="Repeat keys"
                   />
                    <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
@@ -222,7 +222,7 @@ export default function RegisterPage() {
                <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-4 bg-slate-900 dark:bg-bk-yellow text-white dark:text-bk-side font-black rounded-2xl shadow-xl hover:shadow-2xl transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 relative overflow-hidden group"
+                className="w-full py-4 bg-slate-900 dark:bg-bk-yellow text-white dark:text-bk-side font-black rounded-[6px] shadow-xl hover:shadow-2xl transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 relative overflow-hidden group"
               >
                 {loading ? (
                   <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
@@ -236,7 +236,7 @@ export default function RegisterPage() {
             </div>
 
             {apiError && (
-              <div className="p-4 bg-rose-50 dark:bg-rose-500/10 border border-rose-100 dark:border-rose-500/20 rounded-2xl flex items-center gap-3">
+              <div className="p-4 bg-rose-50 dark:bg-rose-500/10 border border-rose-100 dark:border-rose-500/20 rounded-[6px] flex items-center gap-3">
                 <span className="material-symbols-outlined text-rose-500 text-[20px]">report</span>
                 <p className="text-xs text-rose-600 dark:text-rose-400 font-bold leading-relaxed">{apiError}</p>
               </div>

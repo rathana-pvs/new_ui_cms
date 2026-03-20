@@ -1,18 +1,18 @@
 export default function DatabaseListSection({ dbListDisplay, handleAutoStartToggle }) {
   return (
-    <details className="group border border-slate-200 dark:border-slate-800 rounded-lg shadow-sm bg-white dark:bg-bk-side overflow-hidden" open>
+    <details className="group border border-slate-200 dark:border-slate-800 rounded-[6px] shadow-sm bg-white dark:bg-bk-side overflow-hidden" open>
       <summary className="flex items-center gap-2 px-3 py-2.5 cursor-pointer list-none hover:bg-slate-50 dark:hover:bg-white/5 transition-colors bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-slate-800 text-sm font-medium text-slate-900 dark:text-slate-200">
         <span className="material-symbols-outlined text-[16px] text-bk-yellow leading-none transition-transform group-open:rotate-180">expand_more</span>
         <span className="material-symbols-outlined text-[16px] text-slate-400">database</span>
         <span>Databases</span>
       </summary>
       <div className="overflow-x-auto w-full">
-        <table className="w-full text-left text-xs whitespace-nowrap font-sans">
+        <table className="w-full text-left text-[13px] whitespace-nowrap font-sans">
           <thead>
             <tr className="text-slate-500 dark:text-slate-400 bg-slate-50/20 dark:bg-transparent border-b border-slate-200 dark:border-slate-800">
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Database</th>
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Auto Startup</th>
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Status</th>
+              <th className="px-4 py-3 font-medium text-[11px] tracking-wide">Database</th>
+              <th className="px-4 py-3 font-medium text-[11px] tracking-wide">Auto Startup</th>
+              <th className="px-4 py-3 font-medium text-[11px] tracking-wide">Status</th>
             </tr>
           </thead>
           <tbody className="font-mono">
@@ -22,7 +22,7 @@ export default function DatabaseListSection({ dbListDisplay, handleAutoStartTogg
                 <td className="px-4 py-3">
                   <input 
                     type="checkbox" 
-                    className="w-4 h-4 rounded border-slate-300 dark:border-slate-700 bg-white dark:bg-bk-main text-bk-yellow focus:ring-bk-yellow/50 cursor-pointer accent-bk-yellow" 
+                    className="w-4 h-4 rounded-[6px] border-slate-300 dark:border-slate-700 bg-white dark:bg-bk-main text-bk-yellow focus:ring-bk-yellow/50 cursor-pointer accent-bk-yellow" 
                     checked={row.autoStart} 
                     onChange={() => handleAutoStartToggle(row.db, row.autoStart)}
                   />

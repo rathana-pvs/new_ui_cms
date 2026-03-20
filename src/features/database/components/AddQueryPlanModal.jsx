@@ -24,7 +24,7 @@ const CustomSelect = ({ value, options, onChange, icon }) => {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded px-3 text-[12px] text-slate-900 dark:text-white flex items-center justify-between hover:border-bk-yellow/50 transition-all font-medium h-9"
+        className="w-full bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded-[6px] px-3 text-[12px] text-slate-900 dark:text-white flex items-center justify-between hover:border-bk-yellow/50 transition-all font-medium h-9"
       >
         <span className="flex items-center gap-2">
           {icon && <span className="material-symbols-outlined text-[16px] text-slate-400">{icon}</span>}
@@ -34,7 +34,7 @@ const CustomSelect = ({ value, options, onChange, icon }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 z-[250] bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl shadow-black/40 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 max-h-[300px] overflow-y-auto custom-scrollbar">
+        <div className="absolute top-full left-0 right-0 mt-2 z-[250] bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-[6px] shadow-2xl shadow-black/40 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 max-h-[300px] overflow-y-auto custom-scrollbar">
           <div className="py-1">
             {options.map((opt) => (
               <button
@@ -159,7 +159,7 @@ export default function AddQueryPlanModal() {
 
   return (
     <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-bk-main/60 backdrop-blur-sm animate-in fade-in duration-200 font-sans text-left">
-      <div className="bg-white dark:bg-bk-side w-full max-w-[700px] h-auto max-h-[90vh] rounded-xl shadow-[0_10px_50px_rgba(0,0,0,0.3)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col relative text-left">
+      <div className="bg-white dark:bg-bk-side w-full max-w-[700px] h-auto max-h-[90vh] rounded-[6px] shadow-[0_10px_50px_rgba(0,0,0,0.3)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col relative text-left">
         
         {/* ribbon accent */}
         <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-bk-yellow via-amber-500 to-bk-yellow z-[310]"></div>
@@ -167,7 +167,7 @@ export default function AddQueryPlanModal() {
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
+            <div className="w-8 h-8 rounded-[6px] bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
               <span className="material-symbols-outlined text-bk-yellow text-xl">bolt</span>
             </div>
             <div>
@@ -177,7 +177,7 @@ export default function AddQueryPlanModal() {
           </div>
           <button 
             onClick={() => dispatch(closeAddQueryPlanModal())}
-            className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
+            className="w-7 h-7 rounded-[6px] hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
           >
             <span className="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform">close</span>
           </button>
@@ -187,7 +187,7 @@ export default function AddQueryPlanModal() {
         <div className="p-5 space-y-6 overflow-y-auto custom-scrollbar max-h-[70vh] flex-1">
           
           {error && (
-            <div className="bg-rose-500/10 border border-rose-500/20 p-4 rounded-2xl flex items-center gap-4 animate-in slide-in-from-top-4 duration-200">
+            <div className="bg-rose-500/10 border border-rose-500/20 p-4 rounded-[6px] flex items-center gap-4 animate-in slide-in-from-top-4 duration-200">
                <div className="w-10 h-10 rounded-full bg-rose-500/20 flex items-center justify-center text-rose-500 shrink-0">
                   <span className="material-symbols-outlined text-2xl font-black">error</span>
                </div>
@@ -212,7 +212,7 @@ export default function AddQueryPlanModal() {
                   value={formData.queryId}
                   onChange={(e) => handleInputChange('queryId', e.target.value)}
                   placeholder="e.g. daily_stats_update"
-                  className="w-full h-9 px-3 flex items-center bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded text-[12px] font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-bk-yellow/50 transition-all"
+                  className="w-full h-9 px-3 flex items-center bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded-[6px] text-[12px] font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-bk-yellow/50 transition-all"
                 />
               </div>
               <div className="col-span-6 space-y-1.5">
@@ -221,7 +221,7 @@ export default function AddQueryPlanModal() {
                   type="text" 
                   value={formData.username}
                   onChange={(e) => handleInputChange('username', e.target.value)}
-                  className="w-full h-9 px-3 flex items-center bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded text-[12px] font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-bk-yellow/50 transition-all"
+                  className="w-full h-9 px-3 flex items-center bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded-[6px] text-[12px] font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-bk-yellow/50 transition-all"
                 />
               </div>
               <div className="col-span-6 space-y-1.5">
@@ -230,7 +230,7 @@ export default function AddQueryPlanModal() {
                   type="password" 
                   value={formData.password}
                   onChange={(e) => handleInputChange('password', e.target.value)}
-                  className="w-full h-9 px-3 flex items-center bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded text-[12px] font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-bk-yellow/50 transition-all"
+                  className="w-full h-9 px-3 flex items-center bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded-[6px] text-[12px] font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-bk-yellow/50 transition-all"
                 />
               </div>
             </div>
@@ -243,7 +243,7 @@ export default function AddQueryPlanModal() {
                <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
             </div>
             
-            <div className="bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded-2xl p-5 space-y-5">
+            <div className="bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded-[6px] p-5 space-y-5">
               <div className="grid grid-cols-12 gap-6">
                 <div className="col-span-6 space-y-1.5">
                   <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4 gap-2">
@@ -269,14 +269,14 @@ export default function AddQueryPlanModal() {
                   <div className="relative">
                     <button 
                       onClick={() => setShowTimePicker(!showTimePicker)}
-                      className="w-full h-9 px-3 flex items-center justify-between bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded text-[12px] font-medium text-slate-900 dark:text-white hover:border-bk-yellow/50 transition-all"
+                      className="w-full h-9 px-3 flex items-center justify-between bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-[6px] text-[12px] font-medium text-slate-900 dark:text-white hover:border-bk-yellow/50 transition-all"
                     >
                       <span>{formData.backupTime}</span>
                       <span className="material-symbols-outlined text-bk-yellow text-lg">history_toggle_off</span>
                     </button>
 
                     {showTimePicker && (
-                      <div className="absolute top-full left-0 mt-2 z-[210] w-[200px] bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl shadow-black/40 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                      <div className="absolute top-full left-0 mt-2 z-[210] w-[200px] bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-[6px] shadow-2xl shadow-black/40 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                         <div className="flex divide-x divide-slate-100 dark:divide-slate-800 h-[220px]">
                           {/* Hours Column */}
                           <div className="flex-1 flex flex-col overflow-y-auto custom-scrollbar bg-slate-50/30 dark:bg-bk-main/20">
@@ -343,7 +343,7 @@ export default function AddQueryPlanModal() {
                       <button
                         key={day}
                         onClick={() => toggleDay(day)}
-                        className={`h-8 rounded border text-[11px] font-medium transition-all flex items-center justify-center ${
+                        className={`h-8 rounded-[6px] border text-[11px] font-medium transition-all flex items-center justify-center ${
                           formData.periodDetail.includes(day)
                             ? 'bg-bk-yellow border-bk-yellow text-bk-side shadow-lg shadow-bk-yellow/20'
                             : 'bg-white dark:bg-bk-side border-slate-200 dark:border-slate-800 text-slate-500 hover:border-bk-yellow/50 hover:text-bk-yellow'
@@ -366,7 +366,7 @@ export default function AddQueryPlanModal() {
                         <button
                           key={day}
                           onClick={() => toggleDay(val)}
-                          className={`h-9 rounded border text-[11px] font-medium transition-all flex items-center justify-center ${
+                          className={`h-9 rounded-[6px] border text-[11px] font-medium transition-all flex items-center justify-center ${
                             formData.periodDetail.includes(val)
                               ? 'bg-bk-yellow border-bk-yellow text-bk-side shadow-lg shadow-bk-yellow/20'
                               : 'bg-white dark:bg-bk-side border-slate-200 dark:border-slate-800 text-slate-500 hover:border-bk-yellow/50 hover:text-bk-yellow'
@@ -381,32 +381,32 @@ export default function AddQueryPlanModal() {
               )}
 
               {formData.periodType === 'DAY' && (
-                <div className="p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-xl flex items-center gap-3">
+                <div className="p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-[6px] flex items-center gap-3">
                     <span className="material-symbols-outlined text-emerald-500 text-lg">check_circle</span>
                     <span className="text-[12px] font-medium text-emerald-600/80 tracking-tight italic">Query will execute automatically every day at {formData.backupTime}</span>
                 </div>
               )}
 
               {formData.periodType === 'DATE' && (
-                <div className="bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded px-5 py-4 space-y-3">
+                <div className="bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded-[6px] px-5 py-4 space-y-3">
                   <div className="flex items-center gap-4">
                     <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 w-12 ">Date:</label>
                     <div className="relative flex-1">
                       <button 
                         onClick={() => setShowCalendar(!showCalendar)}
-                        className="w-full h-9 px-3 flex items-center justify-between bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded text-[12px] font-medium text-slate-900 dark:text-white"
+                        className="w-full h-9 px-3 flex items-center justify-between bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-[6px] text-[12px] font-medium text-slate-900 dark:text-white"
                       >
                         <span>{formData.periodDetail || 'Select date'}</span>
                         <span className="material-symbols-outlined text-bk-yellow text-lg">calendar_today</span>
                       </button>
 
                       {showCalendar && (
-                        <div className="absolute top-full left-0 mt-2 z-[200] w-[280px] bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl shadow-black/40 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                        <div className="absolute top-full left-0 mt-2 z-[200] w-[280px] bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-[6px] shadow-2xl shadow-black/40 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                           {/* Calendar Header */}
                           <div className="flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-bk-main/50 border-b border-slate-100 dark:border-slate-800">
                             <button 
                               onClick={() => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1))}
-                              className="w-7 h-7 rounded-lg hover:bg-slate-200 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 transition-colors"
+                              className="w-7 h-7 rounded-[6px] hover:bg-slate-200 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 transition-colors"
                             >
                               <span className="material-symbols-outlined text-lg">chevron_left</span>
                             </button>
@@ -415,7 +415,7 @@ export default function AddQueryPlanModal() {
                             </span>
                             <button 
                               onClick={() => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1))}
-                              className="w-7 h-7 rounded-lg hover:bg-slate-200 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 transition-colors"
+                              className="w-7 h-7 rounded-[6px] hover:bg-slate-200 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 transition-colors"
                             >
                               <span className="material-symbols-outlined text-lg">chevron_right</span>
                             </button>
@@ -453,7 +453,7 @@ export default function AddQueryPlanModal() {
                                         handleInputChange('periodDetail', dateStr);
                                         setShowCalendar(false);
                                       }}
-                                      className={`h-8 w-full rounded-lg text-[11px] font-medium transition-all flex items-center justify-center relative ${
+                                      className={`h-8 w-full rounded-[6px] text-[11px] font-medium transition-all flex items-center justify-center relative ${
                                         isSelected 
                                           ? 'bg-bk-yellow text-bk-side shadow-lg shadow-bk-yellow/20 translate-y-[-1px]' 
                                           : 'hover:bg-bk-yellow/10 hover:text-bk-yellow text-slate-700 dark:text-slate-300'
@@ -480,13 +480,13 @@ export default function AddQueryPlanModal() {
                                 setViewDate(new Date());
                                 setShowCalendar(false);
                               }}
-                              className="text-[10px] font-medium text-bk-yellow px-2 py-1 hover:bg-bk-yellow/5 rounded-md transition-colors"
+                              className="text-[10px] font-medium text-bk-yellow px-2 py-1 hover:bg-bk-yellow/5 rounded-[6px] transition-colors"
                             >
                               Today
                             </button>
                             <button 
                               onClick={() => setShowCalendar(false)}
-                              className="text-[10px] font-medium text-slate-400 px-2 py-1 hover:bg-slate-100 dark:hover:bg-white/5 rounded-md transition-colors"
+                              className="text-[10px] font-medium text-slate-400 px-2 py-1 hover:bg-slate-100 dark:hover:bg-white/5 rounded-[6px] transition-colors"
                             >
                               Close
                             </button>
@@ -519,7 +519,7 @@ export default function AddQueryPlanModal() {
                     value={formData.queryString}
                     onChange={(e) => handleInputChange('queryString', e.target.value)}
                     placeholder="Enter your SQL query here... e.g. UPDATE stats SET total = total + 1 WHERE id = 1;"
-                    className="w-full h-40 pl-10 pr-4 py-3 bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded-2xl text-[13px] font-mono text-slate-900 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-bk-yellow/50 transition-all resize-none custom-scrollbar"
+                    className="w-full h-40 pl-10 pr-4 py-3 bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded-[6px] text-[13px] font-mono text-slate-900 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-bk-yellow/50 transition-all resize-none custom-scrollbar"
                   />
                </div>
                <p className="text-[10px] text-slate-400 dark:text-slate-500 ml-1 italic font-medium">Tip: Ensure the query is valid and the user has appropriate permissions within the database.</p>
@@ -531,14 +531,14 @@ export default function AddQueryPlanModal() {
         <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 backdrop-blur-sm flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
           <button 
             disabled={loading}
-            className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-all text-left"
+            className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded-[6px] hover:bg-slate-100 dark:hover:bg-white/5 transition-all text-left"
             onClick={() => dispatch(closeAddQueryPlanModal())}
           >
             Discard
           </button>
           <button 
             disabled={loading}
-            className="px-6 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center gap-2 min-w-[130px] disabled:opacity-50 text-left"
+            className="px-6 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded-[6px] border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center gap-2 min-w-[130px] disabled:opacity-50 text-left"
             onClick={handleSave}
           >
             {loading ? (

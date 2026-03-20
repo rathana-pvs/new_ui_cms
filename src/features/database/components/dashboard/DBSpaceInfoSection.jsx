@@ -1,36 +1,38 @@
+import React from 'react';
+import Card from '../../../../components/ui/Layout/Card';
+import Table from '../../../../components/ui/Layout/Table';
+import Typography from '../../../../components/ui/Foundation/Typography';
+import Icon from '../../../../components/ui/Foundation/Icon';
+
 export default function DBSpaceInfoSection({ spaceInfo }) {
+  const columns = [
+    { key: 'type', label: 'Type' },
+    { key: 'fileCount', label: 'File Count' },
+    { key: 'usedPages', label: 'Used Pages' },
+    { key: 'fileTablePages', label: 'File Table Pages' },
+    { key: 'reservedPages', label: 'Reserved Pages' },
+    { key: 'totalPages', label: 'Total Pages' },
+  ];
+
   return (
-    <details className="group border border-slate-200 dark:border-slate-800 rounded-lg shadow-sm bg-white dark:bg-bk-side overflow-hidden" open>
-      <summary className="flex items-center gap-2 px-3 py-2.5 cursor-pointer list-none hover:bg-slate-50 dark:hover:bg-white/5 transition-colors bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-slate-800 text-sm font-medium text-slate-900 dark:text-slate-200">
-        <span className="material-symbols-outlined text-[16px] text-bk-yellow leading-none transition-transform group-open:rotate-180">expand_more</span>
-        <span>Space info for files</span>
-      </summary>
-      <div className="overflow-x-auto w-full">
-        <table className="w-full text-left text-xs whitespace-nowrap font-sans">
-          <thead>
-            <tr className="text-slate-500 dark:text-slate-400 bg-slate-50/20 dark:bg-transparent border-b border-slate-200 dark:border-slate-800">
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Type</th>
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">File Count</th>
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Used Pages</th>
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">File Table Pages</th>
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Reserved Pages</th>
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Total Pages</th>
-            </tr>
-          </thead>
-          <tbody className="font-mono">
-            {spaceInfo.map((row, i) => (
-              <tr key={i} className="text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition-colors border-b border-slate-100 dark:border-slate-800">
-                <td className="px-4 py-3 font-sans font-medium">{row.type}</td>
-                <td className="px-4 py-3">{row.fileCount}</td>
-                <td className="px-4 py-3">{row.usedPages}</td>
-                <td className="px-4 py-3">{row.fileTablePages}</td>
-                <td className="px-4 py-3">{row.reservedPages}</td>
-                <td className="px-4 py-3">{row.totalPages}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </details>
+    <Card className="overflow-hidden border-border/50 bg-background shadow-sm group">
+      <details className="w-full" open>
+        <summary className="flex items-center gap-3 px-5 py-3 cursor-pointer list-none hover:bg-muted/5 transition-all border-b border-border/50 select-none">
+          <Icon name="expand_more" size="xs" className="text-primary transition-transform group-open:rotate-180" />
+          <div className="flex items-center gap-2 flex-1">
+             <Icon name="pie_chart" size="xs" className="text-secondary opacity-60" />
+             <Typography variant="h4" className="font-black tracking-tight">Space Usage Distribution</Typography>
+          </div>
+          <Typography variant="caption" className="font-bold opacity-30 uppercase tracking-widest text-[8px]">File Catalog Metrics</Typography>
+        </summary>
+        <div className="p-1">
+           <Table 
+              columns={columns}
+              data={spaceInfo}
+              variant="compact"
+           />
+        </div>
+      </details>
+    </Card>
   );
 }

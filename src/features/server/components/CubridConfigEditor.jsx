@@ -108,7 +108,7 @@ export default function CubridConfigEditor({ hostUid, confname }) {
       {/* ToolBar */}
       <div className="flex items-center justify-between px-6 py-3 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-bk-side">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
+          <div className="w-8 h-8 rounded-[6px] bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
             <span className="material-symbols-outlined text-bk-yellow text-xl">settings_applications</span>
           </div>
           <div>
@@ -129,7 +129,7 @@ export default function CubridConfigEditor({ hostUid, confname }) {
             <button 
               onClick={handleUndo}
               disabled={!hasChanges || loading || saving}
-              className="px-3 py-1.5 flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-200 dark:border-slate-800 rounded-md text-slate-600 dark:text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed transition-all text-[11px] font-bold" 
+              className="px-3 py-1.5 flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-200 dark:border-slate-800 rounded-[6px] text-slate-600 dark:text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed transition-all text-[11px] font-bold" 
             >
               <span className="material-symbols-outlined text-[16px]">undo</span>
               <span>Undo</span>
@@ -137,7 +137,7 @@ export default function CubridConfigEditor({ hostUid, confname }) {
             <button 
               onClick={fetchConfig}
               disabled={loading || saving}
-              className="px-3 py-1.5 flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-200 dark:border-slate-800 rounded-md text-slate-600 dark:text-slate-300 transition-all text-[11px] font-bold"
+              className="px-3 py-1.5 flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-200 dark:border-slate-800 rounded-[6px] text-slate-600 dark:text-slate-300 transition-all text-[11px] font-bold"
             >
               <span className={`material-symbols-outlined text-[16px] ${loading ? 'animate-spin' : ''}`}>refresh</span>
               <span>Refresh</span>
@@ -149,7 +149,7 @@ export default function CubridConfigEditor({ hostUid, confname }) {
           <button 
             onClick={handleSave}
             disabled={!hasChanges || saving || loading}
-            className="px-4 py-1.5 bg-bk-yellow hover:bg-[#ffd700] disabled:opacity-50 disabled:grayscale text-bk-side text-[11px] font-medium tracking-wide rounded-md transition-all flex items-center gap-2 shadow-sm"
+            className="px-4 py-1.5 bg-bk-yellow hover:bg-[#ffd700] disabled:opacity-50 disabled:grayscale text-bk-side text-[11px] font-medium tracking-wide rounded-[6px] transition-all flex items-center gap-2 shadow-sm"
           >
             {saving ? (
               <div className="w-3.5 h-3.5 border-2 border-bk-side/30 border-t-bk-side rounded-full animate-spin"></div>
@@ -169,7 +169,7 @@ export default function CubridConfigEditor({ hostUid, confname }) {
              <span className="text-xs font-medium text-slate-600 dark:text-bk-yellow">Loading configuration...</span>
           </div>
         ) : (
-          <div className="h-full w-full bg-white dark:bg-[#1a1c1e] rounded-xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col">
+          <div className="h-full w-full bg-white dark:bg-[#1a1c1e] rounded-[6px] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col">
             <div className="flex items-center gap-1.5 px-4 py-2 bg-slate-50 dark:bg-white/5 border-b border-slate-100 dark:border-slate-800/50">
                <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 font-mono tracking-tight uppercase">{confname}.conf</span>
             </div>

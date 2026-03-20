@@ -3,8 +3,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { closeLoadDBModal } from '../databaseSlice';
 import { showStatusModal } from '../../layout/layoutSlice';
 import { databaseApi } from '../databaseApi';
-import LoadingOverlay from '../../../components/common/LoadingOverlay';
-import ErrorOverlay from '../../../components/common/ErrorOverlay';
+
+// Import New Design System Components
+import Modal from '../../../components/ui/Layout/Modal';
+import Button from '../../../components/ui/Foundation/Button';
+import Typography from '../../../components/ui/Foundation/Typography';
+import Icon from '../../../components/ui/Foundation/Icon';
+import Alert from '../../../components/ui/Feedback/Alert';
+import Card from '../../../components/ui/Layout/Card';
 
 import LoadConfigSection from './load/LoadConfigSection';
 import LoadSourceSection from './load/LoadSourceSection';
@@ -23,32 +29,13 @@ export default function LoadDatabaseModal() {
   const [formData, setFormData] = useState({
     targetDbName: '',
     dbUsername: 'dba',
-    unloadFiles: {
-      schema: '',
-      object: '',
-      index: '',
-      trigger: ''
-    },
+    unloadFiles: { schema: '', object: '', index: '', trigger: '' },
     checkBoxes: {
-      schema: false,
-      object: false,
-      index: false,
-      trigger: false,
-      checkoption: false,
-      nolog: false,
-      oiduse: false,
-      statisticsuse: false,
-      estimated: false,
-      period: false,
-      errorcontrolfile: false,
-      ignoreclassfile: false
+      schema: false, object: false, index: false, trigger: false,
+      checkoption: false, nolog: false, oiduse: false, statisticsuse: false,
+      estimated: false, period: false, errorcontrolfile: false, ignoreclassfile: false
     },
-    values: {
-      estimated: '',
-      period: '',
-      errorcontrolfile: '',
-      ignoreclassfile: ''
-    }
+    values: { estimated: '', period: '', errorcontrolfile: '', ignoreclassfile: '' }
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -60,9 +47,7 @@ export default function LoadDatabaseModal() {
       .map(([key, value]) => {
         const [path, date] = value.split(';');
         return {
-          loadType: key,
-          path: path,
-          date: date,
+          loadType: key, path: path, date: date,
           key: Math.random().toString(36).substr(2, 4),
           checked: false
         };
@@ -72,18 +57,13 @@ export default function LoadDatabaseModal() {
 
   useEffect(() => {
     if (isLoadDBModalOpen && selectedDatabase) {
-      setFormData(prev => ({
-        ...prev,
-        targetDbName: selectedDatabase,
-      }));
-
+      setFormData(prev => ({ ...prev, targetDbName: selectedDatabase }));
       databaseApi.getUnloadInfo(selectedHostUid).then((res) => {
         const dbs = res.database || [];
         setUnloadList(dbs);
         if (dbs.length > 0) {
-          const firstDb = dbs[0];
-          setSelectedUnload(firstDb.dbname);
-          updateDataSource(firstDb);
+          setSelectedUnload(dbs[0].dbname);
+          updateDataSource(dbs[0]);
         }
       }).catch(err => console.error("Failed to fetch unload info:", err));
     }
@@ -91,53 +71,32 @@ export default function LoadDatabaseModal() {
 
   if (!isLoadDBModalOpen) return null;
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
+  const handleInputChange = (field, value) => setFormData(prev => ({ ...prev, [field]: value }));
   const handleValueChange = (name, value) => {
-    setFormData(prev => ({
-      ...prev,
-      values: { ...prev.values, [name]: value }
-    }));
+    setFormData(prev => ({ ...prev, values: { ...prev.values, [name]: value } }));
   };
-
   const handleCheckBoxChange = (name, checked) => {
-    setFormData(prev => ({
-      ...prev,
-      checkBoxes: { ...prev.checkBoxes, [name]: checked }
-    }));
+    setFormData(prev => ({ ...prev, checkBoxes: { ...prev.checkBoxes, [name]: checked } }));
   };
-
   const handleUnloadPathChange = (name, value) => {
-    setFormData(prev => ({
-      ...prev,
-      unloadFiles: { ...prev.unloadFiles, [name]: value }
-    }));
+    setFormData(prev => ({ ...prev, unloadFiles: { ...prev.unloadFiles, [name]: value } }));
   };
-
   const handleTableCheckboxChange = (checked, key) => {
     setDataSource(prev => prev.map(item => item.key === key ? { ...item, checked } : item));
   };
-
   const handleUnloadSelectChange = (dbname) => {
     setSelectedUnload(dbname);
     const dbData = unloadList.find(d => d.dbname === dbname);
-    if (dbData) {
-      updateDataSource(dbData);
-    }
+    if (dbData) updateDataSource(dbData);
   };
 
   const handleLoadDatabase = async () => {
     if (!selectedHostUid || !selectedDatabase) return;
-    
     setIsLoading(true);
     setError(null);
     try {
       const toYesNo = (val) => (val ? "yes" : "no");
       let loadObject = {};
-
       if (radio === 0) {
         ["index", "schema", "object", "trigger"].forEach(item => {
           const found = dataSource.find(res => res.checked && res.loadType === item);
@@ -152,10 +111,8 @@ export default function LoadDatabaseModal() {
         };
       }
 
-      const payload = {
-        dbname: selectedDatabase,
-        ...loadObject,
-        user: formData.dbUsername,
+      await databaseApi.loadDatabase(selectedHostUid, selectedDatabase, {
+        dbname: selectedDatabase, ...loadObject, user: formData.dbUsername,
         oiduse: toYesNo(formData.checkBoxes.oiduse),
         statisticsuse: toYesNo(formData.checkBoxes.statisticsuse),
         nolog: toYesNo(formData.checkBoxes.nolog),
@@ -164,113 +121,62 @@ export default function LoadDatabaseModal() {
         errorcontrolfile: formData.checkBoxes.errorcontrolfile ? formData.values.errorcontrolfile : "none",
         ignoreclassfile: formData.checkBoxes.ignoreclassfile ? formData.values.ignoreclassfile : "none",
         checkoption: formData.checkBoxes.checkoption ? "both" : "none",
-      };
-
-      await databaseApi.loadDatabase(selectedHostUid, selectedDatabase, payload);
+      });
       dispatch(closeLoadDBModal());
-      dispatch(showStatusModal({
-        type: 'success',
-        title: 'Load success',
-        message: 'Database load operation has been queued successfully.'
-      }));
+      dispatch(showStatusModal({ type: 'success', title: 'Load Success', message: 'Database load operation has been queued successfully.' }));
     } catch (err) {
-      console.error('Failed to load database:', err);
       setError(err.response?.data?.note || err.response?.data?.message || 'Database restoration failed. Verify source file access.');
     } finally {
       setIsLoading(false);
     }
   };
 
+  const footer = (
+    <div className="flex justify-end gap-3 w-full">
+      <Button variant="ghost" onClick={() => dispatch(closeLoadDBModal())} disabled={isLoading}>Discard</Button>
+      <Button variant="primary" onClick={handleLoadDatabase} loading={isLoading} icon="play_circle">Run Load</Button>
+    </div>
+  );
+
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans text-left">
-      <div className="bg-white dark:bg-bk-side w-full max-w-[640px] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col relative text-left">
-        
-        {/* Subtle Top Accent */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-bk-yellow/60"></div>
+    <Modal
+      isOpen={isLoadDBModalOpen}
+      onClose={() => dispatch(closeLoadDBModal())}
+      title="Load Database"
+      subtitle={`${selectedDatabase} @ ${selectedHostUid}`}
+      icon="download"
+      footer={footer}
+      maxWidth="max-w-[680px]"
+    >
+      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
+        {error && <Alert variant="error" title="Restoration failure" onClose={() => setError(null)}>{error}</Alert>}
 
-        <LoadingOverlay 
-            isVisible={isLoading} 
-            title="Processing load" 
-            subtitle="Streaming volumes into target database..." 
-        />
-        <ErrorOverlay 
-          isVisible={!!error} 
-          error={error} 
-          onRetry={handleLoadDatabase}
-          onClose={() => setError(null)}
-        />
+        <div className="space-y-10">
+           <LoadConfigSection 
+             formData={formData} 
+             handleInputChange={(e) => handleInputChange(e.target.name, e.target.value)} 
+           />
 
-        {/* Header - Compact */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
-              <span className="material-symbols-outlined text-bk-yellow text-xl">download</span>
-            </div>
-            <div>
-              <h3 className="text-sm font-medium text-slate-900 dark:text-white leading-none">Load database</h3>
-            </div>
-          </div>
-          <button 
-            onClick={() => dispatch(closeLoadDBModal())}
-            className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
-          >
-            <span className="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform">close</span>
-          </button>
-        </div>
-        
-        {/* Body */}
-        <div className="p-5 space-y-6 overflow-y-auto custom-scrollbar flex-1 max-h-[75vh]">
-          
-          <LoadConfigSection 
-            formData={formData} 
-            handleInputChange={handleInputChange} 
-          />
+           <LoadSourceSection 
+             radio={radio}
+             setRadio={setRadio}
+             selectedUnload={selectedUnload}
+             handleUnloadSelectChange={handleUnloadSelectChange}
+             unloadList={unloadList}
+             dataSource={dataSource}
+             handleTableCheckboxChange={handleTableCheckboxChange}
+             formData={formData}
+             handleCheckBoxChange={handleCheckBoxChange}
+             handleUnloadPathChange={handleUnloadPathChange}
+           />
 
-          <LoadSourceSection 
-            radio={radio}
-            setRadio={setRadio}
-            selectedUnload={selectedUnload}
-            handleUnloadSelectChange={handleUnloadSelectChange}
-            unloadList={unloadList}
-            dataSource={dataSource}
-            handleTableCheckboxChange={handleTableCheckboxChange}
-            formData={formData}
-            handleCheckBoxChange={handleCheckBoxChange}
-            handleUnloadPathChange={handleUnloadPathChange}
-          />
-
-          <LoadOptionsSection 
-            formData={formData}
-            handleCheckBoxChange={handleCheckBoxChange}
-            handleValueChange={handleValueChange}
-          />
-        </div>
-        
-        {/* Footer */}
-        <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 backdrop-blur-sm flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
-          <button 
-            disabled={isLoading}
-            className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-all"
-            onClick={() => dispatch(closeLoadDBModal())}
-          >
-            Discard
-          </button>
-          <button 
-            disabled={isLoading}
-            className="px-6 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center gap-2 min-w-[130px] disabled:opacity-50"
-            onClick={handleLoadDatabase}
-          >
-            {isLoading ? (
-              <div className="w-3 h-3 border-2 border-bk-side/30 border-t-bk-side rounded-full animate-spin"></div>
-            ) : (
-              <>
-                <span className="material-symbols-outlined text-[16px]">play_circle</span>
-                <span>Run load</span>
-              </>
-            )}
-          </button>
+           <LoadOptionsSection 
+             formData={formData}
+             handleCheckBoxChange={handleCheckBoxChange}
+             handleValueChange={handleValueChange}
+           />
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

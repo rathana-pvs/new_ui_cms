@@ -2,8 +2,13 @@ import { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { closeUnloadDBModal, openUnloadResultModal } from '../databaseSlice';
 import { databaseApi } from '../databaseApi';
-import LoadingOverlay from '../../../components/common/LoadingOverlay';
-import ErrorOverlay from '../../../components/common/ErrorOverlay';
+
+// Import New Design System Components
+import Modal from '../../../components/ui/Layout/Modal';
+import Button from '../../../components/ui/Foundation/Button';
+import Typography from '../../../components/ui/Foundation/Typography';
+import Icon from '../../../components/ui/Foundation/Icon';
+import Alert from '../../../components/ui/Feedback/Alert';
 
 import UnloadConfigSection from './unload/UnloadConfigSection';
 import UnloadContentSection from './unload/UnloadContentSection';
@@ -53,23 +58,15 @@ export default function UnloadDatabaseModal() {
     try {
       const status = activeDatabases.includes(selectedDatabase) ? 'on' : 'off';
       const res = await databaseApi.getClassInfo(selectedHostUid, selectedDatabase, status);
-      
       const userTables = res.userclass?.[0]?.class?.map(c => c.classname) || [];
       setDynamicTables(userTables);
-      
-      setFormData(prev => {
-        if (prev.schemaOption === 'All') {
-          return { ...prev, selectedTables: userTables };
-        }
-        return prev;
-      });
+      setFormData(prev => prev.schemaOption === 'All' ? { ...prev, selectedTables: userTables } : prev);
     } catch (err) {
       console.error('Failed to fetch tables:', err);
     } finally {
       setIsTablesLoading(false);
     }
   }, [selectedHostUid, selectedDatabase, activeDatabases]);
-
 
   useEffect(() => {
     if (isUnloadDBModalOpen && selectedDatabase) {
@@ -88,28 +85,16 @@ export default function UnloadDatabaseModal() {
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
 
   const handleSchemaChange = (e) => {
     const { value } = e.target;
-    setFormData(prev => {
-      let newSelectedTables = prev.selectedTables;
-      if (value === 'All') {
-        newSelectedTables = [...dynamicTables];
-      } else if (value === 'Selected tables' || value === 'Not include') {
-        newSelectedTables = [];
-      }
-      
-      return {
-        ...prev,
-        schemaOption: value,
-        selectedTables: newSelectedTables
-      };
-    });
+    setFormData(prev => ({
+      ...prev,
+      schemaOption: value,
+      selectedTables: value === 'All' ? [...dynamicTables] : []
+    }));
   };
 
   const handleTableToggle = (table) => {
@@ -123,7 +108,6 @@ export default function UnloadDatabaseModal() {
 
   const handleUnloadDatabase = async () => {
     if (!selectedHostUid || !selectedDatabase) return;
-    
     setIsUnloading(true);
     setError(null);
     try {
@@ -152,96 +136,53 @@ export default function UnloadDatabaseModal() {
       dispatch(closeUnloadDBModal());
       dispatch(openUnloadResultModal(response));
     } catch (err) {
-      console.error('Failed to unload database:', err);
-      setError(err.response?.data?.note || err.response?.data?.message || 'The unload operation failed. Check the target directory permissions and database state.');
+      setError(err.response?.data?.note || err.response?.data?.message || 'The unload operation failed.');
     } finally {
       setIsUnloading(false);
     }
   };
 
+  const footer = (
+    <div className="flex justify-end gap-3 w-full">
+      <Button variant="ghost" onClick={() => dispatch(closeUnloadDBModal())} disabled={isUnloading}>Discard</Button>
+      <Button variant="primary" onClick={handleUnloadDatabase} loading={isUnloading} icon="play_circle">Run Unload</Button>
+    </div>
+  );
+
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans">
-      <div className="bg-white dark:bg-bk-side w-full max-w-[580px] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col relative text-left">
-        
-        {/* Subtle Top Accent */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-bk-yellow/60"></div>
+    <Modal
+      isOpen={isUnloadDBModalOpen}
+      onClose={() => dispatch(closeUnloadDBModal())}
+      title="Unload Database"
+      subtitle={`${selectedDatabase} @ ${selectedHostUid}`}
+      icon="upload"
+      footer={footer}
+      maxWidth="max-w-[620px]"
+    >
+      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
+        {error && <Alert variant="error" title="Dump failure" onClose={() => setError(null)}>{error}</Alert>}
 
-        <LoadingOverlay 
-            isVisible={isUnloading} 
-            title="Unloading database" 
-            subtitle="Synchronizing schema and data records..." 
-        />
-        <ErrorOverlay 
-          isVisible={!!error} 
-          error={error} 
-          onRetry={handleUnloadDatabase}
-          onClose={() => setError(null)}
-        />
+        <div className="space-y-10">
+           <UnloadConfigSection 
+             formData={formData} 
+             handleInputChange={handleInputChange} 
+           />
 
-        {/* Header - Compact */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
-              <span className="material-symbols-outlined text-bk-yellow text-xl">upload</span>
-            </div>
-            <div>
-              <h3 className="text-[12px] font-medium text-slate-900 dark:text-white leading-none tracking-wide">Unload database</h3>
-            </div>
-          </div>
-          <button 
-            onClick={() => dispatch(closeUnloadDBModal())}
-            className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
-          >
-            <span className="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform">close</span>
-          </button>
-        </div>
+           <UnloadContentSection 
+             formData={formData}
+             handleInputChange={handleInputChange}
+             handleSchemaChange={handleSchemaChange}
+             handleTableToggle={handleTableToggle}
+             dynamicTables={dynamicTables}
+             isTablesLoading={isTablesLoading}
+           />
 
-        {/* Body */}
-        <div className="p-5 space-y-6 max-h-[75vh] overflow-y-auto custom-scrollbar flex-1">
-          <UnloadConfigSection 
-            formData={formData} 
-            handleInputChange={handleInputChange} 
-          />
-
-          <UnloadContentSection 
-            formData={formData}
-            handleInputChange={handleInputChange}
-            handleSchemaChange={handleSchemaChange}
-            handleTableToggle={handleTableToggle}
-            dynamicTables={dynamicTables}
-            isTablesLoading={isTablesLoading}
-          />
-
-          <UnloadAdvancedOptions 
-            formData={formData}
-            handleInputChange={handleInputChange}
-          />
-        </div>
-        
-        {/* Footer */}
-        <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 backdrop-blur-sm flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
-          <button 
-            className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-all"
-            onClick={() => dispatch(closeUnloadDBModal())}
-          >
-            Discard
-          </button>
-          <button 
-            disabled={isUnloading}
-            className="px-6 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center gap-2 min-w-[130px] disabled:opacity-50"
-            onClick={handleUnloadDatabase}
-          >
-            {isUnloading ? (
-              <div className="w-3 h-3 border-2 border-bk-side/30 border-t-bk-side rounded-full animate-spin"></div>
-            ) : (
-              <>
-                <span className="material-symbols-outlined text-[16px]">play_circle</span>
-                <span>Proceed unload</span>
-              </>
-            )}
-          </button>
+           <UnloadAdvancedOptions 
+             formData={formData}
+             handleInputChange={handleInputChange}
+           />
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

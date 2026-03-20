@@ -41,7 +41,7 @@ export default function MonitoringSettingsPopover() {
     <div className="relative" ref={popoverRef}>
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all relative group
+        className={`w-9 h-9 flex items-center justify-center rounded-[6px] transition-all relative group
           ${isOpen ? 'bg-bk-yellow/10 text-bk-yellow' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5'}`}
         title="Monitoring Settings"
       >
@@ -54,7 +54,7 @@ export default function MonitoringSettingsPopover() {
       </button>
 
       {isOpen && (
-        <div className="absolute top-12 right-0 w-72 bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl z-[110] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div className="absolute top-12 right-0 w-72 bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-[6px] shadow-2xl z-[110] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
           <div className="px-4 py-3 bg-slate-50/50 dark:bg-white/5 border-b border-slate-100 dark:border-slate-800">
             <h3 className="text-[11px] font-bold text-slate-900 dark:text-white uppercase tracking-wider">Monitoring Settings</h3>
           </div>
@@ -66,12 +66,12 @@ export default function MonitoringSettingsPopover() {
                 <label className="text-[11px] font-medium text-slate-700 dark:text-slate-300">Dashboard</label>
                 <span className="text-[9px] text-slate-400 font-mono">{localPrefs.dashboardInterval > 0 ? `${localPrefs.dashboardInterval}s` : 'Manual'}</span>
               </div>
-              <div className="flex p-0.5 bg-slate-100 dark:bg-black/20 rounded-lg">
+              <div className="flex p-0.5 bg-slate-100 dark:bg-black/20 rounded-[6px]">
                 {intervals.map((opt) => (
                   <button
                     key={opt.value}
                     onClick={() => setLocalPrefs(prev => ({ ...prev, dashboardInterval: opt.value }))}
-                    className={`flex-1 py-1.5 text-[10px] font-medium rounded-md transition-all
+                    className={`flex-1 py-1.5 text-[10px] font-medium rounded-[6px] transition-all
                       ${localPrefs.dashboardInterval === opt.value 
                         ? 'bg-white dark:bg-slate-700 text-bk-yellow shadow-sm' 
                         : 'text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
@@ -89,12 +89,12 @@ export default function MonitoringSettingsPopover() {
                 <label className="text-[11px] font-medium text-slate-700 dark:text-slate-300">Broker Infrastructure</label>
                 <span className="text-[9px] text-slate-400 font-mono">{localPrefs.brokerStatusInterval > 0 ? `${localPrefs.brokerStatusInterval}s` : 'Manual'}</span>
               </div>
-              <div className="flex p-0.5 bg-slate-100 dark:bg-black/20 rounded-lg">
+              <div className="flex p-0.5 bg-slate-100 dark:bg-black/20 rounded-[6px]">
                 {intervals.map((opt) => (
                   <button
                     key={opt.value}
                     onClick={() => setLocalPrefs(prev => ({ ...prev, brokerStatusInterval: opt.value }))}
-                    className={`flex-1 py-1.5 text-[10px] font-medium rounded-md transition-all
+                    className={`flex-1 py-1.5 text-[10px] font-medium rounded-[6px] transition-all
                       ${localPrefs.brokerStatusInterval === opt.value 
                         ? 'bg-white dark:bg-slate-700 text-bk-yellow shadow-sm' 
                         : 'text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
@@ -117,7 +117,7 @@ export default function MonitoringSettingsPopover() {
             <button 
               onClick={handleSave}
               disabled={preferencesLoading}
-              className="px-4 py-1.5 bg-bk-yellow text-bk-side text-[10px] font-bold rounded-md hover:opacity-90 transition-all active:scale-[0.98] disabled:opacity-50"
+              className="px-4 py-1.5 bg-bk-yellow text-bk-side text-[10px] font-bold rounded-[6px] hover:opacity-90 transition-all active:scale-[0.98] disabled:opacity-50"
             >
               {preferencesLoading ? 'Saving...' : 'Apply Changes'}
             </button>

@@ -85,7 +85,7 @@ export default function DatabaseSpaceMonitor({ hostUid, dbname }) {
       {/* Header Bar */}
       <header className="flex items-center justify-between px-6 py-4 bg-white dark:bg-bk-side border-b border-slate-200 dark:border-slate-800 shadow-sm z-10">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-bk-yellow/10 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-[6px] bg-bk-yellow/10 flex items-center justify-center">
             <span className="material-symbols-outlined text-bk-yellow text-2xl">donut_small</span>
           </div>
           <div>
@@ -106,7 +106,7 @@ export default function DatabaseSpaceMonitor({ hostUid, dbname }) {
           <button 
             onClick={fetchSpaceInfo}
             disabled={loading}
-            className="p-2.5 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 transition-all active:scale-95 disabled:opacity-50"
+            className="p-2.5 rounded-[6px] bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 transition-all active:scale-95 disabled:opacity-50"
             title="Refresh Data"
           >
             <span className={`material-symbols-outlined text-[20px] ${loading ? 'animate-spin text-bk-yellow' : ''}`}>sync</span>
@@ -118,7 +118,7 @@ export default function DatabaseSpaceMonitor({ hostUid, dbname }) {
       <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-white/10">
         
         {error && (
-          <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center gap-3 text-rose-500">
+          <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-[6px] flex items-center gap-3 text-rose-500">
             <span className="material-symbols-outlined">error</span>
             <span className="text-sm font-medium">{error}</span>
           </div>
@@ -126,7 +126,7 @@ export default function DatabaseSpaceMonitor({ hostUid, dbname }) {
 
         {/* 1. CAPACITY OVERVIEW CARDS */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white dark:bg-bk-side p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+          <div className="bg-white dark:bg-bk-side p-5 rounded-[6px] border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
             <div className="flex items-center gap-2 text-slate-400 mb-1">
               <span className="material-symbols-outlined text-sm">database</span>
               <span className="text-[10px] font-bold uppercase tracking-wider italic">Database Version</span>
@@ -136,7 +136,7 @@ export default function DatabaseSpaceMonitor({ hostUid, dbname }) {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-bk-side p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm col-span-1 md:col-span-2 relative overflow-hidden group">
+          <div className="bg-white dark:bg-bk-side p-5 rounded-[6px] border border-slate-200 dark:border-slate-800 shadow-sm col-span-1 md:col-span-2 relative overflow-hidden group">
             <div className="relative z-10 flex flex-col h-full justify-between gap-4">
                <div>
                   <div className="flex items-center justify-between mb-1">
@@ -174,7 +174,7 @@ export default function DatabaseSpaceMonitor({ hostUid, dbname }) {
             <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-bk-yellow/5 rounded-full blur-3xl group-hover:bg-bk-yellow/10 transition-colors" />
           </div>
 
-          <div className="bg-white dark:bg-bk-side p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+          <div className="bg-white dark:bg-bk-side p-5 rounded-[6px] border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
             <div className="flex items-center gap-2 text-slate-400 mb-1">
               <span className="material-symbols-outlined text-sm">description</span>
               <span className="text-[10px] font-bold uppercase tracking-wider italic">Page Configuration</span>
@@ -193,7 +193,7 @@ export default function DatabaseSpaceMonitor({ hostUid, dbname }) {
         </div>
 
         {/* 2. VOLUME TYPE SUMMARY (PERMANENT / TEMPORARY) */}
-        <section className="bg-white dark:bg-bk-side rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+        <section className="bg-white dark:bg-bk-side rounded-[6px] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-white/[0.02]">
              <div className="flex items-center gap-3">
                <span className="material-symbols-outlined text-bk-yellow">layers</span>
@@ -224,7 +224,7 @@ export default function DatabaseSpaceMonitor({ hostUid, dbname }) {
                   return (
                     <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group">
                       <td className="px-6 py-4">
-                        <span className="px-2 py-1 rounded bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-300 font-sans font-bold">
+                        <span className="px-2 py-1 rounded-[6px] bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-300 font-sans font-bold">
                           {info.type}
                         </span>
                       </td>
@@ -255,7 +255,7 @@ export default function DatabaseSpaceMonitor({ hostUid, dbname }) {
         </section>
 
         {/* 3. PHYSICAL VOLUME TOPOLOGY */}
-        <section className="bg-white dark:bg-bk-side rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+        <section className="bg-white dark:bg-bk-side rounded-[6px] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-white/[0.02]">
              <div className="flex items-center gap-3">
                <span className="material-symbols-outlined text-bk-yellow">dataset</span>
@@ -330,7 +330,7 @@ export default function DatabaseSpaceMonitor({ hostUid, dbname }) {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
            {/* 4. FILE SPACE ANALYTICS */}
-          <section className="bg-white dark:bg-bk-side rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden h-fit">
+          <section className="bg-white dark:bg-bk-side rounded-[6px] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden h-fit">
             <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-white/[0.02]">
               <div className="flex items-center gap-3">
                 <span className="material-symbols-outlined text-bk-yellow">analytics</span>
@@ -352,7 +352,7 @@ export default function DatabaseSpaceMonitor({ hostUid, dbname }) {
                   {data?.fileinfo?.map((file, idx) => (
                     <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
                       <td className="px-4 py-3">
-                        <span className="px-2 py-0.5 rounded-md bg-bk-yellow/10 text-bk-yellow font-bold text-[9px] uppercase tracking-tighter">
+                        <span className="px-2 py-0.5 rounded-[6px] bg-bk-yellow/10 text-bk-yellow font-bold text-[9px] uppercase tracking-tighter">
                           {file.data_type}
                         </span>
                       </td>
@@ -368,7 +368,7 @@ export default function DatabaseSpaceMonitor({ hostUid, dbname }) {
           </section>
 
           {/* 5. VISUAL DISTRIBUTION (CSS PIE CHARTS) */}
-          <section className="bg-white dark:bg-bk-side rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
+          <section className="bg-white dark:bg-bk-side rounded-[6px] border border-slate-200 dark:border-slate-800 shadow-sm p-6">
             <div className="flex items-center gap-3 mb-6">
               <span className="material-symbols-outlined text-bk-yellow">pie_chart</span>
               <h2 className="font-bold text-slate-800 dark:text-white">Utilization Distribution</h2>
@@ -400,7 +400,7 @@ export default function DatabaseSpaceMonitor({ hostUid, dbname }) {
 
                <div className="space-y-4 flex flex-col justify-center">
                   <div className="flex items-center gap-3">
-                     <div className="w-3 h-3 rounded bg-bk-yellow shadow-[0_0_5px_rgba(255,218,68,0.5)]"></div>
+                     <div className="w-3 h-3 rounded-[6px] bg-bk-yellow shadow-[0_0_5px_rgba(255,218,68,0.5)]"></div>
                      <div className="flex-1">
                         <div className="flex justify-between items-center text-[10px] font-bold">
                            <span className="text-slate-500 uppercase">Utilized</span>
@@ -409,7 +409,7 @@ export default function DatabaseSpaceMonitor({ hostUid, dbname }) {
                      </div>
                   </div>
                   <div className="flex items-center gap-3">
-                     <div className="w-3 h-3 rounded bg-slate-200 dark:bg-white/10"></div>
+                     <div className="w-3 h-3 rounded-[6px] bg-slate-200 dark:bg-white/10"></div>
                      <div className="flex-1">
                         <div className="flex justify-between items-center text-[10px] font-bold">
                            <span className="text-slate-500 uppercase">Available</span>

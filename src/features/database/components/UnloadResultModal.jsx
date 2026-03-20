@@ -15,7 +15,7 @@ export default function UnloadResultModal() {
 
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans text-left">
-      <div className="bg-white dark:bg-bk-side w-full max-w-[500px] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[85vh] relative text-left">
+      <div className="bg-white dark:bg-bk-side w-full max-w-[500px] rounded-[6px] shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[85vh] relative text-left">
 
         {/* Subtle Top Accent */}
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-bk-yellow/60"></div>
@@ -23,7 +23,7 @@ export default function UnloadResultModal() {
         {/* Header - Compact */}
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
+            <div className="w-8 h-8 rounded-[6px] bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
               <span className="material-symbols-outlined text-bk-yellow text-xl">analytics</span>
             </div>
             <div>
@@ -32,7 +32,7 @@ export default function UnloadResultModal() {
           </div>
           <button
             onClick={() => dispatch(closeUnloadResultModal())}
-            className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
+            className="w-7 h-7 rounded-[6px] hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
           >
             <span className="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform">close</span>
           </button>
@@ -45,7 +45,7 @@ export default function UnloadResultModal() {
             <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
           </div>
 
-          <div className="border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden bg-slate-50/20 dark:bg-bk-main/30">
+          <div className="border border-slate-200 dark:border-slate-800 rounded-[6px] overflow-hidden bg-slate-50/20 dark:bg-bk-main/30">
             <table className="w-full text-left text-[11px] border-collapse">
               <thead className="bg-slate-50/80 dark:bg-bk-main/50 text-[10px] font-medium text-slate-400 tracking-wide border-b border-slate-100 dark:border-slate-800">
                 <tr>
@@ -58,7 +58,7 @@ export default function UnloadResultModal() {
                   <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-all">
                     <td className="px-4 py-2.5 font-medium text-slate-700 dark:text-slate-300">{row.tableName}</td>
                     <td className="px-4 py-2.5 text-right">
-                      <span className="text-bk-yellow font-bold px-2 py-0.5 rounded bg-bk-yellow/5 border border-bk-yellow/10">
+                      <span className="text-bk-yellow font-bold px-2 py-0.5 rounded-[6px] bg-bk-yellow/5 border border-bk-yellow/10">
                         {row.stats}
                       </span>
                     </td>
@@ -82,7 +82,7 @@ export default function UnloadResultModal() {
         <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 backdrop-blur-sm flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
           <button
             onClick={() => dispatch(closeUnloadResultModal())}
-            className="px-8 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center min-w-[120px]"
+            className="px-8 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded-[6px] border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center min-w-[120px]"
           >
             Acknowledge
           </button>

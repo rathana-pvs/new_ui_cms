@@ -4,17 +4,78 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Colors */
+  --primary: 255 193 7; /* #ffc107 */
+  --primary-foreground: 18 18 18; /* #121212 */
+  
+  --background: 246 246 248;
+  --foreground: 18 18 18;
+  
+  --card: 255 255 255;
+  --card-foreground: 18 18 18;
+  
+  --popover: 255 255 255;
+  --popover-foreground: 18 18 18;
+  
+  --muted: 241 245 249;
+  --muted-foreground: 100 116 139;
+  
+  --accent: 255 193 7;
+  --accent-foreground: 18 18 18;
+  
+  --destructive: 244 63 94;
+  --destructive-foreground: 255 255 255;
+  
+  --border: 226 232 240;
+  --input: 226 232 240;
+  --ring: 255 193 7;
+  
+  /* Radii */
+  --radius: 6px;
+  
+  /* Spacing */
+  --header-height: 56px;
+  --sidebar-width: 240px;
+  --sidebar-collapsed-width: 80px;
+}
+
+.dark {
+  --background: 18 18 18;
+  --foreground: 226 232 240;
+  
+  --card: 30 30 30; /* #1e1e1e */
+  --card-foreground: 226 232 240;
+  
+  --popover: 30 30 30;
+  --popover-foreground: 226 232 240;
+  
+  --muted: 30 30 30;
+  --muted-foreground: 148 163 184;
+  
+  --accent: 255 193 7;
+  --accent-foreground: 18 18 18;
+  
+  --destructive: 244 63 94;
+  --destructive-foreground: 255 255 255;
+  
+  --border: 45 45 45; 
+  --input: 45 45 45;
+  --ring: 255 193 7;
+}
+
 @layer base {
-  body {
-    @apply font-sans;
+  * {
+    border-color: rgb(var(--border) / 0.5);
   }
-  .dark body {
-    background-color: #121212;
-    color: #e2e8f0;
+  body {
+    background-color: rgb(var(--background));
+    color: rgb(var(--foreground));
+    font-family: 'Inter', sans-serif;
   }
   *:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.5);
+    box-shadow: 0 0 0 2px rgb(var(--background)), 0 0 0 4px rgb(var(--ring));
   }
 
   /* Autocomplete Background Override */
@@ -27,134 +88,57 @@
     transition: background-color 5000s ease-in-out 0s;
   }
 
-  /* Dark mode autocomplete override */
   .dark input:-webkit-autofill,
   .dark input:-webkit-autofill:hover, 
   .dark input:-webkit-autofill:focus, 
   .dark input:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 30px #1a1a1a inset !important;
-    -webkit-text-fill-color: #f8fafc !important;
+    -webkit-box-shadow: 0 0 0 30px rgb(var(--card)) inset !important;
+    -webkit-text-fill-color: rgb(var(--foreground)) !important;
   }
 }
-
-
 
 @layer utilities {
-  .cursor-col-resize { cursor: col-resize; }
-  .cursor-row-resize { cursor: row-resize; }
-  
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    @apply bg-slate-200 dark:bg-slate-700 rounded-full;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    @apply bg-bk-yellow;
-  }
+/* Global Premium Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
 }
 
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgb(var(--muted-foreground) / 0.15);
+  border-radius: 10px;
+  transition: background-color 0.2s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(var(--primary) / 0.5);
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--muted-foreground) / 0.15) transparent;
+  scroll-behavior: smooth;
+}
+}
 
 html, body {
   margin: 0;
   height: 100vh;
+  width: 100%;
+  overflow: hidden;
 }
 
-@layer base {
-  /* Scrollbar overrides */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: #cbd5e1; /* slate-300 */
-    border-radius: 4px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8; /* slate-400 */
-  }
-  .dark ::-webkit-scrollbar-thumb {
-    background: #334155; /* slate-700 */
-  }
-  .dark ::-webkit-scrollbar-thumb:hover {
-    background: #ffc107; /* bk-yellow */
-  }
-  
-  /* Firefox */
-  * {
-    scrollbar-width: thin;
-    scrollbar-color: #cbd5e1 transparent;
-  }
-  .dark * {
-    scrollbar-color: #334155 transparent;
-  }
-  .dark *:hover {
-    scrollbar-color: #ffc107 transparent;
-  }
-}
-
-
+/* Sidebar Specific Styles */
 #sidebar.collapsed {
-  width: 80px !important;
+  width: var(--sidebar-collapsed-width) !important;
 }
 
-#sidebar.collapsed h2, 
-#sidebar.collapsed .text-sm, 
-#sidebar.collapsed .text-\[10px\], 
-#sidebar.collapsed .text-xs, 
-#sidebar.collapsed summary .text-sm,
-#sidebar.collapsed summary .material-symbols-outlined:first-child,
-#sidebar.collapsed #db-tree-container p,
-#sidebar.collapsed #broker-tree-container p,
-#sidebar.collapsed details div,
-#sidebar.collapsed #sidebar-footer-btn span:last-child,
-#sidebar.collapsed .section-title {
-  display: none !important;
-}
-
-#sidebar.collapsed .px-3, #sidebar.collapsed .p-4 {
-  padding-left: 0.75rem !important;
-  padding-right: 0.75rem !important;
-}
-
-#sidebar.collapsed summary {
-  justify-content: center !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-}
-
-#sidebar.collapsed .flex-1.flex.flex-col.items-center {
-  padding: 0.5rem !important;
-}
-
-#sidebar.collapsed #sidebar-footer-btn {
-  justify-content: center !important;
-  padding: 0.75rem !important;
-}
-
-#sidebar.collapsed #toggle-icon {
-  transform: rotate(180deg);
-}
-
-#sidebar.collapsed summary .material-symbols-outlined:not(:first-child) {
-  margin: 0 !important;
-}
-
-#v-resizer:hover, #v-resizer.resizing { background-color: #ffc107; }
-
-@keyframes reloading {
-  0% { transform: translateX(-100%); }
-  50% { transform: translateX(100%); }
-  100% { transform: translateX(-100%); }
-}
-
+/* Animations */
 .animate-in {
   animation-duration: 300ms;
   animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -162,6 +146,7 @@ html, body {
 }
 
 .fade-in {
+  opacity: 0;
   animation-name: fadeIn;
 }
 
@@ -179,3 +164,19 @@ html, body {
   to { opacity: 1; transform: scale(1); }
 }
 
+/* Resizing States */
+body.resizing-h, 
+body.resizing-h * {
+  cursor: col-resize !important;
+  user-select: none !important;
+}
+
+body.resizing-v, 
+body.resizing-v * {
+  cursor: row-resize !important;
+  user-select: none !important;
+}
+
+#host-section {
+  height: var(--host-section-height, 140px);
+}

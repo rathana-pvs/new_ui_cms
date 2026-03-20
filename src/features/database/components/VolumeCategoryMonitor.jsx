@@ -59,7 +59,7 @@ export default function VolumeCategoryMonitor({ hostUid, dbname, category }) {
       {/* Premium Header */}
       <header className="px-8 py-6 border-b border-slate-100 dark:border-white/[0.03] flex items-center justify-between relative overflow-hidden shrink-0">
         <div className="relative z-10 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center border border-amber-500/20 shadow-inner">
+          <div className="w-12 h-12 rounded-[6px] bg-amber-500/10 flex items-center justify-center border border-amber-500/20 shadow-inner">
              <span className="material-symbols-outlined text-amber-500 text-[28px]" style={{ fontVariationSettings: "'wght' 300" }}>
                database
              </span>
@@ -104,8 +104,8 @@ export default function VolumeCategoryMonitor({ hostUid, dbname, category }) {
                { label: 'Used Storage', val: formatSize(summary.used), icon: 'pie_chart', color: 'text-amber-500', bg: 'bg-amber-500/10' },
                { label: 'Available free', val: formatSize(summary.free), icon: 'check_circle', color: 'text-emerald-500', bg: 'bg-emerald-500/10' }
              ].map((stat, i) => (
-                <div key={i} className="px-5 py-4 rounded-2xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.05] flex items-center gap-4 group hover:border-amber-500/30 transition-all">
-                   <div className={`w-10 h-10 rounded-lg ${stat.bg} ${stat.color} flex items-center justify-center shrink-0`}>
+                <div key={i} className="px-5 py-4 rounded-[6px] bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.05] flex items-center gap-4 group hover:border-amber-500/30 transition-all">
+                   <div className={`w-10 h-10 rounded-[6px] ${stat.bg} ${stat.color} flex items-center justify-center shrink-0`}>
                       <span className="material-symbols-outlined text-[20px]">{stat.icon}</span>
                    </div>
                    <div className="flex flex-col">
@@ -116,7 +116,7 @@ export default function VolumeCategoryMonitor({ hostUid, dbname, category }) {
              ))}
           </div>
 
-          <div className="rounded-2xl bg-white dark:bg-white/[0.01] border border-slate-200 dark:border-white/[0.05] overflow-hidden shadow-sm">
+          <div className="rounded-[6px] bg-white dark:bg-white/[0.01] border border-slate-200 dark:border-white/[0.05] overflow-hidden shadow-sm">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="text-[11px] font-bold text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-white/[0.03] bg-slate-50/50 dark:bg-white/[0.02] uppercase tracking-wider">
@@ -144,7 +144,7 @@ export default function VolumeCategoryMonitor({ hostUid, dbname, category }) {
                       <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-all group">
                         <td className="px-6 py-5">
                           <div className="flex items-center gap-3">
-                             <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:text-amber-500 transition-colors">
+                             <div className="w-8 h-8 rounded-[6px] bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:text-amber-500 transition-colors">
                                 <span className="material-symbols-outlined text-[18px]">description</span>
                              </div>
                              <span className="text-sm font-bold text-slate-700 dark:text-slate-200 font-mono tracking-tight">
@@ -158,15 +158,15 @@ export default function VolumeCategoryMonitor({ hostUid, dbname, category }) {
                                  <span className="text-blue-600 dark:text-blue-400 tracking-tighter">USED: {formatMB(usedPages)} MB</span>
                                  <span className="text-slate-400 tracking-tighter">FREE: {formatMB(freePages)} MB</span>
                               </div>
-                              <div className="w-full h-4 flex bg-slate-100 dark:bg-white/10 rounded-md overflow-hidden p-[2px]">
+                              <div className="w-full h-4 flex bg-slate-100 dark:bg-white/10 rounded-[6px] overflow-hidden p-[2px]">
                                  <div 
-                                   className="h-full bg-blue-600 dark:bg-blue-500 rounded-sm relative group/bar"
+                                   className="h-full bg-blue-600 dark:bg-blue-500 rounded-[6px] relative group/bar"
                                    style={{ width: `${pct}%` }}
                                  >
                                     <div className="absolute inset-0 bg-white/20 animate-pulse" />
                                  </div>
                                  <div 
-                                   className="h-full flex-1 bg-amber-500/20 dark:bg-amber-500/10 rounded-sm ml-[2px]"
+                                   className="h-full flex-1 bg-amber-500/20 dark:bg-amber-500/10 rounded-[6px] ml-[2px]"
                                  />
                               </div>
                               <div className="text-[9px] text-slate-400/60 font-medium">Relative distribution based on page count</div>

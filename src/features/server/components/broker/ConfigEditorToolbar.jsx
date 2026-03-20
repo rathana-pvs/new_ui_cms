@@ -13,7 +13,7 @@ export default function ConfigEditorToolbar({
   return (
     <div className="flex items-center justify-between px-6 py-2 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-bk-side shadow-sm z-10">
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center text-bk-yellow border border-bk-yellow/20">
+        <div className="w-8 h-8 rounded-[6px] bg-bk-yellow/10 flex items-center justify-center text-bk-yellow border border-bk-yellow/20">
           <span className="material-symbols-outlined text-[20px]">hub</span>
         </div>
         <div>
@@ -23,10 +23,10 @@ export default function ConfigEditorToolbar({
       </div>
 
       {/* View Mode Toggle */}
-      <div className="flex bg-slate-100 dark:bg-white/5 p-1 rounded-lg border border-slate-200 dark:border-slate-800">
+      <div className="flex bg-slate-100 dark:bg-white/5 p-1 rounded-[6px] border border-slate-200 dark:border-slate-800">
         <button 
           onClick={() => setViewMode('table')}
-          className={`flex items-center gap-1.5 px-3 py-1 text-[11px] font-bold rounded-md transition-all ${
+          className={`flex items-center gap-1.5 px-3 py-1 text-[11px] font-bold rounded-[6px] transition-all ${
             viewMode === 'table' 
               ? 'bg-white dark:bg-white/10 text-bk-yellow shadow-sm' 
               : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
@@ -37,7 +37,7 @@ export default function ConfigEditorToolbar({
         </button>
         <button 
           onClick={() => setViewMode('source')}
-          className={`flex items-center gap-1.5 px-3 py-1 text-[11px] font-bold rounded-md transition-all ${
+          className={`flex items-center gap-1.5 px-3 py-1 text-[11px] font-bold rounded-[6px] transition-all ${
             viewMode === 'source' 
               ? 'bg-white dark:bg-white/10 text-bk-yellow shadow-sm' 
               : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
@@ -53,7 +53,7 @@ export default function ConfigEditorToolbar({
           <button
             onClick={handleUndo}
             disabled={!hasChanges || loading || saving}
-            className="px-3 py-1.5 flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-200 dark:border-slate-800 rounded-md text-slate-600 dark:text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed transition-all text-[11px] font-bold"
+            className="px-3 py-1.5 flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-200 dark:border-slate-800 rounded-[6px] text-slate-600 dark:text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed transition-all text-[11px] font-bold"
           >
             <span className="material-symbols-outlined text-[16px]">undo</span>
             <span>Undo</span>
@@ -61,7 +61,7 @@ export default function ConfigEditorToolbar({
           <button
             onClick={fetchConfig}
             disabled={loading || saving}
-            className="px-3 py-1.5 flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-200 dark:border-slate-800 rounded-md text-slate-600 dark:text-slate-300 transition-all text-[11px] font-bold"
+            className="px-3 py-1.5 flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-200 dark:border-slate-800 rounded-[6px] text-slate-600 dark:text-slate-300 transition-all text-[11px] font-bold"
           >
             <span className={`material-symbols-outlined text-[16px] ${loading ? 'animate-spin' : ''}`}>refresh</span>
             <span>Refresh</span>
@@ -69,7 +69,7 @@ export default function ConfigEditorToolbar({
           {viewMode === 'table' && (
             <button
               onClick={handleAddProperty}
-              className="px-3 py-1.5 flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-200 dark:border-slate-800 rounded-md text-slate-600 dark:text-slate-300 transition-all text-[11px] font-bold"
+              className="px-3 py-1.5 flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-200 dark:border-slate-800 rounded-[6px] text-slate-600 dark:text-slate-300 transition-all text-[11px] font-bold"
             >
               <span className="material-symbols-outlined text-[16px]">add_box</span>
               <span>Add Property</span>
@@ -89,7 +89,7 @@ export default function ConfigEditorToolbar({
         <button 
           onClick={handleSave}
           disabled={!hasChanges || saving || loading}
-          className="flex items-center gap-2 px-4 py-1.5 bg-bk-yellow hover:bg-[#ffd700] disabled:opacity-50 disabled:grayscale text-bk-side text-[11px] font-bold tracking-wide rounded-md transition-all shadow-md shadow-bk-yellow/10"
+          className="flex items-center gap-2 px-4 py-1.5 bg-bk-yellow hover:bg-[#ffd700] disabled:opacity-50 disabled:grayscale text-bk-side text-[11px] font-bold tracking-wide rounded-[6px] transition-all shadow-md shadow-bk-yellow/10"
         >
           {saving ? (
             <div className="w-3 h-3 border-2 border-bk-side/30 border-t-bk-side rounded-full animate-spin"></div>

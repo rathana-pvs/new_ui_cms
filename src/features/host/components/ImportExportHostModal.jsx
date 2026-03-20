@@ -130,12 +130,12 @@ export default function ImportExportHostModal() {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans">
-      <div className="bg-white dark:bg-bk-side w-full max-w-[640px] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[85vh]">
+      <div className="bg-white dark:bg-bk-side w-full max-w-[640px] rounded-[6px] shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[85vh]">
         
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
+            <div className="w-10 h-10 rounded-[6px] bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
               <span className="material-symbols-outlined text-bk-yellow text-2xl">{icon}</span>
             </div>
             <div>
@@ -149,7 +149,7 @@ export default function ImportExportHostModal() {
           </div>
           <button 
             onClick={() => dispatch(closeImportExportModal())}
-            className="w-8 h-8 rounded-lg hover:bg-slate-200 dark:hover:bg-white/5 transition-colors text-slate-400 dark:text-slate-500 flex items-center justify-center"
+            className="w-8 h-8 rounded-[6px] hover:bg-slate-200 dark:hover:bg-white/5 transition-colors text-slate-400 dark:text-slate-500 flex items-center justify-center"
           >
             <span className="material-symbols-outlined text-xl">close</span>
           </button>
@@ -159,14 +159,14 @@ export default function ImportExportHostModal() {
         <div className="flex-1 overflow-hidden flex flex-col">
           {importExportMode === 'import' && importList.length === 0 && (
             <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
-              <div className="w-16 h-16 rounded-2xl bg-slate-50 dark:bg-bk-main/30 flex items-center justify-center mb-4 border border-dashed border-slate-200 dark:border-slate-800">
+              <div className="w-16 h-16 rounded-[6px] bg-slate-50 dark:bg-bk-main/30 flex items-center justify-center mb-4 border border-dashed border-slate-200 dark:border-slate-800">
                 <span className="material-symbols-outlined text-slate-300 dark:text-slate-700 text-3xl">upload_file</span>
               </div>
               <h4 className="text-[13px] font-semibold text-slate-800 dark:text-slate-200">No file selected</h4>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 max-w-[240px]">Select an XML file containing host connections exported from CUBRID Admin.</p>
               <button 
                 onClick={() => fileInputRef.current?.click()}
-                className="mt-6 px-6 py-2 bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-bk-side text-[11px] font-bold rounded-lg transition-all"
+                className="mt-6 px-6 py-2 bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-bk-side text-[11px] font-bold rounded-[6px] transition-all"
               >
                 Browse Files
               </button>
@@ -187,13 +187,13 @@ export default function ImportExportHostModal() {
                   <div 
                     onClick={handleToggleAll}
                     style={{ pointerEvents: importList.every(h => h.isDuplicate) ? 'none' : 'auto' }}
-                    className={`w-4 h-4 rounded border flex items-center justify-center cursor-pointer hover:border-bk-yellow transition-colors ${importList.every(h => h.isDuplicate) ? 'opacity-30 border-slate-300' : 'border-slate-300 dark:border-slate-600'}`}
+                    className={`w-4 h-4 rounded-[6px] border flex items-center justify-center cursor-pointer hover:border-bk-yellow transition-colors ${importList.every(h => h.isDuplicate) ? 'opacity-30 border-slate-300' : 'border-slate-300 dark:border-slate-600'}`}
                   >
                     {selectedHosts.length > 0 && selectedHosts.length === importList.filter(h => !h.isDuplicate).length && (
-                      <div className="w-2.5 h-2.5 bg-bk-yellow rounded-[1px]"></div>
+                      <div className="w-2.5 h-2.5 bg-bk-yellow rounded-[6px]"></div>
                     )}
                     {selectedHosts.length > 0 && selectedHosts.length < importList.filter(h => !h.isDuplicate).length && (
-                      <div className="w-2 h-[2px] bg-bk-yellow rounded-[1px]"></div>
+                      <div className="w-2 h-[2px] bg-bk-yellow rounded-[6px]"></div>
                     )}
                   </div>
                   <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-wider">SELECT ALL</span>
@@ -226,7 +226,7 @@ export default function ImportExportHostModal() {
                           className={`group border-b border-slate-50 dark:border-slate-800/50 transition-colors ${isSelected ? 'bg-bk-yellow/[0.03]' : ''} ${isDuplicate ? 'opacity-[0.85] cursor-not-allowed bg-slate-50/10' : 'cursor-pointer hover:bg-slate-50/80 dark:hover:bg-white/[0.02]'}`}
                         >
                           <td className="w-12 pl-5 py-3">
-                            <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${isDuplicate ? 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-slate-800' : isSelected ? 'border-bk-yellow bg-bk-yellow/10' : 'border-slate-300 dark:border-slate-700 group-hover:border-slate-400'}`}>
+                            <div className={`w-4 h-4 rounded-[6px] border flex items-center justify-center transition-all ${isDuplicate ? 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-slate-800' : isSelected ? 'border-bk-yellow bg-bk-yellow/10' : 'border-slate-300 dark:border-slate-700 group-hover:border-slate-400'}`}>
                               {isSelected && !isDuplicate && <span className="material-symbols-outlined text-[14px] text-bk-yellow font-bold">check</span>}
                               {isDuplicate && <span className="material-symbols-outlined text-[14px] text-slate-400 dark:text-slate-500">lock</span>}
                             </div>
@@ -237,7 +237,7 @@ export default function ImportExportHostModal() {
                                 {host.alias || 'Unnamed'}
                               </span>
                               {isDuplicate && (
-                                <span className="text-[9px] font-bold bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded uppercase tracking-wider flex items-center gap-1">
+                                <span className="text-[9px] font-bold bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded-[6px] uppercase tracking-wider flex items-center gap-1">
                                   <span className="w-1 h-1 rounded-full bg-slate-400"></span>
                                   Already Exists
                                 </span>
@@ -275,7 +275,7 @@ export default function ImportExportHostModal() {
             {importExportMode === 'export' && (
               <div className="flex items-center gap-2">
                 <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500">FILENAME:</span>
-                <div className="flex items-center bg-white dark:bg-bk-main/50 border border-slate-200 dark:border-slate-800 rounded focus-within:border-bk-yellow transition-colors overflow-hidden">
+                <div className="flex items-center bg-white dark:bg-bk-main/50 border border-slate-200 dark:border-slate-800 rounded-[6px] focus-within:border-bk-yellow transition-colors overflow-hidden">
                   <input 
                     type="text"
                     value={fileName}
@@ -293,14 +293,14 @@ export default function ImportExportHostModal() {
           <div className="flex gap-3">
             <button 
               onClick={() => dispatch(closeImportExportModal())}
-              className="px-5 py-2 text-[11px] font-bold text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-white/5 rounded-lg transition-all shadow-sm active:scale-95"
+              className="px-5 py-2 text-[11px] font-bold text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-white/5 rounded-[6px] transition-all shadow-sm active:scale-95"
             >
               Cancel
             </button>
             <button 
               disabled={selectedHosts.length === 0 || isProcessing}
               onClick={handleAction}
-              className={`px-8 py-2 bg-bk-yellow text-bk-side text-[11px] font-bold rounded-lg transition-all flex items-center gap-2 shadow-sm ${selectedHosts.length === 0 || isProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:scale-[1.02] active:scale-[0.98] hover:shadow-md'}`}
+              className={`px-8 py-2 bg-bk-yellow text-bk-side text-[11px] font-bold rounded-[6px] transition-all flex items-center gap-2 shadow-sm ${selectedHosts.length === 0 || isProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:scale-[1.02] active:scale-[0.98] hover:shadow-md'}`}
             >
               {isProcessing ? (
                 <div className="w-3.5 h-3.5 border-2 border-bk-side/20 border-t-bk-side rounded-full animate-spin"></div>

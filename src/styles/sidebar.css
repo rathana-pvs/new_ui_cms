@@ -1,0 +1,112 @@
+/* Sidebar Tree UI Improvements */
+
+/* Tree item base styles */
+.tree-item {
+  @apply flex items-center gap-2 px-3 py-1.5 cursor-pointer list-none rounded-[6px] transition-all duration-200 select-none border;
+}
+
+.tree-item-primary {
+  @apply bg-white/5 border-white/10 text-text-secondary hover:border-primary/30 hover:text-primary hover:bg-white/10;
+}
+
+.tree-item-selected {
+  @apply bg-primary/10 text-primary border-primary/20 font-medium;
+}
+
+.tree-item-secondary {
+  @apply ml-[22px] border-l border-white/10 space-y-0.5 py-1;
+}
+
+.tree-item-nested {
+  @apply flex items-center gap-2 px-3.5 py-1.5 w-full text-left transition-all cursor-pointer list-none rounded-r-[6px] relative select-none border border-transparent;
+}
+
+.tree-item-nested-base {
+  @apply text-text-secondary hover:bg-white/5 hover:text-primary;
+}
+
+.tree-item-nested-selected {
+  @apply text-primary bg-primary/5 font-medium;
+}
+
+.tree-item-leaf {
+  @apply flex items-center gap-3 px-4 py-1.5 w-full text-left transition-all duration-200 relative rounded-r-[6px] select-none border border-transparent;
+}
+
+.tree-item-leaf-base {
+  @apply text-text-secondary/80 hover:bg-white/5 hover:text-primary;
+}
+
+.tree-item-leaf-selected {
+  @apply text-primary bg-primary/5 font-medium;
+}
+
+/* Selection indicator */
+.selection-indicator {
+  @apply absolute left-[-1px] top-0 bottom-0 w-[2px] bg-primary rounded-full;
+}
+
+/* Status badges */
+.status-badge-on {
+  @apply inline-flex items-center gap-1.5 px-2 py-0.5 text-[9px] font-medium bg-emerald-900/30 text-emerald-400 border border-emerald-500/20 rounded-full tracking-tighter;
+}
+
+.status-badge-off {
+  @apply inline-flex items-center gap-1.5 px-2 py-0.5 text-[9px] font-medium bg-rose-900/30 text-rose-400 border border-rose-500/20 rounded-full tracking-tighter;
+}
+
+/* Loading states */
+.tree-loading {
+  @apply px-4 py-1.5 text-[10px] text-text-secondary animate-pulse;
+}
+
+.tree-empty {
+  @apply px-4 py-1.5 text-[10px] text-text-secondary/60 italic;
+}
+
+/* Icon animations */
+.tree-icon-chevron {
+  @apply material-symbols-outlined text-[14px] transition-transform;
+}
+
+.tree-icon {
+  @apply material-symbols-outlined text-[16px] transition-colors;
+}
+
+/* Improved visual hierarchy */
+.tree-level-1 {
+  @apply ml-[22px];
+}
+
+.tree-level-2 {
+  @apply ml-[44px];
+}
+
+.tree-level-3 {
+  @apply ml-[66px];
+}
+
+/* Border connections */
+.tree-border-connector {
+  @apply border-l border-white/10;
+}
+
+/* Hover effects */
+.tree-hover-glow {
+  @apply hover:shadow-[0_0_8px_rgba(30,215,96,0.2)];
+}
+
+/* Compact mode for collapsed sidebar */
+#sidebar.collapsed .tree-item span:not(.material-symbols-outlined:first-child) {
+  @apply hidden;
+}
+
+#sidebar.collapsed .tree-item {
+  @apply justify-center px-2;
+}
+
+#sidebar.collapsed .tree-item-secondary,
+#sidebar.collapsed .tree-item-nested,
+#sidebar.collapsed .tree-item-leaf {
+  @apply hidden;
+}

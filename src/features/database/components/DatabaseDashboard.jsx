@@ -8,7 +8,7 @@ import DBSpaceInfoSection from './dashboard/DBSpaceInfoSection';
 import DBBrokersCASSection from './dashboard/DBBrokersCASSection';
 import DBLockTransactionSection from './dashboard/DBLockTransactionSection';
 import CASLogModal from './CASLogModal';
-import CustomSelect from '../../../components/common/CustomSelect';
+import Select from '../../../components/ui/Forms/Select';
 
 
 export default function DatabaseDashboard({ dbname }) {
@@ -153,7 +153,7 @@ export default function DatabaseDashboard({ dbname }) {
       {/* Header / Toolbar */}
       <div className="sticky top-0 z-20 flex items-center justify-between px-6 py-3 bg-white dark:bg-bk-side border-b border-slate-200 dark:border-slate-800 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-bk-yellow/10 border border-bk-yellow/20">
+          <div className="w-9 h-9 flex items-center justify-center rounded-[6px] bg-bk-yellow/10 border border-bk-yellow/20">
              <span className="material-symbols-outlined text-bk-yellow text-[22px]">dashboard</span>
           </div>
           <div className="flex flex-col">
@@ -164,7 +164,7 @@ export default function DatabaseDashboard({ dbname }) {
             </div>
           </div>
           <div className="h-6 w-[1px] bg-slate-200 dark:bg-slate-800 mx-2"></div>
-          <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 text-[9px] text-slate-500 dark:text-slate-400 font-bold tracking-tight">
+          <span className="px-2 py-0.5 rounded-[6px] bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 text-[9px] text-slate-500 dark:text-slate-400 font-bold tracking-tight">
             {activeHost?.address}:{activeHost?.port}
           </span>
         </div>
@@ -173,7 +173,7 @@ export default function DatabaseDashboard({ dbname }) {
           {/* Auto Refresh Toggle */}
           <button 
             onClick={() => setAutoRefresh(!autoRefresh)}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded transition-all group ${autoRefresh ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)]' : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 border border-transparent'}`}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] transition-all group ${autoRefresh ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)]' : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 border border-transparent'}`}
             title={autoRefresh ? "Stop Auto Refresh" : "Start Auto Refresh"}
           >
             <span className={`material-symbols-outlined text-[18px] ${autoRefresh ? 'animate-spin' : ''}`}>sync</span>
@@ -185,7 +185,7 @@ export default function DatabaseDashboard({ dbname }) {
           {/* Settings */}
           <button 
             onClick={() => setShowSettings(!showSettings)}
-            className={`w-8 h-8 flex items-center justify-center rounded transition-all ${showSettings ? 'bg-bk-yellow/10 text-bk-yellow border border-bk-yellow/20' : 'text-slate-400 hover:text-bk-yellow hover:bg-slate-100 dark:hover:bg-white/5 border border-transparent'}`}
+            className={`w-8 h-8 flex items-center justify-center rounded-[6px] transition-all ${showSettings ? 'bg-bk-yellow/10 text-bk-yellow border border-bk-yellow/20' : 'text-slate-400 hover:text-bk-yellow hover:bg-slate-100 dark:hover:bg-white/5 border border-transparent'}`}
             title="Dashboard Settings"
           >
             <span className="material-symbols-outlined text-[18px]">settings</span>
@@ -194,7 +194,7 @@ export default function DatabaseDashboard({ dbname }) {
           {/* Export */}
           <button 
             onClick={handleExport}
-            className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-emerald-500 hover:bg-emerald-500/5 rounded transition-all border border-transparent"
+            className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-emerald-500 hover:bg-emerald-500/5 rounded-[6px] transition-all border border-transparent"
             title="Export to CSV"
           >
             <span className="material-symbols-outlined text-[18px]">ios_share</span>
@@ -204,7 +204,7 @@ export default function DatabaseDashboard({ dbname }) {
           <button 
             onClick={handleRefresh}
             disabled={isLoading}
-            className={`w-8 h-8 flex items-center justify-center text-slate-400 hover:text-bk-yellow hover:bg-bk-yellow/5 rounded transition-all border border-transparent ${isLoading ? 'animate-spin cursor-not-allowed' : ''}`}
+            className={`w-8 h-8 flex items-center justify-center text-slate-400 hover:text-bk-yellow hover:bg-bk-yellow/5 rounded-[6px] transition-all border border-transparent ${isLoading ? 'animate-spin cursor-not-allowed' : ''}`}
             title="Refresh Now"
           >
             <span className="material-symbols-outlined text-[18px]">refresh</span>
@@ -215,7 +215,7 @@ export default function DatabaseDashboard({ dbname }) {
 
       {/* Settings Panel Popover */}
       {showSettings && (
-        <div className="mx-4 mt-2 p-3 bg-white dark:bg-bk-side border border-bk-yellow/20 rounded-lg shadow-xl animate-in slide-in-from-top-2 duration-200">
+        <div className="mx-4 mt-2 p-3 bg-white dark:bg-bk-side border border-bk-yellow/20 rounded-[6px] shadow-xl animate-in slide-in-from-top-2 duration-200">
            <div className="flex items-center justify-between mb-2">
              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Dashboard Configuration</span>
              <button onClick={() => setShowSettings(false)} className="text-slate-400 hover:text-rose-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
@@ -223,7 +223,7 @@ export default function DatabaseDashboard({ dbname }) {
            <div className="flex items-center gap-4">
               <div className="flex-1 space-y-1">
                  <label className="text-[9px] font-bold text-slate-500 uppercase">Refresh Interval (sec)</label>
-                 <CustomSelect 
+                  <Select 
                     value={refreshInterval} 
                     onChange={(e) => setRefreshInterval(parseInt(e.target.value))}
                     options={[

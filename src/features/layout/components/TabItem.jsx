@@ -1,3 +1,7 @@
+import React from 'react';
+import Typography from '../../../components/ui/Foundation/Typography';
+import Icon from '../../../components/ui/Foundation/Icon';
+
 /**
  * A single tab item in the Breadcrumb bar.
  */
@@ -13,37 +17,56 @@ export default function TabItem({
 }) {
   return (
     <div 
-      className={`group flex items-center gap-2 px-5 py-2.5 border-r border-slate-200 dark:border-slate-800 font-medium text-[12px] tracking-wide cursor-pointer min-w-[140px] transition-all whitespace-nowrap relative select-none ${
-        isActive 
-          ? 'bg-white dark:bg-bk-side text-slate-800 dark:text-bk-yellow' 
-          : 'bg-slate-100 dark:bg-bk-main text-slate-500 hover:bg-slate-50 dark:hover:bg-white/5'
-      }`}
+      className={`
+        group relative flex items-center gap-2.5 px-5 py-2.5 
+        border-r border-border/40 cursor-pointer 
+        transition-all duration-500 min-w-[140px] max-w-[220px] select-none
+        ${isActive 
+          ? 'bg-background shadow-[0_4px_25px_rgba(0,0,0,0.12)] z-10' 
+          : 'bg-muted/5 hover:bg-muted/10 opacity-50 hover:opacity-100'}
+      `}
       onClick={onClick}
       onContextMenu={onContextMenu}
     >
-      {isActive && <div className="absolute top-0 left-0 right-0 h-[3px] bg-bk-yellow shadow-[0_0_8px_rgba(255,193,7,0.4)]"></div>}
+      <Icon 
+        name={icon} 
+        size="xs" 
+        className={`transition-all duration-500 ${isActive ? 'text-primary scale-110' : 'text-foreground/30 group-hover:text-foreground/50'}`} 
+      />
       
-      <div className="relative">
-        <span className={`material-symbols-outlined text-[16px] ${isActive ? 'text-bk-yellow' : 'opacity-60 text-slate-400'}`} style={{ fontVariationSettings: isActive ? "'wght' 500" : "'wght' 300" }}>
-          {icon}
-        </span>
-        {isDirty && (
-          <div className="absolute -top-1 -right-1 w-2 h-2 bg-amber-500 rounded-full border border-white dark:border-bk-side shadow-sm"></div>
-        )}
-      </div>
-      
-      <span className="truncate flex-1">
+      <Typography 
+        variant="caption" 
+        className={`
+          flex-1 truncate font-black tracking-tight text-[10px] uppercase
+          transition-colors duration-500
+          ${isActive ? 'text-foreground' : 'text-foreground/30 group-hover:text-foreground/50'}
+        `}
+      >
         {label}
-      </span>
-      <div 
-        className={`flex items-center justify-center p-1 ml-2 rounded hover:bg-slate-200 dark:hover:bg-white/10 transition-colors ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+        {isDirty && <span className="ml-1.5 inline-block w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />}
+      </Typography>
+
+      <button
+        className={`
+          p-1 rounded-lg opacity-0 group-hover:opacity-100 
+          hover:bg-destructive/10 hover:text-destructive 
+          transition-all duration-300 active:scale-90
+          ${isActive ? 'opacity-40 hover:opacity-100' : ''}
+        `}
         onClick={(e) => {
           e.stopPropagation();
           onClose();
         }}
       >
-        <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'wght' 300" }}>close</span>
-      </div>
+        <Icon name="close" size="xs" />
+      </button>
+
+      {/* Active High-Fidelity Indicator */}
+      {isActive && (
+        <div className="absolute inset-x-0 top-0 h-[3px] bg-primary animate-in slide-in-from-left-full duration-700 ease-out">
+           <div className="absolute inset-0 bg-primary shadow-[0_0_12px_rgba(var(--primary-rgb),0.6)]"></div>
+        </div>
+      )}
     </div>
   );
 }

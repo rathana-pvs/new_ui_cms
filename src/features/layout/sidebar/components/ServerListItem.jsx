@@ -1,6 +1,9 @@
-import { useDispatch, useSelector } from 'react-redux';
+import React from 'react';
+import { useDispatch } from 'react-redux';
 import { setSelectedHost } from '../../../host/hostSlice';
 import { setActiveMainTab } from '../../layoutSlice';
+import Typography from '../../../../components/ui/Foundation/Typography';
+import Icon from '../../../../components/ui/Foundation/Icon';
 
 export default function ServerListItem({ host, isSelected, isAuthorized, onContextMenu }) {
   const dispatch = useDispatch();
@@ -8,10 +11,10 @@ export default function ServerListItem({ host, isSelected, isAuthorized, onConte
   return (
     <div
       title={`${host.address}:${host.port}`}
-      className={`flex flex-col px-3 py-2 cursor-pointer transition-all select-none rounded-lg group relative mb-1.5 border
+      className={`flex flex-col px-4 py-3 cursor-pointer transition-all select-none rounded-xl group relative mb-2 border
         ${isSelected
-          ? 'bg-bk-yellow/5 border-bk-yellow/40 dark:border-bk-yellow/20'
-          : 'bg-white/40 dark:bg-white/5 border-slate-200 dark:border-white/10 hover:border-bk-yellow/30'
+          ? 'bg-primary/5 border-primary/40 shadow-premium-sm'
+          : 'bg-background/40 border-border/50 hover:border-primary/30 hover:bg-muted/5'
         }`}
       onClick={() => {
         dispatch(setSelectedHost(host.uid));
@@ -19,30 +22,42 @@ export default function ServerListItem({ host, isSelected, isAuthorized, onConte
       }}
       onContextMenu={(e) => onContextMenu(e, host.alias || host.id, host.uid, host.alias || host.id)}
     >
-      <div className="flex items-center gap-1.5">
-        <div className={`flex-shrink-0 w-5 h-5 rounded-[4px] transition-all flex items-center justify-center
-          ${isSelected ? 'bg-bk-yellow/10 dark:bg-bk-yellow/10 text-amber-600 dark:text-bk-yellow' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 group-hover:bg-slate-200 dark:group-hover:bg-slate-700'}`}>
-          <span className={`material-symbols-outlined text-[13px] leading-none ${isSelected ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 group-hover:text-amber-600 dark:group-hover:text-bk-yellow'}`} style={{ fontVariationSettings: "'wght' 300" }}>
-            {isSelected ? 'dns' : 'storage'}
-          </span>
+      <div className="flex items-center gap-3">
+        <div className={`flex-shrink-0 w-8 h-8 rounded-lg transition-all flex items-center justify-center border shadow-sm
+          ${isSelected 
+            ? 'bg-primary/10 border-primary/20 text-primary scale-105' 
+            : 'bg-muted/5 border-border/50 text-foreground/40 group-hover:bg-muted/10 group-hover:text-primary group-hover:border-primary/20'}`}>
+          <Icon 
+             name={isSelected ? 'dns' : 'storage'} 
+             size="xs" 
+             className={isSelected ? 'text-primary' : 'opacity-60'} 
+          />
         </div>
 
         <div className="flex flex-col min-w-0 flex-1">
           <div className="flex items-center justify-between gap-2">
-            <span className={`text-[13px] font-semibold truncate tracking-tight transition-colors 
-              ${isSelected ? 'text-amber-600 dark:text-bk-yellow font-bold' : 'text-slate-800 dark:text-slate-300 group-hover:text-amber-600 dark:group-hover:text-bk-yellow'}`}>
+            <Typography 
+               variant="span" 
+               className={`text-[14px] truncate tracking-tight transition-colors 
+                 ${isSelected ? 'text-primary font-bold' : 'text-foreground/70 group-hover:text-primary font-medium'}`}
+            >
               {host.alias || host.id}
-            </span>
+            </Typography>
             {isAuthorized && (
-              <div className="flex items-center gap-1">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.5)] flex-shrink-0"></span>
+              <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-500/10 rounded-full border border-emerald-500/20">
+                <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-premium animate-pulse flex-shrink-0" />
+                <Typography variant="caption" className="text-emerald-500 font-bold text-[7px] uppercase tracking-widest">Active</Typography>
               </div>
             )}
           </div>
+          <Typography variant="caption" className="opacity-30 font-mono text-[9px] truncate">
+             {host.address}:{host.port}
+          </Typography>
         </div>
       </div>
+      
       {isSelected && (
-        <div className="absolute left-[-1px] top-2 bottom-2 w-[2px] bg-amber-600 dark:bg-bk-yellow rounded-full"></div>
+        <div className="absolute left-[-1px] top-3 bottom-3 w-[3px] bg-primary rounded-full shadow-premium animate-in slide-in-from-left-1 duration-300"></div>
       )}
     </div>
   );

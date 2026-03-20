@@ -29,14 +29,14 @@ export default function ForgotPasswordPage() {
         <div className="relative z-10 w-full flex flex-col justify-between p-20">
           <div>
             <Link to="/login" className="flex items-center gap-4 mb-14 group w-fit transition-all hover:translate-x-[-4px]">
-              <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center border border-white/10 group-hover:bg-white group-hover:border-white transition-all">
+              <div className="w-10 h-10 bg-white/5 rounded-[6px] flex items-center justify-center border border-white/10 group-hover:bg-white group-hover:border-white transition-all">
                 <span className="material-symbols-outlined text-slate-400 group-hover:text-bk-side">arrow_back</span>
               </div>
               <span className="text-sm font-black text-slate-400 group-hover:text-white tracking-widest">Back to Login</span>
             </Link>
 
             <div className="flex items-center gap-4 mb-10">
-               <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center p-2 shadow-xl shadow-white/5">
+               <div className="w-10 h-10 bg-white rounded-[6px] flex items-center justify-center p-2 shadow-xl shadow-white/5">
                  <img src="/cubrid-logo.png" alt="CUBRID" className="object-contain" />
                </div>
                <h3 className="text-xl font-bold text-white tracking-widest uppercase italic">Recovery</h3>
@@ -49,7 +49,7 @@ export default function ForgotPasswordPage() {
               Don't worry. Account recovery is handled with the same enterprise-grade security as our database clustering. We'll help you get back online.
             </p>
 
-            <div className="p-6 rounded-3xl bg-white/[0.02] border border-white/5 max-w-sm">
+            <div className="p-6 rounded-[6px] bg-white/[0.02] border border-white/5 max-w-sm">
                 <div className="flex items-center gap-3 mb-2">
                     <span className="material-symbols-outlined text-bk-yellow">info</span>
                     <p className="text-xs font-bold text-white uppercase tracking-widest">Security Protocol</p>
@@ -86,7 +86,7 @@ export default function ForgotPasswordPage() {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-12 pr-4 py-4 bg-white dark:bg-bk-side border-2 border-slate-100 dark:border-transparent group-focus-within:border-bk-yellow/50 rounded-2xl outline-none shadow-sm transition-all dark:text-white text-sm"
+                      className="w-full pl-12 pr-4 py-4 bg-white dark:bg-bk-side border-2 border-slate-100 dark:border-transparent group-focus-within:border-bk-yellow/50 rounded-[6px] outline-none shadow-sm transition-all dark:text-white text-sm"
                       placeholder="admin@organization.com"
                     />
                   </div>
@@ -95,7 +95,7 @@ export default function ForgotPasswordPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-4 bg-slate-900 dark:bg-bk-yellow text-white dark:text-bk-side font-black rounded-2xl shadow-xl hover:shadow-2xl transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 relative overflow-hidden group"
+                  className="w-full py-4 bg-slate-900 dark:bg-bk-yellow text-white dark:text-bk-side font-black rounded-[6px] shadow-xl hover:shadow-2xl transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 relative overflow-hidden group"
                 >
                   {loading ? (
                     <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
@@ -119,7 +119,7 @@ export default function ForgotPasswordPage() {
               </div>
               <button 
                 onClick={() => setSubmitted(false)}
-                className="text-[10px] font-black uppercase tracking-[0.2em] text-bk-yellow hover:text-[#ffd700] p-4 bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/5 transition-all w-full shadow-sm hover:shadow-md"
+                className="text-[10px] font-black uppercase tracking-[0.2em] text-bk-yellow hover:text-[#ffd700] p-4 bg-white dark:bg-white/5 rounded-[6px] border border-slate-200 dark:border-white/5 transition-all w-full shadow-sm hover:shadow-md"
               >
                 Resend protocol
               </button>

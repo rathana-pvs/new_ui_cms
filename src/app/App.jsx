@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { toggleTheme, toggleSidebar, setIsResizing, setActiveMainTab, closeTab, closeOtherTabs, closeAllTabs } from '../features/layout/layoutSlice';
+import { toggleTheme, toggleSidebar, setIsResizing, setSidebarWidth, setHostSectionHeight, setActiveMainTab, closeTab, closeOtherTabs, closeAllTabs } from '../features/layout/layoutSlice';
 import { openAddHostModal, closeAddHostModal, setSelectedHost } from '../features/host/hostSlice';
 import { setSelectedDatabase } from '../features/database/databaseSlice';
 import { closeCreateUserModal, closeEditUserModal, closeDropUserModal } from '../features/user/userSlice';
@@ -43,8 +43,11 @@ import ServerVersionModal from '../features/host/components/ServerVersionModal';
 import LoginPage from '../features/auth/components/LoginPage';
 import RegisterPage from '../features/auth/components/RegisterPage';
 import ForgotPasswordPage from '../features/auth/components/ForgotPasswordPage';
-import StatusModal from '../components/common/StatusModal';
-import LoadingOverlay from '../components/common/LoadingOverlay';
+
+// New Design System Feedback Components
+import StatusModal from '../components/ui/Feedback/StatusModal';
+import LoadingOverlay from '../components/ui/Feedback/LoadingOverlay';
+
 import LogViewer from '../features/broker/components/LogViewer';
 import CMSLogViewer from '../features/broker/components/CMSLogViewer';
 import BrokerStatus from '../features/broker/components/BrokerStatus';
@@ -62,7 +65,7 @@ import AddVolumeModal from '../features/database/components/AddVolumeModal';
 function DashboardLayout() {
   const dispatch = useDispatch();
   const { isLoginDatabaseModalOpen, selectedDatabase } = useSelector((state) => state.database);
-  const { theme, isSidebarCollapsed, isResizing, activeMainTab, openTabs } = useSelector((state) => state.layout);
+  const { theme, isSidebarCollapsed, isResizing, sidebarWidth, hostSectionHeight, activeMainTab, openTabs } = useSelector((state) => state.layout);
   const { isAddHostModalOpen, hosts, isServiceOperating, serviceOperationType, serviceProgressMessage } = useSelector((state) => state.host);
   const { isCreateUserModalOpen, createUserDbName, isEditUserModalOpen, editUserData, isDropUserModalOpen } = useSelector((state) => state.user);
   const { actionLoading: dbActionLoading } = useSelector((state) => state.database);
@@ -115,6 +118,12 @@ function DashboardLayout() {
     }
   }, [activeMainTab, dispatch]);
 
+  const handleToggleCollapse = useCallback(() => dispatch(toggleSidebar()), [dispatch]);
+  const handleResizeChange = useCallback((val) => dispatch(setIsResizing(val)), [dispatch]);
+  const handleAddHost = useCallback(() => dispatch(openAddHostModal()), [dispatch]);
+  const handleSidebarWidthChange = useCallback((val) => dispatch(setSidebarWidth(val)), [dispatch]);
+  const handleHostSectionHeightChange = useCallback((val) => dispatch(setHostSectionHeight(val)), [dispatch]);
+
   useEffect(() => {
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
@@ -127,19 +136,23 @@ function DashboardLayout() {
 
   return (
     <MonitoringProvider>
-      <div className={`flex h-screen overflow-hidden ${isResizing ? 'select-none' : ''}`}>
+      <div className={`flex h-screen w-full min-w-0 overflow-hidden ${isResizing ? 'select-none' : ''}`}>
         <Sidebar
           isCollapsed={isSidebarCollapsed}
-          onToggleCollapse={() => dispatch(toggleSidebar())}
-          onResizeChange={(val) => dispatch(setIsResizing(val))}
-          onAddHost={() => dispatch(openAddHostModal())}
+          sidebarWidth={sidebarWidth}
+          hostSectionHeight={hostSectionHeight}
+          onToggleCollapse={handleToggleCollapse}
+          onResizeChange={handleResizeChange}
+          onSidebarWidthChange={handleSidebarWidthChange}
+          onHostSectionHeightChange={handleHostSectionHeightChange}
+          onAddHost={handleAddHost}
         />
 
-        <main className="flex-1 flex flex-col bg-background-light dark:bg-bk-main overflow-hidden">
+        <main className="flex-1 min-w-0 flex flex-col bg-background overflow-hidden relative">
 
           <Header theme={theme} toggleTheme={() => dispatch(toggleTheme())} />
-          <div className="flex-shrink-0 bg-slate-50 dark:bg-bk-main">
-
+          
+          <div className="flex-shrink-0 bg-background border-b border-border/50">
             <Breadcrumb
               activeTab={activeMainTab}
               openTabs={openTabs}
@@ -153,13 +166,13 @@ function DashboardLayout() {
 
 
           {openTabs.length === 0 ? (
-            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-slate-50 dark:bg-bk-main font-sans">
-              <div className="w-24 h-24 bg-slate-100 dark:bg-bk-side rounded-full flex items-center justify-center mb-6 shadow-md border border-slate-200 dark:border-white/5">
-                <span className="material-symbols-outlined text-5xl text-slate-400 dark:text-bk-yellow/40" style={{ fontVariationSettings: "'wght' 200" }}>database</span>
+            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-background font-sans">
+              <div className="w-24 h-24 bg-muted/5 rounded-[20px] shadow-premium flex items-center justify-center mb-8 border border-border/50 rotate-3">
+                <span className="material-symbols-outlined text-5xl text-primary opacity-40">database</span>
               </div>
-              <h3 className="text-xl font-medium text-slate-700 dark:text-bk-yellow tracking-tight">Cubrid Manager</h3>
-              <p className="text-slate-500 dark:text-slate-400 mt-2 max-w-xs text-sm leading-relaxed">
-                Select a host or database from the sidebar to start exploring your data.
+              <h3 className="text-2xl font-black text-foreground tracking-tight">CUBRID Manager</h3>
+              <p className="text-foreground/40 mt-3 max-w-xs text-[13px] leading-relaxed font-medium">
+                Select a host or database from the sidebar to start exploring your managed environment.
               </p>
             </div>
 
@@ -168,19 +181,11 @@ function DashboardLayout() {
               const isActive = tabId === activeMainTab;
               const isHost = tabId.startsWith('host:');
               const isDb = tabId.startsWith('db:');
-              const isEditConfig = tabId.startsWith('edit_config:');
-              const isBrokerConfig = tabId.startsWith('broker_config:');
-              const isLogViewer = tabId.startsWith('log:');
-              const isCmsAccessLog = tabId.startsWith('cms-access:');
-              const isCmsErrorLog = tabId.startsWith('cms-error:');
-              const isBrokerStatus = tabId.startsWith('broker_status:');
-              const isBrokersStatus = tabId.startsWith('brokers_status:');
               const isDbSpace = tabId.startsWith('db_space:');
-
               const resourceId = tabId.split(':')[1];
 
-              return (
-                <div key={tabId} className={`flex-1 flex flex-col overflow-hidden ${isActive ? '' : 'hidden'}`}>
+              return (isActive && (
+                <div key={tabId} className="flex-1 flex flex-col overflow-hidden animate-in fade-in duration-300">
                   {isHost && <ServerContent hostUid={resourceId} />}
                   {isDb && <DatabaseDashboard dbname={resourceId} />}
                   {isDbSpace && (
@@ -199,49 +204,48 @@ function DashboardLayout() {
                       category={tabId.split(':')[3]}
                     />
                   )}
-                  {isEditConfig && (
+                  {tabId.startsWith('edit_config:') && (
                     <CubridConfigEditor
                       hostUid={resourceId}
                       confname={tabId.split(':')[2]}
                     />
                   )}
-                  {isBrokerConfig && (
+                  {tabId.startsWith('broker_config:') && (
                     <BrokerConfigEditor
                       hostUid={resourceId}
                     />
                   )}
-                  {isLogViewer && (
+                  {tabId.startsWith('log:') && (
                     <LogViewer
                       hostUid={tabId.split(':')[1]}
                       path={tabId.split(':').slice(2).join(':')}
                     />
                   )}
-                  {isCmsAccessLog && (
+                  {tabId.startsWith('cms-access:') && (
                     <CMSLogViewer
                       hostUid={tabId.split(':')[1]}
                       type="access"
                     />
                   )}
-                  {isCmsErrorLog && (
+                  {tabId.startsWith('cms-error:') && (
                     <CMSLogViewer
                       hostUid={tabId.split(':')[1]}
                       type="error"
                     />
                   )}
-                  {isBrokerStatus && (
+                  {tabId.startsWith('broker_status:') && (
                     <BrokerStatus
                       hostUid={tabId.split(':')[1]}
                       brokerName={tabId.split(':')[2]}
                     />
                   )}
-                  {isBrokersStatus && (
-                    <div className="flex-1 overflow-y-auto p-4 bg-slate-50 dark:bg-bk-main">
+                  {tabId.startsWith('brokers_status:') && (
+                    <div className="flex-1 overflow-y-auto p-6 bg-background">
                       <Brokers hostUid={tabId.split(':')[1]} />
                     </div>
                   )}
-
                 </div>
-              );
+              ));
             })
           )}
 
@@ -299,13 +303,13 @@ function DashboardLayout() {
           isVisible={isServiceOperating || dbActionLoading || brokerActionLoading} 
           title={
             isServiceOperating 
-              ? (serviceOperationType === 'start' ? 'Starting CUBRID Service' : 'Stopping CUBRID Service')
-              : (dbActionLoading ? 'Database Action' : 'Broker Action')
+              ? (serviceOperationType === 'start' ? 'CUBRID Engine Ignite' : 'CUBRID Engine Shutdown')
+              : (dbActionLoading ? 'Synchronizing Cluster' : 'Broker Orchestration')
           }
           subtitle={
             isServiceOperating
-              ? (serviceProgressMessage || `Please wait while we ${serviceOperationType === 'start' ? 'start' : 'stop'} all brokers and databases...`)
-              : "Processing your request, please wait..."
+              ? (serviceProgressMessage || `Automating ${serviceOperationType === 'start' ? 'startup' : 'termination'} sequence for brokers and databases...`)
+              : "Replicating state across nodes, please hold..."
           }
         />
       </div>

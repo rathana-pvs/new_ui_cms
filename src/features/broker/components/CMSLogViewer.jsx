@@ -47,7 +47,7 @@ function CMSLogViewer({ hostUid, type }) {
       {/* Header with Pagination */}
       <div className="flex-shrink-0 px-4 py-2.5 bg-white dark:bg-bk-side border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${type === 'access' ? 'bg-amber-50 dark:bg-amber-900/20' : 'bg-rose-50 dark:bg-rose-900/20'}`}>
+          <div className={`w-8 h-8 rounded-[6px] flex items-center justify-center ${type === 'access' ? 'bg-amber-50 dark:bg-amber-900/20' : 'bg-rose-50 dark:bg-rose-900/20'}`}>
             <span className={`material-symbols-outlined text-[18px] ${type === 'access' ? 'text-amber-600 dark:text-bk-yellow' : 'text-rose-500'}`}>{icon}</span>
           </div>
           <div>
@@ -57,11 +57,11 @@ function CMSLogViewer({ hostUid, type }) {
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="flex items-center bg-slate-100 dark:bg-white/5 rounded-lg p-0.5">
+          <div className="flex items-center bg-slate-100 dark:bg-white/5 rounded-[6px] p-0.5">
             <button 
               onClick={handlePrevPage}
               disabled={currentPage === 1 || loading}
-              className="p-1.5 text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-white/10 hover:text-amber-600 dark:hover:text-bk-yellow rounded-md transition-all disabled:opacity-30 disabled:hover:bg-transparent"
+              className="p-1.5 text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-white/10 hover:text-amber-600 dark:hover:text-bk-yellow rounded-[6px] transition-all disabled:opacity-30 disabled:hover:bg-transparent"
             >
               <span className="material-symbols-outlined text-[20px]">chevron_left</span>
             </button>
@@ -71,7 +71,7 @@ function CMSLogViewer({ hostUid, type }) {
             <button 
               onClick={handleNextPage}
               disabled={currentPage >= totalPages || loading}
-              className="p-1.5 text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-white/10 hover:text-amber-600 dark:hover:text-bk-yellow rounded-md transition-all disabled:opacity-30 disabled:hover:bg-transparent"
+              className="p-1.5 text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-white/10 hover:text-amber-600 dark:hover:text-bk-yellow rounded-[6px] transition-all disabled:opacity-30 disabled:hover:bg-transparent"
             >
               <span className="material-symbols-outlined text-[20px]">chevron_right</span>
             </button>
@@ -82,7 +82,7 @@ function CMSLogViewer({ hostUid, type }) {
           <button 
              onClick={handleRefresh}
              disabled={loading}
-             className="p-1.5 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 rounded-md transition-colors"
+             className="p-1.5 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 rounded-[6px] transition-colors"
           >
             <span className={`material-symbols-outlined text-[18px] ${loading ? 'animate-spin' : ''}`}>refresh</span>
           </button>
@@ -121,21 +121,21 @@ function CMSLogViewer({ hostUid, type }) {
                   <span className="text-slate-700 dark:text-slate-300 font-medium truncate">{log['@user'] || 'System'}</span>
                 </div>
                 <div className="w-40 flex-shrink-0">
-                  <span className="px-2 py-0.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded border border-indigo-500/20 text-[10px] font-bold uppercase tracking-tighter">
+                  <span className="px-2 py-0.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-[6px] border border-indigo-500/20 text-[10px] font-bold uppercase tracking-tighter">
                     {log.taskname}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0 truncate">
                   {type === 'error' ? (
                     <div className="flex gap-2 items-center">
-                      <span className="text-rose-500 dark:text-rose-400 font-bold text-[10px] bg-rose-400/10 px-1 rounded flex-shrink-0">ERR</span>
+                      <span className="text-rose-500 dark:text-rose-400 font-bold text-[10px] bg-rose-400/10 px-1 rounded-[6px] flex-shrink-0">ERR</span>
                       <span className="text-slate-600 dark:text-slate-300 truncate" title={log.errornote?.replace('<end>', '')}>
                         {log.errornote?.replace('<end>', '')}
                       </span>
                     </div>
                   ) : (
                     <div className="flex gap-2 items-center">
-                      <span className="text-emerald-600 dark:text-emerald-400 font-bold text-[10px] bg-emerald-400/10 px-1 rounded flex-shrink-0">SUCCESS</span>
+                      <span className="text-emerald-600 dark:text-emerald-400 font-bold text-[10px] bg-emerald-400/10 px-1 rounded-[6px] flex-shrink-0">SUCCESS</span>
                       <span className="text-slate-500 dark:text-slate-400 italic">Operation: {log.taskname} completed</span>
                     </div>
                   )}

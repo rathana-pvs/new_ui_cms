@@ -1,6 +1,6 @@
 export default function Databases() {
   return (
-    <details className="lg:col-span-2 group bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden h-fit" open>
+    <details className="lg:col-span-2 group bg-white dark:bg-slate-900 rounded-[6px] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden h-fit" open>
       <summary className="flex items-center justify-between px-6 py-4 cursor-pointer list-none hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
         <h3 className="text-sm font-medium text-slate-900 dark:text-white">Databases</h3>
         <span className="material-symbols-outlined text-slate-400 group-open:rotate-180 transition-transform">expand_more</span>

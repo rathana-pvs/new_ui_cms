@@ -41,7 +41,7 @@ export default function DeleteBackupPlanModal() {
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans text-left">
-      <div className="bg-white dark:bg-bk-side w-full max-w-[400px] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col relative text-left">
+      <div className="bg-white dark:bg-bk-side w-full max-w-[400px] rounded-[6px] shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col relative text-left">
         
         {/* Subtle Top Accent */}
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-rose-500/60"></div>
@@ -49,7 +49,7 @@ export default function DeleteBackupPlanModal() {
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-rose-500/10 flex items-center justify-center border border-rose-500/20">
+            <div className="w-8 h-8 rounded-[6px] bg-rose-500/10 flex items-center justify-center border border-rose-500/20">
               <span className="material-symbols-outlined text-rose-500 text-xl">delete_forever</span>
             </div>
             <div>
@@ -59,7 +59,7 @@ export default function DeleteBackupPlanModal() {
           <button 
             disabled={isDeleting}
             onClick={() => dispatch(closeDeleteBackupPlanModal())}
-            className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
+            className="w-7 h-7 rounded-[6px] hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
           >
             <span className="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform">close</span>
           </button>
@@ -80,7 +80,7 @@ export default function DeleteBackupPlanModal() {
             </div>
           </div>
 
-          <div className="p-3 bg-slate-50 dark:bg-bk-main/30 border border-slate-100 dark:border-white/5 rounded-lg">
+          <div className="p-3 bg-slate-50 dark:bg-bk-main/30 border border-slate-100 dark:border-white/5 rounded-[6px]">
              <div className="flex items-start gap-3">
                 <span className="material-symbols-outlined text-amber-500 text-[18px] mt-0.5">info</span>
                 <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed italic">
@@ -94,14 +94,14 @@ export default function DeleteBackupPlanModal() {
         <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 backdrop-blur-sm flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
           <button 
             disabled={isDeleting}
-            className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-all text-left"
+            className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded-[6px] hover:bg-slate-100 dark:hover:bg-white/5 transition-all text-left"
             onClick={() => dispatch(closeDeleteBackupPlanModal())}
           >
             Cancel
           </button>
           <button 
             disabled={isDeleting}
-            className={`px-6 py-1.5 bg-rose-500 hover:bg-rose-600 active:scale-[0.98] text-white text-[11px] font-medium tracking-wide rounded shadow-sm shadow-rose-500/20 transition-all flex items-center justify-center gap-2 min-w-[120px] disabled:opacity-50 text-left`}
+            className={`px-6 py-1.5 bg-rose-500 hover:bg-rose-600 active:scale-[0.98] text-white text-[11px] font-medium tracking-wide rounded-[6px] shadow-sm shadow-rose-500/20 transition-all flex items-center justify-center gap-2 min-w-[120px] disabled:opacity-50 text-left`}
             onClick={handleDelete}
           >
             {isDeleting ? (

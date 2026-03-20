@@ -9,6 +9,8 @@ const getInitialTheme = () => {
 const initialState = {
   theme: getInitialTheme(),
   isSidebarCollapsed: localStorage.getItem('isSidebarCollapsed') === 'true',
+  sidebarWidth: parseInt(localStorage.getItem('sidebarWidth') || '288'),
+  hostSectionHeight: parseInt(localStorage.getItem('hostSectionHeight') || '260'),
   isResizing: false,
   activeMainTab: null,
   openTabs: [],
@@ -43,6 +45,14 @@ const layoutSlice = createSlice({
     },
     setIsResizing: (state, action) => {
       state.isResizing = action.payload;
+    },
+    setSidebarWidth: (state, action) => {
+      state.sidebarWidth = action.payload;
+      localStorage.setItem('sidebarWidth', action.payload);
+    },
+    setHostSectionHeight: (state, action) => {
+      state.hostSectionHeight = action.payload;
+      localStorage.setItem('hostSectionHeight', action.payload);
     },
     setActiveMainTab: (state, action) => {
       state.activeMainTab = action.payload;
@@ -127,6 +137,8 @@ export const {
   toggleSidebar,
   setSidebarCollapsed,
   setIsResizing,
+  setSidebarWidth,
+  setHostSectionHeight,
   setActiveMainTab,
   setTabDirty,
   openTab,

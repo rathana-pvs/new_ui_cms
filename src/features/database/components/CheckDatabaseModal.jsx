@@ -3,8 +3,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { closeCheckDatabaseModal } from '../databaseSlice';
 import { databaseApi } from '../databaseApi';
 import { showStatusModal } from '../../layout/layoutSlice';
-import LoadingOverlay from '../../../components/common/LoadingOverlay';
-import ErrorOverlay from '../../../components/common/ErrorOverlay';
+
+// Import New Design System Components
+import Modal from '../../../components/ui/Layout/Modal';
+import Button from '../../../components/ui/Foundation/Button';
+import Typography from '../../../components/ui/Foundation/Typography';
+import Icon from '../../../components/ui/Foundation/Icon';
+import Alert from '../../../components/ui/Feedback/Alert';
+import Card from '../../../components/ui/Layout/Card';
+import Checkbox from '../../../components/ui/Forms/Checkbox';
 
 export default function CheckDatabaseModal() {
   const dispatch = useDispatch();
@@ -22,11 +29,7 @@ export default function CheckDatabaseModal() {
     setLoading(true);
     setError(null);
     try {
-      const payload = {
-        repairdb: repair ? 'y' : 'n'
-      };
-      const response = await databaseApi.checkDatabase(selectedHostUid, selectedDatabase, payload);
-      
+      const response = await databaseApi.checkDatabase(selectedHostUid, selectedDatabase, { repairdb: repair ? 'y' : 'n' });
       dispatch(closeCheckDatabaseModal());
       dispatch(showStatusModal({
         type: 'success',
@@ -40,119 +43,57 @@ export default function CheckDatabaseModal() {
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans text-left">
-      <div className="bg-white dark:bg-bk-side w-full max-w-[440px] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col relative text-left">
-        
-        {/* Subtle Top Accent */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-bk-yellow/60"></div>
-
-        <LoadingOverlay 
-            isVisible={loading} 
-            title="Checking database" 
-            subtitle="Verifying consistency and integrity flags..." 
-        />
-        <ErrorOverlay 
-          isVisible={!!error} 
-          error={error} 
-          onRetry={handleCheck}
-          onClose={() => setError(null)}
-        />
-
-        {/* Header - Compact */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
-              <span className="material-symbols-outlined text-bk-yellow text-xl">verified</span>
-            </div>
-            <div>
-              <h3 className="text-[12px] font-medium text-slate-900 dark:text-white leading-none tracking-wide">Check database</h3>
-            </div>
-          </div>
-          <button 
-            disabled={loading}
-            onClick={() => dispatch(closeCheckDatabaseModal())}
-            className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
-          >
-            <span className="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform">close</span>
-          </button>
-        </div>
-
-        {/* Body */}
-        <div className="p-5 space-y-5 flex-1">
-          {/* Section: Target Information */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Verification target</span>
-              <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
-            </div>
-            
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">Database identifier</label>
-              <div className="w-full h-9 px-3 flex items-center bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded text-[12px] font-medium text-slate-700 dark:text-slate-100">
-                {selectedDatabase}
-              </div>
-            </div>
-          </div>
-
-          {/* Section: Integrity Parameters */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Integrity flags</span>
-              <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
-            </div>
-            
-            <div className="space-y-3">
-              <div className="p-3 bg-bk-yellow/5 border border-bk-yellow/10 rounded-lg">
-                <div className="flex gap-2.5 items-start">
-                  <span className="material-symbols-outlined text-bk-yellow text-sm mt-0.5">info</span>
-                  <div className="space-y-1.5 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400 font-medium">
-                    <p>Scanning for storage inconsistencies. If errors are found, the utility will attempt automatic recovery if flag is active.</p>
-                  </div>
-                </div>
-              </div>
-
-              <label className="flex items-center gap-3 p-3 bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-white/5 transition-all group active:scale-[0.99]">
-                <input 
-                  type="checkbox" 
-                  checked={repair}
-                  onChange={(e) => setRepair(e.target.checked)}
-                  className="w-4 h-4 cursor-pointer rounded border-slate-300 dark:border-slate-700 bg-white dark:bg-bk-main text-bk-yellow focus:ring-bk-yellow/50 accent-bk-yellow"
-                />
-                <div className="flex flex-col">
-                  <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300 group-hover:text-bk-yellow transition-colors tracking-tight">Auto-repair repair</span>
-                  <span className="text-[10px] text-slate-400 dark:text-slate-500">Attempt to fix inconsistencies if discovered</span>
-                </div>
-              </label>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 backdrop-blur-sm flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
-          <button 
-            disabled={loading}
-            className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-all"
-            onClick={() => dispatch(closeCheckDatabaseModal())}
-          >
-            Discard
-          </button>
-          <button 
-            disabled={loading}
-            className="px-6 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center gap-2 min-w-[130px] disabled:opacity-50"
-            onClick={handleCheck}
-          >
-            {loading ? (
-              <div className="w-3 h-3 border-2 border-bk-side/30 border-t-bk-side rounded-full animate-spin"></div>
-            ) : (
-              <>
-                <span className="material-symbols-outlined text-[16px]">play_circle</span>
-                <span>Run check</span>
-              </>
-            )}
-          </button>
-        </div>
-      </div>
+  const footer = (
+    <div className="flex justify-end gap-3 w-full">
+      <Button variant="ghost" onClick={() => dispatch(closeCheckDatabaseModal())} disabled={loading}>Discard</Button>
+      <Button variant="primary" onClick={handleCheck} loading={loading} icon="verified">Run Check</Button>
     </div>
+  );
+
+  return (
+    <Modal
+      isOpen={isCheckDatabaseModalOpen}
+      onClose={() => dispatch(closeCheckDatabaseModal())}
+      title="Check database"
+      subtitle={`${selectedDatabase} @ ${selectedHostUid}`}
+      icon="verified"
+      footer={footer}
+      maxWidth="max-w-[440px]"
+    >
+      <div className="space-y-6">
+        {error && <Alert variant="error" title="Verification failed" onClose={() => setError(null)}>{error}</Alert>}
+
+        <section className="space-y-4">
+          <div className="flex items-center gap-3">
+             <Typography variant="caption" className="font-bold uppercase tracking-widest text-primary/60">Scanning Scope</Typography>
+             <div className="flex-1 h-[1px] bg-border/50"></div>
+          </div>
+          <Card className="bg-muted/10 border-border/50 py-3 px-4 flex items-center justify-between">
+             <Typography variant="span" className="font-black text-secondary">{selectedDatabase}</Typography>
+             <Icon name="database" size="sm" className="opacity-20" />
+          </Card>
+        </section>
+
+        <section className="space-y-4">
+          <Card className="p-4 bg-primary/5 border-primary/10 flex gap-4">
+             <Icon name="info" className="text-primary" />
+             <div className="space-y-1.5 flex-1">
+                <Typography variant="caption" className="font-bold block tracking-tight uppercase">Integrity Verification</Typography>
+                <Typography variant="p" className="opacity-70 leading-relaxed text-[12px]">
+                   Scans for storage-level inconsistencies and data corruption. Enabling auto-repair allows the system to attempt recovery if issues are detected.
+                </Typography>
+             </div>
+          </Card>
+
+          <div className="p-4 border border-border rounded-xl flex items-center justify-between group cursor-pointer hover:border-primary/50 transition-all" onClick={() => setRepair(!repair)}>
+             <div className="flex flex-col">
+                <Typography variant="span" className="font-bold block tracking-tight">Attempt automatic repair</Typography>
+                <Typography variant="caption" className="opacity-50 block leading-tight">Recover from minor discrepancies during the scan.</Typography>
+             </div>
+             <Checkbox checked={repair} onChange={setRepair} />
+          </div>
+        </section>
+      </div>
+    </Modal>
   );
 }

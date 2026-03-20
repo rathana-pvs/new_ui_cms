@@ -1,7 +1,18 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { closeBrokerPropertyModal, fetchBrokerConfig, updateBrokerConfig } from '../brokerSlice';
-import SelectField from '../../../components/common/SelectField';
+
+// Import New Design System Components
+import Modal from '../../../components/ui/Layout/Modal';
+import Button from '../../../components/ui/Foundation/Button';
+import Typography from '../../../components/ui/Foundation/Typography';
+import Icon from '../../../components/ui/Foundation/Icon';
+import Input from '../../../components/ui/Forms/Input';
+import Select from '../../../components/ui/Forms/Select';
+import Tabs from '../../../components/ui/Layout/Tabs';
+import Card from '../../../components/ui/Layout/Card';
+import Table from '../../../components/ui/Layout/Table';
+import Toggle from '../../../components/ui/Forms/Toggle';
 
 const BROKER_PARAMETERS = [
   { name: 'SERVICE', type: 'string(ON|OFF)', default: 'ON', category: 'common' },
@@ -38,7 +49,7 @@ export default function BrokerPropertyModal() {
   const { propertyModal, brokerConfig, actionLoading } = useSelector((state) => state.broker);
   const { isOpen, brokerName, hostUid } = propertyModal;
 
-  const [activeTab, setActiveTab] = useState('parameters'); // parameters, refresh
+  const [activeTab, setActiveTab] = useState('parameters');
   const [localParams, setLocalParams] = useState({});
   const [specificParams, setSpecificParams] = useState(new Set());
   const [refreshEnabled, setRefreshEnabled] = useState(false);
@@ -47,20 +58,16 @@ export default function BrokerPropertyModal() {
   const config = useMemo(() => brokerConfig[hostUid] || { data: {}, loading: false }, [brokerConfig, hostUid]);
 
   useEffect(() => {
-    if (isOpen && hostUid) {
-      dispatch(fetchBrokerConfig({ hostUid }));
-    }
+    if (isOpen && hostUid) dispatch(fetchBrokerConfig({ hostUid }));
   }, [isOpen, hostUid, dispatch]);
 
   useEffect(() => {
     if (config.data && config.data.confdata) {
       const sections = {};
       let currentSection = 'general';
-      
       config.data.confdata.forEach(line => {
         const trimmed = line.trim();
         if (!trimmed || trimmed.startsWith('#')) return;
-
         const sectionMatch = trimmed.match(/^\[%?(.+)\]$/);
         if (sectionMatch) {
           currentSection = sectionMatch[1].toLowerCase();
@@ -73,17 +80,10 @@ export default function BrokerPropertyModal() {
           }
         }
       });
-
       const targetBroker = brokerName?.toLowerCase();
       const brokerCommonParams = sections['broker'] || {};
       const brokerSpecificParams = sections[targetBroker] || {};
-      
-      const combinedParams = {
-        ...brokerCommonParams,
-        ...brokerSpecificParams
-      };
-
-      setLocalParams(combinedParams);
+      setLocalParams({ ...brokerCommonParams, ...brokerSpecificParams });
       setSpecificParams(new Set(Object.keys(brokerSpecificParams)));
     }
   }, [config.data, brokerName, isOpen]);
@@ -99,7 +99,6 @@ export default function BrokerPropertyModal() {
 
   const handleSave = () => {
     if (!config.data?.confdata) return;
-
     const newConfData = [];
     let inTargetSection = false;
     const targetBroker = brokerName?.toLowerCase();
@@ -108,14 +107,11 @@ export default function BrokerPropertyModal() {
     config.data.confdata.forEach(line => {
         const trimmed = line.trim();
         const sectionMatch = trimmed.match(/^\[%?(.+)\]$/);
-        
         if (sectionMatch) {
             const sectionName = sectionMatch[1].toLowerCase();
             if (inTargetSection) {
                 specificParams.forEach(paramName => {
-                    if (!updatedInTargetSection.has(paramName) && localParams[paramName] !== undefined) {
-                        newConfData.push(`${paramName}=${localParams[paramName]}`);
-                    }
+                    if (!updatedInTargetSection.has(paramName) && localParams[paramName] !== undefined) newConfData.push(`${paramName}=${localParams[paramName]}`);
                 });
             }
             inTargetSection = sectionName === targetBroker;
@@ -125,232 +121,110 @@ export default function BrokerPropertyModal() {
             if (key && localParams[key] !== undefined && specificParams.has(key)) {
                 newConfData.push(`${key}=${localParams[key]}`);
                 updatedInTargetSection.add(key);
-            } else {
-                newConfData.push(line);
-            }
-        } else {
-            newConfData.push(line);
-        }
+            } else { newConfData.push(line); }
+        } else { newConfData.push(line); }
     });
-
     if (inTargetSection) {
         specificParams.forEach(paramName => {
-            if (!updatedInTargetSection.has(paramName) && localParams[paramName] !== undefined) {
-                newConfData.push(`${paramName}=${localParams[paramName]}`);
-            }
+            if (!updatedInTargetSection.has(paramName) && localParams[paramName] !== undefined) newConfData.push(`${paramName}=${localParams[paramName]}`);
         });
     }
-
-    dispatch(updateBrokerConfig({ hostUid, confdata: newConfData }))
-      .unwrap()
-      .then(() => {
-        dispatch(closeBrokerPropertyModal());
-      });
+    dispatch(updateBrokerConfig({ hostUid, confdata: newConfData })).unwrap().then(() => dispatch(closeBrokerPropertyModal()));
   };
 
-  if (!isOpen) return null;
+  const footer = (
+    <div className="flex justify-end gap-3 w-full">
+      <Button variant="ghost" onClick={() => dispatch(closeBrokerPropertyModal())} disabled={actionLoading}>Discard</Button>
+      <Button variant="primary" onClick={handleSave} loading={actionLoading} disabled={config.loading} icon="check_circle">Apply Changes</Button>
+    </div>
+  );
+
+  const columns = [
+    { key: 'name', title: 'Parameter', className: 'w-[40%]' },
+    { key: 'type', title: 'Type', className: 'w-[20%] text-center italic opacity-50' },
+    { 
+      key: 'value', 
+      title: 'Value', 
+      className: 'w-[40%]',
+      render: (item) => {
+        const currentValue = localParams[item.name] || item.default;
+        if (item.type.includes('|')) {
+          const match = item.type.match(/\((.+)\)/);
+          const options = match ? match[1].split('|').map(v => ({ value: v, label: v })) : [{ value: 'ON', label: 'ON' }, { value: 'OFF', label: 'OFF' }];
+          return <Select value={currentValue} onChange={(val) => handleParamChange(item.name, val)} options={options} className="h-8 py-0 min-h-[32px]" />;
+        }
+        return <Input value={currentValue} onChange={(e) => handleParamChange(item.name, e.target.value)} placeholder={item.default} className="h-8" />;
+      }
+    }
+  ];
+
+  const tabs = [
+    { id: 'parameters', label: 'Parameters', icon: 'settings' },
+    { id: 'refresh', label: 'Monitoring', icon: 'update' }
+  ];
 
   return (
-    <div className="fixed inset-0 z-[600] flex items-center justify-center bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="bg-bk-side w-full max-w-2xl rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] border border-white/10 flex flex-col max-h-[85vh] overflow-hidden animate-in zoom-in-95 duration-300">
-        
-        {/* Subtle Top Accent */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-bk-yellow/60"></div>
+    <Modal
+      isOpen={isOpen}
+      onClose={() => dispatch(closeBrokerPropertyModal())}
+      title="Broker Properties"
+      subtitle={`${brokerName} @ ${hostUid}`}
+      icon="tune"
+      footer={footer}
+      maxWidth="max-w-[700px]"
+    >
+      <div className="space-y-6">
+        <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} variant="line" />
 
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3 border-b border-white/5 bg-bk-side flex-shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
-              <span className="material-symbols-outlined text-bk-yellow text-xl">tune</span>
-            </div>
-            <div>
-              <h3 className="text-[12px] font-medium text-slate-100 leading-none tracking-wide">BROKER PROPERTIES</h3>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-[9px] font-medium uppercase text-slate-500 tracking-wide">{brokerName}</span>
-                <span className="w-0.5 h-0.5 rounded-full bg-slate-700"></span>
-                <span className="text-[9px] font-medium text-slate-500 font-mono">@{hostUid}</span>
-              </div>
-            </div>
-          </div>
-          <button 
-            onClick={() => dispatch(closeBrokerPropertyModal())}
-            className="w-7 h-7 rounded-md hover:bg-white/5 transition-all text-slate-500 hover:text-white flex items-center justify-center group"
-          >
-            <span className="material-symbols-outlined text-lg group-hover:rotate-90">close</span>
-          </button>
-        </div>
-
-        {/* Tabs */}
-        {/* Tabs */}
-        <div className="flex px-5 bg-bk-main/30 border-b border-white/5">
-          <button 
-            className={`px-4 py-2.5 text-[11px] font-medium transition-all relative group ${activeTab === 'parameters' ? 'text-bk-yellow' : 'text-slate-500 hover:text-slate-300'}`}
-            onClick={() => setActiveTab('parameters')}
-          >
-            PARAMETERS
-            {activeTab === 'parameters' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-bk-yellow"></div>}
-          </button>
-          <button 
-            className={`px-4 py-2.5 text-[11px] font-medium transition-all relative group ${activeTab === 'refresh' ? 'text-bk-yellow' : 'text-slate-500 hover:text-slate-300'}`}
-            onClick={() => setActiveTab('refresh')}
-          >
-            MONITORING
-            {activeTab === 'refresh' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-bk-yellow"></div>}
-          </button>
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto bg-bk-main/20 custom-scrollbar">
+        <div className="min-h-[400px]">
           {activeTab === 'parameters' ? (
-            <div className="min-h-full">
+            <div className="animate-in fade-in slide-in-from-top-2">
               {config.loading && Object.keys(localParams).length === 0 ? (
-                <div className="py-32 flex flex-col items-center gap-6">
-                  <div className="relative w-16 h-16">
-                    <div className="absolute inset-0 border-4 border-bk-yellow/5 rounded-full"></div>
-                    <div className="absolute inset-0 border-4 border-t-bk-yellow rounded-full animate-spin"></div>
-                  </div>
-                  <div className="flex flex-col items-center gap-1">
-                    <span className="text-sm font-medium text-slate-300">Fetching Configuration</span>
-                    <span className="text-[10px] text-slate-500 font-medium">Please wait a moment...</span>
-                  </div>
+                <div className="py-24 flex flex-col items-center gap-4 opacity-30">
+                  <Icon name="sync" className="animate-spin text-3xl" />
+                  <Typography variant="span" className="font-black uppercase tracking-widest">Fetching Data...</Typography>
                 </div>
               ) : (
-                <div className="p-0">
-                  <table className="w-full text-left border-collapse">
-                    <thead className="sticky top-0 z-10 bg-bk-side border-b border-white/5">
-                      <tr className="text-[10px] font-medium uppercase tracking-wide text-slate-500">
-                        <th className="px-6 py-2.5 w-[35%]">PARAMETER</th>
-                        <th className="px-6 py-2.5 w-[30%] text-center">TYPE</th>
-                        <th className="px-6 py-2.5 w-[35%]">VALUE</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/[0.03]">
-                      {BROKER_PARAMETERS.map((p) => {
-                        const isSpecific = specificParams.has(p.name);
-                        const isCommon = p.category === 'common';
-                        const isHighlight = isCommon || isSpecific;
-                        const currentValue = localParams[p.name] || p.default;
-                        
-                        return (
-                          <tr 
-                            key={p.name} 
-                            className="group hover:bg-white/[0.02] border-b border-white/[0.03] transition-colors"
-                          >
-                            <td className="px-6 py-2.5 text-[12px] font-medium text-slate-100 tracking-tight">
-                              {p.name}
-                            </td>
-                            <td className="px-6 py-2.5 text-center text-[10px] font-mono text-slate-500 uppercase">
-                              {p.type.split('(')[0]}
-                            </td>
-                            <td className="px-6 py-1.5 min-w-[180px]">
-                              {p.type.includes('ON|OFF') ? (
-                                <SelectField 
-                                  value={currentValue}
-                                  onChange={(val) => handleParamChange(p.name, val)}
-                                  isHighlight={true}
-                                  options={(() => {
-                                    const match = p.type.match(/\((.+)\)/);
-                                    if (!match) return [{ value: 'ON', label: 'ON' }, { value: 'OFF', label: 'OFF' }];
-                                    return match[1].split('|').map(v => ({ value: v, label: v }));
-                                  })()}
-                                />
-                              ) : (
-                                <input 
-                                  type="text"
-                                  value={currentValue}
-                                  onChange={(e) => handleParamChange(p.name, e.target.value)}
-                                  placeholder={p.default}
-                                  className="w-full h-9 rounded-lg px-3 py-1.5 text-[12px] font-medium outline-none transition-all bg-bk-side border border-white/10 text-slate-100 placeholder:text-slate-600 focus:border-bk-yellow focus:ring-4 focus:ring-bk-yellow/10 shadow-lg"
-                                />
-                              )}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                <div className="border border-border rounded-xl overflow-hidden">
+                  <Table columns={columns} data={BROKER_PARAMETERS} />
                 </div>
               )}
             </div>
           ) : (
-            <div className="flex flex-col gap-10 max-w-lg mx-auto py-20 px-6">
-              <div className="bg-bk-yellow/5 border border-bk-yellow/10 rounded-2xl p-6 flex gap-5 ring-1 ring-bk-yellow/20">
-                <div className="w-12 h-12 rounded-xl bg-bk-yellow/20 flex-shrink-0 flex items-center justify-center">
-                  <span className="material-symbols-outlined text-bk-yellow text-2xl">update</span>
+            <div className="animate-in fade-in slide-in-from-top-2 space-y-8 p-4">
+              <Card className="bg-primary/5 border-primary/20 p-6 flex gap-5">
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20"><Icon name="speed" className="text-primary text-2xl" /></div>
+                <div className="space-y-1 flex-1">
+                  <Typography variant="h4" className="text-primary">Status Monitoring</Typography>
+                  <Typography variant="p" className="opacity-60 text-[13px] leading-snug">
+                    Fine-tune the auto-refresh behavior for real-time broker metrics. Smaller intervals provide higher precision but increase management overhead.
+                  </Typography>
                 </div>
-                <div>
-                  <h3 className="text-sm font-medium text-bk-yellow mb-1">Status Monitoring</h3>
-                  <p className="text-[11px] text-slate-400 leading-relaxed font-medium">
-                    Configure the auto-refresh interval for the broker status dashboard. 
-                    Real-time updates help in diagnosing performance bottlenecks and monitoring active application servers.
-                  </p>
-                </div>
-              </div>
+              </Card>
 
-              <div className="space-y-8">
-                <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5 hover:border-white/10 transition-all">
-                  <div className="flex flex-col gap-0.5">
-                    <span className="text-sm font-medium text-slate-200">Auto Refresh</span>
-                    <span className="text-[10px] text-slate-500 font-medium">Synchronize status automatically</span>
+              <div className="space-y-6 max-w-md mx-auto">
+                <div className="flex items-center justify-between p-5 bg-background border border-border rounded-xl shadow-sm group hover:border-primary/50 transition-all">
+                  <div className="space-y-1">
+                    <Typography variant="span" className="font-bold block tracking-tight">Auto Refresh</Typography>
+                    <Typography variant="caption" className="opacity-50 block">Keep dashboard context synchronized</Typography>
                   </div>
-                  <button 
-                    onClick={() => setRefreshEnabled(!refreshEnabled)}
-                    className={`w-14 h-7 rounded-full transition-all relative ${refreshEnabled ? 'bg-bk-yellow shadow-[0_0_15px_rgba(255,184,0,0.3)]' : 'bg-slate-800'}`}
-                  >
-                    <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-all shadow-md ${refreshEnabled ? 'left-8 scale-110' : 'left-1'}`}></div>
-                  </button>
+                  <Toggle checked={refreshEnabled} onChange={setRefreshEnabled} />
                 </div>
 
-                <div className={`space-y-4 transition-all duration-300 ${refreshEnabled ? 'opacity-100 translate-y-0' : 'opacity-20 translate-y-4 pointer-events-none'}`}>
-                  <div className="flex flex-col gap-1 px-4">
-                    <label className="text-[10px] font-medium text-slate-500 uppercase tracking-widest block">Update Frequency</label>
-                  </div>
-                  <div className="flex items-center gap-4 bg-white/5 p-2 rounded-2xl border border-white/5">
-                    <input 
-                      type="range"
-                      min="1"
-                      max="60"
-                      value={refreshInterval}
-                      onChange={(e) => setRefreshInterval(e.target.value)}
-                      className="flex-1 accent-bk-yellow"
-                    />
-                    <div className="bg-bk-side border border-white/10 px-4 py-2 rounded-xl min-w-[100px] text-center shadow-inner">
-                      <span className="text-sm font-medium text-bk-yellow">{refreshInterval}</span>
-                      <span className="text-[9px] font-medium text-slate-500 ml-1.5">SEC</span>
-                    </div>
+                <div className={`space-y-4 transition-all duration-300 ${refreshEnabled ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
+                  <Typography variant="caption" className="font-black uppercase tracking-widest text-primary/60 ml-1">Refresh Interval (sec)</Typography>
+                  <div className="flex items-center gap-6 p-5 bg-background border border-border rounded-xl shadow-sm">
+                    <input type="range" min="1" max="60" value={refreshInterval} onChange={(e) => setRefreshInterval(e.target.value)} className="flex-1 accent-primary h-1.5 bg-muted rounded-lg appearance-none cursor-pointer" />
+                    <Card className="w-16 h-10 flex items-center justify-center bg-primary/20 border-primary text-primary font-black shadow-lg shadow-primary/20">
+                      {refreshInterval}
+                    </Card>
                   </div>
                 </div>
               </div>
             </div>
           )}
         </div>
-
-        {/* Footer */}
-        <div className="px-5 py-3.5 bg-bk-main/80 backdrop-blur-sm border-t border-white/5 flex items-center justify-end gap-3 flex-shrink-0">
-          <button 
-            onClick={() => dispatch(closeBrokerPropertyModal())}
-            className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-400 border border-white/10 rounded hover:bg-white/5 transition-all uppercase"
-          >
-            DISCARD
-          </button>
-          <button 
-            onClick={handleSave}
-            disabled={config.loading || actionLoading}
-            className="
-              px-6 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center gap-2 min-w-[140px] uppercase
-            "
-          >
-            {actionLoading ? (
-              <div className="w-3 h-3 border-2 border-bk-side/30 border-t-bk-side rounded-full animate-spin"></div>
-            ) : (
-                <>
-                  <span className="material-symbols-outlined text-[16px]">check_circle</span>
-                  <span>APPLY CHANGES</span>
-                </>
-            )}
-          </button>
-        </div>
       </div>
-    </div>
+    </Modal>
   );
 }

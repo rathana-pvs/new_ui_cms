@@ -8,37 +8,54 @@ export default {
   theme: {
     extend: {
       colors: {
-        "primary": "#ffc107",
-        "bk-main": "#121212",
-        "bk-side": "#1e1e1e",
-        "bk-yellow": "#ffc107",
-        "accent-red": "#f43f5e",
-        "accent-orange": "#f97316",
-        "accent-yellow": "#ffc107",
-        "accent-green": "#10b981",
-        "accent-blue": "#0ea5e9",
-        "accent-purple": "#8b5cf6",
-        "background-light": "#f6f6f8",
-        "background-dark": "#121212",
-      },
-      fontFamily: {
-        "display": ["Inter", "sans-serif"],
-        "sans": ["Inter", "sans-serif"],
-        "mono": ["'JetBrains Mono'", "monospace"],
+        border: "rgb(var(--border) / <alpha-value>)",
+        input: "rgb(var(--input) / <alpha-value>)",
+        ring: "rgb(var(--ring) / <alpha-value>)",
+        background: "rgb(var(--background) / <alpha-value>)",
+        foreground: "rgb(var(--foreground) / <alpha-value>)",
+        primary: {
+          DEFAULT: "rgb(var(--primary) / <alpha-value>)",
+          foreground: "rgb(var(--primary-foreground) / <alpha-value>)",
+        },
+        secondary: {
+          DEFAULT: "rgb(var(--muted) / <alpha-value>)",
+          foreground: "rgb(var(--muted-foreground) / <alpha-value>)",
+        },
+        destructive: {
+          DEFAULT: "rgb(var(--destructive) / <alpha-value>)",
+          foreground: "rgb(var(--destructive-foreground) / <alpha-value>)",
+        },
+        muted: {
+          DEFAULT: "rgb(var(--muted) / <alpha-value>)",
+          foreground: "rgb(var(--muted-foreground) / <alpha-value>)",
+        },
+        accent: {
+          DEFAULT: "rgb(var(--accent) / <alpha-value>)",
+          foreground: "rgb(var(--accent-foreground) / <alpha-value>)",
+        },
+        popover: {
+          DEFAULT: "rgb(var(--popover) / <alpha-value>)",
+          foreground: "rgb(var(--popover-foreground) / <alpha-value>)",
+        },
+        card: {
+          DEFAULT: "rgb(var(--card) / <alpha-value>)",
+          foreground: "rgb(var(--card-foreground) / <alpha-value>)",
+        },
+        // Support legacy bk-* names for backward compatibility during migration
+        "bk-main": "rgb(var(--background) / <alpha-value>)",
+        "bk-side": "rgb(var(--card) / <alpha-value>)",
+        "bk-yellow": "rgb(var(--primary) / <alpha-value>)",
       },
       borderRadius: {
-        "none": "0",
-        "sm": "0.25rem",
-        "DEFAULT": "0.25rem",
-        "md": "0.25rem",
-        "lg": "0.25rem",
-        "xl": "0.25rem",
-        "2xl": "0.25rem",
-        "3xl": "0.25rem",
-        "full": "9999px"
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+      },
+      fontFamily: {
+        sans: ["Inter", "sans-serif"],
+        mono: ["'JetBrains Mono'", "monospace"],
       },
     },
   },
   plugins: [],
 }
-

@@ -1,10 +1,11 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { DropdownMenu, SubMenu, MenuItem, MenuDivider } from '../../../components/common/DropdownMenu';
+import { DropdownMenu, SubMenu, MenuItem, MenuDivider } from '../../../components/ui/Navigation/DropdownMenu';
 import { openTab, showStatusModal } from '../layoutSlice';
 import { openAddHostModal, openEditHostModal, startService, stopService, openServerVersionModal, openImportExportModal } from '../../host/hostSlice';
-import { startDatabase, stopDatabase, openOptimizeDatabaseModal } from '../../database/databaseSlice';
-import { startBroker, stopBroker } from '../../broker/brokerSlice';
+import { startDatabase, stopDatabase, openOptimizeDatabaseModal, fetchDatabaseStartInfo } from '../../database/databaseSlice';
+import { startBroker, stopBroker, fetchBrokerList } from '../../broker/brokerSlice';
 import { setAboutCubrid } from '../appBarSlice';
+import Typography from '../../../components/ui/Foundation/Typography';
 
 export default function HeaderMenu() {
   const dispatch = useDispatch();
@@ -21,8 +22,8 @@ export default function HeaderMenu() {
   };
 
   return (
-    <nav className="flex items-center gap-4 text-sm font-medium text-slate-600 dark:text-slate-400 font-sans">
-      <DropdownMenu label="File">
+    <nav className="flex items-center gap-6">
+      <DropdownMenu label={<Typography variant="span" className="text-[11px] font-black uppercase tracking-[0.15em] text-foreground/60 hover:text-primary transition-colors">File</Typography>}>
         <MenuItem
           icon="add_box"
           label="Add Host"
@@ -46,7 +47,10 @@ export default function HeaderMenu() {
         />
       </DropdownMenu>
 
-      <DropdownMenu label="Tool" width="w-48">
+      <DropdownMenu 
+         label={<Typography variant="span" className="text-[11px] font-black uppercase tracking-[0.15em] text-foreground/60 hover:text-primary transition-colors">Tool</Typography>} 
+         width="w-56"
+      >
         <MenuItem
           icon="play_arrow"
           label="Start Service"
@@ -129,7 +133,10 @@ export default function HeaderMenu() {
         />
       </DropdownMenu>
 
-      <DropdownMenu label="Action" width="w-48">
+      <DropdownMenu 
+         label={<Typography variant="span" className="text-[11px] font-black uppercase tracking-[0.15em] text-foreground/60 hover:text-primary transition-colors">Action</Typography>} 
+         width="w-56"
+      >
         <MenuItem icon="tune" label="Properties" href="#" />
         <SubMenu icon="settings" label="Config Param" width="w-56" gap="ml-3">
           <MenuItem
@@ -168,7 +175,10 @@ export default function HeaderMenu() {
         </SubMenu>
       </DropdownMenu>
 
-      <DropdownMenu label="Help" width="w-56">
+      <DropdownMenu 
+         label={<Typography variant="span" className="text-[11px] font-black uppercase tracking-[0.15em] text-foreground/60 hover:text-primary transition-colors">Help</Typography>} 
+         width="w-64"
+      >
         <MenuItem
           icon="help"
           label="Help"

@@ -1,9 +1,17 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { closeBackupDatabaseModal } from '../databaseSlice';
-import LoadingOverlay from '../../../components/common/LoadingOverlay';
-import ErrorOverlay from '../../../components/common/ErrorOverlay';
-import SelectField from '../../../components/common/SelectField';
+
+// Import New Design System Components
+import Modal from '../../../components/ui/Layout/Modal';
+import Button from '../../../components/ui/Foundation/Button';
+import Typography from '../../../components/ui/Foundation/Typography';
+import Icon from '../../../components/ui/Foundation/Icon';
+import Alert from '../../../components/ui/Feedback/Alert';
+import Card from '../../../components/ui/Layout/Card';
+import Input from '../../../components/ui/Forms/Input';
+import Select from '../../../components/ui/Forms/Select';
+import Checkbox from '../../../components/ui/Forms/Checkbox';
 
 export default function BackupDatabaseModal() {
   const dispatch = useDispatch();
@@ -46,176 +54,104 @@ export default function BackupDatabaseModal() {
     }, 2000);
   };
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans text-left">
-      <div className="bg-white dark:bg-bk-side w-full max-w-[500px] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col relative text-left">
-        
-        {/* Subtle Top Accent */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-bk-yellow/60"></div>
-
-        <LoadingOverlay 
-            isVisible={loading} 
-            title="Processing backup" 
-            subtitle="Creating database volume snapshots..." 
-        />
-        <ErrorOverlay 
-          isVisible={!!error} 
-          error={error} 
-          onRetry={handleBackup}
-          onClose={() => setError(null)}
-        />
-        
-        {/* Header - Compact */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
-              <span className="material-symbols-outlined text-bk-yellow text-xl">backup</span>
-            </div>
-            <div>
-              <h3 className="text-sm font-medium text-slate-900 dark:text-white leading-none">Backup database</h3>
-            </div>
-          </div>
-          <button 
-            disabled={loading}
-            onClick={() => dispatch(closeBackupDatabaseModal())}
-            className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
-          >
-            <span className="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform">close</span>
-          </button>
-        </div>
-
-        {/* Body */}
-        <div className="p-5 space-y-6 overflow-y-auto custom-scrollbar flex-1">
-          {/* Section: Configuration */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Archive configuration</span>
-              <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">Target database</label>
-                <input 
-                  type="text" 
-                  value={selectedDatabase || 'db1'} 
-                  readOnly
-                  className="w-full h-9 px-3 bg-slate-100 dark:bg-bk-main/10 border border-slate-100 dark:border-white/5 rounded text-[12px] text-slate-400 font-medium outline-none cursor-default"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">Volume path</label>
-                <input 
-                  type="text" 
-                  value={formData.volPath}
-                  onChange={(e) => handleInputChange('volPath', e.target.value)}
-                  placeholder="db_backup_path"
-                  className="w-full h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border border-slate-200 dark:border-slate-800 rounded focus:outline-none focus:border-bk-yellow/50 text-[12px] text-slate-900 dark:text-slate-100 font-medium placeholder:text-slate-400"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">Backup ID</label>
-                <input 
-                  type="text" 
-                  value={formData.backupId}
-                  onChange={(e) => handleInputChange('backupId', e.target.value)}
-                  className="w-full h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border border-slate-200 dark:border-slate-800 rounded focus:outline-none focus:border-bk-yellow/50 text-[12px] text-slate-900 dark:text-slate-100 font-medium"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">Backup level</label>
-                <div className="relative">
-                  <SelectField
-                    value={formData.backupLevel}
-                    onChange={(val) => handleInputChange('backupLevel', val)}
-                    options={[
-                      { value: 'level 0', label: 'Level 0 (Full)' },
-                      { value: 'level 1', label: 'Level 1 (Incremental)' },
-                      { value: 'level 2', label: 'Level 2 (Differential)' }
-                    ]}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">Backup directory</label>
-                <input 
-                  type="text" 
-                  value={formData.backupDir}
-                  onChange={(e) => handleInputChange('backupDir', e.target.value)}
-                  placeholder="/var/lib/backup"
-                  className="w-full h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border border-slate-200 dark:border-slate-800 rounded focus:outline-none focus:border-bk-yellow/50 text-[12px] text-slate-900 dark:text-slate-100 font-medium placeholder:text-slate-400"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">Parallel threads</label>
-                <input 
-                  type="number" 
-                  value={formData.parallelBackup}
-                  onChange={(e) => handleInputChange('parallelBackup', e.target.value)}
-                  className="w-full h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border border-slate-200 dark:border-slate-800 rounded focus:outline-none focus:border-bk-yellow/50 text-[12px] text-slate-900 dark:text-slate-100 font-medium"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Section: Advanced Options */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Process flags</span>
-              <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
-            </div>
-            
-            <div className="space-y-2 px-1">
-              {[
-                { label: 'Check database consistency', field: 'checkConsistency' },
-                { label: 'Delete unnecessary log archives', field: 'deleteUnnecessary' },
-                { label: 'Compress backup volumes', field: 'compress' },
-              ].map(opt => (
-                <label key={opt.field} className="flex items-center gap-3 p-2.5 bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-white/5 transition-all group">
-                  <input 
-                    type="checkbox" 
-                    checked={formData[opt.field]}
-                    onChange={(e) => handleInputChange(opt.field, e.target.checked)}
-                    className="w-4 h-4 cursor-pointer rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-bk-main text-bk-yellow focus:ring-bk-yellow/50 accent-bk-yellow transition-all"
-                  />
-                  <span className="text-[11px] font-medium text-slate-600 dark:text-slate-300 group-hover:text-bk-yellow transition-colors tracking-tight">{opt.label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 backdrop-blur-sm flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
-          <button 
-            disabled={loading}
-            className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-all"
-            onClick={() => dispatch(closeBackupDatabaseModal())}
-          >
-            Discard
-          </button>
-          <button 
-            disabled={loading}
-            className="px-6 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center gap-2 min-w-[120px] disabled:opacity-50"
-            onClick={handleBackup}
-          >
-            {loading ? (
-              <div className="w-3 h-3 border-2 border-bk-side/30 border-t-bk-side rounded-full animate-spin"></div>
-            ) : (
-              <>
-                <span className="material-symbols-outlined text-[16px]">play_circle</span>
-                <span>Run backup</span>
-              </>
-            )}
-          </button>
-        </div>
-      </div>
+  const footer = (
+    <div className="flex justify-end gap-3 w-full">
+      <Button variant="ghost" onClick={() => dispatch(closeBackupDatabaseModal())} disabled={loading}>Discard</Button>
+      <Button variant="primary" onClick={handleBackup} loading={loading} icon="play_circle">Run Backup</Button>
     </div>
+  );
+
+  return (
+    <Modal
+      isOpen={isBackupDatabaseModalOpen}
+      onClose={() => dispatch(closeBackupDatabaseModal())}
+      title="Backup Database"
+      subtitle={`${selectedDatabase}`}
+      icon="backup"
+      footer={footer}
+      maxWidth="max-w-[540px]"
+    >
+      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
+        {error && <Alert variant="error" title="Backup execution failure" onClose={() => setError(null)}>{error}</Alert>}
+
+        <section className="space-y-4">
+          <div className="flex items-center gap-3">
+             <Typography variant="caption" className="font-black uppercase tracking-[0.2em] text-primary/60">Archive Configuration</Typography>
+             <div className="flex-1 h-[1px] bg-border/50"></div>
+          </div>
+          <div className="grid grid-cols-2 gap-6">
+             <Input label="Target Database" value={selectedDatabase || 'db1'} readOnly disabled variant="ghost" icon="database" />
+             <Input 
+                label="Volume Path" 
+                value={formData.volPath} 
+                onChange={(val) => handleInputChange('volPath', val)} 
+                placeholder="db_backup_path" 
+                icon="folder_zip"
+             />
+          </div>
+          <div className="grid grid-cols-2 gap-6">
+             <Input 
+                label="Backup ID" 
+                value={formData.backupId} 
+                onChange={(val) => handleInputChange('backupId', val)} 
+                icon="fingerprint"
+             />
+             <Select 
+                label="Backup Level"
+                value={formData.backupLevel}
+                onChange={(val) => handleInputChange('backupLevel', val)}
+                options={[
+                  { value: 'level 0', label: 'Level 0 (Full)' },
+                  { value: 'level 1', label: 'Level 1 (Incremental)' },
+                  { value: 'level 2', label: 'Level 2 (Differential)' }
+                ]}
+             />
+          </div>
+          <div className="grid grid-cols-2 gap-6">
+             <Input 
+                label="Backup Directory" 
+                value={formData.backupDir} 
+                onChange={(val) => handleInputChange('backupDir', val)} 
+                placeholder="/var/lib/backup"
+                icon="folder_open"
+             />
+             <Input 
+                label="Parallel Threads" 
+                type="number"
+                value={formData.parallelBackup} 
+                onChange={(val) => handleInputChange('parallelBackup', val)} 
+                icon="reorder"
+             />
+          </div>
+        </section>
+
+        <section className="space-y-4">
+          <div className="flex items-center gap-3">
+             <Typography variant="caption" className="font-black uppercase tracking-[0.2em] text-secondary/60">Process Flags & Safety</Typography>
+             <div className="flex-1 h-[1px] bg-border/50"></div>
+          </div>
+          <Card className="p-4 bg-muted/5 border-border/50 space-y-4">
+             <Checkbox 
+                label="Check database consistency" 
+                checked={formData.checkConsistency} 
+                onChange={(val) => handleInputChange('checkConsistency', val)} 
+                description="Verify data integrity before creating the archive snapshot."
+             />
+             <Checkbox 
+                label="Delete unnecessary log archives" 
+                checked={formData.deleteUnnecessary} 
+                onChange={(val) => handleInputChange('deleteUnnecessary', val)} 
+                description="Prune old log volumes that are no longer required for recovery."
+             />
+             <Checkbox 
+                label="Compress backup volumes" 
+                checked={formData.compress} 
+                onChange={(val) => handleInputChange('compress', val)} 
+                description="Apply engine-level compression to minimize disk footprint."
+             />
+          </Card>
+        </section>
+      </div>
+    </Modal>
   );
 }

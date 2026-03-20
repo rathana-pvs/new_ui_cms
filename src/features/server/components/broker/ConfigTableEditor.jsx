@@ -1,4 +1,6 @@
-import SelectField from '../../../../components/common/SelectField';
+import Select from '../../../../components/ui/Forms/Select';
+import Typography from '../../../../components/ui/Foundation/Typography';
+import Icon from '../../../../components/ui/Foundation/Icon';
 
 export default function ConfigTableEditor({ 
   sections, 
@@ -11,10 +13,10 @@ export default function ConfigTableEditor({
   return (
     <div className="flex-1 overflow-auto p-4">
       <div className="inline-block min-w-full align-middle font-sans">
-        <div className="border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-[#1a1c1e] shadow-xl overflow-hidden">
+        <div className="border border-slate-200 dark:border-slate-800 rounded-[6px] bg-white dark:bg-[#1a1c1e] shadow-xl overflow-hidden">
           <table className="min-w-full border-collapse">
             <thead>
-              <tr className="bg-slate-50 dark:bg-white/5 text-[11px] text-slate-500 dark:text-slate-400">
+              <tr className="bg-slate-50 dark:bg-white/5 text-[12px] text-slate-500 dark:text-slate-400">
                 <th className="px-4 py-2 text-left border border-slate-200 dark:border-slate-800 font-medium uppercase tracking-wider w-64 bg-slate-100/50 dark:bg-black/40">
                   Property name
                 </th>
@@ -29,7 +31,7 @@ export default function ConfigTableEditor({
               {allPropertyKeys.map((key, rowIdx) => (
                 <tr 
                   key={rowIdx} 
-                  className={`text-[12px] group transition-colors ${
+                  className={`text-[13px] group transition-colors ${
                     (selectedCell.row === rowIdx) ? 'bg-emerald-500/5' : 'odd:bg-white dark:odd:bg-[#1a1c1e] even:bg-slate-50/30 dark:even:bg-white/[0.02]'
                   }`}
                 >
@@ -66,11 +68,9 @@ export default function ConfigTableEditor({
                         }`}
                       >
                         {isBoolean ? (
-                          <SelectField 
+                          <Select 
                             value={currentValue.toUpperCase()}
-                            onChange={(val) => handleValueChange(colIdx, key, val)}
-                            isHighlight={true}
-                            triggerClassName="!h-8 !border-0 bg-transparent"
+                            onChange={(e) => handleValueChange(colIdx, key, e.target.value)}
                             options={[
                               { value: 'ON', label: 'ON' },
                               { value: 'OFF', label: 'OFF' }

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { logout, fetchUser } from '../../auth/authSlice';
 import { fetchPreferences } from '../../user/userSlice';
 import UserProfileModal from '../../user/components/UserProfileModal';
-import { DropdownMenu, SubMenu, MenuItem, MenuDivider } from '../../../components/common/DropdownMenu';
+import { DropdownMenu, SubMenu, MenuItem, MenuDivider } from '../../../components/ui/Navigation/DropdownMenu';
 import { openTab, showStatusModal } from '../layoutSlice';
 import { openAddHostModal, openEditHostModal, startService, stopService } from '../../host/hostSlice';
 import { startDatabase, stopDatabase, fetchDatabaseStartInfo } from '../../database/databaseSlice';
@@ -12,6 +12,8 @@ import { startBroker, stopBroker, fetchBrokerList } from '../../broker/brokerSli
 import { setAboutCubrid } from '../appBarSlice';
 import AboutModal from './AboutModal';
 import { openServerVersionModal } from '../../host/hostSlice';
+import Typography from '../../../components/ui/Foundation/Typography';
+import Icon from '../../../components/ui/Foundation/Icon';
 
 import HeaderMenu from './HeaderMenu';
 
@@ -38,15 +40,16 @@ export default function Header({ theme, toggleTheme }) {
 
   return (
     <>
-      <header className="bg-white dark:bg-bk-side border-b border-slate-200 dark:border-slate-800 h-16 flex items-center justify-between px-6">
-
+      <header className="bg-background/95 backdrop-blur-md border-b border-border/50 h-16 flex items-center justify-between px-6 sticky top-0 z-[100] shadow-sm">
         <div className="flex items-center gap-6">
           <HeaderMenu />
-          <div className="h-6 w-px bg-slate-200 dark:border-slate-800"></div>
-          <div className="flex items-center gap-1.5 ml-2">
+          <div className="h-4 w-px bg-border/50"></div>
+          <div className="flex items-center gap-1.5">
             <button 
-              className={`w-9 h-9 flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors group
-                ${(!selectedDatabase && !selectedBroker) ? 'opacity-30 cursor-not-allowed' : ''}`} 
+              className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-300 group
+                ${(!selectedDatabase && !selectedBroker) 
+                  ? 'opacity-20 cursor-not-allowed grayscale' 
+                  : 'hover:bg-primary/10 hover:shadow-premium-sm text-foreground/40'}`} 
               title="Start Selected"
               onClick={() => {
                 if (selectedDatabase && !activeDatabases.includes(selectedDatabase)) {
@@ -57,8 +60,8 @@ export default function Header({ theme, toggleTheme }) {
                     })
                     .catch(err => dispatch(showStatusModal({ type: 'error', title: 'Start Failed', message: err })));
                 } else if (selectedBroker) {
-                  const broker = brokers.find(b => b.name === selectedBroker);
-                  if (broker && broker.state !== 'ON') {
+                   const broker = brokers.find(b => b.name === selectedBroker);
+                   if (broker && broker.state !== 'ON') {
                     dispatch(startBroker({ hostUid: selectedHostUid, brokerName: selectedBroker }))
                       .unwrap()
                       .then(() => {
@@ -69,16 +72,15 @@ export default function Header({ theme, toggleTheme }) {
                 }
               }}
             >
-              <span className="material-symbols-outlined text-slate-400 text-[20px] group-hover:text-bk-yellow transition-colors leading-none" style={{ fontVariationSettings: "'wght' 300" }}>play_arrow</span>
+              <Icon name="play_arrow" size="sm" className="group-hover:text-primary transition-colors" />
             </button>
-            <button className="w-9 h-9 flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors group" title="Dashboard">
-              <span className="material-symbols-outlined text-slate-400 text-[20px] group-hover:text-bk-yellow transition-colors leading-none" style={{ fontVariationSettings: "'wght' 300" }}>grid_view</span>
+            <button className="w-10 h-10 flex items-center justify-center text-foreground/40 hover:bg-muted/10 hover:shadow-premium-sm rounded-xl transition-all group" title="Dashboard">
+              <Icon name="grid_view" size="sm" className="group-hover:text-primary transition-colors" />
             </button>
-            <button className="w-9 h-9 flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors group" title="Refresh">
-              <span className="material-symbols-outlined text-slate-400 text-[20px] group-hover:text-bk-yellow transition-colors leading-none" style={{ fontVariationSettings: "'wght' 300" }}>refresh</span>
+            <button className="w-10 h-10 flex items-center justify-center text-foreground/40 hover:bg-muted/10 hover:shadow-premium-sm rounded-xl transition-all group" title="Refresh">
+              <Icon name="refresh" size="sm" className="group-hover:text-primary transition-colors" />
             </button>
           </div>
-
         </div>
         <div className="flex items-center gap-4">
 
@@ -98,7 +100,7 @@ export default function Header({ theme, toggleTheme }) {
           >
             {authLoading ? (
               <div className="flex items-center gap-2">
-                <div className="h-3 w-12 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
+                <div className="h-3 w-12 bg-slate-200 dark:bg-slate-700 rounded-[6px] animate-pulse"></div>
                 <div className="h-5 w-5 rounded-full bg-slate-200 dark:bg-slate-700 animate-pulse"></div>
               </div>
             ) : (

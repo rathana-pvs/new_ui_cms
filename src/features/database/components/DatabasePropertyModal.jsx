@@ -3,9 +3,20 @@ import { useDispatch, useSelector } from 'react-redux';
 import { closeDatabasePropertyModal } from '../databaseSlice';
 import { hostApi } from '../../host/hostApi';
 import { brokerApi } from '../../broker/brokerApi';
-import SelectField from '../../../components/common/SelectField';
 
-// Metadata for CUBRID Advanced Parameters based on d-cms ConfConstants.java
+// Import New Design System Components
+import Modal from '../../../components/ui/Layout/Modal';
+import Button from '../../../components/ui/Foundation/Button';
+import Typography from '../../../components/ui/Foundation/Typography';
+import Icon from '../../../components/ui/Foundation/Icon';
+import Input from '../../../components/ui/Forms/Input';
+import Select from '../../../components/ui/Forms/Select';
+import Radio from '../../../components/ui/Forms/Radio';
+import Tabs from '../../../components/ui/Layout/Tabs';
+import Card from '../../../components/ui/Layout/Card';
+import Table from '../../../components/ui/Layout/Table';
+import Alert from '../../../components/ui/Feedback/Alert';
+
 const ADVANCED_PARAMS_SCHEMA = [
   { key: 'access_ip_control', type: 'bool(yes|no)', default: 'no', scope: 'SERVER' },
   { key: 'access_ip_control_file', type: 'string', default: '', scope: 'SERVER' },
@@ -15,83 +26,31 @@ const ADVANCED_PARAMS_SCHEMA = [
   { key: 'block_nowhere_statement', type: 'bool(yes|no)', default: 'no', scope: 'CLIENT' },
   { key: 'call_stack_dump_activation_list', type: 'string', default: '', scope: 'BOTH' },
   { key: 'call_stack_dump_deactivation_list', type: 'string', default: '', scope: 'BOTH' },
-  { key: 'call_stack_dump_on_error', type: 'bool(yes|no)', default: 'no', scope: 'BOTH' },
   { key: 'compactdb_page_reclaim_only', type: 'int', default: '0', scope: 'SERVER' },
   { key: 'compat_numeric_division_scale', type: 'bool(yes|no)', default: 'no', scope: 'BOTH' },
   { key: 'compat_primary_key', type: 'bool(yes|no)', default: 'no', scope: 'CLIENT' },
-  { key: 'csql_history_num', type: 'int', default: '50', scope: 'CLIENT' },
-  { key: 'db_hosts', type: 'string', default: '', scope: 'CLIENT' },
-  { key: 'dont_reuse_heap_file', type: 'bool(yes|no)', default: 'no', scope: 'SERVER' },
   { key: 'error_log', type: 'string', default: 'cubrid.err', scope: 'BOTH' },
   { key: 'file_lock', type: 'bool(yes|no)', default: 'yes', scope: 'SERVER' },
   { key: 'garbage_collection', type: 'bool(yes|no)', default: 'no', scope: 'CLIENT' },
-  { key: 'group_commit_interval_in_msecs', type: 'int', default: '0', scope: 'SERVER' },
   { key: 'ha_mode', type: 'string(on|off|yes|no|replica)', default: 'off', scope: 'SERVER' },
   { key: 'ha_node_list', type: 'string', default: '', scope: 'SERVER' },
   { key: 'ha_port_id', type: 'int', default: '', scope: 'SERVER' },
-  { key: 'hostvar_late_binding', type: 'bool(yes|no)', default: 'no', scope: 'CLIENT' },
-  { key: 'index_scan_in_oid_order', type: 'bool(yes|no)', default: 'no', scope: 'CLIENT' },
-  { key: 'index_scan_oid_buffer_pages', type: 'int', default: '4', scope: 'SERVER' },
-  { key: 'index_scan_oid_buffer_size', type: 'int', default: '65536', scope: 'SERVER' },
-  { key: 'insert_execution_mode', type: 'int', default: '1', scope: 'CLIENT' },
-  { key: 'intl_mbs_support', type: 'bool(yes|no)', default: 'no', scope: 'CLIENT' },
-  { key: 'lock_timeout_message_type', type: 'int', default: '0', scope: 'SERVER' },
-  { key: 'max_plan_cache_entries', type: 'int', default: '1000', scope: 'BOTH' },
-  { key: 'max_query_cache_entries', type: 'int', default: '-1', scope: 'SERVER' },
   { key: 'media_failure_support', type: 'bool(yes|no)', default: 'yes', scope: 'SERVER' },
-  { key: 'oracle_style_empty_string', type: 'bool(yes|no)', default: 'no', scope: 'CLIENT' },
-  { key: 'oracle_style_outerjoin', type: 'bool(yes|no)', default: 'no', scope: 'CLIENT' },
-  { key: 'pthread_scope_process', type: 'bool(yes|no)', default: 'yes', scope: 'SERVER' },
-  { key: 'query_cache_mode', type: 'int', default: '0', scope: 'SERVER' },
-  { key: 'query_cache_size_in_pages', type: 'int', default: '-1', scope: 'SERVER' },
   { key: 'single_byte_compare', type: 'bool(yes|no)', default: 'no', scope: 'SERVER' },
-  { key: 'temp_file_max_size_in_pages', type: 'int', default: '-1', scope: 'SERVER' },
-  { key: 'temp_file_memory_size_in_pages', type: 'int', default: '4', scope: 'SERVER' },
   { key: 'temp_volume_path', type: 'string', default: '', scope: 'SERVER' },
-  { key: 'uj_job_timeout', type: 'int', default: '0', scope: 'SERVER' },
-  { key: 'unfill_factor', type: 'float', default: '0.1', scope: 'SERVER' },
   { key: 'volume_extension_path', type: 'string', default: '', scope: 'SERVER' }
 ];
 
 const GENERAL_PARAMS_SCHEMA = {
-  data_buffer_pages: '25000',
-  data_buffer_size: '512MB',
-  sort_buffer_pages: '16',
-  sort_buffer_size: '2MB',
-  log_buffer_pages: '50',
-  log_buffer_size: '4MB',
-  lock_escalation: '100000',
-  lock_timeout_in_secs: '-1',
-  deadlock_detection_interval_in_secs: '1',
-  checkpoint_interval_in_mins: '1000',
+  data_buffer_pages: '25000', data_buffer_size: '512MB',
+  sort_buffer_pages: '16', sort_buffer_size: '2MB',
+  log_buffer_pages: '50', log_buffer_size: '4MB',
+  lock_escalation: '100000', lock_timeout_in_secs: '-1',
   isolation_level: 'TRAN_REP_CLASS_UNCOMMIT_INSTANCE',
-  cubrid_port_id: '1523',
-  max_clients: '100',
-  auto_restart_server: 'no',
-  replication: 'no'
+  auto_restart_server: 'no'
 };
 
 const GENERAL_PARAMS_KEYS = Object.keys(GENERAL_PARAMS_SCHEMA);
-
-const InputField = ({ label, paramKey, disabled, value, defaultValue, onChange, labelWidth = 'w-[140px]' }) => {
-  const isModified = value !== undefined && value !== null;
-  const displayValue = isModified ? value : defaultValue;
-  
-  return (
-    <div className="flex items-center gap-4 mb-2.5 last:mb-0">
-      <label className={`${labelWidth} text-[10px] font-medium text-slate-500 dark:text-slate-400 tracking-tight`}>{label}</label>
-      <div className="flex-1 relative group/field">
-        <input
-          type="text"
-          value={displayValue || ''}
-          onChange={onChange}
-          disabled={disabled}
-          className={`w-full h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border ${disabled ? 'border-slate-100 dark:border-slate-800/50 opacity-30 shadow-none' : 'border-slate-200 dark:border-slate-800'} rounded focus:outline-none focus:border-bk-yellow/50 text-[11px] transition-all font-medium ${isModified ? 'text-bk-yellow' : 'text-slate-400 italic'}`}
-        />
-      </div>
-    </div>
-  );
-};
 
 export default function DatabasePropertyModal() {
   const dispatch = useDispatch();
@@ -105,450 +64,214 @@ export default function DatabasePropertyModal() {
   const [params, setParams] = useState({});
   const [rawLines, setRawLines] = useState([]);
   const [units, setUnits] = useState({ data: 'MB', sort: 'MB', log: 'MB' });
-  const [bufferSettings, setBufferSettings] = useState({
-    data: 'size', sort: 'size', log: 'size'
-  });
-
+  const [bufferSettings, setBufferSettings] = useState({ data: 'size', sort: 'size', log: 'size' });
   const [brokers, setBrokers] = useState([]);
-  const [connectionInfo, setConnectionInfo] = useState({
-    brokerIp: 'localhost',
-    brokerPort: '',
-    charset: 'UTF-8'
-  });
+  const [connectionInfo, setConnectionInfo] = useState({ brokerIp: 'localhost', brokerPort: '', charset: 'UTF-8' });
 
-  // Load selection state on modal open
   useEffect(() => {
-    if (isDatabasePropertyModalOpen) {
-      if (selectedDatabase) {
-        setActiveSidebar('Connection Information');
-      } else {
-        setActiveSidebar('Server Parameter');
-      }
-    }
+    if (isDatabasePropertyModalOpen) setActiveSidebar(selectedDatabase ? 'Connection Information' : 'Server Parameter');
   }, [isDatabasePropertyModalOpen, selectedDatabase]);
 
-  // Fetch brokers only once when modal opens
   useEffect(() => {
     if (isDatabasePropertyModalOpen && selectedHostUid && isAuthorized) {
-      const fetchBrokers = async () => {
-        try {
-          const response = await brokerApi.getBrokerList(selectedHostUid);
-          const brokerList = response.result || (Array.isArray(response) ? response[0]?.broker : []);
-          if (brokerList && Array.isArray(brokerList)) {
-            const list = brokerList.map(b => ({
-              label: `${b.name} [${b.port}/${b.status || b.state}]`,
-              port: b.port
-            }));
-            setBrokers(list);
-            setConnectionInfo(prev => {
-              if (!prev.brokerPort && list.length > 0) {
-                return { ...prev, brokerPort: list[0].label };
-              }
-              return prev;
-            });
-          }
-        } catch (err) {
-          console.error('Failed to fetch brokers:', err);
+      brokerApi.getBrokerList(selectedHostUid).then(res => {
+        const list = res.result || (Array.isArray(res) ? res[0]?.broker : []);
+        if (Array.isArray(list)) {
+          const mapped = list.map(b => ({ label: `${b.name} (${b.port})`, value: b.port }));
+          setBrokers(mapped);
+          if (mapped.length > 0) setConnectionInfo(prev => ({ ...prev, brokerPort: String(mapped[0].value) }));
         }
-      };
-      fetchBrokers();
+      }).catch(err => console.error(err));
     }
   }, [isDatabasePropertyModalOpen, selectedHostUid, isAuthorized]);
 
-  // Fetch parameters
   useEffect(() => {
-    if (isDatabasePropertyModalOpen && selectedHostUid && isAuthorized) {
-      if (activeSidebar === 'Connection Information') return;
-      
-      const fetchParams = async () => {
-        setLoading(true);
-        try {
-          const response = await hostApi.getHostConfig(selectedHostUid, 'cubridconf');
-          const lines = response?.conflist?.[0]?.confdata || [];
-          setRawLines(lines);
-          let currentSection = '';
-          const newParams = {};
-          
-          for (const line of lines) {
-            const trimmed = line.trim();
-            if (!trimmed || trimmed.startsWith('#')) continue;
-            if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
-              currentSection = trimmed.slice(1, -1).toLowerCase();
-              continue;
-            }
-            const target = selectedDatabase ? `@${selectedDatabase.toLowerCase()}` : 'common';
-            // Match 'common' always, and also match the specific database section if it exists
-            if (currentSection === 'common' || (selectedDatabase && currentSection === target)) {
-              const [key, ...valueParts] = trimmed.split('=');
-              const k = key?.trim();
-              let v = valueParts.join('=').trim();
-              if (k) {
-                if (k.endsWith('_buffer_size')) {
-                  const unit = v.slice(-1).toUpperCase();
-                  if (['K', 'M', 'G', 'T'].includes(unit)) {
-                    const unitMap = { 'K': 'KB', 'M': 'MB', 'G': 'GB', 'T': 'TB' };
-                    const prefix = k.split('_')[0];
-                    setUnits(prev => ({ ...prev, [prefix]: unitMap[unit] || 'MB' }));
-                    v = v.slice(0, -1);
-                  }
-                  const prefix = k.split('_')[0];
-                  setBufferSettings(prev => ({ ...prev, [prefix]: 'size' }));
-                } else if (k.endsWith('_buffer_pages')) {
-                  const prefix = k.split('_')[0];
-                  setBufferSettings(prev => ({ ...prev, [prefix]: 'pages' }));
-                }
-                newParams[k] = v;
-              }
+    if (isDatabasePropertyModalOpen && selectedHostUid && isAuthorized && activeSidebar !== 'Connection Information') {
+      setLoading(true);
+      hostApi.getHostConfig(selectedHostUid, 'cubridconf').then(res => {
+        const lines = res?.conflist?.[0]?.confdata || [];
+        setRawLines(lines);
+        let currentSection = '';
+        const newParams = {};
+        lines.forEach(line => {
+          const trimmed = line.trim();
+          if (!trimmed || trimmed.startsWith('#')) return;
+          if (trimmed.startsWith('[') && trimmed.endsWith(']')) { currentSection = trimmed.slice(1, -1).toLowerCase(); return; }
+          const target = selectedDatabase ? `@${selectedDatabase.toLowerCase()}` : 'common';
+          if (currentSection === 'common' || (selectedDatabase && currentSection === target)) {
+            const [key, value] = trimmed.split('=').map(s => s.trim());
+            if (key) {
+               if (key.endsWith('_buffer_size')) {
+                  const unit = value.slice(-1).toUpperCase();
+                  if (['K','M','G','T'].includes(unit)) {
+                     const uMap = {'K':'KB','M':'MB','G':'GB','T':'TB'};
+                     setUnits(prev => ({ ...prev, [key.split('_')[0]]: uMap[unit] || 'MB' }));
+                     newParams[key] = value.slice(0, -1);
+                  } else { newParams[key] = value; }
+                  setBufferSettings(prev => ({ ...prev, [key.split('_')[0]]: 'size' }));
+               } else if (key.endsWith('_buffer_pages')) {
+                  setBufferSettings(prev => ({ ...prev, [key.split('_')[0]]: 'pages' }));
+                  newParams[key] = value;
+               } else { newParams[key] = value; }
             }
           }
-          setParams(newParams);
-        } catch (err) {
-          console.error('Failed to fetch config:', err);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchParams();
+        });
+        setParams(newParams);
+      }).finally(() => setLoading(false));
     }
   }, [isDatabasePropertyModalOpen, selectedDatabase, selectedHostUid, activeSidebar, isAuthorized]);
 
   const handleApply = async () => {
-    if (activeSidebar === 'Connection Information') {
-      dispatch(closeDatabasePropertyModal());
-      return;
-    }
+    if (activeSidebar === 'Connection Information') { dispatch(closeDatabasePropertyModal()); return; }
     setLoading(true);
     try {
-      // 1. Prepare the parameters to save
       const saveParams = { ...params };
-      ['data', 'sort', 'log'].forEach(prefix => {
-        const setting = bufferSettings[prefix];
-        const pagesKey = `${prefix}_buffer_pages`;
-        const sizeKey = `${prefix}_buffer_size`;
-        
-        if (setting === 'size') {
-          const val = params[sizeKey];
-          const unit = units[prefix].charAt(0); // K, M, G, T
-          if (val) saveParams[sizeKey] = `${val}${unit}`;
-          delete saveParams[pagesKey];
-        } else {
-          delete saveParams[sizeKey];
-        }
+      ['data', 'sort', 'log'].forEach(p => {
+        if (bufferSettings[p] === 'size') {
+           if (params[`${p}_buffer_size`]) saveParams[`${p}_buffer_size`] = `${params[`${p}_buffer_size`]}${units[p].charAt(0)}`;
+           delete saveParams[`${p}_buffer_pages`];
+        } else { delete saveParams[`${p}_buffer_size`]; }
       });
-
-      // 2. Modify rawLines to apply changes
       const sectionName = selectedDatabase ? `[@${selectedDatabase.toLowerCase()}]` : '[common]';
       let lines = [...rawLines];
-      
-      // Find section start and end
-      let sectionStartIndex = -1;
-      let sectionEndIndex = -1;
-      
-      for (let i = 0; i < lines.length; i++) {
-        if (lines[i].trim().toLowerCase() === sectionName.toLowerCase()) {
-          sectionStartIndex = i;
-          // Find next section
-          for (let j = i + 1; j < lines.length; j++) {
-            if (lines[j].trim().startsWith('[') && lines[j].trim().endsWith(']')) {
-              sectionEndIndex = j;
-              break;
-            }
-          }
-          if (sectionEndIndex === -1) sectionEndIndex = lines.length;
-          break;
-        }
-      }
-
-      if (sectionStartIndex === -1) {
-        // Section not found, append to end
-        lines.push("");
-        lines.push(sectionName);
-        sectionStartIndex = lines.length - 1;
-        sectionEndIndex = lines.length;
-      }
-
-      const sectionLines = lines.slice(sectionStartIndex + 1, sectionEndIndex);
-      const otherBefore = lines.slice(0, sectionStartIndex + 1);
-      const otherAfter = lines.slice(sectionEndIndex);
-
-      // Update existing or add new
-      const updatedSection = [...sectionLines];
-      Object.entries(saveParams).forEach(([key, value]) => {
+      let start = -1, end = -1;
+      lines.forEach((l, i) => { if (l.trim().toLowerCase() === sectionName.toLowerCase()) start = i; });
+      if (start !== -1) { for (let i = start + 1; i < lines.length; i++) { if (lines[i].trim().startsWith('[')) { end = i; break; } } if (end === -1) end = lines.length; }
+      if (start === -1) { lines.push("", sectionName); start = lines.length - 1; end = lines.length; }
+      const updated = lines.slice(start + 1, end);
+      Object.entries(saveParams).forEach(([k, v]) => {
         let found = false;
-        for (let i = 0; i < updatedSection.length; i++) {
-          const trimmed = updatedSection[i].trim();
-          if (trimmed.startsWith('#')) continue;
-          if (trimmed.split('=')[0].trim().toLowerCase() === key.toLowerCase()) {
-            updatedSection[i] = `${key}=${value}`;
-            found = true;
-            break;
-          }
-        }
-        if (!found) {
-          updatedSection.push(`${key}=${value}`);
-        }
+        for (let i = 0; i < updated.length; i++) { if (!updated[i].trim().startsWith('#') && updated[i].split('=')[0].trim().toLowerCase() === k.toLowerCase()) { updated[i] = `${k}=${v}`; found = true; break; } }
+        if (!found) updated.push(`${k}=${v}`);
       });
-
-      const finalConfData = [...otherBefore, ...updatedSection, ...otherAfter];
-      const payload = {
-        confname: 'cubridconf',
-        confdata: finalConfData
-      };
-
-      await hostApi.setHostConfig(selectedHostUid, payload);
+      await hostApi.setHostConfig(selectedHostUid, { confname: 'cubridconf', confdata: [...lines.slice(0, start + 1), ...updated, ...lines.slice(end)] });
       dispatch(closeDatabasePropertyModal());
-    } catch (err) {
-      console.error('Failed to save properties:', err);
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
-  const advancedData = useMemo(() => ADVANCED_PARAMS_SCHEMA
-    .filter(p => !GENERAL_PARAMS_KEYS.includes(p.key))
-    .map(p => ({
-      ...p,
-      currentValue: params[p.key] !== undefined ? params[p.key] : p.default,
-      isModified: params[p.key] !== undefined
-    })), [params]);
+  const columns = [
+    { key: 'key', title: 'Parameter', className: 'w-[40%] font-bold' },
+    { key: 'scope', title: 'Scope', className: 'w-[15%] text-center uppercase opacity-40 font-black tracking-tighter' },
+    { 
+      key: 'value', title: 'Value', className: 'w-[45%]',
+      render: (item) => {
+        const val = params[item.key] !== undefined ? params[item.key] : item.default;
+        if (item.type.includes('|')) {
+           const opts = item.type.match(/\((.+)\)/)?.[1].split('|').map(v => ({ label: v, value: v })) || [];
+           return <Select value={val} options={opts} onChange={v => setParams({ ...params, [item.key]: v })} className="h-8 py-0 min-h-[32px]" />;
+        }
+        return <Input value={val} onChange={e => setParams({ ...params, [item.key]: e.target.value })} className="h-8" />;
+      }
+    }
+  ];
 
-  if (!isDatabasePropertyModalOpen) return null;
+  const sidebarItems = selectedDatabase ? [
+    { id: 'Connection Information', icon: 'settings_ethernet' },
+    { id: 'Server Parameter', icon: 'hub' }
+  ] : [{ id: 'Server Parameter', icon: 'hub' }];
+
+  const footer = (
+    <div className="flex justify-end gap-3 w-full">
+      <Button variant="ghost" onClick={() => dispatch(closeDatabasePropertyModal())} disabled={loading}>Discard</Button>
+      <Button variant="primary" onClick={handleApply} loading={loading} icon="save">Apply Changes</Button>
+    </div>
+  );
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans">
-      <div className="bg-white dark:bg-bk-side w-full max-w-[700px] shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden rounded-xl animate-in zoom-in-95 duration-200 flex flex-col relative h-[600px]">
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-bk-yellow/60"></div>
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
-              <span className="material-symbols-outlined text-bk-yellow text-xl">tune</span>
-            </div>
-            <h3 className="text-[12px] font-medium text-slate-900 dark:text-slate-100 leading-none tracking-wide text-left">
-              {(activeSidebar === 'Connection Information' ? `${selectedDatabase} CONNECTION` : (selectedDatabase ? `${selectedDatabase} PROPERTIES` : 'SERVER PROPERTIES')).toUpperCase()}
-            </h3>
-          </div>
-          <button onClick={() => dispatch(closeDatabasePropertyModal())} className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center">
-            <span className="material-symbols-outlined text-lg">close</span>
-          </button>
+    <Modal
+      isOpen={isDatabasePropertyModalOpen}
+      onClose={() => dispatch(closeDatabasePropertyModal())}
+      title={selectedDatabase ? `Database Properties: ${selectedDatabase}` : 'Common Server Properties'}
+      subtitle={`${selectedHostUid}`}
+      icon="tune"
+      footer={footer}
+      maxWidth="max-w-[850px]"
+    >
+      <div className="flex h-[550px] -mx-6 -my-6">
+        {/* Sidebar Nav */}
+        <div className="w-[220px] bg-muted/5 border-r border-border p-3 space-y-1">
+          {sidebarItems.map(item => (
+            <button
+              key={item.id}
+              onClick={() => setActiveSidebar(item.id)}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeSidebar === item.id ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 font-bold' : 'text-foreground/60 hover:bg-muted/10'}`}
+            >
+              <Icon name={item.icon} size="sm" />
+              <Typography variant="span" className="text-[12px] uppercase tracking-wide">{item.id}</Typography>
+            </button>
+          ))}
         </div>
 
-        <div className="flex flex-1 overflow-hidden">
-          {/* Sidebar */}
-          <div className="w-48 bg-slate-50/30 dark:bg-bk-main/20 border-r border-slate-100 dark:border-slate-800/50 flex flex-col py-2 overflow-y-auto">
-            {(selectedDatabase ? ['Connection Information', 'Server Parameter'] : ['Server Parameter']).map(id => (
-              <button key={id} onClick={() => setActiveSidebar(id)} className={`flex items-center gap-2.5 px-4 py-2 text-[10px] font-medium transition-all relative group ${activeSidebar === id ? 'text-bk-yellow bg-bk-yellow/5' : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 uppercase tracking-wide'}`}>
-                <span className={`material-symbols-outlined text-[16px] ${activeSidebar === id ? 'text-bk-yellow' : 'text-slate-400 opacity-60'}`}>{id === 'Connection Information' ? 'settings_ethernet' : 'hub'}</span>
-                <span className="tracking-tight">{id}</span>
-                {activeSidebar === id && <div className="absolute left-0 top-1.5 bottom-1.5 w-[2px] bg-bk-yellow rounded-r"></div>}
-              </button>
-            ))}
-          </div>
+        {/* Content Area */}
+        <div className="flex-1 flex flex-col min-w-0">
+          {activeSidebar === 'Server Parameter' && (
+            <div className="px-6 pt-4 border-b border-border bg-background">
+               <Tabs tabs={[{ id: 'General', label: 'General' }, { id: 'Advanced', label: 'Advanced' }]} activeTab={activeTab} onChange={setActiveTab} variant="line" />
+            </div>
+          )}
 
-          <div className="flex-1 flex flex-col bg-white dark:bg-transparent overflow-hidden">
-            {activeSidebar === 'Server Parameter' && (
-              <div className="px-4 flex border-b border-slate-100 dark:border-slate-800 bg-slate-50/20 dark:bg-bk-main/10 flex-shrink-0">
-                {['General', 'Advanced'].map(tab => (
-                  <button key={tab} onClick={() => setActiveTab(tab)} className={`px-5 py-2.5 text-[10px] uppercase font-medium transition-all relative ${activeTab === tab ? 'text-bk-yellow' : 'text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
-                    {tab}
-                    {activeTab === tab && <div className="absolute bottom-0 left-3 right-3 h-[1.5px] bg-bk-yellow rounded-t-full"></div>}
-                  </button>
-                ))}
+          <div className="flex-1 overflow-y-auto p-8">
+            {loading ? (
+              <div className="h-full flex flex-col items-center justify-center opacity-30 gap-4"><Icon name="sync" className="animate-spin text-3xl" /><Typography variant="caption" className="font-black uppercase tracking-widest">Hydrating Config...</Typography></div>
+            ) : activeSidebar === 'Connection Information' ? (
+              <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
+                 <div className="space-y-6 max-w-lg">
+                    <Typography variant="caption" className="font-black uppercase tracking-widest text-primary border-b border-primary/20 pb-2 block">Manager Connectivity</Typography>
+                    <Input label="Broker Host/IP" value={connectionInfo.brokerIp} onChange={e => setConnectionInfo({ ...connectionInfo, brokerIp: e.target.value })} icon="dns" />
+                    <Select label="Broker Port" options={brokers} value={connectionInfo.brokerPort} onChange={v => setConnectionInfo({ ...connectionInfo, brokerPort: v })} icon="link" />
+                    <Select label="Client Charset" options={['UTF-8','EUC-KR','ISO-8859-1','UHC'].map(o => ({label:o, value:o}))} value={connectionInfo.charset} onChange={v => setConnectionInfo({ ...connectionInfo, charset: v })} icon="translate" />
+                 </div>
+                 <Alert variant="info" title="Infrastructure Routing">Establish a direct path from the management interface to the CUBRID Broker. These settings impact administrative tooling only.</Alert>
+              </div>
+            ) : activeTab === 'General' ? (
+              <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 pb-4">
+                 {['data', 'sort', 'log'].map(p => (
+                   <Card key={p} className="p-6 space-y-5 border-border/50 bg-muted/5">
+                      <div className="flex items-center gap-3">
+                         <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-black text-[10px] uppercase border border-primary/20">{p}</div>
+                         <Typography variant="h4" className="uppercase tracking-widest opacity-80">{p} Space Allocation</Typography>
+                      </div>
+                      <div className="space-y-4 pt-2">
+                         <div className="flex items-center gap-5 group">
+                            <Radio checked={bufferSettings[p] === 'pages'} onChange={() => setBufferSettings(s => ({ ...s, [p]: 'pages' }))} />
+                            <div className="flex-1 space-y-3">
+                               <Typography variant="caption" className={`font-bold transition-all ${bufferSettings[p] === 'pages' ? 'text-foreground' : 'text-muted-foreground/40'}`}>{p.toUpperCase()}_BUFFER_PAGES</Typography>
+                               <Input label="" value={params[`${p}_buffer_pages`] || GENERAL_PARAMS_SCHEMA[`${p}_buffer_pages`]} onChange={e => setParams({ ...params, [`${p}_buffer_pages`]: e.target.value })} disabled={bufferSettings[p] !== 'pages'} className="h-9" />
+                            </div>
+                         </div>
+                         <div className="flex items-center gap-5 group">
+                            <Radio checked={bufferSettings[p] === 'size'} onChange={() => setBufferSettings(s => ({ ...s, [p]: 'size' }))} />
+                            <div className="flex-1 space-y-3">
+                               <Typography variant="caption" className={`font-bold transition-all ${bufferSettings[p] === 'size' ? 'text-foreground' : 'text-muted-foreground/40'}`}>{p.toUpperCase()}_BUFFER_SIZE</Typography>
+                               <div className="flex gap-3">
+                                  <Input label="" value={params[`${p}_buffer_size`] || GENERAL_PARAMS_SCHEMA[`${p}_buffer_size`]?.replace(/[A-Z]/g, '')} onChange={e => setParams({ ...params, [`${p}_buffer_size`]: e.target.value })} disabled={bufferSettings[p] !== 'size'} className="flex-1 h-9" />
+                                  <Select options={['KB','MB','GB','TB'].map(o => ({label:o, value:o}))} value={units[p]} onChange={v => setUnits(u => ({ ...u, [p]: v }))} disabled={bufferSettings[p] !== 'size'} className="w-[90px] h-9 min-h-[36px]" />
+                               </div>
+                            </div>
+                         </div>
+                      </div>
+                   </Card>
+                 ))}
+                 <Card className="p-6 space-y-6 border-border/50">
+                    <Typography variant="caption" className="font-black uppercase tracking-widest text-secondary border-b border-border/50 pb-2 block">Operational Policy</Typography>
+                    <div className="grid grid-cols-2 gap-6">
+                       <Input label="Lock Escalation" value={params.lock_escalation} onChange={e => setParams({ ...params, lock_escalation: e.target.value })} icon="lock_open" />
+                       <Input label="Timeout (sec)" value={params.lock_timeout_in_secs} onChange={e => setParams({ ...params, lock_timeout_in_secs: e.target.value })} icon="timer" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-6">
+                       <Select label="Isolation Level" options={['TRAN_SERIALIZABLE','TRAN_REP_CLASS_REP_INSTANCE','TRAN_REP_CLASS_COMMIT_INSTANCE','TRAN_REP_CLASS_UNCOMMIT_INSTANCE'].map(o => ({label:o, value:o}))} value={params.isolation_level || 'TRAN_REP_CLASS_UNCOMMIT_INSTANCE'} onChange={v => setParams({ ...params, isolation_level: v })} />
+                       <Select label="Auto Restart" options={[{label:'Yes', value:'yes'}, {label:'No', value:'no'}]} value={params.auto_restart_server || 'no'} onChange={v => setParams({ ...params, auto_restart_server: v })} />
+                    </div>
+                 </Card>
+              </div>
+            ) : (
+              <div className="animate-in fade-in slide-in-from-bottom-4 border border-border rounded-2xl overflow-hidden shadow-sm">
+                 <Table columns={columns} data={ADVANCED_PARAMS_SCHEMA.map(p => ({ ...p, name: p.key }))} />
               </div>
             )}
-            
-            <div className="flex-1 overflow-y-auto p-6 custom-scrollbar flex flex-col">
-              {loading ? (
-                <div className="flex-1 flex flex-col items-center justify-center gap-3 opacity-60">
-                  <div className="w-8 h-8 border-2 border-bk-yellow/20 border-t-bk-yellow rounded-full animate-spin"></div>
-                  <span className="text-[10px] font-medium tracking-widest text-slate-500 uppercase">Synchronizing...</span>
-                </div>
-              ) : activeSidebar === 'Connection Information' ? (
-                /* Inline rendering for Connection Information View to ensure absolute stability */
-                <div key="connection-view" className="flex-1 flex flex-col gap-8 animate-in fade-in slide-in-from-right-2 duration-200">
-                  <div className="space-y-6">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-medium tracking-widest text-slate-500 uppercase">Connection Information</span>
-                      <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800"></div>
-                    </div>
-                    <div className="px-1 space-y-4">
-                      <InputField label="Broker IP:" value={connectionInfo.brokerIp} onChange={(e) => setConnectionInfo({ ...connectionInfo, brokerIp: e.target.value })} />
-                      <div className="flex items-center gap-4">
-                        <label className="w-[140px] text-[10px] font-medium text-slate-500 dark:text-slate-400 tracking-tight">Broker Port:</label>
-                        <div className="flex-1">
-                          <SelectField 
-                            value={connectionInfo.brokerPort} 
-                            options={brokers.map(b => ({ value: b.label, label: b.label }))} 
-                            onChange={(val) => setConnectionInfo({ ...connectionInfo, brokerPort: val })} 
-                          />
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <label className="w-[140px] text-[10px] font-medium text-slate-500 dark:text-slate-400 tracking-tight">Character set:</label>
-                        <div className="flex-1">
-                          <SelectField 
-                            value={connectionInfo.charset} 
-                            options={['UTF-8', 'EUC-KR', 'ISO-8859-1', 'UHC'].map(o => ({ value: o, label: o }))} 
-                            onChange={(val) => setConnectionInfo({ ...connectionInfo, charset: val })} 
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-auto p-4 bg-bk-yellow/5 border border-bk-yellow/10 rounded-lg flex gap-4 pr-6">
-                    <span className="material-symbols-outlined text-bk-yellow text-xl">info</span>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed italic">
-                      These connection settings establish a communication channel with the database through the CUBRID Broker. Changes affect manager connectivity only.
-                    </p>
-                  </div>
-                </div>
-              ) : activeTab === 'General' ? (
-                <div key="general-view" className="animate-in fade-in slide-in-from-bottom-2 duration-200">
-                  {['data', 'sort', 'log'].map(prefix => {
-                    const pagesKey = `${prefix}_buffer_pages`;
-                    const sizeKey = `${prefix}_buffer_size`;
-                    const hasPages = params[pagesKey] !== undefined;
-                    const hasSize = params[sizeKey] !== undefined;
-                    
-                    return (
-                      <div key={prefix} className="space-y-3 mb-5">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500 uppercase">{prefix} Buffers</span>
-                          <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
-                        </div>
-                        <div className="space-y-2.5 px-1">
-                          <div className="flex items-center gap-3">
-                            <input type="radio" checked={bufferSettings[prefix] === 'pages'} onChange={() => setBufferSettings(s => ({ ...s, [prefix]: 'pages' }))} className="w-4 h-4 cursor-pointer accent-bk-yellow"/>
-                            <label className={`w-[160px] text-[11px] font-medium ${bufferSettings[prefix] !== 'pages' ? 'text-slate-400' : 'text-slate-700 dark:text-slate-300'}`}>{pagesKey}</label>
-                            <input 
-                              type="text" 
-                              value={hasPages ? params[pagesKey] : GENERAL_PARAMS_SCHEMA[pagesKey] || ''} 
-                              onChange={(e) => setParams({ ...params, [pagesKey]: e.target.value })} 
-                              disabled={bufferSettings[prefix] !== 'pages'} 
-                              className={`flex-1 h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border border-slate-200 dark:border-slate-800 rounded text-[11px] focus:outline-none ${hasPages ? 'text-bk-yellow font-medium' : 'text-slate-400 italic'}`}
-                            />
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <input type="radio" checked={bufferSettings[prefix] === 'size'} onChange={() => setBufferSettings(s => ({ ...s, [prefix]: 'size' }))} className="w-4 h-4 cursor-pointer accent-bk-yellow"/>
-                            <label className={`w-[160px] text-[11px] font-medium ${bufferSettings[prefix] !== 'size' ? 'text-slate-400' : 'text-slate-700 dark:text-slate-300'}`}>{sizeKey}</label>
-                            <div className="flex-1 flex gap-2">
-                               <input 
-                                 type="text" 
-                                 value={hasSize ? params[sizeKey] : (GENERAL_PARAMS_SCHEMA[sizeKey] ? GENERAL_PARAMS_SCHEMA[sizeKey].replace(/[A-Z]/g, '') : '')} 
-                                 onChange={(e) => setParams({ ...params, [sizeKey]: e.target.value })} 
-                                 disabled={bufferSettings[prefix] !== 'size'} 
-                                 className={`flex-1 h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border border-slate-200 dark:border-slate-800 rounded text-[12px] focus:outline-none ${hasSize ? 'text-slate-100 font-medium' : 'text-slate-400 italic'}`}
-                               />
-                               <SelectField 
-                                 value={units[prefix]} 
-                                 options={['KB', 'MB', 'GB', 'TB'].map(o => ({ value: o, label: o }))} 
-                                 onChange={(val) => setUnits(u => ({ ...u, [prefix]: val }))} 
-                                 disabled={bufferSettings[prefix] !== 'size'}
-                                 className="w-[85px]"
-                               />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                  <div className="space-y-4 pt-1">
-                    <div className="flex items-center gap-2"><span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500 uppercase">Other Parameters</span><div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div></div>
-                    <div className="space-y-1 px-1">
-                        <InputField label="lock_escalation" value={params.lock_escalation} defaultValue={GENERAL_PARAMS_SCHEMA.lock_escalation} onChange={(e) => setParams({ ...params, lock_escalation: e.target.value })} />
-                        <InputField label="lock_timeout_in_secs" value={params.lock_timeout_in_secs} defaultValue={GENERAL_PARAMS_SCHEMA.lock_timeout_in_secs} onChange={(e) => setParams({ ...params, lock_timeout_in_secs: e.target.value })} />
-                        <InputField label="deadlock_interval" value={params.deadlock_detection_interval_in_secs} defaultValue={GENERAL_PARAMS_SCHEMA.deadlock_detection_interval_in_secs} onChange={(e) => setParams({ ...params, deadlock_detection_interval_in_secs: e.target.value })} />
-                        <InputField label="checkpoint_interval" value={params.checkpoint_interval_in_mins} defaultValue={GENERAL_PARAMS_SCHEMA.checkpoint_interval_in_mins} onChange={(e) => setParams({ ...params, checkpoint_interval_in_mins: e.target.value })} />
-                        <div className="flex items-center gap-4 py-1.5">
-                          <label className="w-[140px] text-[10px] font-medium text-slate-500 dark:text-slate-400 tracking-tight">isolation_level</label>
-                          <div className="flex-1">
-                            <SelectField 
-                              value={params.isolation_level || GENERAL_PARAMS_SCHEMA.isolation_level} 
-                              options={['TRAN_SERIALIZABLE','TRAN_REP_CLASS_REP_INSTANCE','TRAN_REP_CLASS_COMMIT_INSTANCE','TRAN_REP_CLASS_UNCOMMIT_INSTANCE','TRAN_COMMIT_CLASS_COMMIT_INSTANCE','TRAN_COMMIT_CLASS_UNCOMMIT_INSTANCE'].map(o => ({ value: o, label: o }))} 
-                              onChange={(val) => setParams({ ...params, isolation_level: val })}
-                              isHighlight={params.isolation_level !== undefined}
-                            />
-                          </div>
-                        </div>
-                        <InputField label="max_clients" value={params.max_clients} defaultValue={GENERAL_PARAMS_SCHEMA.max_clients} onChange={(e) => setParams({ ...params, max_clients: e.target.value })} />
-                        <div className="flex items-center gap-4 py-1.5">
-                          <label className="w-[140px] text-[10px] font-medium text-slate-500 dark:text-slate-400 tracking-tight">auto_restart_server</label>
-                          <div className="flex-1">
-                            <SelectField 
-                              value={params.auto_restart_server || GENERAL_PARAMS_SCHEMA.auto_restart_server} 
-                              options={['yes', 'no'].map(o => ({ value: o, label: o }))} 
-                              onChange={(val) => setParams({ ...params, auto_restart_server: val })}
-                              isHighlight={params.auto_restart_server !== undefined}
-                            />
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-4 py-1.5">
-                          <label className="w-[140px] text-[10px] font-medium text-slate-500 dark:text-slate-400 tracking-tight">replication</label>
-                          <div className="flex-1">
-                            <SelectField 
-                              value={params.replication || GENERAL_PARAMS_SCHEMA.replication} 
-                              options={['yes', 'no'].map(o => ({ value: o, label: o }))} 
-                              onChange={(val) => setParams({ ...params, replication: val })}
-                              isHighlight={params.replication !== undefined}
-                            />
-                          </div>
-                        </div>
-                        <InputField label="cubrid_port_id" value={params.cubrid_port_id} defaultValue={GENERAL_PARAMS_SCHEMA.cubrid_port_id} onChange={(e) => setParams({ ...params, cubrid_port_id: e.target.value })} />
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div key="advanced-view" className="flex-1 flex flex-col min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-200">
-                  <div className="border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden bg-slate-50/20 dark:bg-bk-main/10 flex flex-col flex-1">
-                    <div className="sticky top-0 bg-slate-100 dark:bg-bk-main flex border-b border-slate-200 dark:border-slate-800 z-10 uppercase">
-                      <div className="w-[200px] px-4 py-2.5 text-[9px] font-medium text-slate-500 dark:text-slate-400 tracking-wide">PARAMETER</div>
-                      <div className="w-[70px] px-4 py-2.5 text-[9px] font-medium text-slate-500 dark:text-slate-400 tracking-wide border-l border-slate-200 dark:border-slate-800 text-center">TARGET</div>
-                      <div className="w-[90px] px-4 py-2.5 text-[9px] font-medium text-slate-500 dark:text-slate-400 tracking-wide border-l border-slate-200 dark:border-slate-800 text-center">TYPE</div>
-                      <div className="flex-1 px-4 py-2.5 text-[9px] font-medium text-slate-500 dark:text-slate-400 tracking-wide border-l border-slate-200 dark:border-slate-800">VALUE</div>
-                    </div>
-                    <div className="flex-1 overflow-y-auto custom-scrollbar">
-                      {advancedData.map((item, idx) => (
-                        <div key={item.key} className={`flex border-b border-slate-100 dark:border-slate-800/50 hover:bg-slate-50/50 dark:hover:bg-white/5 transition-colors group ${idx % 2 === 0 ? 'bg-white/40 dark:bg-transparent' : ''}`}>
-                          <div className="w-[240px] px-4 py-2 flex items-center shrink-0">
-                            <span className={`text-[12px] font-medium truncate ${item.isModified ? 'text-bk-yellow' : 'text-slate-700 dark:text-slate-100'}`}>{item.key}</span>
-                          </div>
-                          <div className="w-[80px] px-4 py-2 flex items-center shrink-0 border-l border-slate-100 dark:border-slate-800/30 justify-center">
-                            <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-bk-side text-[9px] font-medium text-slate-500 dark:text-slate-400">{item.scope}</span>
-                          </div>
-                          <div className="w-[110px] px-4 py-2 flex items-center shrink-0 justify-center border-l border-slate-100 dark:border-slate-800/30">
-                            <span className="text-[10px] text-slate-400 font-mono tracking-tighter uppercase">{item.type.split('(')[0]}</span>
-                          </div>
-                          <div className="flex-1 px-4 py-1.5 flex items-center border-l border-slate-100 dark:border-slate-800/30">
-                            {item.type.includes('yes|no') || item.type.includes('on|off') ? (
-                              <SelectField 
-                                value={item.currentValue} 
-                                options={(item.type.includes('on|off') && item.type.includes('yes|no') 
-                                  ? (item.type.includes('replica') ? ['on', 'off', 'yes', 'no', 'replica'] : ['on', 'off', 'yes', 'no']) 
-                                  : item.type.includes('on|off') ? ['on', 'off'] : ['yes', 'no']).map(o => ({ value: o, label: o }))} 
-                                onChange={(val) => setParams({ ...params, [item.key]: val })}
-                                isHighlight={true}
-                              />
-                            ) : (
-                              <input type="text" value={item.currentValue} onChange={(e) => setParams({ ...params, [item.key]: e.target.value })} className={`w-full h-9 px-2 bg-transparent border border-transparent hover:border-slate-200 dark:hover:border-slate-800 focus:border-bk-yellow/40 focus:bg-white dark:focus:bg-bk-main/50 rounded text-[11px] transition-all outline-none ${item.isModified ? 'text-bk-yellow font-medium' : 'text-slate-500 dark:text-slate-400 italic'}`}/>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
         </div>
-
-        <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 backdrop-blur-sm flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
-          <button onClick={() => dispatch(closeDatabasePropertyModal())} className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-all uppercase">DISCARD</button>
-          <button onClick={handleApply} className="px-6 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center gap-2 min-w-[140px] uppercase">
-             <span className="material-symbols-outlined text-[16px]">save</span>
-             <span>APPLY CHANGES</span>
-          </button>
-        </div>
       </div>
-    </div>
+    </Modal>
   );
 }

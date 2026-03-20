@@ -43,7 +43,7 @@ export default function CASLogModal({ isOpen, onClose, hostUid, brokerName, casI
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-      <div className="bg-white dark:bg-bk-side w-full max-w-5xl h-[80vh] rounded-xl shadow-2xl flex flex-col overflow-hidden border border-slate-200 dark:border-white/10 animate-in zoom-in-95 duration-200">
+      <div className="bg-white dark:bg-bk-side w-full max-w-5xl h-[80vh] rounded-[6px] shadow-2xl flex flex-col overflow-hidden border border-slate-200 dark:border-white/10 animate-in zoom-in-95 duration-200">
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-white/5">
           <div className="flex items-center gap-3">
             <div className={`w-10 h-10 rounded-full flex items-center justify-center ${type === 'sql' ? 'bg-sky-500/10 text-sky-500' : 'bg-rose-500/10 text-rose-500'}`}>
@@ -83,7 +83,7 @@ export default function CASLogModal({ isOpen, onClose, hostUid, brokerName, casI
               </p>
               <button 
                 onClick={fetchLogPath}
-                className="mt-6 px-4 py-2 bg-slate-100 dark:bg-white/5 hover:bg-bk-yellow hover:text-black rounded text-[11px] font-bold transition-all transition-colors"
+                className="mt-6 px-4 py-2 bg-slate-100 dark:bg-white/5 hover:bg-bk-yellow hover:text-black rounded-[6px] text-[11px] font-bold transition-all transition-colors"
               >
                 Retry
               </button>

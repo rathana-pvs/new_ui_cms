@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { closeServerVersionModal } from '../hostSlice';
 import { hostApi } from '../hostApi';
-import LoadingOverlay from '../../../components/common/LoadingOverlay';
+import LoadingOverlay from '../../../components/ui/Feedback/LoadingOverlay';
 
 export default function ServerVersionModal() {
   const dispatch = useDispatch();
@@ -32,7 +32,7 @@ export default function ServerVersionModal() {
 
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans text-left">
-      <div className="bg-white dark:bg-bk-side w-full max-w-[420px] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col relative text-left">
+      <div className="bg-white dark:bg-bk-side w-full max-w-[420px] rounded-[6px] shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col relative text-left">
         
         {/* Subtle Top Accent */}
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-bk-yellow/60"></div>
@@ -42,7 +42,7 @@ export default function ServerVersionModal() {
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
+            <div className="w-8 h-8 rounded-[6px] bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
               <span className="material-symbols-outlined text-bk-yellow text-xl">info</span>
             </div>
             <div>
@@ -52,7 +52,7 @@ export default function ServerVersionModal() {
           </div>
           <button 
             onClick={() => dispatch(closeServerVersionModal())}
-            className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
+            className="w-7 h-7 rounded-[6px] hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
           >
             <span className="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform">close</span>
           </button>
@@ -60,7 +60,7 @@ export default function ServerVersionModal() {
 
         {/* Body */}
         <div className="p-6 flex flex-col items-center text-center space-y-6">
-          <div className="w-24 h-24 p-2 bg-white dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/10 shadow-sm flex items-center justify-center">
+          <div className="w-24 h-24 p-2 bg-white dark:bg-white/5 rounded-[6px] border border-slate-100 dark:border-white/10 shadow-sm flex items-center justify-center">
              <img src="/cubrid-logo.png" alt="CUBRID logo" className="w-full h-auto object-contain" />
           </div>
 
@@ -96,7 +96,7 @@ export default function ServerVersionModal() {
         {/* Footer */}
         <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800">
           <button 
-            className="px-6 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center min-w-[100px]"
+            className="px-6 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded-[6px] border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center min-w-[100px]"
             onClick={() => dispatch(closeServerVersionModal())}
           >
             Close

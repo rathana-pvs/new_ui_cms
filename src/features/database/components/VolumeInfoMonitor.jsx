@@ -75,20 +75,20 @@ export default function VolumeInfoMonitor({ tabId }) {
       <div className="flex-1 min-h-0 flex flex-col md:flex-row p-8 gap-8 overflow-hidden">
         {/* Left Stats Section */}
         <div className="flex flex-col gap-6 w-full md:w-[320px] shrink-0">
-          <div className="p-6 rounded-2xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.05] shadow-sm flex flex-col gap-8">
+          <div className="p-6 rounded-[6px] bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.05] shadow-sm flex flex-col gap-8">
             <div className="flex flex-col gap-4">
               <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Storage Details</span>
               <div className="space-y-4">
                 <div className="flex flex-col">
                   <span className="text-[10px] text-slate-500 mb-1">Type</span>
-                  <div className="px-3 py-1.5 bg-slate-200 dark:bg-white/10 rounded-lg text-[12px] font-bold text-slate-700 dark:text-slate-200 inline-block border border-slate-300 dark:border-white/5 w-fit">
+                  <div className="px-3 py-1.5 bg-slate-200 dark:bg-white/10 rounded-[6px] text-[12px] font-bold text-slate-700 dark:text-slate-200 inline-block border border-slate-300 dark:border-white/5 w-fit">
                     {volume.type}
                   </div>
                 </div>
                 {volume.purpose && (
                   <div className="flex flex-col">
                     <span className="text-[10px] text-slate-500 mb-1">Purpose</span>
-                    <div className="px-3 py-1.5 bg-amber-500/10 rounded-lg text-[12px] font-bold text-amber-600 dark:text-amber-500 border border-amber-500/10 w-fit">
+                    <div className="px-3 py-1.5 bg-amber-500/10 rounded-[6px] text-[12px] font-bold text-amber-600 dark:text-amber-500 border border-amber-500/10 w-fit">
                       {volume.purpose}
                     </div>
                   </div>
@@ -113,7 +113,7 @@ export default function VolumeInfoMonitor({ tabId }) {
             </div>
           </div>
 
-          <div className="mt-auto p-5 rounded-2xl bg-bk-yellow/5 border border-bk-yellow/10">
+          <div className="mt-auto p-5 rounded-[6px] bg-bk-yellow/5 border border-bk-yellow/10">
             <div className="flex items-center gap-2 mb-2 text-bk-yellow">
               <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
               <span className="text-[10px] font-bold uppercase tracking-wider">Volume Health</span>
@@ -125,7 +125,7 @@ export default function VolumeInfoMonitor({ tabId }) {
         </div>
 
         {/* Visualization Canvas */}
-        <div className="flex-1 flex flex-col bg-slate-50 dark:bg-white/[0.01] rounded-[32px] border border-slate-200 dark:border-white/[0.03] p-8 relative overflow-hidden group">
+        <div className="flex-1 flex flex-col bg-slate-50 dark:bg-white/[0.01] rounded-[6px] border border-slate-200 dark:border-white/[0.03] p-8 relative overflow-hidden group">
            {/* Grid Pattern Background */}
            <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none" 
                 style={{backgroundImage: 'radial-gradient(circle, #7777fd 1px, transparent 1px)', backgroundSize: '24px 24px'}}></div>
@@ -186,15 +186,15 @@ export default function VolumeInfoMonitor({ tabId }) {
 
               {/* Data Cards for Legend */}
               <div className="mt-12 flex flex-wrap justify-center gap-6">
-                 <div className="px-6 py-4 rounded-2xl bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.05] shadow-sm flex items-center gap-4 hover:border-amber-500/30 transition-colors">
-                    <div className="w-3 h-3 rounded-sm bg-[#eb8b52] shadow-[0_0_10px_#eb8b5244] shrink-0"></div>
+                 <div className="px-6 py-4 rounded-[6px] bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.05] shadow-sm flex items-center gap-4 hover:border-amber-500/30 transition-colors">
+                    <div className="w-3 h-3 rounded-[6px] bg-[#eb8b52] shadow-[0_0_10px_#eb8b5244] shrink-0"></div>
                     <div className="flex flex-col">
                        <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Physical Used</span>
                        <span className="text-[15px] font-black text-slate-800 dark:text-slate-200">{usedM.toFixed(1)} MB</span>
                     </div>
                  </div>
-                 <div className="px-6 py-4 rounded-2xl bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.05] shadow-sm flex items-center gap-4 hover:border-indigo-500/30 transition-colors">
-                    <div className="w-3 h-3 rounded-sm bg-[#7777fd] shadow-[0_0_10px_#7777fd44] shrink-0"></div>
+                 <div className="px-6 py-4 rounded-[6px] bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.05] shadow-sm flex items-center gap-4 hover:border-indigo-500/30 transition-colors">
+                    <div className="w-3 h-3 rounded-[6px] bg-[#7777fd] shadow-[0_0_10px_#7777fd44] shrink-0"></div>
                     <div className="flex flex-col">
                        <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Physical Free</span>
                        <span className="text-[15px] font-black text-slate-800 dark:text-slate-200">{freeM.toFixed(1)} MB</span>

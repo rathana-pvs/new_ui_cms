@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { SubMenu, MenuItem, MenuDivider } from '../../../components/common/DropdownMenu';
-import ConfirmModal from '../../../components/common/ConfirmModal';
-import ContextMenuWrapper from '../../../components/common/ContextMenuWrapper';
+import Typography from '../../../components/ui/Foundation/Typography';
+import Icon from '../../../components/ui/Foundation/Icon';
+import { DropdownMenu, SubMenu, MenuItem, MenuDivider } from '../../../components/ui/Navigation/DropdownMenu';
+import ContextMenu from '../../../components/ui/Navigation/ContextMenu';
+import Modal from '../../../components/ui/Layout/Modal';
 
 
 import TabItem from './TabItem';
@@ -101,8 +103,8 @@ export default function Breadcrumb({ activeTab, onTabChange, openTabs = [], onCl
   };
 
   return (
-    <div className="bg-slate-50 dark:bg-bk-main border-b border-slate-200 dark:border-slate-800 font-sans relative">
-      <div className="flex overflow-x-auto scrollbar-hide">
+    <div className="bg-background-secondary border-b border-border/50 relative">
+      <div className="flex overflow-x-auto scrollbar-hide bg-muted/5">
         {openTabs.map((tabId) => (
           <TabItem
             key={tabId}
@@ -119,7 +121,7 @@ export default function Breadcrumb({ activeTab, onTabChange, openTabs = [], onCl
       </div>
 
       {contextMenu && (
-        <ContextMenuWrapper 
+        <ContextMenu 
           x={contextMenu.x} 
           y={contextMenu.y} 
           onClose={() => setContextMenu(null)}
@@ -154,15 +156,22 @@ export default function Breadcrumb({ activeTab, onTabChange, openTabs = [], onCl
             label="Reload Tab" 
             onClick={() => setContextMenu(null)}
           />
-        </ContextMenuWrapper>
+        </ContextMenu>
       )}
  
-      <ConfirmModal 
+      <Modal 
         isOpen={confirmModal.isOpen}
-        message={confirmModal.message}
-        onConfirm={confirmModal.onConfirm}
+        title="Confirm Action"
         onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
-      />
+      >
+        <div className="space-y-4">
+          <Typography variant="body2" className="opacity-60">{confirmModal.message}</Typography>
+          <div className="flex justify-end gap-3">
+             <button onClick={() => setConfirmModal({ ...confirmModal, isOpen: false })} className="px-4 py-2 rounded-lg bg-muted text-foreground/40 text-[10px] font-black uppercase tracking-widest">Cancel</button>
+             <button onClick={confirmModal.onConfirm} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-widest">Confirm</button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

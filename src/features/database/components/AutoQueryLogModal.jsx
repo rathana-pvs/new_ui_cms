@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { closeAutoQueryLogModal, fetchQueryPlanLog } from '../databaseSlice';
-import LoadingOverlay from '../../../components/common/LoadingOverlay';
+import LoadingOverlay from '../../../components/ui/Feedback/LoadingOverlay';
 
 export default function AutoQueryLogModal() {
   const dispatch = useDispatch();
@@ -28,7 +28,7 @@ export default function AutoQueryLogModal() {
 
   return (
     <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans text-left">
-      <div className="bg-white dark:bg-bk-side w-full max-w-[800px] h-[600px] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.3)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col relative text-left">
+      <div className="bg-white dark:bg-bk-side w-full max-w-[800px] h-[600px] rounded-[6px] shadow-[0_10px_40px_rgba(0,0,0,0.3)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col relative text-left">
         
         {/* Subtle Top Accent */}
         <div className="absolute top-0 left-0 right-0 h-[2.5px] bg-sky-500/60"></div>
@@ -42,7 +42,7 @@ export default function AutoQueryLogModal() {
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-sky-500/10 flex items-center justify-center border border-sky-500/20 shadow-sm">
+            <div className="w-9 h-9 rounded-[6px] bg-sky-500/10 flex items-center justify-center border border-sky-500/20 shadow-sm">
               <span className="material-symbols-outlined text-sky-500 text-[22px]">history</span>
             </div>
             <div>
@@ -61,12 +61,12 @@ export default function AutoQueryLogModal() {
                    placeholder="Filter logs..."
                    value={searchTerm}
                    onChange={(e) => setSearchTerm(e.target.value)}
-                   className="w-48 h-8 pl-9 pr-3 rounded-lg bg-white dark:bg-bk-main border border-slate-200 dark:border-white/5 text-[11px] focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500/50 transition-all"
+                   className="w-48 h-8 pl-9 pr-3 rounded-[6px] bg-white dark:bg-bk-main border border-slate-200 dark:border-white/5 text-[11px] focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500/50 transition-all"
                 />
              </div>
              <button 
                 onClick={() => dispatch(closeAutoQueryLogModal())}
-                className="w-8 h-8 rounded-lg hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
+                className="w-8 h-8 rounded-[6px] hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
               >
                 <span className="material-symbols-outlined text-[20px] group-hover:rotate-90 transition-transform">close</span>
               </button>
@@ -91,7 +91,7 @@ export default function AutoQueryLogModal() {
               <p className="text-[12px] text-slate-500 dark:text-slate-400 mb-6 max-w-sm">{logsError}</p>
               <button 
                 onClick={() => dispatch(fetchQueryPlanLog({ hostUid: selectedHostUid }))}
-                className="px-6 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg text-[12px] font-semibold shadow-lg shadow-sky-500/20 transition-all active:scale-[0.98]"
+                className="px-6 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-[6px] text-[12px] font-semibold shadow-lg shadow-sky-500/20 transition-all active:scale-[0.98]"
               >
                 Retry Fetch
               </button>
@@ -106,7 +106,7 @@ export default function AutoQueryLogModal() {
             </div>
           ) : (
             <div className="flex-1 overflow-auto custom-scrollbar px-6 pb-6">
-              <div className="border border-slate-100 dark:border-slate-800 rounded-lg overflow-hidden">
+              <div className="border border-slate-100 dark:border-slate-800 rounded-[6px] overflow-hidden">
                 <table className="w-full border-collapse text-left">
                   <thead className="bg-slate-50/90 dark:bg-bk-main/90 backdrop-blur-sm">
                     <tr>
@@ -180,7 +180,7 @@ export default function AutoQueryLogModal() {
           
           <div className="flex gap-3">
              <button 
-              className="px-6 py-1.5 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-bold rounded-lg hover:bg-slate-200 dark:hover:bg-white/10 transition-all active:scale-[0.98]"
+              className="px-6 py-1.5 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-bold rounded-[6px] hover:bg-slate-200 dark:hover:bg-white/10 transition-all active:scale-[0.98]"
               onClick={() => dispatch(closeAutoQueryLogModal())}
             >
               Cancel
@@ -188,7 +188,7 @@ export default function AutoQueryLogModal() {
             <button 
               disabled={logsLoading}
               onClick={() => dispatch(fetchQueryPlanLog({ hostUid: selectedHostUid }))}
-              className="px-6 py-1.5 bg-sky-500 hover:bg-sky-600 active:scale-[0.98] text-white text-[11px] font-bold rounded-lg border border-sky-500/50 shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              className="px-6 py-1.5 bg-sky-500 hover:bg-sky-600 active:scale-[0.98] text-white text-[11px] font-bold rounded-[6px] border border-sky-500/50 shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {logsLoading ? (
                 <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>

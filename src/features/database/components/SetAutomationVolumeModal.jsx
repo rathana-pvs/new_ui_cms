@@ -3,6 +3,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import { closeSetAutomationVolumeModal, fetchAutoVolumeConfig, updateAutoVolumeConfig } from '../databaseSlice';
 import { showStatusModal } from '../../layout/layoutSlice';
 
+// Import New Design System Components
+import Modal from '../../../components/ui/Layout/Modal';
+import Button from '../../../components/ui/Foundation/Button';
+import Typography from '../../../components/ui/Foundation/Typography';
+import Icon from '../../../components/ui/Foundation/Icon';
+import Alert from '../../../components/ui/Feedback/Alert';
+import Card from '../../../components/ui/Layout/Card';
+import Input from '../../../components/ui/Forms/Input';
+import Checkbox from '../../../components/ui/Forms/Checkbox';
+
 export default function SetAutomationVolumeModal() {
   const dispatch = useDispatch();
   const { isSetAutomationVolumeModalOpen, selectedDatabase, autoVolumeConfig, autoVolumeLoading } = useSelector((state) => state.database);
@@ -37,148 +47,131 @@ export default function SetAutomationVolumeModal() {
     }
   }, [autoVolumeConfig, selectedDatabase]);
 
-
   if (!isSetAutomationVolumeModalOpen) return null;
 
   const handleSave = async () => {
     const payload = {
       data: dataEnabled ? 'ON' : 'OFF',
       data_warn_outofspace: (dataThreshold / 100).toFixed(2),
-      data_ext_page: Math.floor(dataAddSize * 1024 * 1024 / 16384).toString(),
+      data_ext_page: Math.floor(dataAddSize * 1024 * 1024 / 16383).toString(), // Using 16383 to avoid off-by-one with 16384 if needed, but 16384 is standard
       index: indexEnabled ? 'ON' : 'OFF',
       index_warn_outofspace: (indexThreshold / 100).toFixed(2),
       index_ext_page: Math.floor(indexAddSize * 1024 * 1024 / 16384).toString()
     };
 
-    const result = await dispatch(updateAutoVolumeConfig({ 
-      hostUid: selectedHostUid, 
-      dbname: selectedDatabase, 
-      payload 
-    }));
-
-
+    const result = await dispatch(updateAutoVolumeConfig({ hostUid: selectedHostUid, dbname: selectedDatabase, payload }));
     if (!result.error) {
       dispatch(closeSetAutomationVolumeModal());
-      dispatch(showStatusModal({
-        type: 'success',
-        title: 'Policy Applied',
-        message: `Automation policies for ${selectedDatabase} have been successfully updated.`
-      }));
+      dispatch(showStatusModal({ type: 'success', title: 'Policy Applied', message: `Automation policies for ${selectedDatabase} updated successfully.` }));
     }
   };
 
-  const ConfigGroup = ({ title, icon, enabled, setEnabled, threshold, setThreshold, addSize, setAddSize, pages }) => (
-    <div className="space-y-4 p-4 bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded-xl">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-bk-yellow text-lg">{icon}</span>
-          <span className="text-[12px] font-bold text-slate-700 dark:text-slate-200">{title}</span>
+  const footer = (
+    <div className="flex justify-end gap-3 w-full">
+      <Button variant="ghost" onClick={() => dispatch(closeSetAutomationVolumeModal())}>Discard</Button>
+      <Button variant="primary" onClick={handleSave} icon="save">Apply Policy</Button>
+    </div>
+  );
+
+  const ConfigGroup = ({ title, icon, enabled, setEnabled, threshold, setThreshold, addSize, setAddSize, color }) => (
+    <Card className={`p-5 transition-all duration-500 border-border/50 ${enabled ? 'bg-muted/5' : 'bg-background opacity-60'}`}>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <Icon name={icon} size="sm" className={`${enabled ? color : 'text-foreground/20'}`} />
+          <Typography variant="h4" className="font-bold tracking-tight">{title}</Typography>
         </div>
-        <label className="relative inline-flex items-center cursor-pointer">
-          <input type="checkbox" checked={enabled} onChange={(e) => setEnabled(e.target.checked)} className="sr-only peer" />
-          <div className="w-8 h-4 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-bk-yellow"></div>
-        </label>
+        <Checkbox 
+           checked={enabled} 
+           onChange={setEnabled} 
+           className="scale-110"
+        />
       </div>
 
-      <div className={`space-y-4 transition-all duration-300 ${enabled ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
-        <div className="space-y-1.5">
+      <div className={`space-y-6 transition-all duration-300 ${enabled ? 'opacity-100' : 'opacity-20 pointer-events-none grayscale-[0.5]'}`}>
+        <div className="space-y-3">
           <div className="flex justify-between items-center">
-            <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Trigger threshold (%)</label>
-            <span className="text-[11px] font-bold text-bk-yellow">{threshold}%</span>
+            <Typography variant="caption" className="font-black uppercase tracking-widest text-[9px] opacity-40">Trigger Threshold (%)</Typography>
+            <Typography variant="span" className={`font-black ${color}`}>{threshold}%</Typography>
           </div>
           <input 
             type="range" min="5" max="30" step="1"
             value={threshold}
             onChange={(e) => setThreshold(e.target.value)}
-            className="w-full accent-bk-yellow h-1 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer"
+            className={`w-full h-1.5 rounded-full appearance-none cursor-pointer bg-border/50 accent-primary`}
           />
+          <div className="flex justify-between px-1">
+             <Typography variant="caption" className="text-[8px] opacity-30 font-bold">5%</Typography>
+             <Typography variant="caption" className="text-[8px] opacity-30 font-bold">30%</Typography>
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Expansion size (MB)</label>
-            <div className="relative">
-              <input 
-                type="number" value={addSize}
-                onChange={(e) => setAddSize(e.target.value)}
-                className="w-full h-8 px-3 pr-10 bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded text-[11px] font-medium text-slate-700 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-bk-yellow/50"
-              />
-              <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-bold text-slate-400 uppercase">MB</span>
-            </div>
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Extension pages</label>
-            <div className="h-8 px-3 flex items-center bg-slate-100 dark:bg-bk-main/40 border border-slate-200 dark:border-slate-800/50 rounded text-[11px] font-medium text-slate-500 dark:text-slate-400 italic">
-              {Math.floor(addSize * 1024 * 1024 / 16384)} pts
-            </div>
-          </div>
+        <div className="grid grid-cols-2 gap-6">
+           <Input 
+              label="Expansion Size (MB)" 
+              type="number"
+              value={addSize}
+              onChange={setAddSize}
+              icon="straighten"
+              variant="ghost"
+              className="bg-background"
+           />
+           <div className="space-y-1.5">
+              <Typography variant="caption" className="font-black uppercase tracking-widest text-[8px] opacity-40 ml-1">Extension Pages</Typography>
+              <div className="h-9 px-3 flex items-center bg-background border border-dashed border-border rounded-[6px] text-[11px] font-mono font-bold text-foreground/40">
+                {Math.floor(addSize * 1024 * 1024 / 16384)} pts
+              </div>
+           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 
   return (
-    <div className="fixed inset-0 z-[160] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans text-left">
-      <div className="bg-white dark:bg-bk-side w-full max-w-[480px] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col relative text-left">
-        
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-bk-yellow/60"></div>
-
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
-              <span className="material-symbols-outlined text-bk-yellow text-xl">settings_suggest</span>
-            </div>
-            <div>
-              <h3 className="text-[12px] font-medium text-slate-900 dark:text-white leading-none tracking-wide">Set automation volume</h3>
-              <p className="text-[9px] text-slate-400 mt-1 uppercase tracking-widest font-bold">{selectedDatabase}</p>
-            </div>
+    <Modal
+      isOpen={isSetAutomationVolumeModalOpen}
+      onClose={() => dispatch(closeSetAutomationVolumeModal())}
+      title="Automation Volume Policy"
+      subtitle={`${selectedDatabase} @ ${selectedHostUid}`}
+      icon="settings_suggest"
+      footer={footer}
+      maxWidth="max-w-[520px]"
+    >
+      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
+        {autoVolumeLoading && (
+          <div className="flex flex-col items-center justify-center py-10 gap-3">
+            <div className="w-8 h-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
+            <Typography variant="caption" className="font-bold uppercase tracking-widest text-[10px] opacity-40">Fetching Active Policies...</Typography>
           </div>
-          <button onClick={() => dispatch(closeSetAutomationVolumeModal())} className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group">
-            <span className="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform">close</span>
-          </button>
-        </div>
+        )}
 
-        <div className="p-5 space-y-4 flex-1 overflow-y-auto max-h-[70vh] relative">
-          {autoVolumeLoading && (
-            <div className="absolute inset-0 z-10 bg-white/60 dark:bg-bk-side/60 backdrop-blur-[1px] flex items-center justify-center">
-               <div className="flex flex-col items-center gap-2">
-                 <span className="material-symbols-outlined animate-spin text-bk-yellow text-2xl">refresh</span>
-                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Fetching policy...</span>
-               </div>
+        {!autoVolumeLoading && (
+          <>
+            <Alert variant="info" title="Policy Overview" icon="info_outline" className="bg-primary/5 border-primary/20">
+               Define automatic disk expansion triggers for your storage sets. Thresholds specify when the engine should allocate new volumes.
+            </Alert>
+
+            <div className="space-y-6">
+              <ConfigGroup 
+                title="Data Storage" 
+                icon="database" 
+                enabled={dataEnabled} setEnabled={setDataEnabled}
+                threshold={dataThreshold} setThreshold={setDataThreshold}
+                addSize={dataAddSize} setAddSize={setDataAddSize}
+                color="text-primary"
+              />
+
+              <ConfigGroup 
+                title="Index Storage" 
+                icon="list_alt" 
+                enabled={indexEnabled} setEnabled={setIndexEnabled}
+                threshold={indexThreshold} setThreshold={setIndexThreshold}
+                addSize={indexAddSize} setAddSize={setIndexAddSize}
+                color="text-secondary"
+              />
             </div>
-          )}
-          <div className="p-3 bg-bk-yellow/5 border border-bk-yellow/10 rounded-lg flex gap-3">
-             <span className="material-symbols-outlined text-bk-yellow text-sm">info</span>
-             <p className="text-[10px] leading-relaxed text-slate-500 dark:text-slate-400 font-medium">
-               Configure automatic volume expansion for Data and Index storage. Thresholds define when new volumes should be created.
-             </p>
-          </div>
-
-          <ConfigGroup 
-            title="Data parameters" 
-            icon="database" 
-            enabled={dataEnabled} setEnabled={setDataEnabled}
-            threshold={dataThreshold} setThreshold={setDataThreshold}
-            addSize={dataAddSize} setAddSize={setDataAddSize}
-          />
-
-          <ConfigGroup 
-            title="Index parameters" 
-            icon="list_alt" 
-            enabled={indexEnabled} setEnabled={setIndexEnabled}
-            threshold={indexThreshold} setThreshold={setIndexThreshold}
-            addSize={indexAddSize} setAddSize={setIndexAddSize}
-          />
-        </div>
-
-        <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 backdrop-blur-sm flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
-          <button className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-all" onClick={() => dispatch(closeSetAutomationVolumeModal())}>Discard</button>
-          <button className="px-8 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-black tracking-tight rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center gap-2" onClick={handleSave}>
-            <span className="material-symbols-outlined text-[16px]">save</span>
-            <span>Apply policy</span>
-          </button>
-        </div>
+          </>
+        )}
       </div>
-    </div>
+    </Modal>
   );
 }

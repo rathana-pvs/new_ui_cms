@@ -1,6 +1,9 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setAboutCubrid } from '../appBarSlice';
+import Modal from '../../../components/ui/Layout/Modal';
+import Typography from '../../../components/ui/Foundation/Typography';
+import Icon from '../../../components/ui/Foundation/Icon';
 
 export default function AboutModal() {
   const dispatch = useDispatch();
@@ -9,59 +12,69 @@ export default function AboutModal() {
   if (!isAboutCubridOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-bk-side w-full max-w-[420px] rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-slate-200 dark:border-white/10 overflow-hidden animate-in zoom-in-95 duration-200">
-        
-        {/* Decorative Header */}
-        <div className="h-24 bg-gradient-to-r from-bk-main to-slate-900 relative flex items-center justify-center overflow-hidden">
-           <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
-           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-black/20"></div>
-           <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-xl relative z-10 translate-y-6 border-4 border-white dark:border-bk-side">
-              <img src="/cubrid-logo.png" alt="CUBRID Logo" className="w-10 h-10 object-contain" />
-           </div>
-        </div>
-
-        <div className="px-8 pt-10 pb-8 text-center space-y-6">
-          <div>
-            <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">CUBRID <span className="text-bk-yellow italic">Manager</span></h2>
-            <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em] mt-1">Enterprise Web Management</p>
-          </div>
-
-          <div className="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed px-2 text-justify bg-slate-50 dark:bg-white/[0.02] p-4 rounded-2xl border border-slate-100 dark:border-white/5 italic">
-            "CUBRID is an open-source SQL-based RDBMS with object extensions. The name combines 'Cube' (Data Space) and 'Bridge' (Data Bridge), reflecting its role as a secure connection between users and their critical infrastructure."
-          </div>
-
-          <div className="space-y-3 pt-2">
-            <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-white/5">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Core Version</span>
-              <span className="text-xs text-slate-900 dark:text-white font-black">12.4.0-Final</span>
-            </div>
-            <div className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-white/5">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Web Interface</span>
-              <span className="text-xs text-slate-900 dark:text-white font-black">v1.1.2</span>
-            </div>
-            <div className="flex justify-between items-center py-2">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Environment</span>
-              <div className="flex items-center gap-1.5">
-                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-                 <span className="text-xs text-slate-900 dark:text-white font-black uppercase tracking-tighter">Production Ready</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <button 
-              onClick={() => dispatch(setAboutCubrid(false))}
-              className="w-full py-4 bg-slate-900 dark:bg-bk-yellow text-white dark:text-bk-side text-xs font-black uppercase tracking-widest rounded-2xl hover:opacity-90 transition-all active:scale-[0.98] shadow-lg"
-            >
-              Acknowledge & Close
-            </button>
-            <p className="text-[9px] font-bold text-slate-400 dark:text-slate-600 tracking-widest uppercase">
-              © 2026 CUBRID Corporation. All rights reserved.
-            </p>
-          </div>
+    <Modal
+      isOpen={isAboutCubridOpen}
+      onClose={() => dispatch(setAboutCubrid(false))}
+      title="About CUBRID Manager"
+      size="md"
+    >
+      <div className="relative -mx-6 -mt-6 mb-8 overflow-hidden h-32 flex items-center justify-center bg-gradient-to-br from-primary to-accent-indigo">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 mix-blend-overlay"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+        <div className="relative z-10 w-20 h-20 bg-background rounded-2xl flex items-center justify-center shadow-premium-lg border border-border/50 animate-in zoom-in-95 duration-500 delay-100">
+           <img src="/cubrid-logo.png" alt="CUBRID Logo" className="w-12 h-12 object-contain" />
         </div>
       </div>
-    </div>
+
+      <div className="text-center space-y-8 px-2">
+        <div>
+          <Typography variant="h3" className="font-black tracking-tight mb-2">
+            CUBRID <span className="text-primary italic">Manager</span>
+          </Typography>
+          <Typography variant="caption" className="font-black opacity-30 uppercase tracking-[0.3em]">
+            Enterprise Web Management
+          </Typography>
+        </div>
+
+        <div className="relative p-5 rounded-2xl bg-muted/5 border border-border/50 group hover:border-primary/20 transition-all duration-500">
+           <div className="absolute -top-3 -left-2 bg-background p-1">
+              <Icon name="format_quote" size="xs" className="text-primary/40 rotate-180" />
+           </div>
+           <Typography variant="body2" className="italic opacity-60 leading-relaxed font-medium">
+             CUBRID is an open-source SQL-based RDBMS with object extensions. The name combines 'Cube' (Data Space) and 'Bridge' (Data Bridge), reflecting its role as a secure connection between users and their critical infrastructure.
+           </Typography>
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex justify-between items-center py-3 border-b border-border/30">
+             <Typography variant="caption" className="font-black opacity-40 uppercase tracking-widest">Core Version</Typography>
+             <Typography variant="body2" className="font-black font-mono">12.4.0-Final</Typography>
+          </div>
+          <div className="flex justify-between items-center py-3 border-b border-border/30">
+             <Typography variant="caption" className="font-black opacity-40 uppercase tracking-widest">Web Interface</Typography>
+             <Typography variant="body2" className="font-black font-mono">v1.1.2</Typography>
+          </div>
+          <div className="flex justify-between items-center py-3">
+             <Typography variant="caption" className="font-black opacity-40 uppercase tracking-widest">Environment</Typography>
+             <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 rounded-full border border-emerald-500/20">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                <Typography variant="caption" className="font-black text-emerald-600 uppercase tracking-tighter">Production Ready</Typography>
+             </div>
+          </div>
+        </div>
+
+        <div className="pt-4 space-y-6">
+          <button 
+            onClick={() => dispatch(setAboutCubrid(false))}
+            className="w-full py-4 bg-primary text-primary-foreground text-[11px] font-black uppercase tracking-widest rounded-xl hover:shadow-premium-lg hover:-translate-y-0.5 transition-all active:translate-y-0 active:scale-95 shadow-premium"
+          >
+            Acknowledge & Close
+          </button>
+          <Typography variant="caption" className="block font-black opacity-20 tracking-[0.2em] uppercase text-[9px]">
+            © 2026 CUBRID Corporation. All rights reserved.
+          </Typography>
+        </div>
+      </div>
+    </Modal>
   );
 }

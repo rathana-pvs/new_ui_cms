@@ -1,6 +1,10 @@
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setSelectedBroker, setSelectedBrokerSubItem, fetchBrokerLogs } from '../../../broker/brokerSlice';
 import { openTab } from '../../layoutSlice';
+import Typography from '../../../../components/ui/Foundation/Typography';
+import Icon from '../../../../components/ui/Foundation/Icon';
+import Spinner from '../../../../components/ui/Feedback/Spinner';
 
 export default function BrokerTree({ hostUid, onContextMenu }) {
   const dispatch = useDispatch();
@@ -8,25 +12,27 @@ export default function BrokerTree({ hostUid, onContextMenu }) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-4">
-        <svg className="animate-spin h-5 w-5 text-primary" viewBox="0 0 24 24">
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-        </svg>
+      <div className="flex items-center justify-center py-6">
+        <Spinner size="sm" />
       </div>
     );
   }
 
   if (brokers.length === 0) {
-    return <div className="px-3 py-2 text-xs text-slate-400">No brokers found</div>;
+    return (
+      <div className="px-5 py-4 text-center">
+        <Typography variant="caption" className="opacity-40 italic font-medium">No brokers found</Typography>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-1">
+    <div className="flex flex-col gap-1 px-1">
       {brokers.map((broker) => {
         const isOn = broker.state === 'ON';
         const isBrokerSelected = selectedBroker === broker.name;
         const brokerLogs = (logsByBroker[broker.name] || []).filter(log => log.path.toLowerCase().endsWith('.log'));
+        const isMainSelected = isBrokerSelected && !selectedBrokerSubItem;
         
         return (
           <details 
@@ -39,8 +45,10 @@ export default function BrokerTree({ hostUid, onContextMenu }) {
             }}
           >
             <summary
-              className={`flex items-center gap-1 px-3 py-1.5 cursor-pointer list-none rounded-lg transition-all duration-200 select-none mb-1.5 group/sum border relative
-                ${isBrokerSelected && !selectedBrokerSubItem ? 'text-amber-600 dark:text-bk-yellow bg-bk-yellow/5 dark:bg-bk-yellow/5 font-medium border-bk-yellow/40 dark:border-bk-yellow/20' : 'bg-white/40 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:border-bk-yellow/30 hover:text-amber-600 dark:hover:text-bk-yellow'}`}
+              className={`flex items-center gap-2 px-3 py-2 cursor-pointer list-none rounded-lg transition-all duration-300 select-none border relative group/sum
+                ${isMainSelected 
+                  ? 'bg-primary/5 border-primary/40 text-primary shadow-premium-sm' 
+                  : 'bg-transparent border-transparent text-foreground/60 hover:bg-muted/5 hover:text-primary hover:border-border/50'}`}
               onClick={() => {
                 dispatch(setSelectedBroker(broker.name));
                 dispatch(setSelectedBrokerSubItem(null));
@@ -51,65 +59,87 @@ export default function BrokerTree({ hostUid, onContextMenu }) {
               }}
               onContextMenu={(e) => onContextMenu(e, broker.name, broker.state)}
             >
-              <span className={`material-symbols-outlined text-[16px] group-open/broker:rotate-90 transition-transform ${isBrokerSelected && !selectedBrokerSubItem ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500'}`} style={{ fontVariationSettings: "'wght' 300" }}>chevron_right</span>
-              <span className={`material-symbols-outlined transition-colors text-[16px] ${isBrokerSelected && !selectedBrokerSubItem ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500 group-hover:text-amber-600 dark:group-hover:text-bk-yellow'}`} style={{ fontVariationSettings: "'wght' 300" }}>hub</span>
+              <Icon 
+                 name="chevron_right" 
+                 size="xs" 
+                 className={`transition-transform duration-300 group-open/broker:rotate-90 ${isMainSelected ? 'text-primary' : 'opacity-20'}`} 
+              />
+              <Icon 
+                 name="hub" 
+                 size="xs" 
+                 className={`transition-all duration-300 ${isMainSelected ? 'text-primary scale-110 shadow-premium' : 'opacity-40 group-hover/sum:opacity-100 group-hover/sum:text-primary'}`} 
+              />
               <div className="flex-1 min-w-0">
-                <span className={`text-[11.5px] font-medium transition-colors truncate block ${isBrokerSelected && !selectedBrokerSubItem ? 'text-amber-600 dark:text-bk-yellow' : 'group-hover/sum:text-amber-600 dark:group-hover/sum:text-bk-yellow'}`}>
-                  {broker.name} <span className="opacity-50 font-normal ml-1">({broker.port})</span>
-                </span>
+                <Typography 
+                   variant="span" 
+                   className={`text-[13px] font-medium tracking-tight truncate block transition-colors ${isMainSelected ? 'text-primary font-bold' : ''}`}
+                >
+                  {broker.name} <span className="opacity-30 font-normal ml-1">({broker.port})</span>
+                </Typography>
               </div>
-              {isBrokerSelected && !selectedBrokerSubItem && (
-                <div className="absolute left-[-1px] top-0 bottom-0 w-[2px] bg-amber-600 dark:bg-bk-yellow rounded-full shadow-[0_0_8px_rgba(217,119,6,0.4)]"></div>
+              
+              {isMainSelected && (
+                <div className="absolute left-[-1px] top-2 bottom-2 w-[3px] bg-primary rounded-full shadow-premium animate-in fade-in duration-500"></div>
               )}
 
               {isOn ? (
-                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 text-[9px] font-medium bg-emerald-50 text-emerald-600 border border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-500/20 rounded-full tracking-tighter">
-                  <span className="relative flex h-1.5 w-1.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
-                  </span>
-                  On
-                </span>
+                <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
+                  <div className="h-1 w-1 rounded-full bg-emerald-500 shadow-premium animate-pulse" />
+                  <Typography variant="caption" className="text-emerald-500 font-bold text-[7px] uppercase tracking-widest">ON</Typography>
+                </div>
               ) : (
-                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 text-[9px] font-medium bg-rose-50 text-rose-600 border border-rose-100 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-500/20 rounded-full tracking-tighter">
-                  <span className="h-1.5 w-1.5 rounded-full bg-rose-500"></span>
-                  Off
-                </span>
+                <div className="flex items-center gap-1.5 px-2 py-0.5 bg-muted/10 border border-border/20 rounded-full opacity-40">
+                  <div className="h-1 w-1 rounded-full bg-foreground/40" />
+                  <Typography variant="caption" className="text-foreground/60 font-bold text-[7px] uppercase tracking-widest">OFF</Typography>
+                </div>
               )}
             </summary>
 
-            <div className="ml-[22px] border-l border-slate-200 dark:border-slate-800 space-y-0.5 py-1">
+            <div className="ml-5 mt-1 border-l border-border/30 pl-1 space-y-0.5 animate-in slide-in-from-left-2 duration-300">
               <details className="group/nested">
                 <summary 
-                  className={`flex items-center gap-2 px-3.5 py-1.5 w-full text-left transition-all group/item cursor-pointer list-none rounded-r-md relative select-none border border-transparent
-                    ${(isBrokerSelected && selectedBrokerSubItem === 'SQL Log') ? 'text-amber-600 dark:text-bk-yellow font-medium' : 'text-slate-700 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow'}`}
+                  className={`flex items-center gap-2 px-3 py-1.5 w-full text-left transition-all group/item-sum cursor-pointer list-none rounded-lg relative border border-transparent
+                    ${(isBrokerSelected && selectedBrokerSubItem === 'SQL Log') 
+                      ? 'bg-primary/5 text-primary border-primary/20' 
+                      : 'text-foreground/50 hover:bg-muted/5 hover:text-primary'}`}
                   onClick={() => {
                     dispatch(setSelectedBroker(broker.name));
                     dispatch(setSelectedBrokerSubItem('SQL Log'));
                   }}
                 >
-                  <span className={`material-symbols-outlined text-[14px] group-open/nested:rotate-90 transition-transform ${(isBrokerSelected && selectedBrokerSubItem === 'SQL Log') ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500'}`}>chevron_right</span>
-                  <span className={`material-symbols-outlined text-[16px] transition-colors
-                    ${(isBrokerSelected && selectedBrokerSubItem === 'SQL Log') ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500 group-hover/item:text-amber-600 dark:group-hover/item:text-bk-yellow'}`} 
-                    style={{ fontVariationSettings: "'wght' 300" }}>
-                    history_edu
-                  </span>
-                  <span className="text-[11px] tracking-wide whitespace-nowrap">SQL Log</span>
+                  <Icon 
+                     name="chevron_right" 
+                     size="xs" 
+                     className={`scale-[0.7] transition-transform duration-300 group-open/nested:rotate-90 ${(isBrokerSelected && selectedBrokerSubItem === 'SQL Log') ? 'text-primary' : 'opacity-20'}`} 
+                  />
+                  <Icon 
+                     name="history_edu" 
+                     size="xs" 
+                     className={`transition-colors ${(isBrokerSelected && selectedBrokerSubItem === 'SQL Log') ? 'text-primary' : 'opacity-40 group-hover/item-sum:opacity-100 group-hover/item-sum:text-primary'}`} 
+                  />
+                  <Typography variant="span" className="text-[12px] font-medium tracking-tight">SQL Log</Typography>
                   {(isBrokerSelected && selectedBrokerSubItem === 'SQL Log') && (
-                    <div className="absolute left-[-1px] top-0 bottom-0 w-[2px] bg-amber-600 dark:bg-bk-yellow rounded-full"></div>
+                    <div className="absolute left-[-1px] top-1.5 bottom-1.5 w-[2.5px] bg-primary rounded-full shadow-premium"></div>
                   )}
                 </summary>
                 
-                <div className="ml-4 border-l border-slate-100 dark:border-slate-800/50 mt-0.5 space-y-0.5">
-                  {logsLoading && <div className="px-4 py-1 text-[10px] text-slate-400 animate-pulse">Loading logs...</div>}
+                <div className="ml-4 border-l border-border/20 pl-1 mt-0.5 space-y-0.5">
+                  {logsLoading && (
+                    <div className="px-4 py-2 flex items-center gap-2">
+                       <Spinner size="xs" />
+                       <Typography variant="caption" className="opacity-40 font-bold">Loading logs...</Typography>
+                    </div>
+                  )}
                   {brokerLogs.map((log, idx) => {
                     const fileName = log.path.split('/').pop();
                     const isLogSelected = isBrokerSelected && selectedBrokerSubItem === log.path;
                     return (
                       <button
                         key={idx}
-                        className={`flex items-center gap-3 px-4 py-1.5 w-full text-left transition-all duration-200 group/child relative rounded-r-md select-none border
-                          ${isLogSelected ? 'text-amber-600 dark:text-bk-yellow font-medium border-transparent' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow border-transparent'}`}
+                        className={`flex items-center gap-2.5 px-3 py-1.5 w-full text-left transition-all duration-200 group/child relative rounded-lg
+                          ${isLogSelected 
+                             ? 'bg-primary/10 text-primary shadow-premium-sm border border-primary/20' 
+                             : 'text-foreground/40 hover:bg-muted/5 hover:text-primary'}`}
                         onClick={(e) => {
                           e.stopPropagation();
                           dispatch(setSelectedBroker(broker.name));
@@ -120,19 +150,26 @@ export default function BrokerTree({ hostUid, onContextMenu }) {
                           dispatch(openTab(`log:${hostUid}:${log.path}`));
                         }}
                       >
-                        <span className={`material-symbols-outlined text-[15px]
-                          ${isLogSelected ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500 group-hover/child:text-amber-600 dark:group-hover/child:text-bk-yellow'}`}>
-                          description
-                        </span>
-                        <span className="text-[10.5px] tracking-wide truncate" title={fileName}>{fileName}</span>
+                        <Icon 
+                           name="description" 
+                           size="xs" 
+                           className={`opacity-30 transition-all ${isLogSelected ? 'opacity-100 scale-110 text-primary' : 'group-hover/child:opacity-100 group-hover/child:text-primary'}`} 
+                        />
+                        <Typography 
+                           variant="caption" 
+                           className={`truncate font-mono tracking-tighter text-[11px] ${isLogSelected ? 'font-bold' : 'font-medium'}`}
+                           title={fileName}
+                        >
+                           {fileName}
+                        </Typography>
                         {isLogSelected && (
-                          <div className="absolute left-[-1px] top-0 bottom-0 w-[2px] bg-amber-600 dark:bg-bk-yellow rounded-full"></div>
+                          <div className="absolute left-[-1px] top-1.5 bottom-1.5 w-[2.5px] bg-primary rounded-full shadow-premium"></div>
                         )}
                       </button>
                     );
                   })}
                   {!logsLoading && brokerLogs.length === 0 && (
-                    <div className="px-4 py-1 text-[10px] text-slate-400 italic">No logs found</div>
+                    <div className="px-4 py-1.5 opacity-20 italic text-[11px] font-bold uppercase tracking-wider">No logs found</div>
                   )}
                 </div>
               </details>
