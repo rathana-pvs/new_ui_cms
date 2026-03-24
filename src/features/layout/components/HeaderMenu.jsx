@@ -1,14 +1,15 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { DropdownMenu, SubMenu, MenuItem, MenuDivider } from '../../../components/common/DropdownMenu';
-import { openTab, showStatusModal } from '../layoutSlice';
+import { openTab, showStatusModal, setActiveMainTab } from '../layoutSlice';
 import { openAddHostModal, openEditHostModal, startService, stopService, openServerVersionModal, openImportExportModal } from '../../host/hostSlice';
-import { startDatabase, stopDatabase, openOptimizeDatabaseModal } from '../../database/databaseSlice';
-import { startBroker, stopBroker } from '../../broker/brokerSlice';
+import { startDatabase, stopDatabase, openOptimizeDatabaseModal, fetchDatabaseStartInfo } from '../../database/databaseSlice';
+import { startBroker, stopBroker, fetchBrokerList } from '../../broker/brokerSlice';
 import { setAboutCubrid } from '../appBarSlice';
+import { Typography } from '../../../components/ds/foundation/Typography';
 
 export default function HeaderMenu() {
   const dispatch = useDispatch();
-  const { hosts, selectedHostUid } = useSelector((state) => state.host);
+  const { selectedHostUid } = useSelector((state) => state.host);
   const { selectedDatabase, activeDatabases } = useSelector((state) => state.database);
   const { brokers, selectedBroker } = useSelector((state) => state.broker);
 
@@ -20,9 +21,15 @@ export default function HeaderMenu() {
     dispatch(openImportExportModal('import'));
   };
 
+  const MenuLabel = ({ children }) => (
+    <Typography variant="caption" className="font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest text-[10px] group-hover:text-bk-yellow transition-colors">
+      {children}
+    </Typography>
+  );
+
   return (
-    <nav className="flex items-center gap-4 text-sm font-medium text-slate-600 dark:text-slate-400 font-sans">
-      <DropdownMenu label="File">
+    <nav className="flex items-center gap-6 font-sans">
+      <DropdownMenu label={<MenuLabel>File</MenuLabel>}>
         <MenuItem
           icon="add_box"
           label="Add Host"
@@ -46,7 +53,7 @@ export default function HeaderMenu() {
         />
       </DropdownMenu>
 
-      <DropdownMenu label="Tool" width="w-48">
+      <DropdownMenu label={<MenuLabel>Tool</MenuLabel>} width="w-48">
         <MenuItem
           icon="play_arrow"
           label="Start Service"
@@ -129,7 +136,7 @@ export default function HeaderMenu() {
         />
       </DropdownMenu>
 
-      <DropdownMenu label="Action" width="w-48">
+      <DropdownMenu label={<MenuLabel>Action</MenuLabel>} width="w-48">
         <MenuItem icon="tune" label="Properties" href="#" />
         <SubMenu icon="settings" label="Config Param" width="w-56" gap="ml-3">
           <MenuItem
@@ -168,7 +175,7 @@ export default function HeaderMenu() {
         </SubMenu>
       </DropdownMenu>
 
-      <DropdownMenu label="Help" width="w-56">
+      <DropdownMenu label={<MenuLabel>Help</MenuLabel>} width="w-56">
         <MenuItem
           icon="help"
           label="Help"

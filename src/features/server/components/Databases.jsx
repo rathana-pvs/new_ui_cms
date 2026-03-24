@@ -1,41 +1,55 @@
+import React from 'react';
+import { Card } from '../../../components/ds/layout/Card';
+import { Table } from '../../../components/ds/layout/Table';
+import { Typography } from '../../../components/ds/foundation/Typography';
+import { Icon } from '../../../components/ds/foundation/Icon';
+
 export default function Databases() {
+  const columns = [
+    { header: 'Database', accessor: 'dbname', className: 'font-bold' },
+    { 
+      header: 'Auto startup', 
+      accessor: 'autoStart',
+      render: (val) => (
+        <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border transition-colors
+          ${val === 'On' 
+            ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' 
+            : 'bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20'}`}>
+          <span className={`size-1.5 rounded-full ${val === 'On' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-slate-400 dark:bg-slate-600'}`}></span>
+          {val}
+        </span>
+      )
+    },
+    { 
+      header: 'Status', 
+      accessor: 'status',
+      render: (val) => (
+        <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border transition-colors
+          ${val === 'Active' 
+            ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20' 
+            : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20'}`}>
+          <span className={`size-1.5 rounded-full ${val === 'Active' ? 'bg-blue-500 animate-pulse' : 'bg-rose-500'}`}></span>
+          {val}
+        </span>
+      )
+    },
+  ];
+
+  const data = [
+    { id: 1, dbname: 'demodb', autoStart: 'On', status: 'Active' },
+    { id: 2, dbname: 'db1', autoStart: 'Off', status: 'Inactive' },
+  ];
+
+  const cardTitle = (
+    <div className="flex items-center gap-2">
+      <Icon name="database" size="sm" className="text-bk-yellow"  weight={300} />
+      <Typography variant="span" className="font-bold">Databases</Typography>
+    </div>
+  );
+
   return (
-    <details className="lg:col-span-2 group bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden h-fit" open>
-      <summary className="flex items-center justify-between px-6 py-4 cursor-pointer list-none hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-        <h3 className="text-sm font-medium text-slate-900 dark:text-white">Databases</h3>
-        <span className="material-symbols-outlined text-slate-400 group-open:rotate-180 transition-transform">expand_more</span>
-      </summary>
-      <div className="overflow-x-auto border-t border-slate-100 dark:border-slate-800">
-        <table className="w-full text-left text-sm">
-          <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 font-medium border-b border-slate-100 dark:border-slate-800">
-            <tr>
-              <th className="px-6 py-3 font-medium">Database</th>
-              <th className="px-6 py-3 font-medium">Auto startup</th>
-              <th className="px-6 py-3 font-medium">Status</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-            <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/30">
-              <td className="px-6 font-medium py-2">demodb</td>
-              <td className="px-6 py-2">
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">On</span>
-              </td>
-              <td className="px-6 py-2">
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">Active</span>
-              </td>
-            </tr>
-            <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/30">
-              <td className="px-6 font-medium py-2">db1</td>
-              <td className="px-6 py-2">
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">Off</span>
-              </td>
-              <td className="px-6 py-2">
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500">Inactive</span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </details>
+    <Card title={cardTitle} className="lg:col-span-2 shadow-2xl shadow-black/5" bodyClassName="p-0">
+      <Table columns={columns} data={data} sortable={true} />
+    </Card>
   );
 }

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback, useLayoutEffect } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   fetchHosts,
@@ -42,20 +42,23 @@ import {
   openAutoVolumeLogModal,
   fetchQueryPlan,
   setSelectedBackupId,
-  setSelectedQueryPlanId,
   openLoginDatabaseModal
 } from '../../database/databaseSlice';
 import {
   fetchBrokerList,
   startBroker,
   stopBroker,
-  setSelectedBroker,
   openBrokerPropertyModal
 } from '../../broker/brokerSlice';
 import { setActiveMainTab, openTab, closeHostTabs, showStatusModal } from '../layoutSlice';
 import { fetchDatabaseUsers, openCreateUserModal, openEditUserModal, openDropUserModal } from '../../user/userSlice';
-import { SubMenu, MenuItem, MenuDivider } from '../../../components/common/DropdownMenu';
+import { MenuItem, MenuDivider, SubMenu } from '../../../components/common/DropdownMenu';
 import ContextMenuWrapper from '../../../components/common/ContextMenuWrapper';
+import { SplitPane } from '../../../components/ds/layout/SplitPane';
+import { Typography } from '../../../components/ds/foundation/Typography';
+import { Icon } from '../../../components/ds/foundation/Icon';
+import { Spinner } from '../../../components/ds/foundation/Spinner';
+import { Button } from '../../../components/ds/foundation/Button';
 
 // Internal Sidebar Components
 import SidebarHeader from '../sidebar/components/SidebarHeader';
@@ -70,9 +73,7 @@ import AutoQueryLogModal from '../../database/components/AutoQueryLogModal';
 import SetAutomationVolumeModal from '../../database/components/SetAutomationVolumeModal';
 import AutoVolumeLogModal from '../../database/components/AutoVolumeLogModal';
 
-// Internal Sidebar Components
-
-export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange, onAddHost }) {
+export default function Sidebar({ isCollapsed, onAddHost }) {
   const sidebarRef = useRef(null);
   const hostSectionRef = useRef(null);
   const [activeTab, setActiveTab] = useState('db');
@@ -92,7 +93,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
   const dispatch = useDispatch();
   const { hosts, selectedHostUid, loading: hostsLoading, authorizedHosts, isLoggingIntoHost, hostAuthErrors } = useSelector((state) => state.host);
   const { databases, activeDatabases, loggedInDatabases, actionLoading: dbActionLoading } = useSelector((state) => state.database);
-  const { actionLoading: brokerActionLoading } = useSelector((state) => state.broker);
+  const { brokers, actionLoading: brokerActionLoading } = useSelector((state) => state.broker);
 
   useEffect(() => {
     dispatch(fetchHosts());
@@ -109,7 +110,6 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
     setSpaceContextMenu(null);
     setQueryPlanContextMenu(null);
     setBrokerRootContextMenu(null);
-
     setBackupItemContextMenu(null);
   }, []);
 
@@ -202,7 +202,6 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
     setBrokerRootContextMenu({ mouseX: e.clientX, mouseY: e.clientY });
   };
 
-
   const handleBackupItemContextMenu = (e, dbName, planId) => {
     e.preventDefault();
     e.stopPropagation();
@@ -213,123 +212,93 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
 
   useEffect(() => {
     const handleOutsideAction = (e) => {
-      // Check if click/contextmenu is outside of any active context menu
       const isInsideMenu = e.target.closest('.context-menu-container');
       if (!isInsideMenu) {
         closeAllContextMenus();
       }
     };
-
-    // Use capture phase to catch events even if propagation is stopped elsewhere
     document.addEventListener('mousedown', handleOutsideAction, true);
     document.addEventListener('contextmenu', handleOutsideAction, true);
-
     return () => {
       document.removeEventListener('mousedown', handleOutsideAction, true);
       document.removeEventListener('contextmenu', handleOutsideAction, true);
     };
   }, [closeAllContextMenus]);
 
-  // Resizing logic
-  useEffect(() => {
-    const resizer = document.getElementById('resizer');
-    const vResizer = document.getElementById('v-resizer');
-    const sidebar = sidebarRef.current;
-    const hostSection = hostSectionRef.current;
+  const [isServerListCollapsed, setIsServerListCollapsed] = useState(false);
+  const [serverListSize, setServerListSize] = useState(260);
 
-    if (!resizer || !vResizer || !sidebar || !hostSection) return;
-
-    let isResizingH = false;
-    let isResizingV = false;
-
-    const onMouseDownH = () => {
-      if (isCollapsed) return;
-      isResizingH = true;
-      document.body.style.cursor = 'col-resize';
-      document.body.style.userSelect = 'none';
-      onResizeChange(true);
-    };
-
-    const onMouseDownV = () => {
-      if (isCollapsed) return;
-      isResizingV = true;
-      vResizer.classList.add('resizing');
-      document.body.style.cursor = 'row-resize';
-      document.body.style.userSelect = 'none';
-    };
-
-    const onMouseMove = (e) => {
-      if (isResizingH) {
-        const newWidth = e.clientX;
-        if (newWidth > 150 && newWidth < 600) sidebar.style.width = `${newWidth}px`;
-      }
-      if (isResizingV) {
-        const sidebarRect = sidebar.getBoundingClientRect();
-        const newHeight = e.clientY - sidebarRect.top - 68;
-        if (newHeight > 100 && newHeight < (sidebarRect.height - 250)) hostSection.style.height = `${newHeight}px`;
-      }
-    };
-
-    const onMouseUp = () => {
-      if (isResizingH) onResizeChange(false);
-      isResizingH = isResizingV = false;
-      vResizer.classList.remove('resizing');
-      document.body.style.cursor = 'default';
-      document.body.style.userSelect = 'auto';
-    };
-
-    resizer.addEventListener('mousedown', onMouseDownH);
-    vResizer.addEventListener('mousedown', onMouseDownV);
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
-
-    return () => {
-      resizer.removeEventListener('mousedown', onMouseDownH);
-      vResizer.removeEventListener('mousedown', onMouseDownV);
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
-    };
-  }, [isCollapsed, onResizeChange]);
+  const toggleServerListCollapse = () => {
+    setIsServerListCollapsed(!isServerListCollapsed);
+    if (!isServerListCollapsed) {
+      setServerListSize(40);
+    } else {
+      setServerListSize(260);
+    }
+  };
 
   return (
     <>
-      <aside ref={sidebarRef} className={`w-72 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-bk-side flex flex-col ${isCollapsed ? 'collapsed' : ''}`} id="sidebar">
+      <aside ref={sidebarRef} className={`w-full h-full border-r border-slate-200 dark:border-white/10 bg-white dark:bg-bk-side flex flex-col ${isCollapsed ? 'hidden' : ''}`} id="sidebar">
         <SidebarHeader />
 
-        <div className="flex flex-col flex-1 overflow-hidden">
-          <details className="flex-none group/hosts border-b border-slate-200 dark:border-slate-800 flex flex-col" open>
-            <summary className="flex-none px-4 py-2 text-[11px] font-medium text-slate-400 dark:text-slate-500 cursor-pointer list-none hover:bg-slate-50 dark:hover:bg-white/5 transition-colors flex items-center justify-between">
+        <SplitPane
+          split="horizontal"
+          size={serverListSize}
+          onSizeChange={setServerListSize}
+          minSize={isServerListCollapsed ? 40 : 100}
+          maxSize={500}
+          className="flex-1 w-full flex flex-col overflow-hidden"
+        >
+          <div className="h-full flex flex-col overflow-hidden bg-white dark:bg-bk-side">
+            <div
+              className="flex-none px-4 py-2 border-b border-slate-200 dark:border-white/5 flex items-center justify-between bg-slate-50 dark:bg-white/[0.02] cursor-pointer hover:bg-slate-100 dark:hover:bg-white/5 transition-colors group/host-header"
+              onClick={toggleServerListCollapse}
+            >
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[15px] group-open/hosts:rotate-180 transition-transform text-slate-400">expand_more</span>
-                <span>Server List</span>
+                <Icon
+                  name="chevron_right"
+                  size="xs"
+                  className={`transition-transform duration-200 text-slate-400 group-hover/host-header:text-bk-yellow ${!isServerListCollapsed ? 'rotate-90' : ''}`}
+                 weight={300} />
+                <Typography variant="caption" className="font-medium text-slate-600 dark:text-slate-400 text-[13px]">Server List</Typography>
               </div>
-              <span className="text-[9px] bg-slate-100 dark:bg-slate-800 px-1.5 rounded-full font-normal lowercase tracking-normal group-open/hosts:hidden animate-in fade-in">{hosts.length} found</span>
-            </summary>
-
-            <div ref={hostSectionRef} className="overflow-y-auto p-2 space-y-0.5 bg-slate-50/50 dark:bg-black/10 min-h-[100px]" id="host-section" style={{ height: '260px' }}>
-              {hostsLoading ? (
-                <div className="flex items-center justify-center py-4">
-                  <div className="animate-spin h-5 w-5 border-2 border-bk-yellow border-t-transparent rounded-full"></div>
-                </div>
-              ) : hosts.length === 0 ? (
-                <p className="px-3 py-2 text-xs text-slate-400 text-center">No hosts found</p>
-              ) : (
-                hosts.map((host) => (
-                  <ServerListItem
-                    key={host.uid}
-                    host={host}
-                    isSelected={selectedHostUid === host.uid}
-                    isAuthorized={authorizedHosts.includes(host.uid)}
-                    onContextMenu={handleContextMenu}
-                  />
-                ))
+              {!isServerListCollapsed && (
+                <Typography variant="caption" className="text-[11px] bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-slate-400 px-2 py-0.5 rounded-full font-medium">{hosts.length} found</Typography>
               )}
             </div>
-          </details>
 
-          <div className="h-1 bg-slate-100 dark:bg-slate-800 cursor-row-resize transition-colors" id="v-resizer" title="Drag to resize sections"></div>
+            <div
+              ref={hostSectionRef}
+              className={`flex-1 overflow-y-auto p-2 space-y-0.5 bg-slate-50/50 dark:bg-black/20 transition-opacity duration-200 ${isServerListCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+              id="host-section"
+            >
+              {!isServerListCollapsed && (
+                hostsLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Spinner size="md" />
+                  </div>
+                ) : hosts.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-8 opacity-40 text-slate-400 dark:text-slate-500">
+                    <Icon name="dns" size="md" className="mb-2"  weight={300} />
+                    <Typography variant="caption">No hosts found</Typography>
+                  </div>
+                ) : (
+                  hosts.map((host) => (
+                    <ServerListItem
+                      key={host.uid}
+                      host={host}
+                      isSelected={selectedHostUid === host.uid}
+                      isAuthorized={authorizedHosts.includes(host.uid)}
+                      onContextMenu={handleContextMenu}
+                    />
+                  ))
+                )
+              )}
+            </div>
+          </div>
 
-          <div className="flex-1 flex flex-col overflow-hidden mt-1" id="tree-section-container">
+          <div className="h-full flex flex-col overflow-hidden" id="tree-section-container">
             {selectedHostUid ? (
               <>
                 <TreeTabHeader 
@@ -342,37 +311,41 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
                 <div className="flex-1 overflow-y-auto px-4 pb-4 relative min-h-[200px]">
                   {/* States Overlay */}
                   {isLoggingIntoHost && (
-                    <div className="absolute inset-0 bg-white/80 dark:bg-bk-side/80 z-[210] flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-200">
-                      <div className="w-16 h-16 border-4 border-bk-yellow/10 border-t-bk-yellow rounded-full animate-spin mb-6"></div>
-                      <h3 className="text-sm font-medium text-slate-900 dark:text-bk-yellow mb-1 tracking-wide">Host login</h3>
-                      <p className="text-[11px] text-slate-500">Establishing secure session...</p>
+                    <div className="absolute inset-0 bg-white/80 dark:bg-bk-side z-[210] flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-200">
+                      <div className="size-16 border-4 border-bk-yellow/10 border-t-bk-yellow rounded-full animate-spin mb-6 shadow-[0_0_15px_rgba(255,193,7,0.2)]"></div>
+                      <Typography variant="p" className="text-sm font-bold text-slate-900 dark:text-bk-yellow tracking-wide">Host login</Typography>
+                      <Typography variant="caption" className="text-slate-500 mt-1 dark:text-slate-400">Establishing secure session...</Typography>
                     </div>
                   )}
 
                   {!isLoggingIntoHost && hostAuthErrors[selectedHostUid] && (
                     <div className="absolute inset-0 bg-white dark:bg-bk-side z-[210] flex flex-col items-center justify-center p-6 text-center animate-in zoom-in-95 duration-200">
-                      <span className="material-symbols-outlined text-rose-500 text-3xl mb-4 bg-rose-500/10 p-4 rounded-full border border-rose-500/20">error</span>
-                      <h3 className="text-sm font-medium text-rose-500 mb-2">Connection failed</h3>
-                      <p className="text-[11px] text-slate-500 mb-6">{hostAuthErrors[selectedHostUid]}</p>
-                      <button onClick={() => handleHostLogin(selectedHostUid)} className="px-6 py-2 bg-bk-yellow text-bk-side text-[10px] font-black rounded-lg shadow-lg">Try Again</button>
+                      <div className="size-12 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mb-4">
+                        <Icon name="error" className="text-rose-500"  weight={300} />
+                      </div>
+                      <Typography variant="p" className="text-sm font-bold text-rose-500 mb-1">Connection failed</Typography>
+                      <Typography variant="caption" className="text-slate-500 dark:text-slate-400 mb-6 px-4">{hostAuthErrors[selectedHostUid]}</Typography>
+                      <Button variant="primary" size="sm" onClick={() => handleHostLogin(selectedHostUid)} className="px-8 h-9 shadow-[0_4px_12px_rgba(255,193,7,0.3)] text-[13px] font-medium">Try Again</Button>
                     </div>
                   )}
 
                   {(dbActionLoading || brokerActionLoading) && (
                     <div className="absolute inset-0 bg-white/60 dark:bg-bk-main/60 z-[200] flex items-center justify-center backdrop-blur-sm animate-in fade-in duration-200">
-                      <div className="flex flex-col items-center gap-3 bg-white dark:bg-bk-side px-8 py-6 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800">
-                        <div className="w-10 h-10 border-4 border-bk-yellow/20 border-t-bk-yellow rounded-full animate-spin"></div>
-                        <span className="text-xs font-medium text-slate-900 dark:text-bk-yellow">Processing...</span>
+                      <div className="flex flex-col items-center gap-3 bg-white dark:bg-bk-side px-8 py-6 rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10">
+                        <Spinner size="lg" />
+                        <Typography variant="caption" className="font-medium text-slate-900 dark:text-bk-yellow text-[13px]">Processing...</Typography>
                       </div>
                     </div>
                   )}
 
                   <div className={`mt-2 ${(!authorizedHosts.includes(selectedHostUid) || isLoggingIntoHost) ? 'opacity-20 blur-[1px] pointer-events-none' : 'opacity-100'}`} id="db-tree-container">
-                    <p className="px-3 text-[10px] font-medium tracking-wide text-slate-500 dark:text-slate-500 mb-4 flex items-center gap-2">
-                      <span className="h-px flex-1 bg-slate-200 dark:bg-slate-800"></span>
-                      {activeTab === 'db' ? 'Databases' : activeTab === 'broker' ? 'Brokers' : 'Logs'}
-                      <span className="h-px flex-1 bg-slate-200 dark:bg-slate-800"></span>
-                    </p>
+                    <div className="px-3 flex items-center gap-3 mb-4 opacity-50">
+                      <div className="h-px flex-1 bg-slate-200 dark:bg-white/5"></div>
+                      <Typography variant="caption" className="font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest text-[9px]">
+                        {activeTab === 'db' ? 'Databases' : activeTab === 'broker' ? 'Brokers' : 'Logs'}
+                      </Typography>
+                      <div className="h-px flex-1 bg-slate-200 dark:bg-white/5"></div>
+                    </div>
 
                     {activeTab === 'db' && (
                       <DatabaseTree
@@ -382,7 +355,6 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
                         onUserContextMenu={handleUserContextMenu}
                         onBackupPlanContextMenu={handleBackupPlanContextMenu}
                         onSpaceContextMenu={handleSpaceContextMenu}
-
                         onBackupItemContextMenu={handleBackupItemContextMenu}
                       />
                     )}
@@ -395,26 +367,27 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
               <SidebarEmptyState />
             )}
           </div>
-        </div>
+        </SplitPane>
 
-        <div className="p-4 border-t border-slate-200 dark:border-slate-800">
-          <button
-            className="flex w-full items-center justify-center gap-2 bg-bk-yellow hover:bg-[#ffd700] text-bk-side px-4 py-2 rounded-lg text-xs font-black transition-colors group"
+        <div className="p-4 border-t border-slate-200 dark:border-white/10 bg-white dark:bg-bk-side">
+          <Button
+            variant="primary"
+            size="md"
+            className="w-full h-10 font-medium text-[13px] shadow-[0_4px_12px_rgba(255,193,7,0.25)]"
             onClick={onAddHost}
+            icon="add_circle"
           >
-            <span className="material-symbols-outlined text-[18px] group-hover:rotate-90 transition-transform duration-200">add_circle</span>
-            <span className="tracking-wide">Add Host</span>
-          </button>
+            Add Host
+          </Button>
         </div>
       </aside>
-
-      <div className="w-1 hover:w-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-bk-yellow transition-all cursor-col-resize h-full flex-shrink-0 z-10" id="resizer"></div>
 
       {/* Context Menus */}
       {contextMenu && (
         <ContextMenuWrapper x={contextMenu.mouseX} y={contextMenu.mouseY} onClose={() => setContextMenu(null)}>
-          <div className="px-4 py-2 text-[11px] font-medium text-slate-400 border-b border-slate-100 dark:border-white/5 mb-1 flex items-center justify-between">
-            <span>Server: {contextMenu.server}</span>
+          <div className="px-4 py-2 border-b border-slate-100 dark:border-white/5 mb-1 flex items-center justify-between">
+            <Typography variant="caption" className="font-bold text-slate-400 uppercase tracking-widest text-[9px]">Server: {contextMenu.server}</Typography>
+            <Icon name="dns" size="xs" className="opacity-30"  weight={300} />
           </div>
           <MenuItem
             icon="power_settings_new" iconColor="text-rose-500" label="Disconnect"
@@ -439,8 +412,9 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
 
       {dbContextMenu && (
         <ContextMenuWrapper x={dbContextMenu.mouseX} y={dbContextMenu.mouseY} onClose={() => setDbContextMenu(null)}>
-          <div className="px-4 py-2 text-[11px] font-medium text-slate-400 border-b border-slate-100 dark:border-white/5 mb-1">
-            Database: {dbContextMenu.db}
+          <div className="px-4 py-2 border-b border-slate-100 dark:border-white/5 mb-1 flex items-center justify-between">
+            <Typography variant="caption" className="font-bold text-slate-400 uppercase tracking-widest text-[9px]">Database: {dbContextMenu.db}</Typography>
+            <Icon name="database" size="xs" className="opacity-30"  weight={300} />
           </div>
           {dbContextMenu.isActive ? (
             <MenuItem
@@ -450,12 +424,8 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
               onClick={() => {
                 dispatch(stopDatabase({ hostUid: selectedHostUid, dbname: dbContextMenu.db }))
                   .unwrap()
-                  .then(() => {
-                    dispatch(fetchDatabaseStartInfo(selectedHostUid));
-                  })
-                  .catch((err) => {
-                    dispatch(showStatusModal({ type: 'error', title: 'Action Failed', message: err }));
-                  });
+                  .then(() => dispatch(fetchDatabaseStartInfo(selectedHostUid)))
+                  .catch((err) => dispatch(showStatusModal({ type: 'error', title: 'Action Failed', message: err })));
                 setDbContextMenu(null);
               }}
             />
@@ -467,12 +437,8 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
               onClick={() => {
                 dispatch(startDatabase({ hostUid: selectedHostUid, dbname: dbContextMenu.db }))
                   .unwrap()
-                  .then(() => {
-                    dispatch(fetchDatabaseStartInfo(selectedHostUid));
-                  })
-                  .catch((err) => {
-                    dispatch(showStatusModal({ type: 'error', title: 'Action Failed', message: err }));
-                  });
+                  .then(() => dispatch(fetchDatabaseStartInfo(selectedHostUid)))
+                  .catch((err) => dispatch(showStatusModal({ type: 'error', title: 'Action Failed', message: err })));
                 setDbContextMenu(null);
               }}
             />
@@ -516,7 +482,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
               icon="monitoring" 
               label="Status Monitor" 
               onClick={() => { 
-                dispatch(openTab(`db_status_monitor:${selectedHostUid}:${dbContextMenu.db}`));
+                dispatch(setActiveMainTab(`db_status_monitor:${selectedHostUid}:${dbContextMenu.db}`));
                 setDbContextMenu(null); 
               }} 
             />
@@ -556,8 +522,9 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
 
       {dbRootContextMenu && (
         <ContextMenuWrapper x={dbRootContextMenu.mouseX} y={dbRootContextMenu.mouseY} onClose={() => setDbRootContextMenu(null)}>
-          <div className="px-4 py-2 text-[11px] font-medium text-slate-400 border-b border-slate-100 dark:border-white/5 mb-1">
-            Databases
+          <div className="px-4 py-2 border-b border-slate-100 dark:border-white/5 mb-1 flex items-center justify-between">
+            <Typography variant="caption" className="font-bold text-slate-400 uppercase tracking-widest text-[9px]">All Databases</Typography>
+            <Icon name="database" size="xs" className="opacity-30"  weight={300} />
           </div>
           <MenuItem
             icon="play_circle"
@@ -623,8 +590,9 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
 
       {brokerRootContextMenu && (
         <ContextMenuWrapper x={brokerRootContextMenu.mouseX} y={brokerRootContextMenu.mouseY} onClose={() => setBrokerRootContextMenu(null)}>
-          <div className="px-4 py-2 text-[11px] font-medium text-slate-400 border-b border-slate-100 dark:border-white/5 mb-1">
-            Brokers
+          <div className="px-4 py-2 border-b border-slate-100 dark:border-white/5 mb-1 flex items-center justify-between">
+            <Typography variant="caption" className="font-bold text-slate-400 uppercase tracking-widest text-[9px]">All Brokers</Typography>
+            <Icon name="hub" size="xs" className="opacity-30"  weight={300} />
           </div>
           <MenuItem
             icon="play_circle"
@@ -701,8 +669,9 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
 
       {brokerContextMenu && (
         <ContextMenuWrapper x={brokerContextMenu.mouseX} y={brokerContextMenu.mouseY} onClose={() => setBrokerContextMenu(null)}>
-          <div className="px-4 py-2 text-[11px] font-medium text-slate-400 border-b border-slate-100 dark:border-white/5 mb-1">
-            Broker: {brokerContextMenu.broker}
+          <div className="px-4 py-2 border-b border-slate-100 dark:border-white/5 mb-1 flex items-center justify-between">
+            <Typography variant="caption" className="font-bold text-slate-400 uppercase tracking-widest text-[9px]">Broker: {brokerContextMenu.broker}</Typography>
+            <Icon name="hub" size="xs" className="opacity-30"  weight={300} />
           </div>
           {brokerContextMenu.state === 'ON' ? (
             <MenuItem
@@ -712,12 +681,8 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
               onClick={() => {
                 dispatch(stopBroker({ hostUid: selectedHostUid, brokerName: brokerContextMenu.broker }))
                   .unwrap()
-                  .then(() => {
-                    dispatch(fetchBrokerList(selectedHostUid));
-                  })
-                  .catch((err) => {
-                    dispatch(showStatusModal({ type: 'error', title: 'Action Failed', message: err }));
-                  });
+                  .then(() => dispatch(fetchBrokerList(selectedHostUid)))
+                  .catch((err) => dispatch(showStatusModal({ type: 'error', title: 'Action Failed', message: err })));
                 setBrokerContextMenu(null);
               }}
             />
@@ -729,12 +694,8 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
               onClick={() => {
                 dispatch(startBroker({ hostUid: selectedHostUid, brokerName: brokerContextMenu.broker }))
                   .unwrap()
-                  .then(() => {
-                    dispatch(fetchBrokerList(selectedHostUid));
-                  })
-                  .catch((err) => {
-                    dispatch(showStatusModal({ type: 'error', title: 'Action Failed', message: err }));
-                  });
+                  .then(() => dispatch(fetchBrokerList(selectedHostUid)))
+                  .catch((err) => dispatch(showStatusModal({ type: 'error', title: 'Action Failed', message: err })));
                 setBrokerContextMenu(null);
               }}
             />
@@ -745,7 +706,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
             label="Show Status" 
             onClick={() => {
               if (selectedHostUid) {
-                dispatch(openTab(`broker_status:${selectedHostUid}:${brokerContextMenu.broker}`));
+                dispatch(setActiveMainTab(`broker_status:${selectedHostUid}:${brokerContextMenu.broker}`));
               }
               setBrokerContextMenu(null);
             }} 
@@ -763,8 +724,9 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
 
       {usersContextMenu && (
         <ContextMenuWrapper x={usersContextMenu.mouseX} y={usersContextMenu.mouseY} onClose={() => setUsersContextMenu(null)}>
-          <div className="px-4 py-2 text-[11px] font-medium text-slate-400 border-b border-slate-100 dark:border-white/5 mb-1">
-            Users: {usersContextMenu.db}
+          <div className="px-4 py-2 border-b border-slate-100 dark:border-white/5 mb-1 flex items-center justify-between">
+             <Typography variant="caption" className="font-bold text-slate-400 uppercase tracking-widest text-[9px]">Users: {usersContextMenu.db}</Typography>
+             <Icon name="groups" size="xs" className="opacity-30"  weight={300} />
           </div>
           <MenuItem
             icon="person_add"
@@ -787,9 +749,9 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
 
       {userContextMenu && (
         <ContextMenuWrapper x={userContextMenu.mouseX} y={userContextMenu.mouseY} onClose={() => setUserContextMenu(null)}>
-          <div className="px-4 py-2 text-[11px] font-bold text-slate-700 dark:text-slate-200 border-b border-slate-100 dark:border-white/5 mb-1 flex items-center justify-between">
-            <span>{userContextMenu.user}</span>
-            <span className="material-symbols-outlined text-[16px] opacity-40">person</span>
+          <div className="px-4 py-2 border-b border-slate-100 dark:border-white/5 mb-1 flex items-center justify-between">
+            <Typography variant="caption" className="font-bold text-slate-700 dark:text-slate-200 uppercase tracking-widest text-[9px]">{userContextMenu.user}</Typography>
+            <Icon name="person" size="xs" className="opacity-30"  weight={300} />
           </div>
           <MenuItem
             icon="edit"
@@ -821,9 +783,9 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
       )}
       {backupPlanContextMenu && (
         <ContextMenuWrapper x={backupPlanContextMenu.mouseX} y={backupPlanContextMenu.mouseY} onClose={() => setBackupPlanContextMenu(null)}>
-          <div className="px-4 py-2 text-[11px] font-bold text-slate-700 dark:text-slate-200 border-b border-slate-100 dark:border-white/5 mb-1 flex items-center justify-between">
-            <span>Backup Plan</span>
-            <span className="material-symbols-outlined text-[16px] opacity-40">backup</span>
+          <div className="px-4 py-2 border-b border-slate-100 dark:border-white/5 mb-1 flex items-center justify-between">
+            <Typography variant="caption" className="font-bold text-slate-400 uppercase tracking-widest text-[9px]">Backup Plan</Typography>
+            <Icon name="backup" size="xs" className="opacity-30"  weight={300} />
           </div>
           <MenuItem
             icon="add_circle"
@@ -858,9 +820,9 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
       )}
       {spaceContextMenu && (
         <ContextMenuWrapper x={spaceContextMenu.mouseX} y={spaceContextMenu.mouseY} onClose={() => setSpaceContextMenu(null)}>
-          <div className="px-4 py-2 text-[11px] font-bold text-slate-700 dark:text-slate-200 border-b border-slate-100 dark:border-white/5 mb-1 flex items-center justify-between">
-            <span>Space: {spaceContextMenu.db}</span>
-            <span className="material-symbols-outlined text-[16px] opacity-40">donut_small</span>
+          <div className="px-4 py-2 border-b border-slate-100 dark:border-white/5 mb-1 flex items-center justify-between">
+            <Typography variant="caption" className="font-bold text-slate-400 uppercase tracking-widest text-[9px]">Space: {spaceContextMenu.db}</Typography>
+            <Icon name="donut_small" size="xs" className="opacity-30"  weight={300} />
           </div>
           <MenuItem
             icon="add_to_drive"
@@ -903,7 +865,6 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
             icon="refresh"
             label="Refresh"
             onClick={() => {
-              // Any space specific refresh logic could go here
               setSpaceContextMenu(null);
             }}
           />
@@ -912,9 +873,9 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
 
       {backupItemContextMenu && (
         <ContextMenuWrapper x={backupItemContextMenu.mouseX} y={backupItemContextMenu.mouseY} onClose={() => setBackupItemContextMenu(null)}>
-          <div className="px-4 py-2 text-[11px] font-bold text-slate-700 dark:text-slate-200 border-b border-slate-100 dark:border-white/5 mb-1 flex items-center justify-between">
-            <span>Backup: {backupItemContextMenu.planId}</span>
-            <span className="material-symbols-outlined text-[16px] opacity-40">event_note</span>
+          <div className="px-4 py-2 border-b border-slate-100 dark:border-white/5 mb-1 flex items-center justify-between">
+            <Typography variant="caption" className="font-bold text-slate-400 uppercase tracking-widest text-[9px]">Backup: {backupItemContextMenu.planId}</Typography>
+            <Icon name="event_note" size="xs" className="opacity-30"  weight={300} />
           </div>
 
           <MenuItem
@@ -952,9 +913,9 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, onResizeChange,
 
       {queryPlanContextMenu && (
         <ContextMenuWrapper x={queryPlanContextMenu.mouseX} y={queryPlanContextMenu.mouseY} onClose={() => setQueryPlanContextMenu(null)}>
-          <div className="px-4 py-2 text-[11px] font-bold text-slate-700 dark:text-slate-200 border-b border-slate-100 dark:border-white/5 mb-1 flex items-center justify-between">
-            <span>Query Plan: {queryPlanContextMenu.db}</span>
-            <span className="material-symbols-outlined text-[16px] opacity-40">bolt</span>
+          <div className="px-4 py-2 border-b border-slate-100 dark:border-white/5 mb-1 flex items-center justify-between">
+            <Typography variant="caption" className="font-bold text-slate-400 uppercase tracking-widest text-[9px]">Query Plan: {queryPlanContextMenu.db}</Typography>
+            <Icon name="bolt" size="xs" className="opacity-30"  weight={300} />
           </div>
           <MenuItem
             icon="add_circle"

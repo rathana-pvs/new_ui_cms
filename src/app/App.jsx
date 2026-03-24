@@ -17,6 +17,7 @@ import VolumeInfoMonitor from '../features/database/components/VolumeInfoMonitor
 import VolumeCategoryMonitor from '../features/database/components/VolumeCategoryMonitor';
 import CubridConfigEditor from '../features/server/components/CubridConfigEditor';
 import BrokerConfigEditor from '../features/server/components/BrokerConfigEditor';
+import { SplitPane } from '../components/ds/layout/SplitPane';
 import UnloadDatabaseModal from '../features/database/components/UnloadDatabaseModal';
 import LoadDatabaseModal from '../features/database/components/LoadDatabaseModal';
 import DeleteDatabaseModal from '../features/database/components/DeleteDatabaseModal';
@@ -127,17 +128,18 @@ function DashboardLayout() {
 
   return (
     <MonitoringProvider>
-      <div className={`flex h-screen overflow-hidden ${isResizing ? 'select-none' : ''}`}>
-        <Sidebar
-          isCollapsed={isSidebarCollapsed}
-          onToggleCollapse={() => dispatch(toggleSidebar())}
-          onResizeChange={(val) => dispatch(setIsResizing(val))}
-          onAddHost={() => dispatch(openAddHostModal())}
-        />
+      <div className={`h-screen overflow-hidden ${isResizing ? 'select-none' : ''}`}>
+        <SplitPane split="vertical" defaultSize={288} minSize={200} maxSize={600} className="h-full w-full">
+          <Sidebar
+            isCollapsed={isSidebarCollapsed}
+            onToggleCollapse={() => dispatch(toggleSidebar())}
+            onResizeChange={(val) => dispatch(setIsResizing(val))}
+            onAddHost={() => dispatch(openAddHostModal())}
+          />
 
-        <main className="flex-1 flex flex-col bg-background-light dark:bg-bk-main overflow-hidden">
+          <main className="w-full h-full flex flex-col bg-background-light dark:bg-bk-main overflow-hidden">
 
-          <Header theme={theme} toggleTheme={() => dispatch(toggleTheme())} />
+            <Header theme={theme} toggleTheme={() => dispatch(toggleTheme())} />
           <div className="flex-shrink-0 bg-slate-50 dark:bg-bk-main">
 
             <Breadcrumb
@@ -246,7 +248,8 @@ function DashboardLayout() {
           )}
 
           <Footer />
-        </main>
+          </main>
+        </SplitPane>
 
         <AddHostModal
           isOpen={isAddHostModalOpen}

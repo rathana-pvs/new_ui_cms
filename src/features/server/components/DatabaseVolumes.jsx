@@ -1,6 +1,10 @@
-import { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchDatabaseVolumes } from '../../database/databaseSlice';
+import { Card } from '../../../components/ds/layout/Card';
+import { Table } from '../../../components/ds/layout/Table';
+import { Icon } from '../../../components/ds/foundation/Icon';
+import { Spinner } from '../../../components/ds/foundation/Spinner';
 
 const getSizeFormat = (size) => {
   if (size >= 1024 ** 3) {
@@ -68,6 +72,7 @@ export default function DatabaseVolumes({ hostUid }) {
   useEffect(() => {
     fetchVolumes();
   }, [fetchVolumes]);
+
   const volumeData = volumes?.map((result) => {
     let permanent = { display: '-', pct: 0 };
     let temporary = { display: '-', pct: 0 };
@@ -84,6 +89,7 @@ export default function DatabaseVolumes({ hostUid }) {
     }
 
     return {
+      id: result.dbname,
       db: result.dbname,
       permanent,
       temporary,
@@ -93,72 +99,59 @@ export default function DatabaseVolumes({ hostUid }) {
     };
   }) || [];
 
-  return (
-    <details className="group border border-slate-200 dark:border-slate-800 rounded-lg shadow-sm bg-white dark:bg-bk-side overflow-hidden" open>
-      <summary className="flex items-center gap-2 px-3 py-2.5 cursor-pointer list-none hover:bg-slate-50 dark:hover:bg-white/5 transition-colors bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-slate-800 text-sm font-medium text-slate-800 dark:text-slate-200">
-        <span className="material-symbols-outlined text-[16px] text-bk-yellow leading-none transition-transform group-open:rotate-180">expand_more</span>
-        <span className="material-symbols-outlined text-[16px] text-slate-400">storage</span>
-        <span>Database volumes</span>
-        {loading && (
-          <svg className="animate-spin h-3 w-3 text-bk-yellow ml-auto" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-          </svg>
-        )}
-      </summary>
-      <div className="overflow-x-auto w-full">
-        <table className="w-full text-left text-xs whitespace-nowrap font-sans">
-          <thead>
-            <tr className="text-slate-500 dark:text-slate-400 bg-slate-50/20 dark:bg-transparent border-b border-slate-200 dark:border-slate-800">
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Database</th>
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Permanent (U/T/F%)</th>
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Temporary (U/T/F%)</th>
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Active Log</th>
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Archive Log</th>
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Storage Free</th>
-            </tr>
-          </thead>
-          <tbody className="font-mono">
-            {volumeData.length === 0 ? (
-              <tr>
-                <td colSpan="6" className="px-4 py-8 text-center text-slate-400 italic">
-                  {loading ? 'Loading volume data...' : 'No active databases found or information unavailable'}
-                </td>
-              </tr>
-            ) : (
-              volumeData.map((row, i) => (
-                <tr key={i} className="text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors border-b border-slate-100 dark:border-slate-800">
-                  <td className="px-4 py-3 font-sans font-medium">{row.db}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex flex-col gap-1 w-full max-w-[160px]">
-                      <div className="flex justify-between items-center text-[10px] mb-0.5">
-                        <span className="font-mono opacity-80">{row.permanent.display}</span>
-                      </div>
-                      <div className="w-full bg-slate-200 dark:bg-slate-700/50 rounded-full h-1 overflow-hidden">
-                        <div className={`h-full rounded-full transition-all duration-300 ${row.permanent.pct > 80 ? 'bg-rose-500' : row.permanent.pct > 60 ? 'bg-amber-500' : 'bg-bk-yellow'}`} style={{ width: `${row.permanent.pct}%` }}></div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex flex-col gap-1 w-full max-w-[160px]">
-                      <div className="flex justify-between items-center text-[10px] mb-0.5">
-                        <span className="font-mono opacity-80">{row.temporary.display}</span>
-                      </div>
-                      <div className="w-full bg-slate-200 dark:bg-slate-700/50 rounded-full h-1 overflow-hidden">
-                        <div className={`h-full rounded-full transition-all duration-300 ${row.temporary.pct > 80 ? 'bg-rose-500' : 'bg-bk-yellow'}`} style={{ width: `${row.temporary.pct}%` }}></div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">{row.activeLog}</td>
-                  <td className="px-4 py-3">{row.archiveLog}</td>
-                  <td className="px-4 py-3 opacity-80">{row.storageFree}</td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-    </details>
+  const columns = [
+    { header: 'Database', accessor: 'db', className: 'font-bold' },
+    { 
+      header: 'Permanent (U/T/F%)', 
+      accessor: 'permanent',
+      render: (val) => (
+        <div className="flex flex-col gap-1 w-full max-w-[160px]">
+          <div className="text-[10px] font-mono opacity-80">{val.display}</div>
+          <div className="w-full bg-slate-100 dark:bg-black/40 rounded-full h-1 overflow-hidden border border-slate-200 dark:border-white/5">
+            <div 
+              className={`h-full rounded-full shadow-[0_0_8px] transition-all duration-500 ${val.pct > 80 ? 'bg-rose-500 shadow-rose-500/20' : 'bg-bk-yellow shadow-bk-yellow/20'}`} 
+              style={{ width: `${val.pct}%` }} 
+            />
+          </div>
+        </div>
+      )
+    },
+    { 
+      header: 'Temporary (U/T/F%)', 
+      accessor: 'temporary',
+      render: (val) => (
+        <div className="flex flex-col gap-1 w-full max-w-[160px]">
+          <div className="text-[10px] font-mono opacity-80">{val.display}</div>
+          <div className="w-full bg-slate-100 dark:bg-black/40 rounded-full h-1 overflow-hidden border border-slate-200 dark:border-white/5">
+            <div 
+              className={`h-full rounded-full shadow-[0_0_8px] transition-all duration-500 ${val.pct > 80 ? 'bg-rose-500 shadow-rose-500/20' : 'bg-emerald-500 shadow-emerald-500/20'}`} 
+              style={{ width: `${val.pct}%` }} 
+            />
+          </div>
+        </div>
+      )
+    },
+    { header: 'Active Log', accessor: 'activeLog' },
+    { header: 'Archive Log', accessor: 'archiveLog' },
+    { header: 'Free Storage', accessor: 'storageFree', className: 'opacity-60' }
+  ];
 
+  const cardTitle = (
+    <div className="flex items-center gap-2">
+      <Icon name="storage" size="sm" className="text-bk-yellow"  weight={300} />
+      <span>Storage Volumes</span>
+      {loading && <Spinner size="xs" className="ml-2" />}
+    </div>
+  );
+
+  return (
+    <Card title={cardTitle} bodyClassName="p-0">
+      <Table 
+        columns={columns} 
+        data={volumeData} 
+        loading={loading}
+        className="font-mono text-[12px]"
+      />
+    </Card>
   );
 }

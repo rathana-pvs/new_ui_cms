@@ -6,12 +6,25 @@ import { store } from './app/store'
 import './styles/index.css'
 import App from './app/App'
 
+import { ThemeProvider } from './infrastructure/ThemeProvider'
+import { ToastProvider } from './infrastructure/context/ToastContext'
+import { ConfirmProvider } from './infrastructure/context/ConfirmContext'
+import { ErrorBoundary } from './infrastructure/ErrorBoundary'
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Provider store={store}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <ThemeProvider defaultTheme="system">
+        <ToastProvider>
+          <ConfirmProvider>
+            <BrowserRouter>
+              <ErrorBoundary>
+                <App />
+              </ErrorBoundary>
+            </BrowserRouter>
+          </ConfirmProvider>
+        </ToastProvider>
+      </ThemeProvider>
     </Provider>
   </StrictMode>,
 )

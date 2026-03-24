@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { closeServerVersionModal } from '../hostSlice';
 import { hostApi } from '../hostApi';
-import LoadingOverlay from '../../../components/common/LoadingOverlay';
+import { Modal } from '../../../components/ds/layout/Modal';
+import { Button } from '../../../components/ds/foundation/Button';
+import { Typography } from '../../../components/ds/foundation/Typography';
+import { Divider } from '../../../components/ds/layout/Divider';
 
 export default function ServerVersionModal() {
   const dispatch = useDispatch();
@@ -31,78 +34,63 @@ export default function ServerVersionModal() {
   const currentHost = hosts.find(h => h.uid === serverVersionHostUid);
 
   return (
-    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans text-left">
-      <div className="bg-white dark:bg-bk-side w-full max-w-[420px] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col relative text-left">
-        
-        {/* Subtle Top Accent */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-bk-yellow/60"></div>
-
-        <LoadingOverlay isVisible={loading} title="Fetching env..." />
-
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
-              <span className="material-symbols-outlined text-bk-yellow text-xl">info</span>
-            </div>
-            <div>
-              <h3 className="text-[12px] font-medium text-slate-900 dark:text-white leading-none tracking-wide">Server Version</h3>
-              <p className="text-[9px] text-slate-400 font-medium mt-1">Host: {currentHost?.alias || currentHost?.id}</p>
-            </div>
-          </div>
-          <button 
-            onClick={() => dispatch(closeServerVersionModal())}
-            className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
-          >
-            <span className="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform">close</span>
-          </button>
+    <Modal
+      isOpen={isServerVersionModalOpen}
+      onClose={() => dispatch(closeServerVersionModal())}
+      title="Server Version"
+      icon="info"
+      loading={loading}
+      maxWidth="420px"
+      subtitle={`Host: ${currentHost?.alias || currentHost?.id}`}
+      footer={
+        <Button 
+          variant="primary" 
+          onClick={() => dispatch(closeServerVersionModal())}
+          className="min-w-[100px]"
+        >
+          Close
+        </Button>
+      }
+    >
+      <div className="flex flex-col items-center space-y-6 pt-2">
+        <div className="w-24 h-24 p-3 bg-white dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/10 shadow-sm flex items-center justify-center animate-in zoom-in duration-300">
+          <img src="/cubrid-logo.png" alt="CUBRID logo" className="w-full h-auto object-contain" />
         </div>
 
-        {/* Body */}
-        <div className="p-6 flex flex-col items-center text-center space-y-6">
-          <div className="w-24 h-24 p-2 bg-white dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/10 shadow-sm flex items-center justify-center">
-             <img src="/cubrid-logo.png" alt="CUBRID logo" className="w-full h-auto object-contain" />
+        <div className="w-full space-y-5">
+          <div className="flex flex-col items-center text-center space-y-1">
+            <Typography variant="caption" className="font-bold text-bk-yellow uppercase tracking-widest text-[10px]">
+              Cubrid Version
+            </Typography>
+            <Typography variant="p" className="font-mono text-slate-700 dark:text-slate-200 leading-relaxed text-[13px]">
+              {envData?.CUBRIDVER || 'Loading...'}
+            </Typography>
           </div>
 
-          <div className="w-full space-y-4">
-            <div className="space-y-2">
-              <span className="text-[10px] font-bold text-bk-yellow uppercase tracking-widest">Cubrid Version</span>
-              <p className="text-sm font-mono text-slate-700 dark:text-slate-200 leading-relaxed max-w-[320px] mx-auto">
-                {envData?.CUBRIDVER || 'Loading...'}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 gap-2 border-t border-slate-50 dark:border-white/5 pt-4">
-              <div className="flex justify-between items-center py-1">
-                <span className="text-[11px] font-medium text-slate-400">OS Platform</span>
-                <span className="text-[11px] font-mono text-slate-700 dark:text-slate-200">{envData?.osinfo || '-'}</span>
-              </div>
-               <div className="flex justify-between items-center py-1">
-                <span className="text-[11px] font-medium text-slate-400">Broker Version</span>
-                <span className="text-[11px] font-mono text-slate-700 dark:text-slate-200">{envData?.BROKERVER || '-'}</span>
-              </div>
-              <div className="flex justify-between items-center py-1">
-                <span className="text-[11px] font-medium text-slate-400">Install Path</span>
-                <span className="text-[11px] font-mono text-slate-700 dark:text-slate-200 truncate ml-4 max-w-[200px]" title={envData?.CUBRID}>{envData?.CUBRID || '-'}</span>
-              </div>
-              <div className="flex justify-between items-center py-1">
-                <span className="text-[11px] font-medium text-slate-400">Databases Path</span>
-                <span className="text-[11px] font-mono text-slate-700 dark:text-slate-200 truncate ml-4 max-w-[200px]" title={envData?.CUBRID_DATABASES}>{envData?.CUBRID_DATABASES || '-'}</span>
-              </div>
+          <div className="space-y-1 pt-2">
+            <Divider label="Environment Details" />
+            <div className="space-y-0.5 pt-2">
+              {[
+                { label: 'OS Platform', value: envData?.osinfo },
+                { label: 'Broker Version', value: envData?.BROKERVER },
+                { label: 'Install Path', value: envData?.CUBRID, isPath: true },
+                { label: 'Databases Path', value: envData?.CUBRID_DATABASES, isPath: true }
+              ].map((item, idx) => (
+                <div key={idx} className="flex justify-between items-center py-1.5 border-b border-slate-50 dark:border-white/5 last:border-0">
+                  <Typography variant="caption" className="text-slate-400 font-medium">{item.label}</Typography>
+                  <Typography 
+                    variant="caption" 
+                    className={`font-mono text-slate-700 dark:text-slate-200 ${item.isPath ? 'truncate ml-4 max-w-[200px]' : ''}`}
+                    title={item.isPath ? item.value : undefined}
+                  >
+                    {item.value || '-'}
+                  </Typography>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
-
-        {/* Footer */}
-        <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800">
-          <button 
-            className="px-6 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center min-w-[100px]"
-            onClick={() => dispatch(closeServerVersionModal())}
-          >
-            Close
-          </button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

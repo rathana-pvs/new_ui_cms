@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { hostApi } from '../../host/hostApi';
 import { databaseApi } from '../../database/databaseApi';
@@ -12,6 +12,8 @@ import SystemInfo from './SystemInfo';
 import SystemStatusSection from './server/SystemStatusSection';
 import DatabaseListSection from './server/DatabaseListSection';
 import MonitoringSettingsPopover from '../../user/components/MonitoringSettingsPopover';
+import { Typography } from '../../../components/ds/foundation/Typography';
+import { Icon } from '../../../components/ds/foundation/Icon';
 
 export default function ServerContent({ hostUid }) {
   const dispatch = useDispatch();
@@ -111,19 +113,19 @@ export default function ServerContent({ hostUid }) {
   }));
 
   return (
-    <div className="flex-1 overflow-y-auto bg-slate-50 dark:bg-bk-main">
+    <div className="flex-1 overflow-y-auto bg-slate-50 dark:bg-bk-main custom-scrollbar">
       {/* Top Breadcrumb Bar */}
-      <div className="flex items-center justify-between px-3 py-2 text-xs text-slate-500 border-b border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-bk-side/50">
-        <span className="font-medium text-slate-900 dark:text-bk-yellow tracking-wide flex items-center gap-1.5 font-sans">
-          <span className="material-symbols-outlined text-[14px]">dns</span>
+      <div className="flex items-center justify-between px-6 py-2 text-xs border-b border-slate-200 dark:border-white/5 bg-white/80 dark:bg-bk-side/80 backdrop-blur-md sticky top-0 z-20">
+        <Typography variant="span" className="font-bold text-slate-900 dark:text-bk-yellow tracking-wide flex items-center gap-2 uppercase">
+          <Icon name="dns" size="14px"  weight={300} />
           Host - {currentHost ? (currentHost.alias || currentHost.id) : 'unknown'}
-        </span>
+        </Typography>
         <div className="flex items-center gap-2">
           <MonitoringSettingsPopover />
         </div>
       </div>
 
-      <div className="flex flex-col p-4 space-y-4">
+      <div className="flex flex-col p-6 space-y-6">
         
         {/* Database Volumes Section */}
         <DatabaseVolumes hostUid={hostUid} />

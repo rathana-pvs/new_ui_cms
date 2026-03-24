@@ -1,30 +1,38 @@
+import React from 'react';
+import { Typography } from '../../../../components/ds/foundation/Typography';
+import { Icon } from '../../../../components/ds/foundation/Icon';
+
 export default function SidebarEmptyState() {
   return (
-    <div className="flex-1 flex flex-col items-center justify-center p-8 text-center relative overflow-hidden">
-      {/* Ambient glow backgrounds */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-bk-yellow/5 rounded-full blur-3xl pointer-events-none"></div>
+    <div className="flex-1 flex flex-col items-center justify-center p-8 text-center relative overflow-hidden animate-in fade-in duration-1000 bg-transparent">
+      {/* Decorative Background Blur */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-bk-yellow/[0.04] rounded-full blur-[100px] pointer-events-none animate-pulse"></div>
       
-      <div className="relative z-10 flex flex-col items-center max-w-[200px]">
-        <div className="relative mb-6">
-          {/* Background circles for depth */}
-          <div className="absolute inset-0 scale-[1.5] bg-slate-100 dark:bg-white/5 rounded-full blur-xl opacity-50"></div>
-          <div className="relative w-16 h-16 bg-white dark:bg-bk-side rounded-2xl flex items-center justify-center shadow-md border border-slate-100 dark:border-white/5 transition-all">
-            <span className="material-symbols-outlined text-3xl text-slate-400 dark:text-slate-500" style={{ fontVariationSettings: "'wght' 200" }}>account_tree</span>
-          </div>
-          {/* Floating smaller icon */}
-          <div className="absolute -top-2 -right-2 w-8 h-8 bg-bk-yellow rounded-lg flex items-center justify-center shadow-md transition-all">
-            <span className="material-symbols-outlined text-bk-side text-[18px]" style={{ fontVariationSettings: "'wght' 500" }}>dns</span>
+      <div className="relative z-10 flex flex-col items-center max-w-[280px]">
+        {/* Animated Icon Group */}
+        <div className="relative mb-12 w-24 h-24 mx-auto flex items-center justify-center group">
+          {/* Outer Glow */}
+          <div className="absolute inset-0 scale-[2.5] bg-bk-yellow/[0.03] rounded-full blur-3xl opacity-50 group-hover:scale-[3] transition-transform duration-1000"></div>
+          
+          {/* Main Icon Container */}
+          <div className="relative w-24 h-24 bg-white dark:bg-white/[0.03] rounded-[2.25rem] flex items-center justify-center shadow-2xl border border-white/5 transition-all group-hover:-translate-y-2 duration-700 backdrop-blur-sm">
+            <Icon name="dns" size="xl" className="text-slate-300 dark:text-bk-yellow opacity-90 drop-shadow-[0_0_15px_rgba(255,193,7,0.3)]" weight={300} />
           </div>
         </div>
         
-        <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200 tracking-tight mb-2">No Server Selected</h3>
-        <p className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-500 font-medium">
-          Select a connection from the list above to manage databases, brokers, and view logs.
-        </p>
+        {/* Typography Content */}
+        <Typography variant="h3" className="text-xs font-black text-slate-800 dark:text-bk-yellow tracking-[0.3em] uppercase mb-5 leading-none opacity-90 drop-shadow-sm">
+          No Node Selected
+        </Typography>
         
-        {/* Subtle pointing arrow for UX */}
-        <div className="mt-8 animate-bounce opacity-30">
-          <span className="material-symbols-outlined text-slate-400 text-[20px]">expand_less</span>
+        <Typography variant="p" className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400/60 font-medium tracking-tight px-4 max-w-[240px]">
+          Select a system node from the host list to visualize architecture, manage brokers, and stream real-time logs.
+        </Typography>
+        
+        {/* Animated Visual Cue */}
+        <div className="mt-14 flex flex-col items-center space-y-4 opacity-30">
+          <div className="w-px h-16 bg-gradient-to-b from-bk-yellow to-transparent"></div>
+          <Icon name="keyboard_arrow_down" size="sm" className="animate-bounce text-bk-yellow"  weight={300} />
         </div>
       </div>
     </div>

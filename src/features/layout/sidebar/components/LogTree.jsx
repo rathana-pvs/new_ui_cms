@@ -1,6 +1,10 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { setSelectedBroker, setSelectedBrokerSubItem, fetchBrokerLogs, fetchAdminLogs, fetchCMSLogs, fetchDatabaseLogs } from '../../../broker/brokerSlice';
 import { openTab } from '../../layoutSlice';
+import { TreeNode } from '../../../../components/domain/tree/TreeNode';
+import { Spinner } from '../../../../components/ds/foundation/Spinner';
+import { Typography } from '../../../../components/ds/foundation/Typography';
+import { Icon } from '../../../../components/ds/foundation/Icon';
 
 export default function LogTree({ hostUid }) {
   const dispatch = useDispatch();
@@ -8,312 +12,232 @@ export default function LogTree({ hostUid }) {
   const { brokers, logsByBroker, logsLoading, adminLogsByHost, adminLogsLoading, cmsLogsByHost, selectedBrokerSubItem, dbLogsByDbName, dbLogsLoading } = useSelector((state) => state.broker);
 
   return (
-    <div className="space-y-1">
-      <details className="group/log-broker">
-        <summary 
-          className={`flex items-center gap-1 px-3 py-1.5 cursor-pointer list-none rounded-lg transition-all duration-200 select-none mb-1.5 group/sum border
-            ${selectedBrokerSubItem === 'log-broker-root' ? 'bg-bk-yellow/5 text-amber-600 dark:text-bk-yellow border-bk-yellow/40 dark:border-bk-yellow/20' : 'bg-white/40 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:border-bk-yellow/30 hover:text-amber-600 dark:hover:text-bk-yellow'}`}
-          onClick={() => {
-            dispatch(setSelectedBroker(null));
-            dispatch(setSelectedBrokerSubItem('log-broker-root'));
-          }}
-        >
-          <span className={`material-symbols-outlined text-[16px] group-open/log-broker:rotate-90 transition-transform ${selectedBrokerSubItem === 'log-broker-root' ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500'}`} style={{ fontVariationSettings: "'wght' 300" }}>chevron_right</span>
-          <span className={`material-symbols-outlined transition-colors text-[16px] ${selectedBrokerSubItem === 'log-broker-root' ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500 group-hover:text-amber-600 dark:group-hover:text-bk-yellow'}`} style={{ fontVariationSettings: "'wght' 300" }}>hub</span>
-          <span className={`text-[11.5px] font-medium tracking-tight ${selectedBrokerSubItem === 'log-broker-root' ? 'text-amber-600 dark:text-bk-yellow' : ''}`}>Broker</span>
-        </summary>
-        
-        <div className="ml-[22px] border-l border-slate-200 dark:border-slate-800 space-y-0.5 py-1">
-          <details className="group/log-access">
-            <summary 
-              className={`flex items-center gap-2 px-3.5 py-1.5 cursor-pointer list-none rounded-r-md transition-all select-none group/item relative border
-                ${selectedBrokerSubItem === 'log-access' ? 'text-amber-600 dark:text-bk-yellow font-medium border-transparent' : 'text-slate-700 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow border-transparent'}`}
-              onClick={() => {
-                dispatch(setSelectedBroker(null));
-                dispatch(setSelectedBrokerSubItem('log-access'));
-              }}
-            >
-              <span className={`material-symbols-outlined text-[14px] group-open/log-access:rotate-90 transition-transform ${selectedBrokerSubItem === 'log-access' ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500'}`}>chevron_right</span>
-              <span className={`material-symbols-outlined text-[16px] ${selectedBrokerSubItem === 'log-access' ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500 group-hover/item:text-amber-600 dark:group-hover/item:text-bk-yellow'}`}>login</span>
-              <span className="text-[11px] tracking-wide">Access</span>
-              {selectedBrokerSubItem === 'log-access' && (
-                <div className="absolute left-[-1px] top-0 bottom-0 w-[2px] bg-amber-600 dark:bg-bk-yellow rounded-full"></div>
-              )}
-            </summary>
-            <div className="ml-4 border-l border-slate-100 dark:border-slate-800/50 mt-0.5 space-y-0.5 whitespace-nowrap overflow-hidden">
-              {/* Children here */}
-            </div>
-          </details>
+    <div className="space-y-0.5 px-1 py-1">
+      {/* Broker Logs Section */}
+      <TreeNode
+        label="Broker"
+        icon="hub"
+        isActive={selectedBrokerSubItem === 'log-broker-root'}
+        hasChildren={true}
+        onSelect={() => {
+          dispatch(setSelectedBroker(null));
+          dispatch(setSelectedBrokerSubItem('log-broker-root'));
+        }}
+      >
+        <div className="space-y-0.5">
+          {/* Access Logs */}
+          <TreeNode
+            label="Access"
+            icon="login"
+            isActive={selectedBrokerSubItem === 'log-access'}
+            hasChildren={false}
+            onSelect={() => {
+              dispatch(setSelectedBroker(null));
+              dispatch(setSelectedBrokerSubItem('log-access'));
+            }}
+          />
 
-          <details 
-            className="group/log-error"
-            onToggle={(e) => {
-              if (e.target.open && !logsLoading) {
+          {/* Error Logs */}
+          <TreeNode 
+            label="Error"
+            icon="report"
+            isActive={selectedBrokerSubItem === 'log-error'}
+            hasChildren={true}
+            onSelect={() => {
+              dispatch(setSelectedBroker(null));
+              dispatch(setSelectedBrokerSubItem('log-error'));
+            }}
+            onToggle={() => {
+              if (!logsLoading) {
                 brokers.forEach(broker => {
                   if (!logsByBroker[broker.name]) {
-                    dispatch(fetchBrokerLogs({ hostUid: hostUid, brokerName: broker.name }));
+                    dispatch(fetchBrokerLogs({ hostUid, brokerName: broker.name }));
                   }
                 });
               }
             }}
           >
-            <summary 
-              className={`flex items-center gap-2 px-3.5 py-1.5 cursor-pointer list-none rounded-r-md transition-all select-none group/item relative border
-                ${selectedBrokerSubItem === 'log-error' ? 'text-amber-600 dark:text-bk-yellow font-medium border-transparent' : 'text-slate-700 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow border-transparent'}`}
-              onClick={() => {
-                dispatch(setSelectedBroker(null));
-                dispatch(setSelectedBrokerSubItem('log-error'));
-              }}
-            >
-              <span className={`material-symbols-outlined text-[14px] group-open/log-error:rotate-90 transition-transform ${selectedBrokerSubItem === 'log-error' ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500'}`}>chevron_right</span>
-              <span className={`material-symbols-outlined text-[16px] ${selectedBrokerSubItem === 'log-error' ? 'text-rose-400/80 dark:text-rose-500/80 group-hover/item:text-rose-500 dark:group-hover/item:text-rose-400' : 'text-rose-400/80 dark:text-rose-500/80'}`}>report</span>
-              <span className="text-[11px] tracking-wide">Error</span>
-              {selectedBrokerSubItem === 'log-error' && (
-                <div className="absolute left-[-1px] top-0 bottom-0 w-[2px] bg-amber-600 dark:bg-bk-yellow rounded-full"></div>
-              )}
-            </summary>
-            <div className="ml-4 border-l border-slate-100 dark:border-slate-800/50 mt-0.5 space-y-0.5 whitespace-nowrap overflow-hidden">
-              {logsLoading && <div className="px-4 py-1.5 text-[10px] text-slate-400 animate-pulse">Loading error logs...</div>}
+            <div className="space-y-0.5">
+              {logsLoading && <div className="px-4 py-2 flex items-center gap-3 animate-pulse"><Spinner size="xs" color="bk-yellow" /><Typography variant="caption" className="text-slate-400">Loading...</Typography></div>}
               {(() => {
                 const errorLogs = Object.values(logsByBroker)
                   .flat()
                   .filter(log => log.path.toLowerCase().endsWith('.err'));
 
                 if (!logsLoading && errorLogs.length === 0) {
-                  return <div className="px-4 py-1.5 text-[10px] text-slate-400 italic">No error logs found</div>;
+                  return <div className="px-5 py-2"><Typography variant="caption" className="italic text-slate-500 opacity-60">No error logs found</Typography></div>;
                 }
 
                 return errorLogs.map((log, idx) => {
                   const fileName = log.path.split('/').pop();
                   const isLogSelected = selectedBrokerSubItem === log.path;
                   return (
-                    <button
+                    <TreeNode
                       key={idx}
-                      className={`flex items-center gap-3 px-4 py-1.5 w-full text-left transition-all duration-200 group/child relative rounded-r-md select-none border
-                        ${isLogSelected ? 'text-amber-600 dark:text-bk-yellow bg-bk-yellow/5 dark:bg-bk-yellow/5 font-medium border-transparent' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow border-transparent'}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
+                      label={fileName}
+                      icon="description"
+                      isActive={isLogSelected}
+                      level={2}
+                      onSelect={() => {
                         dispatch(setSelectedBroker(null));
                         dispatch(setSelectedBrokerSubItem(log.path));
                       }}
-                      onDoubleClick={(e) => {
-                        e.stopPropagation();
-                        dispatch(openTab(`log:${hostUid}:${log.path}`));
-                      }}
-                    >
-                      <span className={`material-symbols-outlined text-[15px]
-                        ${isLogSelected ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500 group-hover/child:text-amber-600 dark:group-hover/child:text-bk-yellow'}`}>
-                        description
-                      </span>
-                      <span className="text-[10.5px] tracking-wide truncate" title={fileName}>{fileName}</span>
-                      {isLogSelected && (
-                        <div className="absolute left-[-1px] top-0 bottom-0 w-[2px] bg-amber-600 dark:bg-bk-yellow rounded-full"></div>
-                      )}
-                    </button>
+                      onDoubleClick={() => dispatch(openTab(`log:${hostUid}:${log.path}`))}
+                    />
                   );
                 });
               })()}
             </div>
-          </details>
+          </TreeNode>
 
-          <details 
-            className="group/log-admin"
-            onToggle={(e) => {
-              if (e.target.open && !adminLogsByHost[hostUid] && !adminLogsLoading) {
+          {/* Admin Logs */}
+          <TreeNode 
+            label="Admin Log"
+            icon="admin_panel_settings"
+            isActive={selectedBrokerSubItem === 'log-admin'}
+            hasChildren={true}
+            onSelect={() => {
+              dispatch(setSelectedBroker(null));
+              dispatch(setSelectedBrokerSubItem('log-admin'));
+            }}
+            onToggle={() => {
+              if (!adminLogsByHost[hostUid] && !adminLogsLoading) {
                 dispatch(fetchAdminLogs(hostUid));
               }
             }}
           >
-            <summary 
-              className={`flex items-center gap-2 px-3.5 py-1.5 cursor-pointer list-none rounded-r-md transition-all select-none group/item relative border
-                ${selectedBrokerSubItem === 'log-admin' ? 'text-amber-600 dark:text-bk-yellow font-medium border-transparent' : 'text-slate-700 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow border-transparent'}`}
-              onClick={() => {
-                dispatch(setSelectedBroker(null));
-                dispatch(setSelectedBrokerSubItem('log-admin'));
-              }}
-            >
-              <span className={`material-symbols-outlined text-[14px] group-open/log-admin:rotate-90 transition-transform ${selectedBrokerSubItem === 'log-admin' ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500'}`}>chevron_right</span>
-              <span className={`material-symbols-outlined text-[16px] ${selectedBrokerSubItem === 'log-admin' ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500 group-hover/item:text-amber-600 dark:group-hover/item:text-bk-yellow'}`}>admin_panel_settings</span>
-              <span className="text-[11px] tracking-wide">Admin Log</span>
-              {selectedBrokerSubItem === 'log-admin' && (
-                <div className="absolute left-[-1px] top-0 bottom-0 w-[2px] bg-amber-600 dark:bg-bk-yellow rounded-full"></div>
-              )}
-            </summary>
-            <div className="ml-4 border-l border-slate-100 dark:border-slate-800/50 mt-0.5 space-y-0.5 whitespace-nowrap overflow-hidden">
-              {adminLogsLoading && <div className="px-4 py-1.5 text-[10px] text-slate-400 animate-pulse">Loading logs...</div>}
+            <div className="space-y-0.5">
+              {adminLogsLoading && <div className="px-4 py-2 flex items-center gap-3 animate-pulse"><Spinner size="xs" color="bk-yellow" /><Typography variant="caption" className="text-slate-400">Loading...</Typography></div>}
               {(adminLogsByHost[hostUid] || []).map((log, idx) => {
                 const fileName = log.path.split('/').pop();
                 const isLogSelected = selectedBrokerSubItem === log.path;
                 return (
-                  <button
+                  <TreeNode
                     key={idx}
-                    className={`flex items-center gap-3 px-4 py-1.5 w-full text-left transition-all duration-200 group/child relative rounded-r-md select-none border
-                      ${isLogSelected ? 'text-amber-600 dark:text-bk-yellow bg-bk-yellow/5 dark:bg-bk-yellow/5 font-medium border-transparent' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow border-transparent'}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
+                    label={fileName}
+                    icon="description"
+                    isActive={isLogSelected}
+                    level={2}
+                    onSelect={() => {
                       dispatch(setSelectedBroker(null));
                       dispatch(setSelectedBrokerSubItem(log.path));
                     }}
-                    onDoubleClick={(e) => {
-                      e.stopPropagation();
-                      dispatch(openTab(`log:${hostUid}:${log.path}`));
-                    }}
-                  >
-                    <span className={`material-symbols-outlined text-[15px]
-                      ${isLogSelected ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500 group-hover/child:text-amber-600 dark:group-hover/child:text-bk-yellow'}`}>
-                      description
-                    </span>
-                    <span className="text-[10.5px] tracking-wide truncate" title={fileName}>{fileName}</span>
-                    {isLogSelected && (
-                      <div className="absolute left-[-1px] top-0 bottom-0 w-[2px] bg-amber-600 dark:bg-bk-yellow rounded-full"></div>
-                    )}
-                  </button>
+                    onDoubleClick={() => dispatch(openTab(`log:${hostUid}:${log.path}`))}
+                  />
                 );
               })}
               {!adminLogsLoading && (adminLogsByHost[hostUid] || []).length === 0 && (
-                <div className="px-4 py-1.5 text-[10px] text-slate-400 italic">No admin logs found</div>
+                <div className="px-5 py-2"><Typography variant="caption" className="italic text-slate-500 opacity-60">No admin logs found</Typography></div>
               )}
             </div>
-          </details>
+          </TreeNode>
         </div>
-      </details>
+      </TreeNode>
 
-      <details 
-        className="group/log-manager"
-        onToggle={(e) => {
-          if (e.target.open && !cmsLogsByHost[hostUid] && !logsLoading) {
+      {/* Manager Logs Section */}
+      <TreeNode
+        label="Manager"
+        icon="manage_accounts"
+        isActive={selectedBrokerSubItem === 'log-manager-root'}
+        hasChildren={true}
+        onSelect={() => {
+          dispatch(setSelectedBroker(null));
+          dispatch(setSelectedBrokerSubItem('log-manager-root'));
+        }}
+        onToggle={() => {
+          if (!cmsLogsByHost[hostUid] && !logsLoading) {
             dispatch(fetchCMSLogs(hostUid));
           }
         }}
       >
-        <summary 
-          className={`flex items-center gap-1 px-3 py-1.5 cursor-pointer list-none rounded-lg transition-all duration-200 select-none mb-1.5 group/sum border
-            ${selectedBrokerSubItem === 'log-manager-root' ? 'bg-bk-yellow/5 text-amber-600 dark:text-bk-yellow border-bk-yellow/40 dark:border-bk-yellow/20' : 'bg-white/40 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:border-bk-yellow/30 hover:text-amber-600 dark:hover:text-bk-yellow'}`}
-          onClick={() => {
-            dispatch(setSelectedBroker(null));
-            dispatch(setSelectedBrokerSubItem('log-manager-root'));
-          }}
-        >
-          <span className={`material-symbols-outlined text-[16px] group-open/log-manager:rotate-90 transition-transform ${selectedBrokerSubItem === 'log-manager-root' ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500'}`} style={{ fontVariationSettings: "'wght' 300" }}>chevron_right</span>
-          <span className={`material-symbols-outlined transition-colors text-[16px] ${selectedBrokerSubItem === 'log-manager-root' ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500 group-hover:text-amber-600 dark:group-hover:text-bk-yellow'}`} style={{ fontVariationSettings: "'wght' 300" }}>manage_accounts</span>
-          <span className={`text-[11.5px] font-medium tracking-tight ${selectedBrokerSubItem === 'log-manager-root' ? 'text-amber-600 dark:text-bk-yellow' : ''}`}>Manager</span>
-        </summary>
-        
-        <div className="ml-[22px] border-l border-slate-200 dark:border-slate-800 space-y-0.5 py-1">
-          <button 
-            className={`flex items-center gap-2 px-3.5 py-1.5 w-full text-left transition-all select-none rounded-r-md group/item relative border
-              ${selectedBrokerSubItem === 'cms-access' ? 'text-amber-600 dark:text-bk-yellow bg-bk-yellow/5 dark:bg-bk-yellow/5 font-medium border-transparent' : 'border-transparent text-slate-700 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow'}`}
-            onClick={() => {
+        <div className="space-y-0.5">
+          <TreeNode
+            label="Access log"
+            icon="login"
+            isActive={selectedBrokerSubItem === 'cms-access'}
+            onSelect={() => {
               dispatch(setSelectedBroker(null));
               dispatch(setSelectedBrokerSubItem('cms-access'));
             }}
             onDoubleClick={() => dispatch(openTab(`cms-access:${hostUid}`))}
-          >
-            <span className={`material-symbols-outlined text-[16px] ${selectedBrokerSubItem === 'cms-access' ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500 group-hover/item:text-amber-600 dark:group-hover/item:text-bk-yellow'}`}>login</span>
-            <span className="text-[11px] tracking-wide">Access log</span>
-            {selectedBrokerSubItem === 'cms-access' && (
-              <div className="absolute left-[-1px] top-0 bottom-0 w-[2px] bg-amber-600 dark:bg-bk-yellow rounded-full"></div>
-            )}
-          </button>
-
-          <button 
-            className={`flex items-center gap-2 px-3.5 py-1.5 w-full text-left transition-all select-none rounded-r-md group/item relative border
-              ${selectedBrokerSubItem === 'cms-error' ? 'text-amber-600 dark:text-bk-yellow bg-bk-yellow/5 dark:bg-bk-yellow/5 font-medium border-transparent' : 'border-transparent text-slate-700 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow'}`}
-            onClick={() => {
+          />
+          <TreeNode
+            label="Error log"
+            icon="report"
+            isActive={selectedBrokerSubItem === 'cms-error'}
+            onSelect={() => {
               dispatch(setSelectedBroker(null));
               dispatch(setSelectedBrokerSubItem('cms-error'));
             }}
             onDoubleClick={() => dispatch(openTab(`cms-error:${hostUid}`))}
-          >
-            <span className={`material-symbols-outlined text-[16px] ${selectedBrokerSubItem === 'cms-error' ? 'text-rose-400/80 dark:text-rose-500/80 group-hover/item:text-rose-500 dark:group-hover/item:text-rose-400' : 'text-slate-400 dark:text-slate-500 group-hover/item:text-amber-600 dark:group-hover/item:text-bk-yellow'}`}>report</span>
-            <span className="text-[11px] tracking-wide">Error log</span>
-            {selectedBrokerSubItem === 'cms-error' && (
-              <div className="absolute left-[-1px] top-0 bottom-0 w-[2px] bg-amber-600 dark:bg-bk-yellow rounded-full"></div>
-            )}
-          </button>
+          />
         </div>
-      </details>
+      </TreeNode>
 
-      <details className="group/log-server">
-        <summary 
-          className={`flex items-center gap-1 px-3 py-1.5 cursor-pointer list-none rounded-lg transition-all duration-200 select-none mb-1.5 group/sum border
-            ${selectedBrokerSubItem === 'log-server-root' ? 'bg-bk-yellow/5 text-amber-600 dark:text-bk-yellow border-bk-yellow/40 dark:border-bk-yellow/20' : 'bg-white/40 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:border-bk-yellow/30 hover:text-amber-600 dark:hover:text-bk-yellow'}`}
-          onClick={() => {
-            dispatch(setSelectedBroker(null));
-            dispatch(setSelectedBrokerSubItem('log-server-root'));
-          }}
-        >
-          <span className={`material-symbols-outlined text-[16px] group-open/log-server:rotate-90 transition-transform ${selectedBrokerSubItem === 'log-server-root' ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500'}`} style={{ fontVariationSettings: "'wght' 300" }}>chevron_right</span>
-          <span className={`material-symbols-outlined transition-colors text-[16px] ${selectedBrokerSubItem === 'log-server-root' ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500 group-hover:text-amber-600 dark:group-hover:text-bk-yellow'}`} style={{ fontVariationSettings: "'wght' 300" }}>dns</span>
-          <span className={`text-[11.5px] font-medium tracking-tight ${selectedBrokerSubItem === 'log-server-root' ? 'text-amber-600 dark:text-bk-yellow' : ''}`}>Server logs</span>
-        </summary>
-        
-        <div className="ml-[22px] border-l border-slate-200 dark:border-slate-800 space-y-0.5 py-1">
+      {/* Server/Database Logs Section */}
+      <TreeNode
+        label="Server logs"
+        icon="dns"
+        isActive={selectedBrokerSubItem === 'log-server-root'}
+        hasChildren={true}
+        onSelect={() => {
+          dispatch(setSelectedBroker(null));
+          dispatch(setSelectedBrokerSubItem('log-server-root'));
+        }}
+      >
+        <div className="space-y-0.5">
           {(databases || []).map((db, idx) => (
-            <details 
+            <TreeNode 
               key={idx} 
-              className="group/log-db"
-               onToggle={(e) => {
-                if (e.target.open && !dbLogsByDbName[db.dbname] && !dbLogsLoading) {
-                  dispatch(fetchDatabaseLogs({ hostUid: hostUid, dbname: db.dbname }));
+              label={db.dbname}
+              icon="database"
+              isActive={selectedBrokerSubItem === `log-db-${db.dbname}`}
+              hasChildren={true}
+              onSelect={() => {
+                dispatch(setSelectedBroker(null));
+                dispatch(setSelectedBrokerSubItem(`log-db-${db.dbname}`));
+              }}
+              onToggle={() => {
+                if (!dbLogsByDbName[db.dbname] && !dbLogsLoading) {
+                  dispatch(fetchDatabaseLogs({ hostUid, dbname: db.dbname }));
                 }
               }}
             >
-              <summary 
-                className={`flex items-center gap-2 px-3.5 py-1.5 cursor-pointer list-none rounded-r-md transition-all select-none group/item relative border
-                  ${selectedBrokerSubItem === `log-db-${db.dbname}` ? 'text-amber-600 dark:text-bk-yellow font-medium border-transparent' : 'text-slate-700 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow border-transparent'}`}
-                onClick={() => {
-                  dispatch(setSelectedBroker(null));
-                  dispatch(setSelectedBrokerSubItem(`log-db-${db.dbname}`));
-                }}
-              >
-                <span className={`material-symbols-outlined text-[14px] group-open/log-db:rotate-90 transition-transform ${selectedBrokerSubItem === `log-db-${db.dbname}` ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500'}`}>chevron_right</span>
-                <span className={`material-symbols-outlined text-[16px] ${selectedBrokerSubItem === `log-db-${db.dbname}` ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500 group-hover/item:text-amber-600 dark:group-hover/item:text-bk-yellow'}`}>database</span>
-                <span className="text-[11px] tracking-wide">{db.dbname}</span>
-                {selectedBrokerSubItem === `log-db-${db.dbname}` && (
-                  <div className="absolute left-[-1px] top-0 bottom-0 w-[2px] bg-amber-600 dark:bg-bk-yellow rounded-full"></div>
-                )}
-              </summary>
-              <div className="ml-4 border-l border-slate-100 dark:border-slate-800/50 mt-0.5 space-y-0.5 whitespace-nowrap overflow-hidden">
+              <div className="space-y-0.5">
                   {dbLogsLoading && !dbLogsByDbName[db.dbname] && (
-                    <div className="px-4 py-1.5 text-[10px] text-slate-400 animate-pulse">Loading logs...</div>
+                    <div className="px-4 py-2 flex items-center gap-3 animate-pulse"><Spinner size="xs" color="bk-yellow" /><Typography variant="caption" className="text-slate-400">Loading...</Typography></div>
                   )}
                   {(dbLogsByDbName[db.dbname] || []).map((log, lIdx) => {
                     const fileName = log.path.split('/').pop();
                     const isLogSelected = selectedBrokerSubItem === log.path;
                     return (
-                      <button 
+                      <TreeNode 
                         key={lIdx}
-                        className={`flex items-center gap-3 px-4 py-1.5 w-full text-left transition-all duration-200 group/child relative rounded-r-md select-none border
-                          ${isLogSelected ? 'text-amber-600 dark:text-bk-yellow bg-bk-yellow/5 dark:bg-bk-yellow/5 font-medium border-transparent' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-amber-600 dark:hover:text-bk-yellow border-transparent'}`}
-                        onClick={() => {
+                        label={fileName}
+                        icon="description"
+                        isActive={isLogSelected}
+                        level={2}
+                        onSelect={() => {
                           dispatch(setSelectedBroker(null));
                           dispatch(setSelectedBrokerSubItem(log.path));
                         }}
                         onDoubleClick={() => dispatch(openTab(`log:${hostUid}:${log.path}`))}
-                      >
-                        <span className={`material-symbols-outlined text-[15px]
-                          ${isLogSelected ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500 group-hover/child:text-amber-600 dark:group-hover/child:text-bk-yellow'}`}>
-                          description
-                        </span>
-                        <span className="text-[10.5px] tracking-wide truncate" title={fileName}>{fileName}</span>
-                        {isLogSelected && (
-                          <div className="absolute left-[-1px] top-0 bottom-0 w-[2px] bg-amber-600 dark:bg-bk-yellow rounded-full"></div>
-                        )}
-                      </button>
+                      />
                     );
                   })}
                   {!dbLogsLoading && (dbLogsByDbName[db.dbname] || []).length === 0 && (
-                    <div className="px-4 py-1.5 text-[10px] text-slate-400 italic">No logs found</div>
+                    <div className="px-5 py-2"><Typography variant="caption" className="italic text-slate-500 opacity-60">No logs found</Typography></div>
                   )}
               </div>
-            </details>
+            </TreeNode>
           ))}
           {(!databases || databases.length === 0) && (
-            <div className="px-4 py-1.5 text-[10px] text-slate-400 italic">No databases found</div>
+            <div className="px-6 py-4 flex flex-col items-center justify-center opacity-40">
+               <Typography variant="caption" className="italic">No databases available</Typography>
+            </div>
           )}
         </div>
-      </details>
+      </TreeNode>
     </div>
   );
 }

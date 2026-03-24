@@ -1,6 +1,8 @@
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { setSelectedHost } from '../../../host/hostSlice';
 import { setActiveMainTab } from '../../layoutSlice';
+import { Typography } from '../../../../components/ds/foundation/Typography';
+import { Icon } from '../../../../components/ds/foundation/Icon';
 
 export default function ServerListItem({ host, isSelected, isAuthorized, onContextMenu }) {
   const dispatch = useDispatch();
@@ -8,10 +10,10 @@ export default function ServerListItem({ host, isSelected, isAuthorized, onConte
   return (
     <div
       title={`${host.address}:${host.port}`}
-      className={`flex flex-col px-3 py-2 cursor-pointer transition-all select-none rounded-lg group relative mb-1.5 border
+      className={`flex flex-col px-4 py-1.5 cursor-pointer transition-all select-none rounded-xl group relative mb-1 border
         ${isSelected
-          ? 'bg-bk-yellow/5 border-bk-yellow/40 dark:border-bk-yellow/20'
-          : 'bg-white/40 dark:bg-white/5 border-slate-200 dark:border-white/10 hover:border-bk-yellow/30'
+          ? 'bg-bk-yellow/5 border-bk-yellow/40 dark:border-bk-yellow/20 shadow-lg shadow-bk-yellow/5'
+          : 'bg-white/40 dark:bg-white/5 border-slate-200 dark:border-white/5 hover:border-bk-yellow/30 hover:bg-slate-50 dark:hover:bg-white/[0.08]'
         }`}
       onClick={() => {
         dispatch(setSelectedHost(host.uid));
@@ -19,30 +21,41 @@ export default function ServerListItem({ host, isSelected, isAuthorized, onConte
       }}
       onContextMenu={(e) => onContextMenu(e, host.alias || host.id, host.uid, host.alias || host.id)}
     >
-      <div className="flex items-center gap-1.5">
-        <div className={`flex-shrink-0 w-5 h-5 rounded-[4px] transition-all flex items-center justify-center
-          ${isSelected ? 'bg-bk-yellow/10 dark:bg-bk-yellow/10 text-amber-600 dark:text-bk-yellow' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 group-hover:bg-slate-200 dark:group-hover:bg-slate-700'}`}>
-          <span className={`material-symbols-outlined text-[13px] leading-none ${isSelected ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 group-hover:text-amber-600 dark:group-hover:text-bk-yellow'}`} style={{ fontVariationSettings: "'wght' 300" }}>
-            {isSelected ? 'dns' : 'storage'}
-          </span>
+      <div className="flex items-center gap-3">
+        <div className={`flex-shrink-0 w-7 h-7 rounded-xl transition-all duration-300 flex items-center justify-center border
+          ${isSelected 
+            ? 'bg-bk-yellow border-bk-yellow/20 shadow-md shadow-bk-yellow/20 rotate-0' 
+            : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-white/10 text-slate-400 group-hover:rotate-6 group-hover:border-bk-yellow/30'}`}>
+          <Icon 
+            name={isSelected ? 'dns' : 'storage'} 
+            size="12px" 
+            className={isSelected ? 'text-bk-side' : 'text-slate-400 group-hover:text-bk-yellow'} 
+            weight={isSelected ? 900 : 300}
+          />
         </div>
 
         <div className="flex flex-col min-w-0 flex-1">
           <div className="flex items-center justify-between gap-2">
-            <span className={`text-[13px] font-semibold truncate tracking-tight transition-colors 
-              ${isSelected ? 'text-amber-600 dark:text-bk-yellow font-bold' : 'text-slate-800 dark:text-slate-300 group-hover:text-amber-600 dark:group-hover:text-bk-yellow'}`}>
+            <Typography 
+              variant="span" 
+              className={`text-[13px] font-medium truncate tracking-tight transition-colors 
+                ${isSelected ? 'text-bk-yellow' : 'text-slate-700 dark:text-slate-300 group-hover:text-bk-yellow'}`}
+            >
               {host.alias || host.id}
-            </span>
+            </Typography>
             {isAuthorized && (
-              <div className="flex items-center gap-1">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.5)] flex-shrink-0"></span>
+              <div className="relative group/status">
+                <span className="size-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)] flex-shrink-0 animate-pulse"></span>
+                <div className="absolute right-0 top-full mt-1 bg-bk-side text-[8px] px-1.5 py-0.5 rounded opacity-0 group-hover/status:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                  Authorized
+                </div>
               </div>
             )}
           </div>
         </div>
       </div>
       {isSelected && (
-        <div className="absolute left-[-1px] top-2 bottom-2 w-[2px] bg-amber-600 dark:bg-bk-yellow rounded-full"></div>
+        <div className="absolute left-[-1px] top-3 bottom-3 w-[3px] bg-bk-yellow rounded-full shadow-[0_0_10px_rgba(255,193,7,0.5)]"></div>
       )}
     </div>
   );

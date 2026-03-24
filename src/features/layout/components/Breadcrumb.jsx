@@ -1,15 +1,21 @@
-import { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { SubMenu, MenuItem, MenuDivider } from '../../../components/common/DropdownMenu';
-import ConfirmModal from '../../../components/common/ConfirmModal';
+import { MenuItem, MenuDivider } from '../../../components/common/DropdownMenu';
+import { ConfirmDialog } from '../../../components/ds/layout/ConfirmDialog';
 import ContextMenuWrapper from '../../../components/common/ContextMenuWrapper';
-
-
 import TabItem from './TabItem';
 
-export default function Breadcrumb({ activeTab, onTabChange, openTabs = [], onCloseTab, onCloseOthers, onCloseAll, labels = {} }) {
+export default function Breadcrumb({ 
+  activeTab, 
+  onTabChange, 
+  openTabs = [], 
+  onCloseTab, 
+  onCloseOthers, 
+  onCloseAll, 
+  labels = {} 
+}) {
   const [contextMenu, setContextMenu] = useState(null);
-  const [confirmModal, setConfirmModal] = useState({ isOpen: false, onConfirm: null, message: '' });
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, onConfirm: null, title: '', message: '' });
   const { dirtyTabs } = useSelector((state) => state.layout);
 
   useEffect(() => {
@@ -24,7 +30,7 @@ export default function Breadcrumb({ activeTab, onTabChange, openTabs = [], onCl
 
   const handleCloseTab = (tabId, queue = []) => {
     if (dirtyTabs.includes(tabId)) {
-      onTabChange(tabId); // Switch to the dirty tab so user sees contents
+      onTabChange(tabId);
       setConfirmModal({
         isOpen: true,
         title: 'Discard Changes?',
@@ -33,8 +39,7 @@ export default function Breadcrumb({ activeTab, onTabChange, openTabs = [], onCl
           onCloseTab(tabId);
           if (queue.length > 1) {
             const nextQueue = queue.slice(1);
-            setConfirmModal({ ...confirmModal, isOpen: false });
-            // Small timeout to allow modal to cycle
+            setConfirmModal(prev => ({ ...prev, isOpen: false }));
             setTimeout(() => handleCloseTab(nextQueue[0], nextQueue), 100);
           }
         }
@@ -53,7 +58,6 @@ export default function Breadcrumb({ activeTab, onTabChange, openTabs = [], onCl
     const dirtyOthers = others.filter(tid => dirtyTabs.includes(tid));
     const cleanOthers = others.filter(tid => !dirtyTabs.includes(tid));
 
-    // Immediately close clean tabs
     cleanOthers.forEach(tid => onCloseTab(tid));
 
     if (dirtyOthers.length > 0) {
@@ -65,7 +69,6 @@ export default function Breadcrumb({ activeTab, onTabChange, openTabs = [], onCl
     const dirtyOnes = openTabs.filter(tid => dirtyTabs.includes(tid));
     const cleanOnes = openTabs.filter(tid => !dirtyTabs.includes(tid));
 
-    // Immediately close clean tabs
     cleanOnes.forEach(tid => onCloseTab(tid));
 
     if (dirtyOnes.length > 0) {
@@ -75,11 +78,7 @@ export default function Breadcrumb({ activeTab, onTabChange, openTabs = [], onCl
 
   const handleContextMenu = (e, tabId) => {
     e.preventDefault();
-    setContextMenu({
-      x: e.clientX,
-      y: e.clientY,
-      tabId
-    });
+    setContextMenu({ x: e.clientX, y: e.clientY, tabId });
   };
 
   const getTabIcon = (id) => {
@@ -93,16 +92,12 @@ export default function Breadcrumb({ activeTab, onTabChange, openTabs = [], onCl
 
   const getTabLabel = (id) => {
     if (labels[id]) return labels[id];
-    switch (id) {
-      case 'server': return 'server';
-      case 'demodb': return 'demodb';
-      default: return id;
-    }
+    return id;
   };
 
   return (
-    <div className="bg-slate-50 dark:bg-bk-main border-b border-slate-200 dark:border-slate-800 font-sans relative">
-      <div className="flex overflow-x-auto scrollbar-hide">
+    <div className="bg-slate-50 dark:bg-bk-main border-b border-slate-200 dark:border-white/5 font-sans relative">
+      <div className="flex overflow-x-auto scrollbar-hide h-10">
         {openTabs.map((tabId) => (
           <TabItem
             key={tabId}
@@ -157,11 +152,14 @@ export default function Breadcrumb({ activeTab, onTabChange, openTabs = [], onCl
         </ContextMenuWrapper>
       )}
  
-      <ConfirmModal 
+      <ConfirmDialog 
         isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
         message={confirmModal.message}
         onConfirm={confirmModal.onConfirm}
-        onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
+        onClose={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+        confirmText="Discard Changes"
+        type="warning"
       />
     </div>
   );

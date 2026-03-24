@@ -1,18 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import { logout, fetchUser } from '../../auth/authSlice';
 import { fetchPreferences } from '../../user/userSlice';
 import UserProfileModal from '../../user/components/UserProfileModal';
-import { DropdownMenu, SubMenu, MenuItem, MenuDivider } from '../../../components/common/DropdownMenu';
-import { openTab, showStatusModal } from '../layoutSlice';
-import { openAddHostModal, openEditHostModal, startService, stopService } from '../../host/hostSlice';
-import { startDatabase, stopDatabase, fetchDatabaseStartInfo } from '../../database/databaseSlice';
-import { startBroker, stopBroker, fetchBrokerList } from '../../broker/brokerSlice';
+import { showStatusModal } from '../layoutSlice';
+import { fetchDatabaseStartInfo, startDatabase } from '../../database/databaseSlice';
+import { fetchBrokerList, startBroker } from '../../broker/brokerSlice';
 import { setAboutCubrid } from '../appBarSlice';
+import { Typography } from '../../../components/ds/foundation/Typography';
+import { Icon } from '../../../components/ds/foundation/Icon';
 import AboutModal from './AboutModal';
-import { openServerVersionModal } from '../../host/hostSlice';
-
 import HeaderMenu from './HeaderMenu';
 
 export default function Header({ theme, toggleTheme }) {
@@ -32,94 +29,85 @@ export default function Header({ theme, toggleTheme }) {
 
   const handleLogout = () => {
     dispatch(logout());
-    // Use window.location.href to force a full page refresh and clear all in-memory state
     window.location.href = '/login';
   };
 
   return (
     <>
-      <header className="bg-white dark:bg-bk-side border-b border-slate-200 dark:border-slate-800 h-16 flex items-center justify-between px-6">
-
+      <header className="bg-white dark:bg-bk-side border-b border-slate-200 dark:border-white/10 h-16 flex items-center justify-between px-6 z-40">
         <div className="flex items-center gap-6">
           <HeaderMenu />
-          <div className="h-6 w-px bg-slate-200 dark:border-slate-800"></div>
-          <div className="flex items-center gap-1.5 ml-2">
+          <div className="h-6 w-px bg-slate-200 dark:bg-white/5 opacity-50"></div>
+          
+          <div className="flex items-center gap-1 ml-1 scale-95 origin-left">
             <button 
-              className={`w-9 h-9 flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors group
-                ${(!selectedDatabase && !selectedBroker) ? 'opacity-30 cursor-not-allowed' : ''}`} 
+              className={`size-9 flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-all group
+                ${(!selectedDatabase && !selectedBroker) ? 'opacity-30 cursor-not-allowed' : 'active:scale-95'}`} 
               title="Start Selected"
               onClick={() => {
                 if (selectedDatabase && !activeDatabases.includes(selectedDatabase)) {
                   dispatch(startDatabase({ hostUid: selectedHostUid, dbname: selectedDatabase }))
                     .unwrap()
-                    .then(() => {
-                      dispatch(fetchDatabaseStartInfo(selectedHostUid));
-                    })
+                    .then(() => dispatch(fetchDatabaseStartInfo(selectedHostUid)))
                     .catch(err => dispatch(showStatusModal({ type: 'error', title: 'Start Failed', message: err })));
                 } else if (selectedBroker) {
                   const broker = brokers.find(b => b.name === selectedBroker);
                   if (broker && broker.state !== 'ON') {
                     dispatch(startBroker({ hostUid: selectedHostUid, brokerName: selectedBroker }))
                       .unwrap()
-                      .then(() => {
-                        dispatch(fetchBrokerList(selectedHostUid));
-                      })
+                      .then(() => dispatch(fetchBrokerList(selectedHostUid)))
                       .catch(err => dispatch(showStatusModal({ type: 'error', title: 'Start Failed', message: err })));
                   }
                 }
               }}
             >
-              <span className="material-symbols-outlined text-slate-400 text-[20px] group-hover:text-bk-yellow transition-colors leading-none" style={{ fontVariationSettings: "'wght' 300" }}>play_arrow</span>
+              <Icon name="play_arrow" size="sm" className="text-slate-400 group-hover:text-bk-yellow transition-colors"  weight={300} />
             </button>
-            <button className="w-9 h-9 flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors group" title="Dashboard">
-              <span className="material-symbols-outlined text-slate-400 text-[20px] group-hover:text-bk-yellow transition-colors leading-none" style={{ fontVariationSettings: "'wght' 300" }}>grid_view</span>
+            <button className="size-9 flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-all active:scale-95 group" title="Dashboard">
+              <Icon name="grid_view" size="sm" className="text-slate-400 group-hover:text-bk-yellow transition-colors"  weight={300} />
             </button>
-            <button className="w-9 h-9 flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors group" title="Refresh">
-              <span className="material-symbols-outlined text-slate-400 text-[20px] group-hover:text-bk-yellow transition-colors leading-none" style={{ fontVariationSettings: "'wght' 300" }}>refresh</span>
+            <button className="size-9 flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-all active:scale-95 group" title="Refresh">
+              <Icon name="refresh" size="sm" className="text-slate-400 group-hover:text-bk-yellow transition-colors"  weight={300} />
             </button>
           </div>
-
         </div>
-        <div className="flex items-center gap-4">
 
+        <div className="flex items-center gap-4">
           <button
-            className="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full transition-colors flex items-center justify-center"
+            className="p-2.5 text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl transition-all active:scale-95 flex items-center justify-center"
             onClick={toggleTheme}
             title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
           >
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'wght' 300" }}>
-              {theme === 'light' ? 'dark_mode' : 'light_mode'}
-            </span>
+            <Icon name={theme === 'light' ? 'dark_mode' : 'light_mode'} size="sm"  weight={300} />
           </button>
 
           <div
-            className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-slate-800 cursor-pointer hover:bg-slate-100 dark:hover:bg-white/10 transition-all group/profile"
+            className="flex items-center gap-2.5 pl-3 pr-1.5 py-1.5 rounded-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 cursor-pointer hover:bg-slate-100 dark:hover:bg-white/10 transition-all group/profile"
             onClick={() => setIsProfileOpen(true)}
           >
             {authLoading ? (
-              <div className="flex items-center gap-2">
-                <div className="h-3 w-12 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
-                <div className="h-5 w-5 rounded-full bg-slate-200 dark:bg-slate-700 animate-pulse"></div>
-              </div>
+               <div className="flex items-center gap-2 px-2">
+                 <div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded animate-pulse"></div>
+                 <div className="size-6 rounded-full bg-slate-200 dark:bg-slate-800 animate-pulse"></div>
+               </div>
             ) : (
               <>
-                <span className="text-[11px] font-normal text-slate-700 dark:text-slate-300 tracking-wide">
+                <Typography variant="caption" className="font-bold text-slate-600 dark:text-slate-400 tracking-wide uppercase text-[10px]">
                   {user?.id || 'Admin'}
-                </span>
-                <div className="h-6 w-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center transition-transform group-hover/profile:scale-105">
-                  <span className="material-symbols-outlined text-slate-500 text-[14px]">
-                    {authError ? 'error' : 'person'}
-                  </span>
+                </Typography>
+                <div className="size-6 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center transition-transform group-hover/profile:scale-105 overflow-hidden">
+                   <Icon name={authError ? 'error' : 'person'} size="xs" className="text-slate-500"  weight={300} />
                 </div>
               </>
             )}
           </div>
+
           <button
-            className="p-2 text-slate-500 hover:bg-accent-red/10 hover:text-accent-red rounded-full transition-colors flex items-center justify-center"
+            className="p-2.5 text-slate-400 hover:bg-accent-red/10 hover:text-accent-red rounded-xl transition-all active:scale-95 flex items-center justify-center"
             onClick={handleLogout}
             title="Logout"
           >
-            <span className="material-symbols-outlined text-[20px]">logout</span>
+            <Icon name="logout" size="sm"  weight={300} />
           </button>
         </div>
       </header>

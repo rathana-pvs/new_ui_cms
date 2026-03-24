@@ -1,7 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { hostApi } from '../../host/hostApi';
 import { showStatusModal, setTabDirty } from '../../layout/layoutSlice';
+import { Typography } from '../../../components/ds/foundation/Typography';
+import { Icon } from '../../../components/ds/foundation/Icon';
+import { Spinner } from '../../../components/ds/foundation/Spinner';
 
 import ConfigEditorToolbar from './broker/ConfigEditorToolbar';
 import ConfigTableEditor from './broker/ConfigTableEditor';
@@ -220,7 +223,7 @@ export default function BrokerConfigEditor({ hostUid }) {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-slate-50 dark:bg-bk-main overflow-hidden font-sans">
+    <div className="flex-1 flex flex-col bg-slate-50 dark:bg-bk-main overflow-hidden font-sans transition-colors">
       <ConfigEditorToolbar 
         hostDisplayName={hostDisplayName}
         viewMode={viewMode}
@@ -237,9 +240,9 @@ export default function BrokerConfigEditor({ hostUid }) {
       {/* Main Content Area */}
       <div className="flex-1 overflow-hidden flex flex-col relative bg-slate-100 dark:bg-black/20">
         {loading ? (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-            <div className="w-10 h-10 border-4 border-bk-yellow/20 border-t-bk-yellow rounded-full animate-spin"></div>
-            <span className="text-xs font-bold text-slate-600 dark:text-bk-yellow uppercase tracking-widest">Loading...</span>
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
+            <Spinner size="lg" />
+            <Typography variant="overline" className="text-slate-600 dark:text-bk-yellow tracking-widest animate-pulse">Initializing Editor...</Typography>
           </div>
         ) : (
           viewMode === 'table' ? (
@@ -261,12 +264,20 @@ export default function BrokerConfigEditor({ hostUid }) {
       </div>
       
       {/* Bottom hint bar */}
-      <div className="px-4 py-1.5 bg-white dark:bg-bk-side border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-500 font-medium">
-         <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500"></span> Section Identifier</span>
-            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500"></span> Active Cell</span>
+      <div className="px-6 py-2 bg-white dark:bg-bk-side border-t border-slate-200 dark:border-white/5 flex items-center justify-between transition-colors">
+         <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2">
+              <span className="size-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.3)]"></span>
+              <Typography variant="caption" className="text-slate-500 dark:text-slate-400 font-medium">Section Identifier</Typography>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="size-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]"></span>
+              <Typography variant="caption" className="text-slate-500 dark:text-slate-400 font-medium">Active Cell</Typography>
+            </div>
          </div>
-         <div>Displaying {sections.length} brokers found in configuration</div>
+         <Typography variant="caption" className="text-slate-400 dark:text-slate-500 font-medium">
+           Displaying {sections.length} brokers found in configuration
+         </Typography>
       </div>
     </div>
   );
