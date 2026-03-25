@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchDetailedBrokerStatus } from '../brokerSlice';
 
+import { Icon } from '../../../components/ds/foundation/Icon';
+
 export default function BrokerStatus({ hostUid, brokerName }) {
   const dispatch = useDispatch();
   const { detailedStatus } = useSelector((state) => state.broker);
@@ -38,7 +40,7 @@ export default function BrokerStatus({ hostUid, brokerName }) {
     return (
       <div className="flex-1 p-8 bg-slate-50 dark:bg-bk-main">
         <div className="bg-rose-50 border border-rose-100 rounded-lg p-6 text-center max-w-lg mx-auto dark:bg-rose-900/10 dark:border-rose-500/20">
-          <span className="material-symbols-outlined text-rose-500 text-4xl mb-4">error</span>
+          <Icon name="error" size="sm" weight={300} className="text-rose-500 text-4xl mb-4" />
           <h3 className="text-rose-700 dark:text-rose-400 font-medium mb-2">Failed to Load Status</h3>
           <p className="text-rose-600/70 dark:text-rose-400/60 text-sm">{status.error}</p>
         </div>
@@ -55,7 +57,7 @@ export default function BrokerStatus({ hostUid, brokerName }) {
       {/* Top Breadcrumb Bar */}
       <div className="flex items-center justify-between px-3 py-2 text-xs text-slate-500 border-b border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-bk-side/50">
         <span className="font-medium text-slate-900 dark:text-bk-yellow tracking-wide flex items-center gap-1.5 font-sans">
-          <span className="material-symbols-outlined text-[14px]">hub</span>
+          <Icon name="hub" size="sm" weight={300} />
           Broker Status - {brokerName}
         </span>
         <div className="flex items-center gap-4">
@@ -82,7 +84,7 @@ export default function BrokerStatus({ hostUid, brokerName }) {
         <section className="bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden">
           <div className="px-4 py-3 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/5 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-bk-yellow text-lg">info</span>
+              <Icon name="info" size="sm" weight={300} className="text-bk-yellow text-lg" />
               <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">Basic Information</h3>
             </div>
           </div>
@@ -122,7 +124,7 @@ export default function BrokerStatus({ hostUid, brokerName }) {
         <section className="bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden flex-1">
           <div className="px-4 py-3 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/5 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-bk-yellow text-lg">dns</span>
+              <Icon name="dns" size="sm" weight={300} className="text-bk-yellow text-lg" />
               <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">Application Servers (AS)</h3>
             </div>
             <span className="text-[10px] text-slate-400 font-medium px-2 py-0.5 bg-slate-100 dark:bg-white/5 rounded-full">
@@ -181,7 +183,7 @@ export default function BrokerStatus({ hostUid, brokerName }) {
         <section className="bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden flex-1">
           <div className="px-4 py-3 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/5 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-bk-yellow text-lg">queue</span>
+              <Icon name="queue" size="sm" weight={300} className="text-bk-yellow text-lg" />
               <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">Job Queue</h3>
             </div>
           </div>

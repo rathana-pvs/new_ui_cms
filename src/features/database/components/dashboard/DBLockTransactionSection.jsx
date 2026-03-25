@@ -1,41 +1,57 @@
+import { Icon } from '../../../../components/ds/foundation/Icon';
+import { Table } from '../../../../components/ds/layout/Table';
+import { Typography } from '../../../../components/ds/foundation/Typography';
+import { Card } from '../../../../components/ds/layout/Card';
+
 export default function DBLockTransactionSection({ locks }) {
-  return (
-    <details className="group border border-slate-200 dark:border-slate-800 rounded-lg shadow-sm bg-white dark:bg-bk-side overflow-hidden" open>
-      <summary className="flex items-center gap-2 px-3 py-2.5 cursor-pointer list-none hover:bg-slate-50 dark:hover:bg-white/5 transition-colors bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-slate-800 text-sm font-medium text-slate-900 dark:text-slate-200">
-        <span className="material-symbols-outlined text-[16px] text-bk-yellow leading-none transition-transform group-open:rotate-180">expand_more</span>
-        <span>Lock and transaction</span>
-      </summary>
-      <div className="overflow-x-auto w-full">
-        <table className="w-full text-left text-xs whitespace-nowrap font-sans">
-          <thead>
-            <tr className="text-slate-500 dark:text-slate-400 bg-slate-50/20 dark:bg-transparent border-b border-slate-200 dark:border-slate-800">
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Tran index</th>
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">User name</th>
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Host</th>
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Process id</th>
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Object type</th>
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Mode</th>
-            </tr>
-          </thead>
-          <tbody className="font-mono">
-            {locks.map((row, i) => (
-              <tr key={i} className="text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition-colors border-b border-slate-100 dark:border-slate-800">
-                <td className="px-4 py-3 font-sans font-medium">{row.index}</td>
-                <td className="px-4 py-3 font-sans">{row.user}</td>
-                <td className="px-4 py-3 text-[11px]">{row.host}</td>
-                <td className="px-4 py-3">{row.pid}</td>
-                <td className="px-4 py-3 font-sans">{row.obj}</td>
-                <td className="px-4 py-3">
-                  <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium border ${row.mode === 'X_LOCK' ? 'bg-rose-50 text-rose-600 border-rose-100 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-500/20' : 'bg-bk-yellow/10 text-bk-yellow border-bk-yellow/20'}`}>
-                    {row.mode === 'X_LOCK' && <span className="h-1.5 w-1.5 rounded-full bg-rose-500"></span>}
-                    {row.mode}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+  const columns = [
+    { 
+      header: 'Tran Index', 
+      accessor: 'index',
+      render: (val) => <Typography variant="p" className="font-bold text-slate-700 dark:text-white tabular-nums">{val}</Typography>
+    },
+    { header: 'Username', accessor: 'user' },
+    { 
+      header: 'Remote Host', 
+      accessor: 'host',
+      render: (val) => <Typography variant="caption" className="font-medium text-slate-500 dark:text-slate-400">{val}</Typography>
+    },
+    { header: 'Process ID', accessor: 'pid' },
+    { header: 'Object Identifier', accessor: 'obj' },
+    { 
+      header: 'Lock Mode', 
+      accessor: 'mode',
+      render: (val) => (
+        <div className={`inline-flex items-center gap-2 px-2.5 py-1 rounded-lg border font-bold uppercase tracking-widest ${
+          val === 'X_LOCK' 
+            ? 'bg-rose-500/10 border-rose-500/20 text-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.3)]' 
+            : 'bg-bk-yellow/10 border-bk-yellow/20 text-bk-yellow shadow-[0_0_8px_rgba(255,215,0,0.3)]'
+        }`}>
+          <div className={`w-1.5 h-1.5 rounded-full ${val === 'X_LOCK' ? 'bg-rose-500 animate-pulse' : 'bg-bk-yellow'}`}></div>
+          <Typography variant="caption" className="font-black">{val}</Typography>
+        </div>
+      )
+    },
+  ];
+
+  const cardTitle = (
+    <div className="flex items-center justify-between w-full">
+      <div className="flex items-center gap-2">
+        <Icon name="lock" size="sm" weight={300} className="text-bk-yellow" />
+        <span>Active Transactions & Locks</span>
+        <span className="font-normal text-slate-500 dark:text-slate-400 ml-1 text-[11px] uppercase tracking-wider">
+          (Concurrency Status)
+        </span>
       </div>
-    </details>
+    </div>
+  );
+
+  return (
+    <Card title={cardTitle} bodyClassName="p-0" collapsible={true}>
+      <Table 
+        columns={columns}
+        data={locks}
+      />
+    </Card>
   );
 }

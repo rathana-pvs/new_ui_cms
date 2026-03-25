@@ -1,6 +1,8 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { closeUnloadResultModal } from '../databaseSlice';
 
+import { Icon } from '../../../components/ds/foundation/Icon';
+
 export default function UnloadResultModal() {
   const dispatch = useDispatch();
   const { isUnloadResultModalOpen, unloadResultData } = useSelector((state) => state.database);
@@ -24,7 +26,7 @@ export default function UnloadResultModal() {
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
-              <span className="material-symbols-outlined text-bk-yellow text-xl">analytics</span>
+              <Icon name="analytics" size="sm" weight={300} className="text-bk-yellow text-xl" />
             </div>
             <div>
               <h3 className="text-sm font-medium text-slate-900 dark:text-white leading-none">Unload job summary</h3>
@@ -34,7 +36,7 @@ export default function UnloadResultModal() {
             onClick={() => dispatch(closeUnloadResultModal())}
             className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
           >
-            <span className="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform">close</span>
+            <Icon name="close" size="sm" weight={300} className="text-lg group-hover:rotate-90 transition-transform" />
           </button>
         </div>
 
@@ -67,7 +69,7 @@ export default function UnloadResultModal() {
                   <tr>
                     <td colSpan="2" className="px-4 py-20 text-center">
                       <div className="flex flex-col items-center justify-center gap-3 opacity-30 grayscale items-center">
-                        <span className="material-symbols-outlined text-4xl">inventory_2</span>
+                        <Icon name="inventory_2" size="sm" weight={300} className="text-4xl" />
                         <p className="text-[10px] font-medium tracking-wide">No results metadata found</p>
                       </div>
                     </td>

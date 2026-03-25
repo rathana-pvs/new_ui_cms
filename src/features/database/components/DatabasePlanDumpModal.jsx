@@ -4,6 +4,9 @@ import { closePlanDumpModal, fetchDatabasePlanDump } from '../databaseSlice';
 import LoadingOverlay from '../../../components/common/LoadingOverlay';
 import ErrorOverlay from '../../../components/common/ErrorOverlay';
 
+import { Icon } from '../../../components/ds/foundation/Icon';
+import { Typography } from '../../../components/ds/foundation/Typography';
+
 /**
  * DatabasePlanDumpModal follows the "Check Database" style.
  * Study from d-cms (PlanDumpDialog.java) and implemented for w-cms.
@@ -77,18 +80,18 @@ export default function DatabasePlanDumpModal() {
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
-              <span className="material-symbols-outlined text-bk-yellow text-xl">schema</span>
+              <Icon name="schema" size="sm" weight={300} className="text-bk-yellow text-xl" />
             </div>
             <div>
-              <h3 className="text-[13px] font-bold text-slate-900 dark:text-white leading-none tracking-tight">Plan Cache Dump</h3>
-              {step === 'setup' && <p className="text-[11px] text-slate-500 mt-1">Check out the query plan values</p>}
+              <Typography variant="h3" className="text-[13px] font-bold text-slate-900 dark:text-white leading-none tracking-tight">Plan Cache Dump</Typography>
+              {step === 'setup' && <Typography variant="caption" className="text-[11px] text-slate-500 mt-1">Check out the query plan values</Typography>}
             </div>
           </div>
           <button 
             onClick={handleClose}
             className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
           >
-            <span className="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform">close</span>
+            <Icon name="close" size="sm" weight={300} className="text-lg group-hover:rotate-90 transition-transform" />
           </button>
         </div>
 
@@ -99,18 +102,20 @@ export default function DatabasePlanDumpModal() {
               {/* Database Name Field */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between px-1">
-                  <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Database name:</label>
+                  <Typography variant="label" className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Database name:</Typography>
                 </div>
-                <div className="w-full h-10 px-4 flex items-center bg-slate-50/80 dark:bg-bk-main/40 border border-slate-200 dark:border-slate-800 rounded-lg text-[13px] font-medium text-slate-500 dark:text-slate-400 select-none">
-                  {selectedDatabase}
+                <div className="w-full h-10 px-4 flex items-center bg-slate-50/80 dark:bg-bk-main/40 border border-slate-200 dark:border-slate-800 rounded-lg select-none">
+                  <Typography variant="p" className="text-[13px] font-medium text-slate-500 dark:text-slate-400">{selectedDatabase}</Typography>
                 </div>
               </div>
 
               {/* Description Field */}
               <div className="space-y-2">
-                <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 px-1">Description</label>
-                <div className="w-full p-4 bg-bk-yellow/[0.03] border border-bk-yellow/10 rounded-lg text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium italic">
-                  This utility is used to display the query plans currently stored in the server's plan cache. It helps analyze how queries are being executed and optimized by the database engine.
+                <Typography variant="label" className="text-[11px] font-bold text-slate-700 dark:text-slate-300 px-1">Description</Typography>
+                <div className="w-full p-4 bg-bk-yellow/[0.03] border border-bk-yellow/10 rounded-lg">
+                  <Typography variant="p" className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium italic">
+                    This utility is used to display the query plans currently stored in the server's plan cache. It helps analyze how queries are being executed and optimized by the database engine.
+                  </Typography>
                 </div>
               </div>
 
@@ -123,7 +128,7 @@ export default function DatabasePlanDumpModal() {
                   className="w-4.5 h-4.5 cursor-pointer rounded border-slate-300 dark:border-slate-700 bg-white dark:bg-bk-main text-bk-yellow focus:ring-bk-yellow/50 accent-bk-yellow"
                 />
                 <div className="flex flex-col">
-                  <span className="text-[12px] font-bold text-slate-700 dark:text-slate-300 group-hover:text-bk-yellow transition-colors tracking-tight">Drop all plans in server's cache</span>
+                  <Typography variant="p" className="text-[12px] font-bold text-slate-700 dark:text-slate-300 group-hover:text-bk-yellow transition-colors tracking-tight">Drop all plans in server's cache</Typography>
                 </div>
               </label>
             </div>
@@ -133,12 +138,12 @@ export default function DatabasePlanDumpModal() {
               {/* Header Info */}
               <div className="px-5 py-2 flex items-center justify-between bg-slate-50/80 dark:bg-bk-main/40 border-b border-slate-100 dark:border-slate-800">
                 <div className="flex items-center gap-3">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Plan Cache For:</span>
-                  <span className="text-[12px] font-black text-bk-yellow underline decoration-bk-yellow/20 underline-offset-4">{selectedDatabase}</span>
+                  <Typography variant="label" className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Plan Cache For:</Typography>
+                  <Typography variant="span" className="text-[12px] font-black text-bk-yellow underline decoration-bk-yellow/20 underline-offset-4">{selectedDatabase}</Typography>
                 </div>
                 <div className="flex items-center gap-2">
-                   <div className="px-2 py-0.5 rounded-full bg-slate-200/50 dark:bg-white/5 border border-slate-300/30 dark:border-white/5 text-[9px] font-bold text-slate-500 uppercase">
-                      XASL Cache
+                   <div className="px-2 py-0.5 rounded-full bg-slate-200/50 dark:bg-white/5 border border-slate-300/30 dark:border-white/5">
+                      <Typography variant="label" className="text-[9px] font-bold text-slate-500 uppercase">XASL Cache</Typography>
                    </div>
                 </div>
               </div>
@@ -163,32 +168,32 @@ export default function DatabasePlanDumpModal() {
                   return (
                     <div className="grid grid-cols-4 gap-4">
                       <div className="bg-white dark:bg-bk-main/20 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm transition-transform hover:scale-[1.02]">
-                        <div className="text-[10px] text-slate-400 font-bold uppercase mb-1 flex items-center gap-1.5">
-                          <span className="material-symbols-outlined text-sm text-bk-yellow">adjust</span>
+                        <Typography variant="label" className="text-[10px] text-slate-400 font-bold uppercase mb-1 flex items-center gap-1.5">
+                          <Icon name="adjust" size="sm" weight={300} className="text-bk-yellow" />
                           Hit Ratio
-                        </div>
-                        <div className="text-xl font-black text-slate-900 dark:text-white">{hitRatio}%</div>
+                        </Typography>
+                        <Typography variant="h2" className="text-xl font-black text-slate-900 dark:text-white">{hitRatio}%</Typography>
                       </div>
                       <div className="bg-white dark:bg-bk-main/20 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm transition-transform hover:scale-[1.02]">
-                        <div className="text-[10px] text-slate-400 font-bold uppercase mb-1 flex items-center gap-1.5">
-                          <span className="material-symbols-outlined text-sm text-emerald-500">check_circle</span>
+                        <Typography variant="label" className="text-[10px] text-slate-400 font-bold uppercase mb-1 flex items-center gap-1.5">
+                          <Icon name="check_circle" size="sm" weight={300} className="text-emerald-500" />
                           Hits
-                        </div>
-                        <div className="text-xl font-black text-slate-900 dark:text-white">{stats['Hits'] || '0'}</div>
+                        </Typography>
+                        <Typography variant="h2" className="text-xl font-black text-slate-900 dark:text-white">{stats['Hits'] || '0'}</Typography>
                       </div>
                       <div className="bg-white dark:bg-bk-main/20 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm transition-transform hover:scale-[1.02]">
-                        <div className="text-[10px] text-slate-400 font-bold uppercase mb-1 flex items-center gap-1.5">
-                          <span className="material-symbols-outlined text-sm text-rose-500">error</span>
+                        <Typography variant="label" className="text-[10px] text-slate-400 font-bold uppercase mb-1 flex items-center gap-1.5">
+                          <Icon name="error" size="sm" weight={300} className="text-rose-500" />
                           Misses
-                        </div>
-                        <div className="text-xl font-black text-slate-900 dark:text-white">{stats['Miss'] || '0'}</div>
+                        </Typography>
+                        <Typography variant="h2" className="text-xl font-black text-slate-900 dark:text-white">{stats['Miss'] || '0'}</Typography>
                       </div>
                        <div className="bg-white dark:bg-bk-main/20 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm transition-transform hover:scale-[1.02]">
-                        <div className="text-[10px] text-slate-400 font-bold uppercase mb-1 flex items-center gap-1.5">
-                          <span className="material-symbols-outlined text-sm text-sky-500">layers</span>
+                        <Typography variant="label" className="text-[10px] text-slate-400 font-bold uppercase mb-1 flex items-center gap-1.5">
+                          <Icon name="layers" size="sm" weight={300} className="text-sky-500" />
                           Entry Count
-                        </div>
-                        <div className="text-xl font-black text-slate-900 dark:text-white">{stats['Current entry count'] || '0'}</div>
+                        </Typography>
+                        <Typography variant="h2" className="text-xl font-black text-slate-900 dark:text-white">{stats['Current entry count'] || '0'}</Typography>
                       </div>
                     </div>
                   );
@@ -197,8 +202,8 @@ export default function DatabasePlanDumpModal() {
                 {/* 2. Structured Entries List */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 px-1">
-                    <span className="material-symbols-outlined text-bk-yellow text-sm">list_alt</span>
-                    <span className="text-[11px] font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest">Query Plan Entries</span>
+                    <Icon name="list_alt" size="sm" weight={300} className="text-bk-yellow" />
+                    <Typography variant="label" className="text-[11px] font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest">Query Plan Entries</Typography>
                     <div className="flex-1 h-[1px] bg-slate-200 dark:bg-slate-800"></div>
                   </div>
 
@@ -217,18 +222,18 @@ export default function DatabasePlanDumpModal() {
                                   key={idx} 
                                   className={`px-5 py-2.5 border-b border-slate-100 dark:border-slate-800/50 flex transition-colors ${isHeader ? 'bg-slate-50/50 dark:bg-white/5' : 'hover:bg-bk-yellow/[0.02]'}`}
                                 >
-                                  <div className="shrink-0 w-8 text-[9px] font-mono text-slate-400 mt-1">{(idx + 1).toString().padStart(3, '0')}</div>
-                                  <div className={`text-[11px] font-mono ${isHeader ? 'text-bk-yellow font-bold' : isPlanLine ? 'text-sky-600 dark:text-sky-400 pl-4 border-l border-sky-500/20' : 'text-slate-600 dark:text-slate-300'}`}>
+                                  <Typography variant="span" className="shrink-0 w-8 text-[9px] font-mono text-slate-400 mt-1">{(idx + 1).toString().padStart(3, '0')}</Typography>
+                                  <Typography variant="span" className={`text-[11px] font-mono ${isHeader ? 'text-bk-yellow font-bold' : isPlanLine ? 'text-sky-600 dark:text-sky-400 pl-4 border-l border-sky-500/20' : 'text-slate-600 dark:text-slate-300'}`}>
                                     {line}
-                                  </div>
+                                  </Typography>
                                 </div>
                               );
                             })}
                          </div>
                        ) : (
                          <div className="p-20 text-center opacity-30 italic">
-                            <span className="material-symbols-outlined text-4xl mb-2">subtitles_off</span>
-                            <p className="text-[11px]">No active plans found in cache</p>
+                            <Icon name="subtitles_off" size="sm" weight={300} className="text-4xl mb-2" />
+                            <Typography variant="p" className="text-[11px]">No active plans found in cache</Typography>
                          </div>
                        )}
                     </div>

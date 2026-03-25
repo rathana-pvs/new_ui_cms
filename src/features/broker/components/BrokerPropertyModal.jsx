@@ -3,6 +3,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { closeBrokerPropertyModal, fetchBrokerConfig, updateBrokerConfig } from '../brokerSlice';
 import SelectField from '../../../components/common/SelectField';
 
+import { Icon } from '../../../components/ds/foundation/Icon';
+
 const BROKER_PARAMETERS = [
   { name: 'SERVICE', type: 'string(ON|OFF)', default: 'ON', category: 'common' },
   { name: 'BROKER_PORT', type: 'int(1024~65535)', default: '', category: 'common' },
@@ -161,7 +163,7 @@ export default function BrokerPropertyModal() {
         <div className="flex items-center justify-between px-5 py-3 border-b border-white/5 bg-bk-side flex-shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
-              <span className="material-symbols-outlined text-bk-yellow text-xl">tune</span>
+              <Icon name="tune" size="sm" weight={300} className="text-bk-yellow text-xl" />
             </div>
             <div>
               <h3 className="text-[12px] font-medium text-slate-100 leading-none tracking-wide">BROKER PROPERTIES</h3>
@@ -176,7 +178,7 @@ export default function BrokerPropertyModal() {
             onClick={() => dispatch(closeBrokerPropertyModal())}
             className="w-7 h-7 rounded-md hover:bg-white/5 transition-all text-slate-500 hover:text-white flex items-center justify-center group"
           >
-            <span className="material-symbols-outlined text-lg group-hover:rotate-90">close</span>
+            <Icon name="close" size="sm" weight={300} className="text-lg group-hover:rotate-90" />
           </button>
         </div>
 
@@ -276,7 +278,7 @@ export default function BrokerPropertyModal() {
             <div className="flex flex-col gap-10 max-w-lg mx-auto py-20 px-6">
               <div className="bg-bk-yellow/5 border border-bk-yellow/10 rounded-2xl p-6 flex gap-5 ring-1 ring-bk-yellow/20">
                 <div className="w-12 h-12 rounded-xl bg-bk-yellow/20 flex-shrink-0 flex items-center justify-center">
-                  <span className="material-symbols-outlined text-bk-yellow text-2xl">update</span>
+                  <Icon name="update" size="sm" weight={300} className="text-bk-yellow text-2xl" />
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-bk-yellow mb-1">Status Monitoring</h3>
@@ -344,7 +346,7 @@ export default function BrokerPropertyModal() {
               <div className="w-3 h-3 border-2 border-bk-side/30 border-t-bk-side rounded-full animate-spin"></div>
             ) : (
                 <>
-                  <span className="material-symbols-outlined text-[16px]">check_circle</span>
+                  <Icon name="check_circle" size="sm" weight={300} />
                   <span>APPLY CHANGES</span>
                 </>
             )}

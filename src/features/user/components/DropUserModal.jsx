@@ -1,6 +1,8 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { closeDropUserModal, dropDatabaseUser } from '../userSlice';
 
+import { Icon } from '../../../components/ds/foundation/Icon';
+
 export default function DropUserModal() {
   const dispatch = useDispatch();
   const { isDropUserModalOpen, dropUserData, actionLoading } = useSelector((state) => state.user);
@@ -21,7 +23,7 @@ export default function DropUserModal() {
       <div className="bg-white dark:bg-bk-side w-full max-w-[400px] rounded-2xl shadow-2xl border border-slate-200 dark:border-white/5 overflow-hidden animate-in zoom-in-95 duration-200 text-left">
         <div className="p-6">
           <div className="w-12 h-12 rounded-full bg-rose-500/10 flex items-center justify-center mb-4">
-            <span className="material-symbols-outlined text-rose-500 text-2xl">person_remove</span>
+            <Icon name="person_remove" size="sm" weight={300} className="text-rose-500 text-2xl" />
           </div>
           <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Drop Database User</h3>
           <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">

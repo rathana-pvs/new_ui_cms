@@ -23,7 +23,7 @@ export const theme = {
   },
 
   typography: {
-    treeLabel: "text-[11.5px] font-mono",
+    treeLabel: "text-[13px] font-medium font-mono",
     columnDetail: "text-[11px] text-slate-400",
     statusLabel: "text-[11px] font-medium uppercase tracking-wide",
   },

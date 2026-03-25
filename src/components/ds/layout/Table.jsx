@@ -51,7 +51,7 @@ export const Table = ({
 
   return (
     <div className={`w-full overflow-x-auto ${className}`}>
-      <table className="w-full text-left border-collapse min-w-max">
+      <table className="w-full text-left border-collapse">
         {headersVisible && (
           <thead>
             <tr className="bg-slate-50/50 dark:bg-black/20 border-b border-slate-100 dark:border-white/5">
@@ -87,7 +87,7 @@ export const Table = ({
               {columns.map((col, colIdx) => (
                 <td
                   key={col.accessor || colIdx}
-                  className="px-3 py-2 text-[13px] font-medium text-slate-700 dark:text-slate-300 border-r border-transparent last:border-r-0"
+                  className="px-3 py-2 text-[13px] font-mono font-medium text-slate-700 dark:text-slate-300 border-r border-transparent last:border-r-0"
                 >
                   {col.render ? col.render(row[col.accessor], row) : row[col.accessor]}
                 </td>

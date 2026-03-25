@@ -7,6 +7,8 @@ import { Button } from '../../../components/ds/foundation/Button';
 import { Typography } from '../../../components/ds/foundation/Typography';
 import { Divider } from '../../../components/ds/layout/Divider';
 
+import { Icon } from '../../../components/ds/foundation/Icon';
+
 export default function AddHostModal({ isOpen, onClose }) {
   const [formData, setFormData] = useState({
     id: '',
@@ -71,7 +73,7 @@ export default function AddHostModal({ isOpen, onClose }) {
       onClose={handleClose}
       title="New connection"
       icon="add_link"
-      maxWidth="max-w-[480px]"
+      maxWidth="max-w-[520px]"
       loading={loading}
       footer={
         <>
@@ -96,16 +98,16 @@ export default function AddHostModal({ isOpen, onClose }) {
     >
       <div className="space-y-6">
         {apiError && (
-          <div className="flex items-center gap-2 px-3 py-2 bg-rose-500/5 border border-rose-500/10 rounded animate-in fade-in slide-in-from-top-1">
-            <span className="material-symbols-outlined text-[16px] text-rose-500">error</span>
+          <div className="flex items-center gap-2 px-3 py-2.5 bg-rose-500/5 border border-rose-500/10 rounded-lg animate-in fade-in slide-in-from-top-1">
+            <Icon name="error" size="sm" weight={300} className="text-rose-500" />
             <Typography variant="caption" className="text-rose-500 font-medium">{apiError}</Typography>
-            <button onClick={() => dispatch(clearHostError())} className="ml-auto text-rose-500/50 hover:text-rose-500">
-               <span className="material-symbols-outlined text-sm">close</span>
+            <button onClick={() => dispatch(clearHostError())} className="ml-auto text-rose-500/50 hover:text-rose-500 transition-colors">
+               <Icon name="close" size="sm" weight={300} />
             </button>
           </div>
         )}
 
-        <div className="space-y-5">
+        <div className="space-y-6">
           <div className="space-y-3">
             <Divider label="Credentials" />
             <Input 

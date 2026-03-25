@@ -1,21 +1,22 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchDashboardData } from '../databaseSlice';
-import { openTab } from '../../layout/layoutSlice';
 import DBPerformanceSection from './dashboard/DBPerformanceSection';
 import DBVolumesSection from './dashboard/DBVolumesSection';
 import DBSpaceInfoSection from './dashboard/DBSpaceInfoSection';
 import DBBrokersCASSection from './dashboard/DBBrokersCASSection';
 import DBLockTransactionSection from './dashboard/DBLockTransactionSection';
 import CASLogModal from './CASLogModal';
-import CustomSelect from '../../../components/common/CustomSelect';
 
+import { Icon } from '../../../components/ds/foundation/Icon';
+import { Button } from '../../../components/ds/foundation/Button';
+import { Select } from '../../../components/ds/forms/Select';
+import { Typography } from '../../../components/ds/foundation/Typography';
 
 export default function DatabaseDashboard({ dbname }) {
   const dispatch = useDispatch();
   const { selectedHostUid, hosts } = useSelector((state) => state.host);
   const { dashboardData, dashboardLoading } = useSelector((state) => state.database);
-  const { brokers } = useSelector((state) => state.monitoring);
   
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [refreshInterval, setRefreshInterval] = useState(10); // Default 10s
@@ -149,109 +150,125 @@ export default function DatabaseDashboard({ dbname }) {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto bg-slate-50 dark:bg-bk-main font-sans">
-      {/* Header / Toolbar */}
-      <div className="sticky top-0 z-20 flex items-center justify-between px-6 py-3 bg-white dark:bg-bk-side border-b border-slate-200 dark:border-slate-800 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-bk-yellow/10 border border-bk-yellow/20">
-             <span className="material-symbols-outlined text-bk-yellow text-[22px]">dashboard</span>
+    <div className="flex-1 overflow-y-auto bg-slate-50 dark:bg-bk-main font-sans custom-scrollbar">
+      {/* Refined Top Breadcrumb Bar (Matches ServerContent Style) */}
+      <div className="sticky top-0 z-20 flex items-center justify-between px-6 py-2 text-xs border-b border-slate-200 dark:border-white/5 bg-white/80 dark:bg-bk-side/80 backdrop-blur-md">
+        <div className="flex items-center gap-4">
+          <Typography variant="span" className="font-bold text-slate-700 dark:text-bk-yellow tracking-wide flex items-center gap-2">
+            <Icon name="database" size="14px" weight={400} />
+            Database - {dbname}
+          </Typography>
+          
+          <div className="h-4 w-[1px] bg-slate-200 dark:bg-white/10 mx-1"></div>
+          
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+            <Typography variant="caption" className="font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-none">Running</Typography>
           </div>
-          <div className="flex flex-col">
-            <h2 className="text-[15px] font-bold text-slate-900 dark:text-white leading-tight tracking-tight">{dbname}</h2>
-            <div className="flex items-center gap-2 mt-0.5">
-               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
-               <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-none">Status: Running</span>
-            </div>
+
+          <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100/50 dark:bg-white/5 border border-slate-200/50 dark:border-white/5 ml-2">
+            <Icon name="dns" size="12px" weight={300} className="text-slate-400" />
+            <Typography variant="caption" className="text-slate-500 dark:text-slate-400 font-bold tracking-tight text-[10px]">
+              {activeHost?.address}:{activeHost?.port}
+            </Typography>
           </div>
-          <div className="h-6 w-[1px] bg-slate-200 dark:bg-slate-800 mx-2"></div>
-          <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 text-[9px] text-slate-500 dark:text-slate-400 font-bold tracking-tight">
-            {activeHost?.address}:{activeHost?.port}
-          </span>
         </div>
 
-        <div className="flex items-center gap-1">
-          {/* Auto Refresh Toggle */}
-          <button 
-            onClick={() => setAutoRefresh(!autoRefresh)}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded transition-all group ${autoRefresh ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)]' : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 border border-transparent'}`}
-            title={autoRefresh ? "Stop Auto Refresh" : "Start Auto Refresh"}
-          >
-            <span className={`material-symbols-outlined text-[18px] ${autoRefresh ? 'animate-spin' : ''}`}>sync</span>
-            <span className="text-[10px] font-black uppercase tracking-tighter">{autoRefresh ? 'Live' : 'Auto'}</span>
-          </button>
+        <div className="flex items-center gap-2">
+          {/* Action Toolbar */}
+          <div className="flex items-center gap-1 p-0.5 bg-slate-100/50 dark:bg-black/20 rounded-lg border border-slate-200/50 dark:border-white/5">
+            <Button
+              variant="ghost"
+              size="xs"
+              onClick={() => setAutoRefresh(!autoRefresh)}
+              icon={autoRefresh ? 'sync' : 'sync_disabled'}
+              className={`rounded-md h-7 ${autoRefresh ? 'text-emerald-500' : 'text-slate-400'}`}
+              title={autoRefresh ? "Live Monitoring Active" : "Auto Refresh Off"}
+            />
+            <Button 
+              variant="ghost"
+              size="xs"
+              onClick={handleRefresh}
+              loading={isLoading}
+              icon="refresh"
+              className="rounded-md h-7 text-slate-500"
+              title="Manual Refresh"
+            />
+          </div>
 
-          <div className="w-[1px] h-4 bg-slate-200 dark:bg-slate-800 mx-1"></div>
+          <div className="w-[1px] h-4 bg-slate-200 dark:bg-white/10 mx-1"></div>
 
-          {/* Settings */}
-          <button 
+          <Button 
+            variant="ghost" 
+            size="xs"
             onClick={() => setShowSettings(!showSettings)}
-            className={`w-8 h-8 flex items-center justify-center rounded transition-all ${showSettings ? 'bg-bk-yellow/10 text-bk-yellow border border-bk-yellow/20' : 'text-slate-400 hover:text-bk-yellow hover:bg-slate-100 dark:hover:bg-white/5 border border-transparent'}`}
+            icon="tune"
+            className={`rounded-md h-7 ${showSettings ? 'bg-bk-yellow/10 text-bk-yellow' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5'}`}
             title="Dashboard Settings"
-          >
-            <span className="material-symbols-outlined text-[18px]">settings</span>
-          </button>
+          />
 
-          {/* Export */}
-          <button 
+          <Button 
+            variant="ghost"
+            size="xs"
             onClick={handleExport}
-            className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-emerald-500 hover:bg-emerald-500/5 rounded transition-all border border-transparent"
-            title="Export to CSV"
-          >
-            <span className="material-symbols-outlined text-[18px]">ios_share</span>
-          </button>
-
-          {/* Manual Refresh */}
-          <button 
-            onClick={handleRefresh}
-            disabled={isLoading}
-            className={`w-8 h-8 flex items-center justify-center text-slate-400 hover:text-bk-yellow hover:bg-bk-yellow/5 rounded transition-all border border-transparent ${isLoading ? 'animate-spin cursor-not-allowed' : ''}`}
-            title="Refresh Now"
-          >
-            <span className="material-symbols-outlined text-[18px]">refresh</span>
-          </button>
-
+            icon="ios_share"
+            className="rounded-md h-7 text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5"
+            title="Export Metrics"
+          />
         </div>
       </div>
 
       {/* Settings Panel Popover */}
       {showSettings && (
-        <div className="mx-4 mt-2 p-3 bg-white dark:bg-bk-side border border-bk-yellow/20 rounded-lg shadow-xl animate-in slide-in-from-top-2 duration-200">
-           <div className="flex items-center justify-between mb-2">
-             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Dashboard Configuration</span>
-             <button onClick={() => setShowSettings(false)} className="text-slate-400 hover:text-rose-500 transition-colors"><span className="material-symbols-outlined text-[16px]">close</span></button>
+        <div className="mx-6 mt-4 p-5 bg-white dark:bg-bk-side border border-slate-200 dark:border-white/5 rounded-2xl shadow-2xl animate-in slide-in-from-top-4 duration-300 relative overflow-hidden">
+           <div className="absolute top-0 left-0 w-1 h-full bg-bk-yellow"></div>
+           <div className="flex items-center justify-between mb-4">
+             <div className="flex items-center gap-2">
+               <Icon name="tune" size="xs" weight={300} className="text-bk-yellow" />
+               <Typography variant="label" className="font-black text-slate-400 uppercase tracking-[0.2em]">Dashboard Configuration</Typography>
+             </div>
+             <Button variant="ghost" size="sm" onClick={() => setShowSettings(false)} icon="close" />
            </div>
-           <div className="flex items-center gap-4">
-              <div className="flex-1 space-y-1">
-                 <label className="text-[9px] font-bold text-slate-500 uppercase">Refresh Interval (sec)</label>
-                 <CustomSelect 
+           
+           <div className="flex items-center gap-6">
+              <div className="w-64">
+                 <Select 
+                    label="Refresh Interval"
                     value={refreshInterval} 
                     onChange={(e) => setRefreshInterval(parseInt(e.target.value))}
                     options={[
-                      { label: '1 second', value: 1 },
+                      { label: '1 second (Realtime)', value: 1 },
                       { label: '5 seconds', value: 5 },
-                      { label: '10 seconds', value: 10 },
+                      { label: '10 seconds (Standard)', value: 10 },
                       { label: '30 seconds', value: 30 },
-                      { label: '1 minute', value: 60 },
+                      { label: '1 minute (Conservative)', value: 60 },
                     ]}
                   />
               </div>
-              <div className="flex-1 items-end pt-5">
-                 <p className="text-[9px] text-slate-400 italic font-medium leading-tight">Lower interval increases server load.</p>
+              <div className="flex-1 p-4 bg-bk-yellow/5 rounded-xl border border-bk-yellow/10">
+                 <div className="flex gap-3">
+                   <Icon name="info" size="xs" weight={300} className="text-bk-yellow shrink-0 mt-0.5" />
+                   <Typography variant="p" className="text-[11px] text-slate-500 dark:text-slate-400 italic font-medium leading-normal">
+                     Lower refresh intervals increase the polling frequency. This may impact server performance and network overhead in high-traffic environments.
+                   </Typography>
+                 </div>
               </div>
            </div>
         </div>
       )}
 
-      <div className="flex flex-col p-4 space-y-4">
+      <div className="flex flex-col p-6 space-y-6">
         {isLoading && (!data.volumes || data.volumes.length === 0) ? (
           <div className="flex items-center justify-center p-20 text-slate-400">
-             <div className="flex flex-col items-center gap-2">
-                <span className="material-symbols-outlined animate-spin text-4xl text-bk-yellow/40">refresh</span>
-                <span className="text-[11px] font-bold uppercase tracking-widest">Hydrating Dashboard...</span>
+             <div className="flex flex-col items-center gap-4">
+                <div className="w-16 h-16 rounded-full border-4 border-bk-yellow/10 border-t-bk-yellow animate-spin flex items-center justify-center">
+                  <Icon name="refresh" size="lg" weight={100} className="text-bk-yellow/20" />
+                </div>
+                <Typography variant="label" className="font-black uppercase tracking-[0.3em] text-bk-yellow/60">Hydrating Dashboard...</Typography>
              </div>
           </div>
         ) : (
-          <div className="space-y-4 animate-in fade-in duration-500">
+          <div className="space-y-6 animate-in fade-in duration-700">
             <DBPerformanceSection dbStats={dbStats} />
             <DBVolumesSection volumes={mappedVolumes} />
             <DBSpaceInfoSection spaceInfo={mappedSpaceInfo} />

@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 
+import { Icon } from '../ds/foundation/Icon';
+
 /**
  * Premium Custom Select Component
  * Aligned with the "Technical Compact" and "High-End Dark" design system.
@@ -86,7 +88,7 @@ export default function CustomSelect({
                   <div className="flex items-center justify-between">
                     <span>{option[labelField]}</span>
                     {isActive && (
-                      <span className="material-symbols-outlined text-[14px]">check</span>
+                      <Icon name="check" size="sm" weight={300} />
                     )}
                   </div>
                 </button>

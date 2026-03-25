@@ -6,6 +6,14 @@ import { showStatusModal } from '../../layout/layoutSlice';
 import LoadingOverlay from '../../../components/common/LoadingOverlay';
 import ErrorOverlay from '../../../components/common/ErrorOverlay';
 
+import { Icon } from '../../../components/ds/foundation/Icon';
+import { Modal } from '../../../components/ds/layout/Modal';
+import { Button } from '../../../components/ds/foundation/Button';
+import { Input } from '../../../components/ds/forms/Input';
+import { Select } from '../../../components/ds/forms/Select';
+import { Divider } from '../../../components/ds/layout/Divider';
+import { Typography } from '../../../components/ds/foundation/Typography';
+
 /**
  * Custom Searchable Select for Class List
  */
@@ -14,7 +22,6 @@ const ClassSelect = ({ value, userClasses, systemClasses, onChange, disabled, is
   const [search, setSearch] = useState('');
   const dropdownRef = useRef(null);
 
-  // Close when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -39,106 +46,97 @@ const ClassSelect = ({ value, userClasses, systemClasses, onChange, disabled, is
 
   return (
     <div className="relative" ref={dropdownRef}>
-      {/* Trigger Button */}
       <button
         type="button"
         disabled={disabled || isLoading}
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full h-10 px-3 flex items-center justify-between bg-white dark:bg-bk-main border border-slate-200 dark:border-slate-800/50 rounded-lg shadow-sm transition-all text-left outline-none ${
+        className={`w-full h-10 px-4 flex items-center justify-between bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm transition-all text-left outline-none ${
           isOpen ? 'ring-2 ring-bk-yellow/20 border-bk-yellow/60' : 'hover:border-bk-yellow/40'
         } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
       >
-        <div className="flex items-center gap-2 overflow-hidden">
-          <span className={`material-symbols-outlined text-[18px] ${value ? 'text-bk-yellow' : 'text-slate-400'}`}>
-            {value ? 'table_view' : 'database'}
-          </span>
-          <span className={`text-[12px] font-medium truncate ${value ? 'text-slate-900 dark:text-white' : 'text-slate-400'}`}>
-            {value ? value : 'All classes (Entire database)'}
-          </span>
+        <div className="flex items-center gap-2.5 overflow-hidden">
+          <Icon 
+            name={value ? 'table_view' : 'database'} 
+            size="sm" 
+            weight={300} 
+            className={value ? 'text-bk-yellow' : 'text-slate-400'} 
+          />
+        <span className={`text-[12px] font-bold truncate ${value ? 'text-slate-900 dark:text-white' : 'text-slate-400'}`}>
+          <Typography variant="span">{value ? value : 'Entire Registry (Global Scan)'}</Typography>
+        </span>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
-          {isLoading && <div className="w-3 h-3 border-2 border-bk-yellow/30 border-t-bk-yellow rounded-full animate-spin"></div>}
-          <span className={`material-symbols-outlined text-lg transition-transform duration-200 ${isOpen ? 'rotate-180 text-bk-yellow' : 'text-slate-400'}`}>
-            expand_more
-          </span>
+          {isLoading && <div className="w-3.5 h-3.5 border-2 border-bk-yellow/30 border-t-bk-yellow rounded-full animate-spin"></div>}
+          <Icon name="expand_more" size="sm" weight={300} className={`text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180 text-bk-yellow' : ''}`} />
         </div>
       </button>
 
-      {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute top-[calc(100%+5px)] left-0 right-0 bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.15)] z-[110] overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[280px]">
-          
-          {/* Search Box */}
-          <div className="p-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/30">
+        <div className="absolute top-[calc(100%+8px)] left-0 right-0 bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] z-[110] overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[320px]">
+          <div className="p-3 border-b border-slate-100 dark:border-slate-800/60 bg-slate-50/50 dark:bg-bk-main/40">
             <div className="relative">
-              <span className="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[16px] text-slate-400">search</span>
+              <Icon name="search" size="sm" weight={300} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input 
                 autoFocus
                 type="text"
-                placeholder="Search tables..."
+                placeholder="Lookup schema objects..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full h-8 pl-8 pr-3 bg-white dark:bg-bk-main border border-slate-200 dark:border-slate-800/80 rounded-md text-[11px] font-medium text-slate-700 dark:text-white placeholder:text-slate-400 focus:border-bk-yellow/60 focus:ring-2 focus:ring-bk-yellow/5 outline-none transition-all"
+                className="w-full h-9 pl-9 pr-3 bg-white dark:bg-bk-main border border-slate-200 dark:border-slate-800/80 rounded-xl text-[11px] font-medium text-slate-700 dark:text-white placeholder:text-slate-400 focus:border-bk-yellow/60 outline-none transition-all shadow-inner"
               />
             </div>
           </div>
 
-          {/* List Content */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar border-t border-slate-50 dark:border-slate-800/50">
-            
-            {/* "All" Option */}
+          <div className="flex-1 overflow-y-auto custom-scrollbar">
             {search === '' && (
               <button
                 type="button"
                 onClick={() => { onChange(''); setIsOpen(false); }}
-                className={`w-full px-4 py-2.5 flex items-center gap-3 text-left transition-colors border-b border-slate-50 dark:border-slate-800/30 ${
-                  value === '' ? 'bg-bk-yellow/10 text-bk-yellow' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5'
+                className={`w-full px-4 py-3 flex items-center gap-3 text-left transition-colors border-b border-slate-100 dark:border-slate-800/40 group ${
+                  value === '' ? 'bg-bk-yellow/10' : 'hover:bg-slate-50 dark:hover:bg-white/5'
                 }`}
               >
-                <div className={`w-2 h-2 rounded-full ${value === '' ? 'bg-bk-yellow animate-pulse' : 'bg-slate-300 dark:bg-slate-600'}`}></div>
-                <span className="text-[11px] font-medium uppercase tracking-wider">Entire database</span>
+                <div className={`w-2 h-2 rounded-full transition-all ${value === '' ? 'bg-bk-yellow scale-125 shadow-[0_0_8px_rgba(255,188,4,0.6)]' : 'bg-slate-300 dark:bg-slate-700 group-hover:bg-bk-yellow/40'}`}></div>
+                <Typography variant="label" className={`text-[10px] font-bold uppercase tracking-[0.15em] ${value === '' ? 'text-bk-yellow' : 'text-slate-500 dark:text-slate-400'}`}>Entire database</Typography>
               </button>
             )}
 
-            {/* Empty Context */}
             {!hasResults && !isLoading && (
-              <div className="py-10 text-center space-y-2">
-                <span className="material-symbols-outlined text-3xl text-slate-300 dark:text-slate-700">filter_none</span>
-                <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">No tables found matching "{search}"</p>
+              <div className="py-12 text-center space-y-3">
+                <Icon name="search_off" size="xl" weight={100} className="text-slate-200 dark:text-slate-800" />
+                <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">No matches for "{search}"</p>
               </div>
             )}
 
-            {/* Loading State in List */}
             {isLoading && (
-              <div className="py-10 text-center space-y-3">
-                <div className="w-6 h-6 border-2 border-bk-yellow/30 border-t-bk-yellow rounded-full animate-spin mx-auto"></div>
-                <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-widest">Fetching schema...</p>
+              <div className="py-12 text-center space-y-4">
+                <div className="w-8 h-8 border-2 border-bk-yellow/20 border-t-bk-yellow rounded-full animate-spin mx-auto shadow-sm"></div>
+                <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-[0.2em]">Inspecting Schema</p>
               </div>
             )}
 
-            {/* User Classes Group */}
             {filteredUserClasses.length > 0 && (
               <div className="py-2">
-                <div className="px-4 py-1.5 flex items-center justify-between sticky top-0 bg-white/95 dark:bg-bk-side/95 backdrop-blur-sm z-10 border-b border-slate-100 dark:border-slate-800/50 mb-1">
-                  <span className="text-[9px] font-medium uppercase tracking-[0.15em] text-slate-400 dark:text-slate-500">User Tables</span>
-                  <span className="text-[9px] bg-slate-100 dark:bg-bk-main px-1.5 py-0.5 rounded text-slate-500">{filteredUserClasses.length}</span>
+                <div className="px-4 py-1.5 flex items-center justify-between sticky top-0 bg-white/95 dark:bg-bk-side/95 backdrop-blur-md z-10 border-b border-slate-100 dark:border-slate-800/50 mb-1">
+                  <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">User Tables</span>
+                  <span className="text-[9px] bg-slate-100 dark:bg-bk-main/50 px-2 py-0.5 rounded-full text-slate-500 font-mono">{filteredUserClasses.length}</span>
                 </div>
-                <div className="space-y-0.5">
+                <div className="px-1.5 space-y-0.5">
                   {filteredUserClasses.map((cls) => (
                     <button
                       key={cls.classname}
                       type="button"
                       onClick={() => { onChange(cls.classname); setIsOpen(false); }}
-                      className={`w-full px-4 py-2 flex items-center gap-3 text-left transition-all ${
+                      className={`w-full px-3 py-2.5 flex items-center gap-3 text-left transition-all rounded-xl group ${
                         value === cls.classname 
-                          ? 'bg-bk-yellow text-bk-side font-medium shadow-lg shadow-bk-yellow/20 mx-[-4px] w-[calc(100%+8px)] z-20' 
-                          : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-bk-yellow'
+                          ? 'bg-bk-yellow text-bk-side font-bold shadow-lg shadow-bk-yellow/10' 
+                          : 'text-slate-600 dark:text-slate-400 hover:bg-bk-yellow/5 hover:text-bk-yellow'
                       }`}
                     >
-                      <span className={`material-symbols-outlined text-[16px] ${value === cls.classname ? 'text-bk-side' : 'opacity-40'}`}>table</span>
+                      <Icon name="table" size="sm" weight={300} className={value === cls.classname ? 'text-bk-side' : 'text-slate-400 group-hover:text-bk-yellow'} />
                       <div className="flex flex-col min-w-0">
-                        <span className="text-[11px] truncate leading-tight">{cls.classname}</span>
-                        <span className={`text-[9px] opacity-60 truncate ${value === cls.classname ? 'text-bk-side' : 'text-slate-400'}`}>Owner: {cls.owner}</span>
+                        <Typography variant="label" className="text-[11px] font-bold truncate leading-tight select-none">{cls.classname}</Typography>
+                        <Typography variant="span" className={`text-[9px] truncate transition-opacity ${value === cls.classname ? 'text-bk-side/60' : 'text-slate-400 group-hover:text-bk-yellow/60'}`}>Owner: {cls.owner}</Typography>
                       </div>
                     </button>
                   ))}
@@ -146,29 +144,28 @@ const ClassSelect = ({ value, userClasses, systemClasses, onChange, disabled, is
               </div>
             )}
 
-            {/* System Classes Group */}
             {filteredSystemClasses.length > 0 && (
-              <div className="py-2 border-t border-slate-100 dark:border-slate-800">
-                <div className="px-4 py-1.5 flex items-center justify-between sticky top-0 bg-white/95 dark:bg-bk-side/95 backdrop-blur-sm z-10 border-b border-slate-100 dark:border-slate-800/50 mb-1">
-                  <span className="text-[9px] font-medium uppercase tracking-[0.15em] text-slate-400 dark:text-slate-500">System Tables</span>
-                  <span className="text-[9px] bg-slate-100 dark:bg-bk-main px-1.5 py-0.5 rounded text-slate-500">{filteredSystemClasses.length}</span>
+              <div className="py-2 border-t border-slate-100 dark:border-slate-800/80">
+                <div className="px-4 py-1.5 flex items-center justify-between sticky top-0 bg-white/95 dark:bg-bk-side/95 backdrop-blur-md z-10 border-b border-slate-100 dark:border-slate-800/50 mb-1">
+                  <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Internal Catalog</span>
+                  <span className="text-[9px] bg-slate-100 dark:bg-bk-main/50 px-2 py-0.5 rounded-full text-slate-500 font-mono">{filteredSystemClasses.length}</span>
                 </div>
-                <div className="space-y-0.5">
+                <div className="px-1.5 space-y-0.5">
                   {filteredSystemClasses.map((cls) => (
                     <button
                       key={cls.classname}
                       type="button"
                       onClick={() => { onChange(cls.classname); setIsOpen(false); }}
-                      className={`w-full px-4 py-2 flex items-center gap-3 text-left transition-all ${
+                      className={`w-full px-3 py-2.5 flex items-center gap-3 text-left transition-all rounded-xl group ${
                         value === cls.classname 
-                        ? 'bg-bk-yellow text-bk-side font-medium shadow-lg shadow-bk-yellow/20 mx-[-4px] w-[calc(100%+8px)] z-20' 
-                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-bk-yellow'
+                        ? 'bg-bk-yellow text-bk-side font-bold shadow-lg shadow-bk-yellow/10' 
+                        : 'text-slate-600 dark:text-slate-400 hover:bg-bk-yellow/5 hover:text-bk-yellow'
                       }`}
                     >
-                      <span className={`material-symbols-outlined text-[16px] ${value === cls.classname ? 'text-bk-side' : 'opacity-40'}`}>settings_suggest</span>
+                      <Icon name="manufacturing" size="sm" weight={300} className={value === cls.classname ? 'text-bk-side' : 'text-slate-400 group-hover:text-bk-yellow'} />
                       <div className="flex flex-col min-w-0">
-                        <span className="text-[11px] truncate leading-tight">{cls.classname}</span>
-                        <span className={`text-[9px] opacity-60 truncate ${value === cls.classname ? 'text-bk-side' : 'text-slate-400'}`}>Internal catalog</span>
+                        <Typography variant="label" className="text-[11px] font-bold truncate leading-tight select-none">{cls.classname}</Typography>
+                        <Typography variant="span" className={`text-[9px] truncate transition-opacity ${value === cls.classname ? 'text-bk-side/60' : 'text-slate-400 group-hover:text-bk-yellow/60'}`}>System object</Typography>
                       </div>
                     </button>
                   ))}
@@ -270,16 +267,34 @@ export default function OptimizeDatabaseModal() {
   const totalTables = classesData.userclass.length + classesData.systemclass.length;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans text-left">
-      <div className="bg-white dark:bg-bk-side w-full max-w-[440px] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col relative text-left">
-        
-        {/* Subtle Top Accent */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-bk-yellow/60"></div>
-
+    <Modal
+      isOpen={isOptimizeDatabaseModalOpen}
+      onClose={() => dispatch(closeOptimizeDatabaseModal())}
+      title="Database Performance Optimization"
+      icon="auto_fix_high"
+      maxWidth="460px"
+      footer={
+        <div className="flex justify-end gap-3 w-full">
+          <Button variant="secondary" onClick={() => dispatch(closeOptimizeDatabaseModal())} disabled={loading}>
+            Discard
+          </Button>
+          <Button 
+            variant="primary" 
+            onClick={handleOptimize} 
+            loading={loading}
+            icon="play_circle"
+            disabled={isLoadingClasses}
+          >
+            Execute Optimization
+          </Button>
+        </div>
+      }
+    >
+      <div className="relative">
         <LoadingOverlay 
-            isVisible={loading} 
-            title="Optimizing Database" 
-            subtitle="Regenerating index and query optimization statistics..." 
+          isVisible={loading} 
+          title="Optimizing Database" 
+          subtitle="Regenerating index and query optimization statistics..." 
         />
         <ErrorOverlay 
           isVisible={!!error} 
@@ -288,62 +303,39 @@ export default function OptimizeDatabaseModal() {
           onClose={() => setError(null)}
         />
 
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
-              <span className="material-symbols-outlined text-bk-yellow text-xl">auto_fix_high</span>
-            </div>
-            <div>
-              <h3 className="text-[12px] font-medium text-slate-900 dark:text-white leading-none tracking-wide">Optimize database</h3>
-            </div>
-          </div>
-          <button 
-            disabled={loading}
-            onClick={() => dispatch(closeOptimizeDatabaseModal())}
-            className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
-          >
-            <span className="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform">close</span>
-          </button>
-        </div>
-
-        {/* Body */}
-        <div className="p-5 space-y-5 flex-1 text-left overflow-visible">
+        <div className="space-y-8">
           {/* Section: Target Information */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Optimization target</span>
-              <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
-            </div>
-            
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">Database identifier</label>
-              <div className="w-full h-9 px-3 flex items-center bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded text-[12px] font-medium text-slate-700 dark:text-slate-100">
-                {selectedDatabase}
-              </div>
+          <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+            <Divider label="MAINTENANCE CONTEXT" />
+            <div className="px-1">
+              <Input 
+                label="Environment Identifier"
+                value={selectedDatabase}
+                disabled
+                icon="database"
+              />
             </div>
           </div>
 
           {/* Section: Configuration */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Optimization flags</span>
-              <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
-            </div>
+          <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-400">
+            <Divider label="OPTIMIZATION CONFIGURATION" />
             
-            <div className="space-y-3">
-              <div className="p-3 bg-bk-yellow/5 border border-bk-yellow/10 rounded-lg">
-                <div className="flex gap-2.5 items-start">
-                  <span className="material-symbols-outlined text-bk-yellow text-sm mt-0.5">info</span>
-                  <div className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400 font-medium">
-                    Updates object statistics for the cost-based optimizer. Recommended after significant data modifications for optimal query performance.
-                  </div>
+            <div className="px-1 space-y-5">
+              <div className="p-4 bg-bk-yellow/5 border border-bk-yellow/10 rounded-2xl flex gap-4 transition-all hover:bg-bk-yellow/10">
+                <div className="w-10 h-10 rounded-xl bg-bk-yellow/10 flex items-center justify-center text-bk-yellow border border-bk-yellow/20 shrink-0">
+                  <Icon name="info" size="md" weight={300} />
                 </div>
+                <Typography variant="p" className="text-[11px] text-slate-500 dark:text-slate-400 italic font-medium leading-relaxed">
+                  Optimization regenerates statistics for the cost-based query optimizer. It is highly recommended to perform this after bulk data ingestion or significant schema restructuring.
+                </Typography>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">Target class</label>
-                
+              <div className="space-y-2">
+                <Typography variant="label" className="text-slate-500 dark:text-slate-400 font-medium ml-1 flex items-center gap-1.5">
+                  Scope selection
+                  <span className="text-[9px] text-slate-300 uppercase tracking-widest">(Class / Table)</span>
+                </Typography>
                 <ClassSelect 
                    value={selectedClassName}
                    userClasses={classesData.userclass}
@@ -353,49 +345,24 @@ export default function OptimizeDatabaseModal() {
                    isLoading={isLoadingClasses}
                 />
 
-                <div className="flex items-center justify-between px-0.5 mt-2">
-                   <div className="flex items-center gap-1.5">
-                      <span className={`w-1.5 h-1.5 rounded-full ${isLoadingClasses ? 'bg-slate-300 animate-pulse' : 'bg-bk-yellow'}`}></span>
-                      <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium tracking-tight">
-                        {isLoadingClasses ? 'Searching...' : `${totalTables} objects discovered`}
-                      </span>
-                   </div>
-                   {!isLoadingClasses && totalTables > 0 && (
-                     <div className="text-[9px] text-slate-400 ">
-                        Select a specific table to narrow scope
-                     </div>
-                   )}
+                <div className="flex items-center justify-between px-1.5 pt-1">
+                  <div className="flex items-center gap-2">
+                    <div className={`w-1.5 h-1.5 rounded-full ${isLoadingClasses ? 'bg-slate-300 animate-pulse' : 'bg-bk-yellow/60'}`}></div>
+                    <Typography variant="p" className="text-[10px] text-slate-500 font-bold tracking-tight">
+                      {isLoadingClasses ? 'Searching Registry...' : `${totalTables.toLocaleString()} objects indexed`}
+                    </Typography>
+                  </div>
+                  {!isLoadingClasses && totalTables > 0 && (
+                    <Typography variant="p" className="text-[9px] text-slate-400 italic font-medium">
+                      Select specific target to minimize lock time
+                    </Typography>
+                  )}
                 </div>
               </div>
             </div>
           </div>
         </div>
-
-        {/* Footer */}
-        <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 backdrop-blur-sm flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
-          <button 
-            disabled={loading}
-            className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-all"
-            onClick={() => dispatch(closeOptimizeDatabaseModal())}
-          >
-            Discard
-          </button>
-          <button 
-            disabled={loading || isLoadingClasses}
-            className={`px-6 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center gap-2 min-w-[130px] disabled:opacity-50`}
-            onClick={handleOptimize}
-          >
-            {loading ? (
-              <div className="w-3 h-3 border-2 border-bk-side/30 border-t-bk-side rounded-full animate-spin text-left"></div>
-            ) : (
-              <>
-                <span className="material-symbols-outlined text-[16px]">play_circle</span>
-                <span>Run optimize</span>
-              </>
-            )}
-          </button>
-        </div>
       </div>
-    </div>
+    </Modal>
   );
 }

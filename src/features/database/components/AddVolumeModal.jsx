@@ -6,6 +6,14 @@ import { showStatusModal } from '../../layout/layoutSlice';
 import LoadingOverlay from '../../../components/common/LoadingOverlay';
 import ErrorOverlay from '../../../components/common/ErrorOverlay';
 
+import { Icon } from '../../../components/ds/foundation/Icon';
+import { Modal } from '../../../components/ds/layout/Modal';
+import { Button } from '../../../components/ds/foundation/Button';
+import { Input } from '../../../components/ds/forms/Input';
+import { Select } from '../../../components/ds/forms/Select';
+import { Divider } from '../../../components/ds/layout/Divider';
+import { Typography } from '../../../components/ds/foundation/Typography';
+
 const PurposeSelect = ({ value, onChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const options = [
@@ -25,7 +33,7 @@ const PurposeSelect = ({ value, onChange }) => {
         className="w-full h-9 px-3 flex items-center justify-between bg-white dark:bg-bk-main/40 border border-slate-200 dark:border-slate-800/50 rounded text-[11px] font-medium text-slate-700 dark:text-slate-200 focus:outline-none hover:border-bk-yellow/50 transition-all group"
       >
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-[16px] text-bk-yellow/80">{selected.icon}</span>
+          <Icon name={selected.icon} size="sm" weight={300} className="text-bk-yellow/80" />
           <span>{selected.label}</span>
         </div>
         <span className={`material-symbols-outlined text-[16px] text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>expand_more</span>
@@ -52,7 +60,7 @@ const PurposeSelect = ({ value, onChange }) => {
                   </div>
                 </div>
                 {value === opt.value && (
-                  <span className="material-symbols-outlined text-[14px] text-bk-yellow">check</span>
+                  <Icon name="check" size="sm" weight={300} className="text-bk-yellow" />
                 )}
               </button>
             ))}
@@ -140,16 +148,34 @@ export default function AddVolumeModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans text-left">
-      <div className="bg-white dark:bg-bk-side w-full max-w-[460px] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col relative text-left">
-        
-        {/* Subtle Top Accent */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-bk-yellow/60"></div>
-
+    <Modal
+      isOpen={isAddVolumeModalOpen}
+      onClose={() => dispatch(closeAddVolumeModal())}
+      title="Add Database Volume"
+      icon="add_to_drive"
+      maxWidth="500px"
+      footer={
+        <div className="flex justify-end gap-3 w-full">
+          <Button variant="secondary" onClick={() => dispatch(closeAddVolumeModal())}>
+            Discard
+          </Button>
+          <Button 
+            variant="primary" 
+            onClick={handleAdd} 
+            loading={loading}
+            icon="add"
+            disabled={!path || !numberOfPages}
+          >
+            Provision Volume
+          </Button>
+        </div>
+      }
+    >
+      <div className="relative">
         <LoadingOverlay 
-            isVisible={loading} 
-            title="Adding volume" 
-            subtitle="Allocating disk space and attaching to database..." 
+          isVisible={loading} 
+          title="Adding volume" 
+          subtitle="Allocating disk space and attaching to database..." 
         />
         <ErrorOverlay 
           isVisible={!!error} 
@@ -158,44 +184,31 @@ export default function AddVolumeModal() {
           onClose={() => setError(null)}
         />
 
-        {/* Header - Compact */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
-              <span className="material-symbols-outlined text-bk-yellow text-xl">add_to_drive</span>
-            </div>
-            <div>
-              <h3 className="text-[12px] font-medium text-slate-900 dark:text-white leading-none tracking-wide">Add database volume</h3>
-            </div>
-          </div>
-          <button 
-            disabled={loading}
-            onClick={() => dispatch(closeAddVolumeModal())}
-            className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
-          >
-            <span className="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform">close</span>
-          </button>
-        </div>
-
-        {/* Body */}
-        <div className="p-5 space-y-5 flex-1 overflow-y-auto max-h-[70vh]">
-          {/* Section: current Status */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Storage status</span>
-              <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5">Free disk space</label>
-                <div className="h-9 px-3 flex items-center bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded text-[11px] font-medium text-slate-600 dark:text-slate-300">
-                  {fetchingStatus ? 'Calculating...' : (volStatus.freespace || 'Unknown')}
+        <div className="space-y-8">
+          {/* Section: Status */}
+          <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+            <Divider label="STORAGE CAPACITY" />
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-1.5 px-1">
+                <Typography variant="label" className="text-slate-500 dark:text-slate-400 font-medium ml-1">Instance Free Space</Typography>
+                <div className="h-10 px-4 flex items-center bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/10 rounded-2xl text-[12px] font-bold text-emerald-600 dark:text-emerald-400 shadow-sm">
+                  {fetchingStatus ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin"></div>
+                      <span className="opacity-50">Calculating...</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <Icon name="sd_card" size="sm" weight={300} />
+                      {volStatus.freespace || 'Unknown (IO Err)'}
+                    </div>
+                  )}
                 </div>
               </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5">Database</label>
-                <div className="h-9 px-3 flex items-center bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded text-[11px] font-medium text-slate-600 dark:text-slate-300">
+              <div className="space-y-1.5 px-1">
+                <Typography variant="label" className="text-slate-500 dark:text-slate-400 font-medium ml-1">Active Database</Typography>
+                <div className="h-10 px-4 flex items-center bg-bk-yellow/5 border border-bk-yellow/10 rounded-2xl text-[12px] font-bold text-bk-yellow shadow-sm">
+                  <Icon name="database" size="sm" weight={300} className="mr-2" />
                   {selectedDatabase}
                 </div>
               </div>
@@ -203,101 +216,66 @@ export default function AddVolumeModal() {
           </div>
 
           {/* Section: Configuration */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Allocation parameters</span>
-              <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
-            </div>
+          <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-400">
+            <Divider label="VOLUME PROVISIONING" />
             
-            <div className="space-y-3">
-               <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5">Volume purpose</label>
-                    <PurposeSelect value={purpose} onChange={setPurpose} />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5">Volume name (optional)</label>
-                    <input 
-                      type="text"
-                      value={volName}
-                      onChange={(e) => setVolName(e.target.value)}
-                      placeholder="e.g. data_vol_1"
-                      className="w-full h-9 px-3 bg-white dark:bg-bk-main/40 border border-slate-200 dark:border-slate-800/50 rounded text-[11px] font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:border-bk-yellow/50 transition-colors"
-                    />
-                  </div>
-               </div>
-
-               <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5">Storage path</label>
-                <input 
-                  type="text"
-                  value={path}
-                  onChange={(e) => setPath(e.target.value)}
-                  placeholder="/path/to/volume/storage"
-                  className="w-full h-9 px-3 bg-white dark:bg-bk-main/40 border border-slate-200 dark:border-slate-800/50 rounded text-[11px] font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:border-bk-yellow/50 transition-colors"
+            <div className="space-y-4 px-1">
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-1.5">
+                  <Typography variant="label" className="text-slate-500 dark:text-slate-400 font-medium ml-1">Volume Purpose</Typography>
+                  <PurposeSelect value={purpose} onChange={setPurpose} />
+                </div>
+                <Input 
+                  label="Display Label"
+                  value={volName}
+                  onChange={(e) => setVolName(e.target.value)}
+                  placeholder="e.g. DATA_VOL_PROD_1"
+                  icon="label"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5">Volume size (MB)</label>
-                    <input 
-                      type="number"
-                      value={sizeMB}
-                      onChange={(e) => {
-                        const mb = e.target.value;
-                        setSizeMB(mb);
-                        const pages = Math.floor((parseFloat(mb) || 0) * 1024 / 16);
-                        setNumberOfPages(pages.toString());
-                      }}
-                      className="w-full h-9 px-3 bg-white dark:bg-bk-main/40 border border-slate-200 dark:border-slate-800/50 rounded text-[11px] font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:border-bk-yellow/50 transition-colors"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5">Calculated pages</label>
-                    <div className="h-9 px-3 flex items-center bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded text-[11px] font-medium text-bk-yellow">
-                      {numberOfPages} pages
-                    </div>
-                  </div>
-              </div>
-            </div>
+              <Input 
+                label="System Storage Path"
+                value={path}
+                onChange={(e) => setPath(e.target.value)}
+                placeholder="/var/lib/cubrid/volumes"
+                icon="folder_zip"
+              />
 
-            <div className="p-3 bg-bk-yellow/5 border border-bk-yellow/10 rounded-lg">
-              <div className="flex gap-2.5 items-start">
-                <span className="material-symbols-outlined text-bk-yellow text-sm mt-0.5">info</span>
-                <div className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400 font-medium">
-                  Dynamic volume management allows scaling storage without taking the database offline. Ensure target path is writable by CUBRID service.
+              <div className="grid grid-cols-2 gap-6 items-end">
+                <Input 
+                  type="number"
+                  label="Allocation Size (MB)"
+                  value={sizeMB}
+                  onChange={(e) => {
+                    const mb = e.target.value;
+                    setSizeMB(mb);
+                    const pages = Math.floor((parseFloat(mb) || 0) * 1024 / 16);
+                    setNumberOfPages(pages.toString());
+                  }}
+                  icon="straighten"
+                />
+                <div className="space-y-1.5 group">
+                  <Typography variant="label" className="text-slate-500 dark:text-slate-400 font-medium ml-1">Computed Index Pages</Typography>
+                  <div className="h-10 px-4 flex items-center justify-between bg-slate-50/50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/5 rounded-2xl text-[12px] font-mono font-bold text-bk-yellow shadow-inner group-hover:border-bk-yellow/20 transition-all">
+                    <span>{parseInt(numberOfPages).toLocaleString()}</span>
+                    <span className="text-[9px] text-slate-400 uppercase tracking-widest font-sans">Units</span>
+                  </div>
                 </div>
               </div>
             </div>
+
+            <div className="p-4 bg-bk-yellow/5 border border-bk-yellow/10 rounded-2xl flex gap-4 transition-all hover:bg-bk-yellow/10">
+              <div className="w-10 h-10 rounded-xl bg-bk-yellow/10 flex items-center justify-center text-bk-yellow border border-bk-yellow/20 shrink-0">
+                <Icon name="info" size="md" weight={300} />
+              </div>
+              <Typography variant="p" className="text-[11px] text-slate-500 dark:text-slate-400 italic font-medium leading-relaxed">
+                Scaled volumes allow dynamic expansion without downtime. Ensure the target directory has sufficient write permissions for the CUBRID instance owner.
+              </Typography>
+            </div>
           </div>
         </div>
-
-        {/* Footer */}
-        <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 backdrop-blur-sm flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
-          <button 
-            disabled={loading}
-            className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-all"
-            onClick={() => dispatch(closeAddVolumeModal())}
-          >
-            Discard
-          </button>
-          <button 
-            disabled={loading || !path || !numberOfPages}
-            className="px-6 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center gap-2 min-w-[130px] disabled:opacity-50"
-            onClick={handleAdd}
-          >
-            {loading ? (
-              <div className="w-3 h-3 border-2 border-bk-side/30 border-t-bk-side rounded-full animate-spin"></div>
-            ) : (
-              <>
-                <span className="material-symbols-outlined text-[16px]">add_to_drive</span>
-                <span>Add volume</span>
-              </>
-            )}
-          </button>
-        </div>
       </div>
-    </div>
+    </Modal>
   );
 }

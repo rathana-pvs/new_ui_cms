@@ -17,7 +17,7 @@ export const Typography = ({
     h4: 'text-xl font-semibold text-slate-900 dark:text-white',
     h5: 'text-lg font-medium text-slate-900 dark:text-white',
     h6: 'text-base font-medium text-slate-900 dark:text-white',
-    p: 'text-base text-slate-700 dark:text-slate-300',
+    p: 'text-slate-700 dark:text-slate-300',
     span: 'text-inherit',
     label: 'text-sm font-medium text-slate-700 dark:text-slate-300',
     caption: 'text-[11.5px] text-slate-500 dark:text-slate-400',

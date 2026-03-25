@@ -1,82 +1,96 @@
+import { Icon } from '../../../../components/ds/foundation/Icon';
+import { Table } from '../../../../components/ds/layout/Table';
+import { Button } from '../../../../components/ds/foundation/Button';
+import { Typography } from '../../../../components/ds/foundation/Typography';
+import { Card } from '../../../../components/ds/layout/Card';
+
 export default function DBBrokersCASSection({ brokersCAS, onViewSQLLog, onViewSlowQueryLog, onRestartCAS }) {
-  return (
-    <details className="group border border-slate-200 dark:border-slate-800 rounded-lg shadow-sm bg-white dark:bg-bk-side overflow-hidden" open>
-      <summary className="flex items-center gap-2 px-3 py-2.5 cursor-pointer list-none hover:bg-slate-50 dark:hover:bg-white/5 transition-colors bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-slate-800 text-sm font-medium text-slate-900 dark:text-slate-200">
-        <span className="material-symbols-outlined text-[16px] text-bk-yellow leading-none transition-transform group-open:rotate-180">expand_more</span>
-        <span>Brokers (CAS)</span>
-      </summary>
-      <div className="overflow-x-auto w-full">
-        <table className="w-full text-left text-xs whitespace-nowrap font-sans">
-          <thead>
-            <tr className="text-slate-500 dark:text-slate-400 bg-slate-50/20 dark:bg-transparent border-b border-slate-200 dark:border-slate-800">
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Broker</th>
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">ID</th>
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">PID</th>
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">QPS</th>
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">LQS</th>
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Status</th>
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Last connection time</th>
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide text-center">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="font-mono">
-            {brokersCAS.map((row, i) => (
-              <tr key={i} className="text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition-colors border-b border-slate-100 dark:border-slate-800">
-                <td className="px-4 py-3 font-sans font-medium">{row.broker}</td>
-                <td className="px-4 py-3">{row.id}</td>
-                <td className="px-4 py-3">{row.pid}</td>
-                <td className="px-4 py-3">{row.qps}</td>
-                <td className="px-4 py-3">{row.lqs}</td>
-                <td className="px-4 py-3">
-                  {row.status === 'READY' ? (
-                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-600 border border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-500/20">
-                      <span className="relative flex h-1.5 w-1.5">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
-                      </span>
-                      Ready
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-50 text-amber-600 border border-amber-100 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-500/20">
-                      <span className="relative flex h-1.5 w-1.5">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-500"></span>
-                      </span>
-                      Busy
-                    </span>
-                  )}
-                </td>
-                <td className="px-4 py-3 text-slate-500 dark:text-slate-400 font-sans">{row.lastConn}</td>
-                <td className="px-4 py-3">
-                   <div className="flex items-center justify-center gap-1">
-                      <button
-                        onClick={() => onRestartCAS?.(row)}
-                        className="w-7 h-7 flex items-center justify-center rounded border border-slate-200 dark:border-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400 hover:text-bk-yellow transition-all"
-                        title="Restart CAS"
-                      >
-                        <span className="material-symbols-outlined text-[16px]">restart_alt</span>
-                      </button>
-                      <button
-                        onClick={() => onViewSQLLog?.(row)}
-                        className="w-7 h-7 flex items-center justify-center rounded border border-slate-200 dark:border-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400 hover:text-sky-500 transition-all"
-                        title="SQL Log"
-                      >
-                        <span className="material-symbols-outlined text-[16px]">terminal</span>
-                      </button>
-                      <button
-                        onClick={() => onViewSlowQueryLog?.(row)}
-                        className="w-7 h-7 flex items-center justify-center rounded border border-slate-200 dark:border-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400 hover:text-rose-500 transition-all"
-                        title="Slow Query Log"
-                      >
-                        <span className="material-symbols-outlined text-[16px]">timer_off</span>
-                      </button>
-                   </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+  const columns = [
+    { 
+      header: 'Broker Parent', 
+      accessor: 'broker',
+      render: (val) => <Typography variant="p" className="font-bold text-slate-700 dark:text-white uppercase tracking-tight">{val}</Typography>
+    },
+    { header: 'CAS ID', accessor: 'id' },
+    { header: 'Process ID', accessor: 'pid' },
+    { header: 'QPS', accessor: 'qps' },
+    { header: 'LQS', accessor: 'lqs' },
+    { 
+      header: 'Service Status', 
+      accessor: 'status',
+      render: (val) => (
+        <div className={`inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full border ${
+          val === 'READY' 
+            ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' 
+            : 'bg-amber-500/10 border-amber-500/20 text-amber-500'
+        }`}>
+          <div className={`w-1.5 h-1.5 rounded-full ${val === 'READY' ? 'bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-amber-500'}`}></div>
+          <Typography variant="caption" className="font-black uppercase tracking-widest">{val}</Typography>
+        </div>
+      )
+    },
+    { header: 'Last Connection', accessor: 'lastConn' },
+    { 
+      header: 'Control Actions', 
+      accessor: 'actions',
+      align: 'center',
+      render: (_, row) => (
+        <div className="flex items-center justify-center gap-1.5">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            icon="restart_alt" 
+            title="Restart CAS Instance" 
+            onClick={() => onRestartCAS?.(row)} 
+            className="text-slate-400 hover:text-bk-yellow"
+          />
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            icon="terminal" 
+            title="View Real-time SQL Logs" 
+            onClick={() => onViewSQLLog?.(row)} 
+            className="text-slate-400 hover:text-sky-500"
+          />
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            icon="timer_off" 
+            title="Analyze Slow Query Logs" 
+            onClick={() => onViewSlowQueryLog?.(row)} 
+            className="text-slate-400 hover:text-rose-500"
+          />
+        </div>
+      )
+    },
+  ];
+
+  const cardTitle = (
+    <div className="flex items-center justify-between w-full">
+      <div className="flex items-center gap-2">
+        <Icon name="dns" size="sm" weight={300} className="text-bk-yellow" />
+        <span>Application Server Brokers (CAS)</span>
+        <div className="flex items-center gap-3 ml-4 bg-slate-100 dark:bg-black/20 px-3 py-1 rounded-full border border-slate-200 dark:border-white/5">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_4px_rgba(16,185,129,0.5)]"></span>
+            <span className="font-bold text-slate-500 uppercase tracking-tight text-[10px]">Ready: {brokersCAS.filter(c => c.status === 'READY').length}</span>
+          </div>
+          <div className="w-[1px] h-3 bg-slate-200 dark:bg-white/10"></div>
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+            <span className="font-bold text-slate-500 uppercase tracking-tight text-[10px]">Busy: {brokersCAS.filter(c => c.status !== 'READY').length}</span>
+          </div>
+        </div>
       </div>
-    </details>
+    </div>
+  );
+
+  return (
+    <Card title={cardTitle} bodyClassName="p-0" collapsible={true}>
+      <Table 
+        columns={columns}
+        data={brokersCAS}
+      />
+    </Card>
   );
 }

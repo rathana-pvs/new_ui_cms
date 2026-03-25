@@ -72,7 +72,7 @@ export function SubMenu({ icon, iconColor = '', label, children, width = 'w-56',
           className={`absolute ${position.y === 'bottom' ? 'top-0' : 'bottom-0'} 
             ${position.x === 'right' ? 'left-full ml-1' : 'right-full mr-1'} 
             ${width} bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-xl 
-            shadow-[0_4px_20px_rgba(0,0,0,0.15)] p-1.5 z-50 animate-in fade-in transition-all duration-200
+            shadow-[0_4px_20px_rgba(0,0,0,0.15)] p-1.5 z-[1000] animate-in fade-in transition-all duration-200
             ${isPositioned ? 'opacity-100 scale-100' : 'opacity-0 scale-95 origin-left'}`}
         >
           {/* Subtle Decorative Side Bar */}
@@ -141,7 +141,7 @@ export function DropdownMenu({ label, children, width = 'w-52' }) {
           ref={menuRef}
           className={`absolute ${align === 'left' ? 'left-0' : 'right-0'} top-full mt-2
             ${width} bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-xl 
-            shadow-[0_4px_25px_rgba(0,0,0,0.2)] p-1.5 z-50 animate-in fade-in transition-all duration-200
+            shadow-[0_4px_25px_rgba(0,0,0,0.2)] p-1.5 z-[1000] animate-in fade-in transition-all duration-200
             ${isPositioned ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 -translate-y-2 scale-95'}`}
         >
           {/* Subtle Top Accent */}

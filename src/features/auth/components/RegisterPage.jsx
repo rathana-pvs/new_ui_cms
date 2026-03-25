@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authApi } from '../authApi';
 
+import { Icon } from '../../../components/ds/foundation/Icon';
+
 export default function RegisterPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -83,7 +85,7 @@ export default function RegisterPage() {
           <div>
             <Link to="/login" className="flex items-center gap-4 mb-14 group w-fit transition-all hover:translate-x-[-4px]">
               <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center border border-white/10 group-hover:bg-white group-hover:border-white transition-all">
-                <span className="material-symbols-outlined text-slate-400 group-hover:text-bk-side">arrow_back</span>
+                <Icon name="arrow_back" size="sm" weight={300} className="text-slate-400 group-hover:text-bk-side" />
               </div>
               <span className="text-sm font-black text-slate-400 group-hover:text-white tracking-widest">Back to Login</span>
             </Link>
@@ -112,7 +114,7 @@ export default function RegisterPage() {
               ].map((stat, i) => (
                 <div key={i} className="p-5 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-bk-yellow/30 transition-all group">
                   <div className="flex items-center gap-3 mb-3">
-                    <span className="material-symbols-outlined text-bk-yellow/40 group-hover:text-bk-yellow transition-colors text-[20px]">{stat.icon}</span>
+                    <Icon name={stat.icon} size="sm" weight={300} className="text-bk-yellow/40 group-hover:text-bk-yellow transition-colors" />
                     <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{stat.label}</p>
                   </div>
                   <p className="text-lg font-bold text-white tracking-tight">{stat.val}</p>
@@ -142,16 +144,16 @@ export default function RegisterPage() {
               <div className="space-y-2">
                 <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-wider ml-1">Username</label>
                 <div className="relative group">
-                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[20px] text-slate-400 group-focus-within:text-bk-yellow transition-colors">person_pin</span>
+                  <Icon name="person_pin" size="sm" weight={300} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-bk-yellow transition-colors" />
                   <input
                     type="text"
                     value={username}
                     onChange={(e) => { setUsername(e.target.value); clearFieldError('username'); }}
-                    className={`w-full pl-12 pr-4 py-3.5 bg-white dark:bg-bk-side border-2 ${errors.username ? 'border-rose-500' : 'border-slate-100 dark:border-transparent group-focus-within:border-bk-yellow/50'} rounded-2xl outline-none shadow-sm transition-all dark:text-white text-sm`}
+                    className={`w-full pl-12 pr-4 py-3.5 bg-white dark:bg-bk-side border ${errors.username ? 'border-rose-500' : 'border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 focus:border-bk-yellow/50'} rounded-2xl outline-none shadow-sm transition-all dark:text-white text-sm`}
                     placeholder="Pick a unique name"
                   />
                 </div>
-                {errors.username && <p className="text-[11px] text-rose-500 font-medium ml-1 flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">error</span>{errors.username}</p>}
+                {errors.username && <p className="text-[11px] text-rose-500 font-medium ml-1 flex items-center gap-1"><Icon name="error" size="sm" weight={300} />{errors.username}</p>}
               </div>
 
               {/* Password */}
@@ -166,11 +168,11 @@ export default function RegisterPage() {
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => { setPassword(e.target.value); clearFieldError('password'); }}
-                    className={`w-full pl-12 pr-12 py-3.5 bg-white dark:bg-bk-side border-2 ${errors.password ? 'border-rose-500' : 'border-slate-100 dark:border-transparent group-focus-within:border-bk-yellow/50'} rounded-2xl outline-none shadow-sm transition-all dark:text-white text-sm`}
+                    className={`w-full pl-12 pr-12 py-3.5 bg-white dark:bg-bk-side border ${errors.password ? 'border-rose-500' : 'border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 focus:border-bk-yellow/50'} rounded-2xl outline-none shadow-sm transition-all dark:text-white text-sm`}
                     placeholder="Create security keys"
                   />
                   <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
-                    <span className="material-symbols-outlined text-[20px]">{showPassword ? 'visibility_off' : 'visibility'}</span>
+                    <Icon name={showPassword ? 'visibility_off' : 'visibility'} size="sm" weight={300} />
                   </button>
                 </div>
                 
@@ -183,38 +185,38 @@ export default function RegisterPage() {
                     </div>
                     <p className="text-[9px] font-black uppercase tracking-widest mt-2 text-slate-400 flex items-center gap-1.5">
                       Security: <span className={`flex items-center gap-1 ${strength.text}`}>
-                        <span className="material-symbols-outlined text-[12px]">{strength.icon}</span>
+                        <Icon name={strength.icon} size="sm" weight={300} />
                         {strength.label}
                       </span>
                     </p>
                   </div>
                 )}
-                {errors.password && <p className="text-[11px] text-rose-500 font-medium ml-1 flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">error</span>{errors.password}</p>}
+                {errors.password && <p className="text-[11px] text-rose-500 font-medium ml-1 flex items-center gap-1"><Icon name="error" size="sm" weight={300} />{errors.password}</p>}
               </div>
 
               {/* Confirm Password */}
               <div className="space-y-2">
                 <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-wider ml-1">Confirm Security</label>
                 <div className="relative group">
-                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[20px] text-slate-400 group-focus-within:text-bk-yellow transition-colors">verified</span>
+                  <Icon name="verified" size="sm" weight={300} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-bk-yellow transition-colors" />
                   <input
                     type={showConfirm ? 'text' : 'password'}
                     value={confirmPassword}
                     onChange={(e) => { setConfirmPassword(e.target.value); clearFieldError('confirmPassword'); }}
-                    className={`w-full pl-12 pr-12 py-3.5 bg-white dark:bg-bk-side border-2 ${errors.confirmPassword ? 'border-rose-500' : confirmPassword && password === confirmPassword ? 'border-emerald-500/50' : 'border-slate-100 dark:border-transparent group-focus-within:border-bk-yellow/50'} rounded-2xl outline-none shadow-sm transition-all dark:text-white text-sm`}
+                    className={`w-full pl-12 pr-12 py-3.5 bg-white dark:bg-bk-side border ${errors.confirmPassword ? 'border-rose-500' : confirmPassword && password === confirmPassword ? 'border-emerald-500/50' : 'border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 focus:border-bk-yellow/50'} rounded-2xl outline-none shadow-sm transition-all dark:text-white text-sm`}
                     placeholder="Repeat keys"
                   />
                    <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
-                    <span className="material-symbols-outlined text-[20px]">{showConfirm ? 'visibility_off' : 'visibility'}</span>
+                    <Icon name={showConfirm ? 'visibility_off' : 'visibility'} size="sm" weight={300} />
                   </button>
                 </div>
                 {confirmPassword && password === confirmPassword && !errors.confirmPassword && (
                    <div className="flex items-center gap-1 text-[11px] text-emerald-500 font-bold ml-1 animate-in fade-in transition-all">
-                      <span className="material-symbols-outlined text-[14px]">verified</span>
+                      <Icon name="verified" size="sm" weight={300} />
                       <span>Ready to sync</span>
                    </div>
                 )}
-                {errors.confirmPassword && <p className="text-[11px] text-rose-500 font-medium ml-1 flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">error</span>{errors.confirmPassword}</p>}
+                {errors.confirmPassword && <p className="text-[11px] text-rose-500 font-medium ml-1 flex items-center gap-1"><Icon name="error" size="sm" weight={300} />{errors.confirmPassword}</p>}
               </div>
             </div>
 
@@ -229,7 +231,7 @@ export default function RegisterPage() {
                 ) : (
                   <>
                     <span className="tracking-widest text-xs">Create Master Account</span>
-                    <span className="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">person_add</span>
+                    <Icon name="person_add" size="sm" weight={300} className="group-hover:translate-x-1 transition-transform" />
                   </>
                 )}
               </button>
@@ -237,7 +239,7 @@ export default function RegisterPage() {
 
             {apiError && (
               <div className="p-4 bg-rose-50 dark:bg-rose-500/10 border border-rose-100 dark:border-rose-500/20 rounded-2xl flex items-center gap-3">
-                <span className="material-symbols-outlined text-rose-500 text-[20px]">report</span>
+                <Icon name="report" size="sm" weight={300} className="text-rose-500" />
                 <p className="text-xs text-rose-600 dark:text-rose-400 font-bold leading-relaxed">{apiError}</p>
               </div>
             )}

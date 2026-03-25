@@ -11,6 +11,8 @@ import { Input } from '../../../components/ds/forms/Input';
 import { Typography } from '../../../components/ds/foundation/Typography';
 import { Checkbox } from '../../../components/ds/forms/Checkbox';
 
+import { Icon } from '../../../components/ds/foundation/Icon';
+
 export default function ImportExportHostModal() {
   const dispatch = useDispatch();
   const { isImportExportModalOpen, importExportMode, hosts } = useSelector((state) => state.host);
@@ -141,7 +143,7 @@ export default function ImportExportHostModal() {
       title={title}
       icon={icon}
       loading={isProcessing}
-      maxWidth="680px"
+      maxWidth="max-w-[720px]"
       subtitle={importExportMode === 'export' 
         ? 'Export hosts to XML file. Note: The passwords are not included.' 
         : 'Import hosts from XML file.'}
@@ -199,7 +201,7 @@ export default function ImportExportHostModal() {
         {importExportMode === 'import' && importList.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
             <div className="w-16 h-16 rounded-2xl bg-slate-50 dark:bg-bk-main/30 flex items-center justify-center mb-4 border border-dashed border-slate-200 dark:border-slate-800 animate-in zoom-in duration-300">
-              <span className="material-symbols-outlined text-slate-300 dark:text-slate-700 text-3xl">upload_file</span>
+              <Icon name="upload_file" size="sm" weight={300} className="text-slate-300 dark:text-slate-700 text-3xl" />
             </div>
             <Typography variant="h3" className="mb-1">No file selected</Typography>
             <Typography variant="p" className="text-slate-500 max-w-[280px] mb-8 text-[11px]">

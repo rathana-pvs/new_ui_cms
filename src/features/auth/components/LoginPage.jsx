@@ -4,6 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { loginStart, loginSuccess, loginFailure } from '../authSlice';
 import { authApi } from '../authApi';
 
+import { Icon } from '../../../components/ds/foundation/Icon';
+
 export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -85,7 +87,7 @@ export default function LoginPage() {
               ].map((item, i) => (
                 <div key={i} className="flex gap-4 p-4 rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-all group">
                   <div className="w-10 h-10 rounded-xl bg-bk-yellow/10 flex items-center justify-center shrink-0 group-hover:bg-bk-yellow transition-colors">
-                    <span className="material-symbols-outlined text-bk-yellow group-hover:text-bk-side">{['bolt', 'layers', 'code'][i]}</span>
+                    <Icon name={['bolt', 'layers', 'code'][i]} size="sm" weight={300} className="text-bk-yellow group-hover:text-bk-side" />
                   </div>
                   <div>
                     <h4 className="text-white font-bold text-sm tracking-wide">{item.title}</h4>
@@ -123,16 +125,16 @@ export default function LoginPage() {
               <div className="space-y-2">
                 <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-wider ml-1">Username</label>
                 <div className="relative group">
-                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[20px] text-slate-400 group-focus-within:text-bk-yellow transition-colors">account_circle</span>
+                  <Icon name="account_circle" size="sm" weight={300} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-bk-yellow transition-colors" />
                   <input
                     type="text"
                     value={username}
                     onChange={(e) => { setUsername(e.target.value); if (errors.username) setErrors({ ...errors, username: '' }); }}
-                    className={`w-full pl-12 pr-4 py-4 bg-white dark:bg-bk-side border-2 ${errors.username ? 'border-rose-500' : 'border-slate-100 dark:border-transparent group-focus-within:border-bk-yellow/50'} rounded-2xl outline-none shadow-sm transition-all dark:text-white placeholder:text-slate-400 text-sm`}
+                    className={`w-full pl-12 pr-4 py-4 bg-white dark:bg-bk-side border ${errors.username ? 'border-rose-500' : 'border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 focus:border-bk-yellow/50'} rounded-2xl outline-none shadow-sm transition-all dark:text-white placeholder:text-slate-400 text-sm`}
                     placeholder="Enter username"
                   />
                 </div>
-                {errors.username && <p className="text-[11px] text-rose-500 font-medium ml-1 flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">error</span>{errors.username}</p>}
+                {errors.username && <p className="text-[11px] text-rose-500 font-medium ml-1 flex items-center gap-1"><Icon name="error" size="sm" weight={300} />{errors.username}</p>}
               </div>
 
               <div className="space-y-2">
@@ -141,12 +143,12 @@ export default function LoginPage() {
                   <Link to="/forgot-password" size="sm" className="text-[10px] font-bold text-bk-yellow hover:text-bk-yellow/80 transition-colors tracking-widest">Forgot?</Link>
                 </div>
                 <div className="relative group">
-                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[20px] text-slate-400 group-focus-within:text-bk-yellow transition-colors">lock_open</span>
+                  <Icon name="lock_open" size="sm" weight={300} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-bk-yellow transition-colors" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => { setPassword(e.target.value); if (errors.password) setErrors({ ...errors, password: '' }); }}
-                    className={`w-full pl-12 pr-12 py-4 bg-white dark:bg-bk-side border-2 ${errors.password ? 'border-rose-500' : 'border-slate-100 dark:border-transparent group-focus-within:border-bk-yellow/50'} rounded-2xl outline-none shadow-sm transition-all dark:text-white text-sm`}
+                    className={`w-full pl-12 pr-12 py-4 bg-white dark:bg-bk-side border ${errors.password ? 'border-rose-500' : 'border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 focus:border-bk-yellow/50'} rounded-2xl outline-none shadow-sm transition-all dark:text-white text-sm`}
                     placeholder="••••••••"
                   />
                   <button
@@ -154,24 +156,24 @@ export default function LoginPage() {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
                   >
-                    <span className="material-symbols-outlined text-[20px]">{showPassword ? 'visibility_off' : 'visibility'}</span>
+                    <Icon name={showPassword ? 'visibility_off' : 'visibility'} size="sm" weight={300} />
                   </button>
                 </div>
-                {errors.password && <p className="text-[11px] text-rose-500 font-medium ml-1 flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">error</span>{errors.password}</p>}
+                {errors.password && <p className="text-[11px] text-rose-500 font-medium ml-1 flex items-center gap-1"><Icon name="error" size="sm" weight={300} />{errors.password}</p>}
               </div>
             </div>
 
             <div className="flex items-center gap-3 group cursor-pointer w-fit select-none">
               <input type="checkbox" id="remember" className="peer sr-only" />
               <div onClick={() => document.getElementById('remember').click()} className="w-5 h-5 rounded-md border-2 border-slate-200 dark:border-white/10 peer-checked:bg-bk-yellow peer-checked:border-bk-yellow flex items-center justify-center transition-all bg-white dark:bg-bk-side">
-                <span className="material-symbols-outlined text-bk-side text-[14px] font-bold opacity-0 peer-checked:opacity-100 transition-opacity">check</span>
+                <Icon name="check" size="sm" weight={300} className="text-bk-side font-bold opacity-0 peer-checked:opacity-100 transition-opacity" />
               </div>
               <label htmlFor="remember" className="text-xs font-bold text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors cursor-pointer tracking-wide">Remember device</label>
             </div>
 
             {apiError && (
               <div className="p-4 bg-rose-50 dark:bg-rose-500/10 border border-rose-100 dark:border-rose-500/20 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
-                <span className="material-symbols-outlined text-rose-500 text-[20px]">error_outline</span>
+                <Icon name="error_outline" size="sm" weight={300} className="text-rose-500" />
                 <p className="text-xs text-rose-600 dark:text-rose-400 font-bold">{apiError}</p>
               </div>
             )}
@@ -186,7 +188,7 @@ export default function LoginPage() {
               ) : (
                 <>
                   <span className="tracking-widest text-xs">Authorize Access</span>
-                  <span className="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">login</span>
+                  <Icon name="login" size="sm" weight={300} className="group-hover:translate-x-1 transition-transform" />
                 </>
               )}
             </button>

@@ -1,57 +1,60 @@
+import { Icon } from '../../../../components/ds/foundation/Icon';
+import { Table } from '../../../../components/ds/layout/Table';
+import { Button } from '../../../../components/ds/foundation/Button';
+import { Typography } from '../../../../components/ds/foundation/Typography';
+import { Card } from '../../../../components/ds/layout/Card';
+
 export default function DBVolumesSection({ volumes }) {
-  return (
-    <details className="group border border-slate-200 dark:border-slate-800 rounded-lg shadow-sm bg-white dark:bg-bk-side overflow-hidden" open>
-      <summary className="flex items-center justify-between px-3 py-2 cursor-pointer list-none hover:bg-slate-50 dark:hover:bg-white/5 transition-colors bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-slate-800 text-sm font-medium text-slate-900 dark:text-slate-200">
-        <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-[16px] text-bk-yellow leading-none transition-transform group-open:rotate-180">expand_more</span>
-          <span>Volumes</span>
+  const columns = [
+    { 
+      header: 'Volume Name', 
+      accessor: 'name',
+      render: (val) => {
+        const lastPath = val.split(/[/\\]/).pop() || val;
+        return <Typography variant="p" className="font-medium text-slate-700 dark:text-white tracking-tight">{lastPath}</Typography>
+      }
+    },
+    { header: 'Type', accessor: 'type' },
+    { header: 'Purpose', accessor: 'purpose' },
+    { 
+      header: 'Space Utilization (Free / Total)', 
+      accessor: 'free',
+      render: (val, row) => (
+        <div className="flex flex-col gap-1.5 min-w-[200px]">
+          <div className="flex items-center justify-between">
+            <Typography variant="p" className="font-bold text-slate-700 dark:text-white tabular-nums">{val} / {row.total}</Typography>
+            <Typography variant="caption" className="font-black text-bk-yellow">{Math.round(row.freePct)}% Free</Typography>
+          </div>
+          <div className="w-full bg-slate-100 dark:bg-white/5 rounded-full h-1 overflow-hidden">
+            <div 
+              className="h-full rounded-full bg-bk-yellow shadow-[0_0_8px_rgba(255,215,0,0.4)] transition-all duration-500" 
+              style={{ width: `${row.freePct}%` }}
+            ></div>
+          </div>
         </div>
-        <button 
-          className="flex items-center gap-1.5 px-3 py-1 rounded bg-bk-yellow hover:bg-[#ffd700] text-bk-side text-[10px] font-black uppercase tracking-tight shadow-sm transition-all active:scale-95"
-          onClick={(e) => {
-            e.preventDefault();
-            // dispatch(openAddVolumeModal()); 
-          }}
-        >
-          <span className="material-symbols-outlined text-[14px]">add_box</span>
-          <span>Add Volume</span>
-        </button>
-      </summary>
-      <div className="overflow-x-auto w-full">
-        <table className="w-full text-left text-xs whitespace-nowrap font-sans">
-          <thead>
-            <tr className="text-slate-500 dark:text-slate-400 bg-slate-50/20 dark:bg-transparent border-b border-slate-200 dark:border-slate-800">
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Volume</th>
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Type</th>
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Purpose</th>
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Free size / Total size</th>
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Modify date</th>
-              <th className="px-4 py-3 font-medium text-[10px] tracking-wide">Volume Path</th>
-            </tr>
-          </thead>
-          <tbody className="font-mono">
-            {volumes?.map((row, i) => (
-              <tr key={i} className="text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition-colors border-b border-slate-100 dark:border-slate-800">
-                <td className="px-4 py-3 font-sans font-medium">{row.name}</td>
-                <td className="px-4 py-3">{row.type}</td>
-                <td className="px-4 py-3">{row.purpose}</td>
-                <td className="px-4 py-3">
-                  <div className="flex flex-col gap-1 w-full max-w-[150px]">
-                    <div className="flex items-center justify-between text-[10px]">
-                      <span>{row.free} / {row.total}</span>
-                    </div>
-                    <div className="w-full bg-slate-200 dark:bg-slate-700/50 rounded-full h-1 overflow-hidden" title={`${row.freePct}% Free`}>
-                      <div className="h-full rounded-full bg-bk-yellow" style={{ width: `${row.freePct}%` }}></div>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-4 py-3">{row.date}</td>
-                <td className="px-4 py-3 text-[11px] text-slate-500 dark:text-slate-400 font-sans">{row.path}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </details>
+      )
+    },
+    { header: 'Modify Date', accessor: 'date' },
+    { 
+      header: 'Physical Path', 
+      accessor: 'path',
+      render: (val) => <Typography variant="caption" className="text-slate-500 dark:text-slate-400 font-medium truncate max-w-[300px]">{val}</Typography>
+    },
+  ];
+
+  const cardTitle = (
+    <div className="flex items-center gap-2">
+      <Icon name="storage" size="sm" weight={300} className="text-bk-yellow" />
+      <span>Storage Volumes</span>
+    </div>
+  );
+
+  return (
+    <Card title={cardTitle} bodyClassName="p-0" collapsible={true}>
+      <Table 
+        columns={columns}
+        data={volumes}
+      />
+    </Card>
   );
 }

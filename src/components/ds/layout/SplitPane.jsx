@@ -75,7 +75,7 @@ export const SplitPane = ({
       </div>
       
       <div
-        className={`flex-shrink-0 z-50 group/resize relative flex items-center justify-center transition-colors ${
+        className={`flex-shrink-0 z-10 group/resize relative flex items-center justify-center transition-colors ${
           isVertical ? 'w-1.5 cursor-col-resize h-full mx-[-3px]' : 'h-1.5 cursor-row-resize w-full my-[-3px]'
         } ${isDragging ? 'bg-bk-yellow/10' : 'bg-transparent hover:bg-bk-yellow/5'}`}
         onMouseDown={() => {

@@ -5,6 +5,9 @@ import { databaseApi } from '../databaseApi';
 import LoadingOverlay from '../../../components/common/LoadingOverlay';
 import ErrorOverlay from '../../../components/common/ErrorOverlay';
 
+import { Icon } from '../../../components/ds/foundation/Icon';
+import { Typography } from '../../../components/ds/foundation/Typography';
+
 export default function LockInformationModal() {
   const dispatch = useDispatch();
   const { isLockInfoModalOpen, selectedDatabase } = useSelector((state) => state.database);
@@ -72,10 +75,10 @@ export default function LockInformationModal() {
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
-              <span className="material-symbols-outlined text-bk-yellow text-xl">lock</span>
+              <Icon name="lock" size="sm" weight={300} className="text-bk-yellow text-xl" />
             </div>
             <div>
-              <h3 className="text-sm font-medium text-slate-900 dark:text-white leading-none">Locking system monitor</h3>
+              <Typography variant="h3" className="text-sm font-medium text-slate-900 dark:text-white leading-none">Locking system monitor</Typography>
             </div>
           </div>
           <button 
@@ -83,7 +86,7 @@ export default function LockInformationModal() {
             onClick={() => dispatch(closeLockInfoModal())}
             className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
           >
-            <span className="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform">close</span>
+            <Icon name="close" size="sm" weight={300} className="text-lg group-hover:rotate-90 transition-transform" />
           </button>
         </div>
 
@@ -101,7 +104,7 @@ export default function LockInformationModal() {
                   ? 'text-bk-yellow border-bk-yellow' 
                   : 'text-slate-400 border-transparent hover:text-slate-600 dark:hover:text-slate-200'}`}
             >
-              {tab.label}
+              <Typography variant="label">{tab.label}</Typography>
               {activeTab === tab.id && (
                 <div className="absolute inset-0 bg-bk-yellow/5 animate-pulse pointer-events-none"></div>
               )}
@@ -114,25 +117,25 @@ export default function LockInformationModal() {
           {loading && transactions.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-4 py-20 min-h-[400px]">
               <div className="w-6 h-6 border-2 border-bk-yellow/20 border-t-bk-yellow rounded-full animate-spin"></div>
-              <p className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Syncing diagnostics...</p>
+              <Typography variant="p" className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Syncing diagnostics...</Typography>
             </div>
           ) : activeTab === 'client' ? (
             <div className="space-y-6">
               {/* Server Context */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Server parameters</span>
+                  <Typography variant="label" className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Server parameters</Typography>
                   <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-4 bg-bk-yellow/5 border border-bk-yellow/10 rounded-xl flex items-center justify-between">
-                    <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 tracking-wide">Lock escalation</span>
-                    <span className="text-sm font-mono font-medium text-slate-700 dark:text-slate-200">{settings.esc || '100,000'}</span>
+                    <Typography variant="label" className="text-[10px] font-medium text-slate-400 dark:text-slate-500 tracking-wide">Lock escalation</Typography>
+                    <Typography variant="span" className="text-sm font-mono font-medium text-slate-700 dark:text-slate-200">{settings.esc || '100,000'}</Typography>
                   </div>
                   <div className="p-4 bg-bk-yellow/5 border border-bk-yellow/10 rounded-xl flex items-center justify-between">
-                    <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 tracking-wide">Deadlock interval</span>
-                    <span className="text-sm font-mono font-medium text-slate-700 dark:text-slate-200">{settings.dinterval || '0'} <span className="text-[10px] opacity-60">ms</span></span>
+                    <Typography variant="label" className="text-[10px] font-medium text-slate-400 dark:text-slate-500 tracking-wide">Deadlock interval</Typography>
+                    <Typography variant="span" className="text-sm font-mono font-medium text-slate-700 dark:text-slate-200">{settings.dinterval || '0'} <Typography variant="span" className="text-[10px] opacity-60">ms</Typography></Typography>
                   </div>
                 </div>
               </div>
@@ -140,7 +143,7 @@ export default function LockInformationModal() {
               {/* Transactions Table */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Active client sessions</span>
+                  <Typography variant="label" className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Active client sessions</Typography>
                   <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
                 </div>
 
@@ -149,34 +152,34 @@ export default function LockInformationModal() {
                     <table className="w-full text-left text-[11px] border-collapse">
                       <thead className="bg-slate-50/80 dark:bg-bk-main/50 text-[10px] font-medium text-slate-400 tracking-wide border-b border-slate-100 dark:border-slate-800">
                         <tr>
-                          <th className="px-3 py-2.5">Idx</th>
-                          <th className="px-3 py-2.5">Pname</th>
-                          <th className="px-3 py-2.5">UID</th>
-                          <th className="px-3 py-2.5">Host address</th>
-                          <th className="px-3 py-2.5 text-center">PID</th>
-                          <th className="px-3 py-2.5">Isolation</th>
-                          <th className="px-3 py-2.5 text-right">Timeout</th>
+                          <th className="px-3 py-2.5"><Typography variant="label">Idx</Typography></th>
+                          <th className="px-3 py-2.5"><Typography variant="label">Pname</Typography></th>
+                          <th className="px-3 py-2.5"><Typography variant="label">UID</Typography></th>
+                          <th className="px-3 py-2.5"><Typography variant="label">Host address</Typography></th>
+                          <th className="px-3 py-2.5 text-center"><Typography variant="label">PID</Typography></th>
+                          <th className="px-3 py-2.5"><Typography variant="label">Isolation</Typography></th>
+                          <th className="px-3 py-2.5 text-right"><Typography variant="label">Timeout</Typography></th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100 dark:divide-white/5 font-mono text-[10px]">
                         {transactions.length > 0 ? transactions.map((client, idx) => (
                           <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-all">
-                            <td className="px-3 py-2 text-bk-yellow font-medium">{client.index}</td>
-                            <td className="px-3 py-2 font-sans font-medium text-slate-700 dark:text-slate-300">{client.pname || '-'}</td>
-                            <td className="px-3 py-2 text-slate-400">{client['@uid'] || '-'}</td>
-                            <td className="px-3 py-2 text-slate-400">{client.host || '-'}</td>
+                            <td className="px-3 py-2"><Typography variant="span" className="text-bk-yellow font-medium">{client.index}</Typography></td>
+                            <td className="px-3 py-2"><Typography variant="span" className="font-sans font-medium text-slate-700 dark:text-slate-300">{client.pname || '-'}</Typography></td>
+                            <td className="px-3 py-2"><Typography variant="span" className="text-slate-400">{client['@uid'] || '-'}</Typography></td>
+                            <td className="px-3 py-2"><Typography variant="span" className="text-slate-400">{client.host || '-'}</Typography></td>
                             <td className="px-3 py-2 text-center">
-                              <span className="bg-slate-100 dark:bg-bk-main/40 px-1.5 py-0.5 rounded text-[10px] border border-slate-200/50 dark:border-white/5">{client.pid}</span>
+                              <Typography variant="span" className="bg-slate-100 dark:bg-bk-main/40 px-1.5 py-0.5 rounded text-[10px] border border-slate-200/50 dark:border-white/5">{client.pid}</Typography>
                             </td>
-                            <td className="px-3 py-2 text-slate-400">{client.isolevel}</td>
-                            <td className="px-3 py-2 text-right text-slate-400">{client.timeout} <span className="opacity-50 text-[9px]">sec</span></td>
+                            <td className="px-3 py-2"><Typography variant="span" className="text-slate-400">{client.isolevel}</Typography></td>
+                            <td className="px-3 py-2 text-right"><Typography variant="span" className="text-slate-400">{client.timeout} <Typography variant="span" className="opacity-50 text-[9px]">sec</Typography></Typography></td>
                           </tr>
                         )) : (
                           <tr>
                             <td colSpan="7" className="px-3 py-16 text-center">
                               <div className="flex flex-col items-center justify-center gap-2 opacity-30 grayscale">
-                                <span className="material-symbols-outlined text-3xl">group_off</span>
-                                <p className="text-[10px] font-medium tracking-wide">No active sessions</p>
+                                <Icon name="group_off" size="sm" weight={300} className="text-3xl" />
+                                <Typography variant="p" className="text-[10px] font-medium tracking-wide">No active sessions</Typography>
                               </div>
                             </td>
                           </tr>
@@ -192,7 +195,7 @@ export default function LockInformationModal() {
               {/* Object Stats */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Lock usage statistics</span>
+                  <Typography variant="label" className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Lock usage statistics</Typography>
                   <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
                 </div>
                 
@@ -203,10 +206,10 @@ export default function LockInformationModal() {
                     { label: 'Storage footprint', value: settings.sizelock || '1M', unit: 'B' }
                   ].map(stat => (
                     <div key={stat.label} className="p-4 bg-bk-yellow/5 border border-bk-yellow/10 rounded-xl space-y-1">
-                      <span className="text-[9px] font-medium text-slate-400 tracking-wide">{stat.label}</span>
+                      <Typography variant="label" className="text-[9px] font-medium text-slate-400 tracking-wide">{stat.label}</Typography>
                       <div className="flex items-baseline gap-1">
-                        <span className="text-lg font-mono font-medium text-slate-700 dark:text-slate-200 tracking-tighter">{stat.value}</span>
-                        <span className="text-[10px] font-medium text-slate-400 opacity-60">{stat.unit}</span>
+                        <Typography variant="span" className="text-lg font-mono font-medium text-slate-700 dark:text-slate-200 tracking-tighter">{stat.value}</Typography>
+                        <Typography variant="span" className="text-[10px] font-medium text-slate-400 opacity-60">{stat.unit}</Typography>
                       </div>
                     </div>
                   ))}
@@ -216,7 +219,7 @@ export default function LockInformationModal() {
               {/* Object Details */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Object level details</span>
+                  <Typography variant="label" className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Object level details</Typography>
                   <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
                 </div>
 
@@ -225,19 +228,19 @@ export default function LockInformationModal() {
                     <table className="w-full text-left text-[11px] border-collapse">
                       <thead className="bg-slate-50/80 dark:bg-bk-main/50 text-[10px] font-medium text-slate-400 tracking-wide border-b border-slate-100 dark:border-slate-800">
                         <tr>
-                          <th className="px-3 py-2.5">Object ID (OID)</th>
-                          <th className="px-3 py-2.5">Structure type</th>
-                          <th className="px-3 py-2.5 text-center">Holders</th>
-                          <th className="px-3 py-2.5 text-center">Blocked</th>
-                          <th className="px-3 py-2.5 text-right">Waiters</th>
+                          <th className="px-3 py-2.5"><Typography variant="label">Object ID (OID)</Typography></th>
+                          <th className="px-3 py-2.5"><Typography variant="label">Structure type</Typography></th>
+                          <th className="px-3 py-2.5 text-center"><Typography variant="label">Holders</Typography></th>
+                          <th className="px-3 py-2.5 text-center"><Typography variant="label">Blocked</Typography></th>
+                          <th className="px-3 py-2.5 text-right"><Typography variant="label">Waiters</Typography></th>
                         </tr>
                       </thead>
                       <tbody>
                         <tr>
                           <td colSpan="5" className="px-3 py-24 text-center">
                             <div className="flex flex-col items-center justify-center gap-2 opacity-30 grayscale">
-                              <span className="material-symbols-outlined text-3xl">key_off</span>
-                                <p className="text-[10px] font-medium tracking-wide">No lock contention discovered</p>
+                              <Icon name="key_off" size="sm" weight={300} className="text-3xl" />
+                                <Typography variant="p" className="text-[10px] font-medium tracking-wide">No lock contention discovered</Typography>
                             </div>
                           </td>
                         </tr>
@@ -246,7 +249,7 @@ export default function LockInformationModal() {
                   </div>
                   <div className="p-2 border-t border-slate-100 dark:border-white/5 flex justify-end">
                     <button className="px-3 py-1 bg-bk-side dark:bg-bk-main text-white text-[10px] font-medium tracking-wide rounded border border-white/10 hover:bg-bk-main transition-all">
-                      Detailed telemetry
+                      <Typography variant="p">Detailed telemetry</Typography>
                     </button>
                   </div>
                 </div>
@@ -259,7 +262,7 @@ export default function LockInformationModal() {
         <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 backdrop-blur-sm flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
           <button 
             disabled={loading}
-            className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-all"
+            className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-all text-left"
             onClick={() => dispatch(closeLockInfoModal())}
           >
             Discard
@@ -267,13 +270,13 @@ export default function LockInformationModal() {
           <button 
             onClick={fetchLockInfo}
             disabled={loading}
-            className="px-6 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center gap-2 min-w-[120px] disabled:opacity-50"
+            className="px-6 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center gap-2 min-w-[120px] disabled:opacity-50 text-left"
           >
             {loading ? (
               <div className="w-3 h-3 border-2 border-bk-side/30 border-t-bk-side rounded-full animate-spin"></div>
             ) : (
               <>
-                <span className="material-symbols-outlined text-[16px]">refresh</span>
+                <Icon name="refresh" size="sm" weight={300} />
                 <span>Refresh stats</span>
               </>
             )}

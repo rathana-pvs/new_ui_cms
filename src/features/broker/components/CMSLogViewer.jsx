@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchCMSLogs } from '../brokerSlice';
 
+import { Icon } from '../../../components/ds/foundation/Icon';
+
 function CMSLogViewer({ hostUid, type }) {
   const dispatch = useDispatch();
   const [currentPage, setCurrentPage] = useState(1);
@@ -63,7 +65,7 @@ function CMSLogViewer({ hostUid, type }) {
               disabled={currentPage === 1 || loading}
               className="p-1.5 text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-white/10 hover:text-amber-600 dark:hover:text-bk-yellow rounded-md transition-all disabled:opacity-30 disabled:hover:bg-transparent"
             >
-              <span className="material-symbols-outlined text-[20px]">chevron_left</span>
+              <Icon name="chevron_left" size="sm" weight={300} />
             </button>
             <div className="px-3 text-[11px] font-medium text-slate-600 dark:text-slate-300 min-w-[80px] text-center">
               Page {currentPage} / {totalPages}
@@ -73,7 +75,7 @@ function CMSLogViewer({ hostUid, type }) {
               disabled={currentPage >= totalPages || loading}
               className="p-1.5 text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-white/10 hover:text-amber-600 dark:hover:text-bk-yellow rounded-md transition-all disabled:opacity-30 disabled:hover:bg-transparent"
             >
-              <span className="material-symbols-outlined text-[20px]">chevron_right</span>
+              <Icon name="chevron_right" size="sm" weight={300} />
             </button>
           </div>
 
@@ -102,7 +104,7 @@ function CMSLogViewer({ hostUid, type }) {
         {!paginatedLogs || paginatedLogs.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center p-8">
             <div className="w-16 h-16 bg-slate-50 dark:bg-white/5 rounded-full flex items-center justify-center mb-4">
-              <span className="material-symbols-outlined text-slate-400 dark:text-slate-500 text-3xl">inbox</span>
+              <Icon name="inbox" size="sm" weight={300} className="text-slate-400 dark:text-slate-500 text-3xl" />
             </div>
             <p className="text-sm text-slate-500 dark:text-slate-400 italic">No log entries found for this category.</p>
           </div>
@@ -117,7 +119,7 @@ function CMSLogViewer({ hostUid, type }) {
                   {log.time}
                 </div>
                 <div className="w-24 flex-shrink-0 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[14px] text-slate-400 dark:text-slate-600">person</span>
+                  <Icon name="person" size="sm" weight={300} className="text-slate-400 dark:text-slate-600" />
                   <span className="text-slate-700 dark:text-slate-300 font-medium truncate">{log['@user'] || 'System'}</span>
                 </div>
                 <div className="w-40 flex-shrink-0">

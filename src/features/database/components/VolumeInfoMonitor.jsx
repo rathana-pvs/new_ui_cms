@@ -2,17 +2,13 @@ import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchDatabaseSpaceInfo } from '../databaseSlice';
 
-/**
- * VolumeInfoMonitor Component
- * Displays detailed information about a specific database volume,
- * mirroring the "Volume Info" editor in the desktop client.
- * 
- * Tab ID Format: vol_info:<hostUid>:<dbname>:<volname>
- */
+import { Icon } from '../../../components/ds/foundation/Icon';
+import { Typography } from '../../../components/ds/foundation/Typography';
+
 export default function VolumeInfoMonitor({ tabId }) {
   const dispatch = useDispatch();
   const [, hostUid, dbname, volname] = tabId.split(':');
-  
+
   const { spaceInfo, spaceInfoLoading } = useSelector((state) => state.database);
   const dbSpace = spaceInfo[dbname];
   const isLoading = spaceInfoLoading[dbname];
@@ -32,194 +28,191 @@ export default function VolumeInfoMonitor({ tabId }) {
 
   if (isLoading && !volume) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-slate-400 gap-4 bg-slate-50/30 dark:bg-transparent">
-        <div className="animate-spin h-10 w-10 border-4 border-amber-500 border-t-transparent rounded-full shadow-lg"></div>
-        <p className="text-sm font-medium animate-pulse tracking-wide">Fetching Volume Metrics...</p>
+      <div className="flex flex-col items-center justify-center h-full gap-3 bg-white dark:bg-background-dark">
+        <div className="h-8 w-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+        <Typography variant="p" className="text-xs text-slate-400">Loading volume data…</Typography>
       </div>
     );
   }
 
   if (!volume) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-slate-400 gap-2 bg-slate-50/30 dark:bg-transparent">
-        <span className="material-symbols-outlined text-6xl opacity-20">inventory_2</span>
-        <p className="text-lg font-semibold text-slate-300">Volume Not Found</p>
-        <p className="text-xs">The volume "{volname}" could not be located in database "{dbname}".</p>
+      <div className="flex flex-col items-center justify-center h-full gap-2 bg-white dark:bg-background-dark">
+        <Icon name="inventory_2" size="sm" weight={300} className="text-4xl text-slate-300" />
+        <Typography variant="p" className="text-sm font-semibold text-slate-400">Volume not found</Typography>
+        <Typography variant="caption" className="text-xs text-slate-300">"{volname}" in {dbname}</Typography>
       </div>
     );
   }
 
-  const freePages = volume.freepage || 0;
+  const freePages  = volume.freepage  || 0;
   const totalPages = volume.totalpage || 0;
-  const usedPages = totalPages - freePages;
-  const freeM = (freePages * pageSize) / (1024 * 1024);
-  const totalM = (totalPages * pageSize) / (1024 * 1024);
-  const usedM = (usedPages * pageSize) / (1024 * 1024);
-  const usedPercent = totalPages > 0 ? (usedPages / totalPages) * 100 : 0;
+  const usedPages  = totalPages - freePages;
+  const freeM      = (freePages  * pageSize) / (1024 * 1024);
+  const totalM     = (totalPages * pageSize) / (1024 * 1024);
+  const usedM      = (usedPages  * pageSize) / (1024 * 1024);
+  const usedPct    = totalPages > 0 ? (usedPages / totalPages) * 100 : 0;
+
+  // SVG donut math (r=38, circumference ≈ 238.76)
+  const R   = 38;
+  const C   = 2 * Math.PI * R;
+  const arc = (usedPct / 100) * C;
+
+  const severity = usedPct > 85 ? 'text-rose-500' : usedPct > 60 ? 'text-amber-500' : 'text-emerald-500';
+
+  const infoRows = [
+    { label: 'Volume Name', val: volume.spacename?.split(/[/\\]/).pop() || volume.spacename },
+    { label: 'Location',    val: volume.location },
+    { label: 'Type',        val: volume.type },
+    { label: 'Purpose',     val: volume.purpose || '—' },
+    { label: 'Page Size',   val: `${parseInt(pageSize).toLocaleString()} B` },
+    { label: 'Total Pages', val: parseInt(totalPages).toLocaleString() },
+    { label: 'Free Pages',  val: parseInt(freePages).toLocaleString() },
+    { label: 'Total Size',  val: `${totalM.toFixed(2)} MB` },
+  ];
 
   return (
-    <div className="h-full overflow-hidden bg-white dark:bg-[#0b0c10] flex flex-col animate-in fade-in duration-700">
-      {/* Ghost Header Title - Refined */}
-      <div className="relative h-20 shrink-0 bg-white/50 dark:bg-white/[0.02] border-b border-slate-100 dark:border-white/[0.03] px-8 flex items-center">
-        <div className="relative z-10 flex flex-col">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_#f59e0b]"></span>
-            <span className="text-[10px] font-bold text-amber-500 uppercase tracking-[0.2em] opacity-90">Volume Metrics</span>
+    <div className="flex-1 flex flex-col h-full bg-white dark:bg-background-dark overflow-hidden select-none animate-in fade-in duration-300">
+
+      {/* ── Header ── */}
+      <header className="px-6 py-4 border-b border-slate-100 dark:border-white/[0.04] flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
+            <Icon name="hard_drive" size="sm" weight={300} className="text-amber-500" />
           </div>
-          <span className="text-sm font-bold text-slate-800 dark:text-slate-100 font-mono tracking-tight truncate max-w-3xl">
-            {volume.location}
-          </span>
-        </div>
-      </div>
-
-      <div className="flex-1 min-h-0 flex flex-col md:flex-row p-8 gap-8 overflow-hidden">
-        {/* Left Stats Section */}
-        <div className="flex flex-col gap-6 w-full md:w-[320px] shrink-0">
-          <div className="p-6 rounded-2xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.05] shadow-sm flex flex-col gap-8">
-            <div className="flex flex-col gap-4">
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Storage Details</span>
-              <div className="space-y-4">
-                <div className="flex flex-col">
-                  <span className="text-[10px] text-slate-500 mb-1">Type</span>
-                  <div className="px-3 py-1.5 bg-slate-200 dark:bg-white/10 rounded-lg text-[12px] font-bold text-slate-700 dark:text-slate-200 inline-block border border-slate-300 dark:border-white/5 w-fit">
-                    {volume.type}
-                  </div>
-                </div>
-                {volume.purpose && (
-                  <div className="flex flex-col">
-                    <span className="text-[10px] text-slate-500 mb-1">Purpose</span>
-                    <div className="px-3 py-1.5 bg-amber-500/10 rounded-lg text-[12px] font-bold text-amber-600 dark:text-amber-500 border border-amber-500/10 w-fit">
-                      {volume.purpose}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="h-px bg-slate-200 dark:bg-white/5"></div>
-
-            <div className="flex flex-col gap-1">
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Page Architecture</span>
-              <div className="flex items-center justify-between py-2">
-                <div className="flex flex-col">
-                  <span className="text-[10px] text-slate-500">Unit Size</span>
-                  <span className="text-[14px] font-mono font-bold text-slate-800 dark:text-slate-100">{pageSize.toLocaleString()} B</span>
-                </div>
-                <div className="flex flex-col items-end">
-                   <span className="text-[10px] text-slate-500">Total Count</span>
-                   <span className="text-[14px] font-mono font-bold text-slate-600 dark:text-slate-400">{(totalPages / 1000).toFixed(1)}K</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-auto p-5 rounded-2xl bg-bk-yellow/5 border border-bk-yellow/10">
-            <div className="flex items-center gap-2 mb-2 text-bk-yellow">
-              <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
-              <span className="text-[10px] font-bold uppercase tracking-wider">Volume Health</span>
-            </div>
-            <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
-               This volume is performing at <span className="text-emerald-500 font-bold">peak efficiency</span> with <span className="text-slate-800 dark:text-slate-100 font-bold">{freeM.toFixed(1)} MB</span> of headroom remaining.
-            </p>
+          <div>
+            <Typography variant="h1" className="text-sm font-bold text-slate-800 dark:text-slate-100 leading-tight">
+              Volume Info
+            </Typography>
+            <Typography variant="label" className="text-[10px] text-slate-400 font-mono truncate max-w-sm">
+              {volume.location}
+            </Typography>
           </div>
         </div>
 
-        {/* Visualization Canvas */}
-        <div className="flex-1 flex flex-col bg-slate-50 dark:bg-white/[0.01] rounded-[32px] border border-slate-200 dark:border-white/[0.03] p-8 relative overflow-hidden group">
-           {/* Grid Pattern Background */}
-           <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none" 
-                style={{backgroundImage: 'radial-gradient(circle, #7777fd 1px, transparent 1px)', backgroundSize: '24px 24px'}}></div>
-           
-           <div className="flex-1 flex flex-col items-center justify-center min-h-0 relative z-10">
-              <div className="relative w-full max-w-[280px] aspect-square flex items-center justify-center">
-                 {/* Radial Glow */}
-                 <div className="absolute inset-[-40px] bg-indigo-500/10 dark:bg-indigo-500/5 blur-[80px] rounded-full opacity-40 group-hover:opacity-60 transition-opacity duration-1000"></div>
-                 
-                 <div className="relative w-[90%] h-[90%] animate-in zoom-in duration-1000">
-                    <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-[0_10px_30px_rgba(0,0,0,0.1)] dark:drop-shadow-[0_30px_60px_rgba(0,0,0,0.4)] overflow-visible">
-                      {/* Base Track */}
-                      <circle cx="50" cy="50" r="40" fill="none" stroke="#7777fd" strokeWidth="18" className="opacity-10 dark:opacity-20" />
-                      
-                      {/* Free Space Arc */}
-                      <circle
-                        cx="50"
-                        cy="50"
-                        r="40"
-                        fill="none"
-                        stroke="#7777fd" 
-                        strokeWidth="18"
-                        strokeDasharray="251.3"
-                        className="opacity-90 dark:opacity-80 transition-all duration-1000"
-                      />
-                      
-                      {/* Used Space Arc */}
-                      {usedPercent > 0 && (
-                        <circle
-                          cx="50"
-                          cy="50"
-                          r="40"
-                          fill="none"
-                          stroke="#eb8b52"
-                          strokeWidth="18"
-                          strokeDasharray={`${usedPercent * 2.513} 251.3`}
-                          transform="rotate(-90 50 50)"
-                          className="transition-all duration-1000 ease-out"
-                        />
-                      )}
-                      
-                      {/* Highlight Inner/Outer Rings */}
-                      <circle cx="50" cy="50" r="49" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-slate-200 dark:text-white/10" />
-                      <circle cx="50" cy="50" r="31" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-slate-200 dark:text-white/10" />
-                    </svg>
+        <button
+          onClick={() => dispatch(fetchDatabaseSpaceInfo({ hostUid, dbname }))}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-white/5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 transition-all active:scale-95 border border-slate-200 dark:border-white/[0.06]"
+        >
+          <Icon name="refresh" size="sm" weight={300} />
+          Refresh
+        </button>
+      </header>
 
-                    {/* Central Indicator */}
-                    <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                       <div className="flex flex-col items-center">
-                          <span className="text-[44px] font-black text-slate-800 dark:text-white leading-none tracking-tighter">
-                            {usedPercent.toFixed(0)}<span className="text-lg text-slate-400 font-bold tracking-normal">%</span>
-                          </span>
-                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Utilization</span>
-                       </div>
-                    </div>
-                 </div>
-              </div>
+      {/* ── Body ── */}
+      <div className="flex-1 min-h-0 flex gap-0 overflow-hidden">
 
-              {/* Data Cards for Legend */}
-              <div className="mt-12 flex flex-wrap justify-center gap-6">
-                 <div className="px-6 py-4 rounded-2xl bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.05] shadow-sm flex items-center gap-4 hover:border-amber-500/30 transition-colors">
-                    <div className="w-3 h-3 rounded-sm bg-[#eb8b52] shadow-[0_0_10px_#eb8b5244] shrink-0"></div>
-                    <div className="flex flex-col">
-                       <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Physical Used</span>
-                       <span className="text-[15px] font-black text-slate-800 dark:text-slate-200">{usedM.toFixed(1)} MB</span>
-                    </div>
-                 </div>
-                 <div className="px-6 py-4 rounded-2xl bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.05] shadow-sm flex items-center gap-4 hover:border-indigo-500/30 transition-colors">
-                    <div className="w-3 h-3 rounded-sm bg-[#7777fd] shadow-[0_0_10px_#7777fd44] shrink-0"></div>
-                    <div className="flex flex-col">
-                       <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Physical Free</span>
-                       <span className="text-[15px] font-black text-slate-800 dark:text-slate-200">{freeM.toFixed(1)} MB</span>
-                    </div>
-                 </div>
+        {/* Left — Info sidebar */}
+        <aside className="w-64 shrink-0 border-r border-slate-100 dark:border-white/[0.04] flex flex-col overflow-y-auto">
+          {/* Info rows */}
+          <div className="p-4 space-y-0 flex-1">
+            <Typography variant="label" className="text-[9px] font-bold text-slate-400 uppercase tracking-widest px-2 pb-2 block">
+              Properties
+            </Typography>
+            {infoRows.map((row, i) => (
+              <div key={i} className="flex flex-col px-2 py-2 border-b border-slate-50 dark:border-white/[0.03] last:border-0">
+                <Typography variant="label" className="text-[9px] text-slate-400 uppercase tracking-wider font-semibold">{row.label}</Typography>
+                <Typography variant="p" className="text-[12px] font-semibold text-slate-700 dark:text-slate-200 font-mono truncate" title={row.val}>{row.val}</Typography>
               </div>
-           </div>
+            ))}
+          </div>
 
-           {/* Visualization Control Footer */}
-           <div className="mt-auto flex items-center justify-between pt-8">
-              <div className="flex items-center gap-3">
-                 <div className="flex -space-x-1.5 overflow-hidden">
-                    <div className="inline-block h-5 w-5 rounded-full ring-2 ring-slate-50 dark:ring-bk-main bg-emerald-500 animate-pulse"></div>
-                    <div className="inline-block h-5 w-5 rounded-full ring-2 ring-slate-50 dark:ring-bk-main bg-indigo-500"></div>
-                 </div>
-                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Real-time Telemetry Active</span>
+          {/* Health note */}
+          <div className="m-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-500/[0.06] border border-amber-100 dark:border-amber-500/20">
+            <div className="flex items-center gap-1.5 mb-1 text-amber-600 dark:text-amber-400">
+              <Icon name="auto_awesome" size="sm" weight={300} />
+              <Typography variant="label" className="text-[9px] font-bold uppercase tracking-wider">Volume Health</Typography>
+            </div>
+            <Typography variant="p" className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
+              {freeM.toFixed(1)} MB headroom remaining.
+            </Typography>
+          </div>
+        </aside>
+
+        {/* Right — Chart area */}
+        <div className="flex-1 flex flex-col items-center justify-center p-8 gap-8 overflow-hidden">
+
+          {/* Donut chart */}
+          <div className="relative w-52 h-52 shrink-0">
+            <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
+              {/* Track */}
+              <circle
+                cx="50" cy="50" r={R}
+                fill="none"
+                stroke="#e2e8f0"
+                strokeWidth="14"
+                className="dark:opacity-20"
+              />
+              {/* Used arc */}
+              {usedPct > 0 && (
+                <circle
+                  cx="50" cy="50" r={R}
+                  fill="none"
+                  stroke="#ffc107"
+                  strokeWidth="14"
+                  strokeDasharray={`${arc} ${C}`}
+                  strokeLinecap="butt"
+                  style={{ transition: 'stroke-dasharray 1s ease-out' }}
+                />
+              )}
+            </svg>
+            {/* Center label */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className={`text-4xl font-black font-mono leading-none ${severity}`}>
+                {usedPct.toFixed(0)}
+              </span>
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">%</span>
+              <span className="text-[9px] text-slate-400 uppercase tracking-widest">Used</span>
+            </div>
+          </div>
+
+          {/* Legend cards */}
+          <div className="flex gap-4 w-full max-w-sm">
+            <div className="flex-1 bg-amber-50 dark:bg-amber-500/[0.06] border border-amber-100 dark:border-amber-500/20 rounded-xl p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="w-2. h-2 rounded-full bg-amber-500 shrink-0" />
+                <Typography variant="label" className="text-[9px] text-amber-600 dark:text-amber-400 font-bold uppercase tracking-widest">Used</Typography>
               </div>
-              <button 
-                 onClick={() => dispatch(fetchDatabaseSpaceInfo({ hostUid, dbname }))}
-                 className="flex items-center gap-2 px-6 py-2 rounded-full bg-slate-200 dark:bg-white/5 text-[10px] font-black uppercase text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-white/10 transition-all border border-slate-300 dark:border-white/10 active:scale-95"
-              >
-                <span className="material-symbols-outlined text-[16px] leading-none">refresh</span>
-                Refresh Session
-              </button>
-           </div>
+              <Typography variant="p" className="text-lg font-black text-slate-700 dark:text-slate-200 font-mono">{usedM.toFixed(1)}</Typography>
+              <Typography variant="label" className="text-[9px] text-slate-400">MB Physical</Typography>
+            </div>
+
+            <div className="flex-1 bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.06] rounded-xl p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="w-2 h-2 rounded-full bg-slate-300 dark:bg-white/20 shrink-0" />
+                <Typography variant="label" className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Free</Typography>
+              </div>
+              <Typography variant="p" className="text-lg font-black text-slate-700 dark:text-slate-200 font-mono">{freeM.toFixed(1)}</Typography>
+              <Typography variant="label" className="text-[9px] text-slate-400">MB Available</Typography>
+            </div>
+          </div>
+
+          {/* Utilization bar */}
+          <div className="w-full max-w-sm">
+            <div className="flex justify-between mb-1.5">
+              <Typography variant="label" className="text-[9px] text-slate-400 font-semibold uppercase tracking-widest">Utilization</Typography>
+              <Typography variant="label" className={`text-[9px] font-black font-mono ${severity}`}>{usedPct.toFixed(2)}%</Typography>
+            </div>
+            <div className="w-full h-1.5 bg-slate-100 dark:bg-white/[0.06] overflow-hidden">
+              <div
+                className="h-full bg-amber-500 transition-all duration-1000 ease-out"
+                style={{ width: `${usedPct}%` }}
+              />
+            </div>
+            <div className="flex justify-between mt-1">
+              <span className="text-[9px] text-slate-400 font-mono">{usedM.toFixed(1)} MB used</span>
+              <span className="text-[9px] text-slate-400 font-mono">{totalM.toFixed(1)} MB total</span>
+            </div>
+          </div>
+
+          {/* Live indicator */}
+          <div className="flex items-center gap-2">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            </span>
+            <Typography variant="label" className="text-[9px] text-slate-400 uppercase tracking-widest font-semibold">Live Telemetry</Typography>
+          </div>
         </div>
       </div>
     </div>

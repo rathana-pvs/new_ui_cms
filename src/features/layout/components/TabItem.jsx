@@ -15,7 +15,7 @@ export default function TabItem({
 }) {
   return (
     <div 
-      className={`group flex items-center gap-2.5 px-4 h-full border-r border-slate-200 dark:border-white/5 cursor-pointer min-w-[120px] max-w-[200px] transition-all whitespace-nowrap relative select-none ${
+      className={`group flex items-center gap-3 px-5 h-full border-r border-slate-200 dark:border-white/5 cursor-pointer min-w-[140px] max-w-[240px] transition-all whitespace-nowrap relative select-none ${
         isActive 
           ? 'bg-white dark:bg-bk-side z-10' 
           : 'bg-slate-100 dark:bg-bk-main text-slate-500 hover:bg-slate-50 dark:hover:bg-white/5'
@@ -28,7 +28,7 @@ export default function TabItem({
       <div className="relative flex items-center justify-center">
         <Icon 
            name={icon || 'description'} 
-           size="13px" 
+           size="18px" 
            className={isActive ? 'text-bk-yellow' : 'text-slate-400 opacity-60'} 
            weight={isActive ? 500 : 300}
         />
@@ -39,19 +39,19 @@ export default function TabItem({
       
       <Typography 
         variant="caption" 
-        className={`truncate flex-1 font-medium text-[11px] ${isActive ? 'text-slate-900 dark:text-bk-yellow' : 'text-slate-500 dark:text-slate-400'}`}
+        className={`truncate flex-1 font-medium text-[13px] ${isActive ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400'}`}
       >
         {label}
       </Typography>
 
       <div 
-        className={`flex items-center justify-center size-4 rounded-md hover:bg-slate-200 dark:hover:bg-white/10 transition-colors ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+        className={`flex items-center justify-center size-6 rounded-md hover:bg-slate-200 dark:hover:bg-white/10 transition-colors ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
         onClick={(e) => {
           e.stopPropagation();
           onClose();
         }}
       >
-        <Icon name="close" size="13px" weight={300} className="text-slate-400" />
+        <Icon name="close" size="16px" weight={400} className="text-slate-400" />
       </div>
     </div>
   );

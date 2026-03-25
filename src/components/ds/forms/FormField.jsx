@@ -15,12 +15,12 @@ export const FormField = ({
       {label && (
         <div className="flex justify-between items-center mb-0.5 ml-0.5">
           <div className="flex items-center gap-1.5">
-            <Typography variant="label" className="text-[10px] font-medium text-slate-500 dark:text-slate-400 font-sans">
+            <Typography variant="label" className="text-[11px] font-medium text-slate-500 dark:text-slate-300 font-sans">
               {label}
             </Typography>
             {required && <span className="text-rose-500 text-[10px]" title="Required">*</span>}
             {labelExtra && (
-              <span className="text-[8px] text-slate-400 dark:text-slate-500 font-normal italic leading-none pt-0.5">
+              <span className="text-[9px] text-slate-400 dark:text-slate-500 font-normal italic leading-none pt-0.5">
                 {labelExtra}
               </span>
             )}
@@ -28,7 +28,7 @@ export const FormField = ({
         </div>
       )}
       {description && (
-        <Typography variant="p" className="text-[9px] text-slate-400 dark:text-slate-500 mb-0.5 ml-0.5 font-medium leading-tight">
+        <Typography variant="p" className="text-[10px] text-slate-400 dark:text-slate-500 mb-0.5 ml-0.5 font-medium leading-tight">
           {description}
         </Typography>
       )}

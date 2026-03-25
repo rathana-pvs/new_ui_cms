@@ -4,154 +4,105 @@ import { fetchDatabaseVolumes } from '../../database/databaseSlice';
 import { Card } from '../../../components/ds/layout/Card';
 import { Table } from '../../../components/ds/layout/Table';
 import { Icon } from '../../../components/ds/foundation/Icon';
+import { Typography } from '../../../components/ds/foundation/Typography';
 import { Spinner } from '../../../components/ds/foundation/Spinner';
 
 const getSizeFormat = (size) => {
-  if (size >= 1024 ** 3) {
-    return `${(size / 1024 ** 3).toFixed(0)}GB`;
-  } else if (size >= 1024 ** 2) {
-    return `${(size / 1024 ** 2).toFixed(0)}MB`;
-  } else if (size >= 1024) {
-    return `${(size / 1024).toFixed(0)}KB`;
-  } else {
-    return `${size}B`;
-  }
+  if (size >= 1024 ** 3) return `${(size / 1024 ** 3).toFixed(1)}GB`;
+  if (size >= 1024 ** 2) return `${(size / 1024 ** 2).toFixed(1)}MB`;
+  if (size >= 1024)      return `${(size / 1024).toFixed(1)}KB`;
+  return `${size}B`;
 };
 
 const getVolumeColumn = (dbSpace, type) => {
-  if (!dbSpace || !dbSpace.spaceinfo) return { display: '-', pct: 0 };
-  let totalPage = 0;
-  let freePage = 0;
-  let pageSize = parseInt(dbSpace.pagesize || 0);
-  if (pageSize === 0) return { display: '-', pct: 0 };
-
+  if (!dbSpace?.spaceinfo) return { display: '-', pct: 0 };
+  let totalPage = 0, freePage = 0;
+  const pageSize = parseInt(dbSpace.pagesize || 0);
+  if (!pageSize) return { display: '-', pct: 0 };
   for (const space of dbSpace.spaceinfo) {
     if (space.type === type) {
       totalPage += parseInt(space.totalpage || 0);
-      freePage += parseInt(space.freepage || 0);
+      freePage  += parseInt(space.freepage  || 0);
     }
   }
   if (totalPage > 0) {
     const used = (totalPage - freePage) * pageSize;
     const total = totalPage * pageSize;
-    const pct = ((freePage * 100) / totalPage).toFixed(0);
-    return {
-      display: `${getSizeFormat(used)} / ${getSizeFormat(total)} / ${pct}%`,
-      pct: 100 - parseInt(pct) // Percentage used
-    };
+    const freePct = ((freePage * 100) / totalPage).toFixed(0);
+    return { display: `${getSizeFormat(used)} / ${getSizeFormat(total)} / ${freePct}%`, pct: 100 - parseInt(freePct) };
   }
   return { display: '-', pct: 0 };
 };
 
 const getLogColumn = (dbSpace, type) => {
   let totalPage = 0;
-  let pageSize = parseInt(dbSpace.pagesize);
+  const pageSize = parseInt(dbSpace.pagesize);
   for (const space of dbSpace.spaceinfo) {
-    if (space.type === type) {
-      totalPage += parseInt(space.totalpage);
-    }
+    if (space.type === type) totalPage += parseInt(space.totalpage);
   }
-  if (totalPage > 0) {
-    return getSizeFormat(totalPage * pageSize);
-  }
-  return '-';
+  return totalPage > 0 ? getSizeFormat(totalPage * pageSize) : '-';
 };
+
+const BarCell = ({ val, barColor = 'bg-amber-500' }) => (
+  <div className="flex flex-col gap-1 min-w-[160px]">
+    <span className="text-[11px] font-mono font-semibold text-slate-600 dark:text-slate-300">{val.display}</span>
+    <div className="w-full h-1 bg-slate-100 dark:bg-white/[0.06] overflow-hidden">
+      <div className={`h-full ${val.pct > 85 ? 'bg-rose-500' : barColor} transition-all duration-500`} style={{ width: `${val.pct}%` }} />
+    </div>
+  </div>
+);
 
 export default function DatabaseVolumes({ hostUid }) {
   const dispatch = useDispatch();
   const { authorizedHosts } = useSelector((state) => state.host);
   const { activeDatabases, volumes, volumesLoading: loading } = useSelector((state) => state.database);
 
-  const fetchVolumes = useCallback(async () => {
-    if (!hostUid || !authorizedHosts.includes(hostUid) || activeDatabases.length === 0) {
-      return;
-    }
+  const fetchVolumes = useCallback(() => {
+    if (!hostUid || !authorizedHosts.includes(hostUid) || activeDatabases.length === 0) return;
     dispatch(fetchDatabaseVolumes({ hostUid, activeDatabases }));
   }, [hostUid, authorizedHosts, activeDatabases, dispatch]);
 
-  useEffect(() => {
-    fetchVolumes();
-  }, [fetchVolumes]);
+  useEffect(() => { fetchVolumes(); }, [fetchVolumes]);
 
   const volumeData = volumes?.map((result) => {
-    let permanent = { display: '-', pct: 0 };
-    let temporary = { display: '-', pct: 0 };
-    let activeLog = '-';
-    let archiveLog = '-';
-    let storageFree = '-';
-
-    if (result && result.spaceinfo) {
-      permanent = getVolumeColumn(result, 'PERMANENT');
-      temporary = getVolumeColumn(result, 'TEMPORARY');
-      activeLog = getLogColumn(result, 'Active_log');
-      archiveLog = getLogColumn(result, 'Archive_log');
-      storageFree = result.freespace ? getSizeFormat(parseInt(result.freespace) * 1024) : '-';
-    }
-
+    if (!result?.spaceinfo) return { id: result.dbname, db: result.dbname, permanent: { display: '-', pct: 0 }, temporary: { display: '-', pct: 0 }, activeLog: '-', archiveLog: '-', storageFree: '-' };
     return {
       id: result.dbname,
       db: result.dbname,
-      permanent,
-      temporary,
-      activeLog,
-      archiveLog,
-      storageFree
+      permanent:   getVolumeColumn(result, 'PERMANENT'),
+      temporary:   getVolumeColumn(result, 'TEMPORARY'),
+      activeLog:   getLogColumn(result, 'Active_log'),
+      archiveLog:  getLogColumn(result, 'Archive_log'),
+      storageFree: result.freespace ? getSizeFormat(parseInt(result.freespace) * 1024) : '-',
     };
   }) || [];
 
   const columns = [
-    { header: 'Database', accessor: 'db', className: 'font-bold' },
-    { 
-      header: 'Permanent (U/T/F%)', 
-      accessor: 'permanent',
-      render: (val) => (
-        <div className="flex flex-col gap-1 w-full max-w-[160px]">
-          <div className="text-[10px] font-mono opacity-80">{val.display}</div>
-          <div className="w-full bg-slate-100 dark:bg-black/40 rounded-full h-1 overflow-hidden border border-slate-200 dark:border-white/5">
-            <div 
-              className={`h-full rounded-full shadow-[0_0_8px] transition-all duration-500 ${val.pct > 80 ? 'bg-rose-500 shadow-rose-500/20' : 'bg-bk-yellow shadow-bk-yellow/20'}`} 
-              style={{ width: `${val.pct}%` }} 
-            />
-          </div>
-        </div>
-      )
+    {
+      header: 'Database',
+      accessor: 'db',
+      render: (val) => <span className="font-mono text-[12px] font-semibold text-slate-700 dark:text-slate-200">{val}</span>
     },
-    { 
-      header: 'Temporary (U/T/F%)', 
-      accessor: 'temporary',
-      render: (val) => (
-        <div className="flex flex-col gap-1 w-full max-w-[160px]">
-          <div className="text-[10px] font-mono opacity-80">{val.display}</div>
-          <div className="w-full bg-slate-100 dark:bg-black/40 rounded-full h-1 overflow-hidden border border-slate-200 dark:border-white/5">
-            <div 
-              className={`h-full rounded-full shadow-[0_0_8px] transition-all duration-500 ${val.pct > 80 ? 'bg-rose-500 shadow-rose-500/20' : 'bg-emerald-500 shadow-emerald-500/20'}`} 
-              style={{ width: `${val.pct}%` }} 
-            />
-          </div>
-        </div>
-      )
-    },
-    { header: 'Active Log', accessor: 'activeLog' },
-    { header: 'Archive Log', accessor: 'archiveLog' },
-    { header: 'Free Storage', accessor: 'storageFree', className: 'opacity-60' }
+    { header: 'Permanent', accessor: 'permanent', render: (val) => <BarCell val={val} barColor="bg-blue-500" /> },
+    { header: 'Temporary', accessor: 'temporary', render: (val) => <BarCell val={val} barColor="bg-amber-500" /> },
+    { header: 'Active Log', accessor: 'activeLog', render: (val) => <span className="font-mono text-[12px] text-slate-500">{val}</span> },
+    { header: 'Archive Log', accessor: 'archiveLog', render: (val) => <span className="font-mono text-[12px] text-slate-500">{val}</span> },
+    { header: 'Free Storage', accessor: 'storageFree', render: (val) => <span className="font-mono text-[12px] text-emerald-600 dark:text-emerald-400 font-semibold">{val}</span> },
   ];
 
-  const cardTitle = (
-    <div className="flex items-center gap-2">
-      <Icon name="storage" size="sm" className="text-bk-yellow"  weight={300} />
-      <span>Storage Volumes</span>
-      {loading && <Spinner size="xs" className="ml-2" />}
-    </div>
-  );
-
   return (
-    <Card title={cardTitle} bodyClassName="p-0">
-      <Table 
-        columns={columns} 
-        data={volumeData} 
-        loading={loading}
-        className="font-mono text-[12px]"
-      />
+    <Card
+      title={
+        <div className="flex items-center gap-2">
+          <Icon name="storage" size="sm" weight={300} className="text-amber-500" />
+          <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">Storage Volumes</span>
+          {loading && <Spinner size="xs" className="ml-1" />}
+        </div>
+      }
+      bodyClassName="p-0"
+      collapsible
+    >
+      <Table columns={columns} data={volumeData} loading={loading} className="text-[12px]" />
     </Card>
   );
 }

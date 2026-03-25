@@ -1,6 +1,8 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 
+import { Icon } from '../ds/foundation/Icon';
+
 export default function ConfirmModal({ 
   isOpen, 
   onClose, 
@@ -35,9 +37,7 @@ export default function ConfirmModal({
                 ? 'bg-rose-500/10 text-rose-500 border border-rose-500/15' 
                 : 'bg-bk-yellow/10 text-bk-yellow border border-bk-yellow/15'
             }`}>
-              <span className="material-symbols-outlined text-[28px] select-none" style={{ fontVariationSettings: "'wght' 300" }}>
-                {variant === 'danger' ? 'warning' : 'help'}
-              </span>
+              <Icon name="{variant === 'danger' ? 'warning' : 'help'}" size="sm" weight={300} className="select-none" />
             </div>
             
             <h3 className="text-lg font-bold text-slate-900 dark:text-white text-center leading-tight">

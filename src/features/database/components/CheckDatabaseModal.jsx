@@ -3,8 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { closeCheckDatabaseModal } from '../databaseSlice';
 import { databaseApi } from '../databaseApi';
 import { showStatusModal } from '../../layout/layoutSlice';
-import LoadingOverlay from '../../../components/common/LoadingOverlay';
-import ErrorOverlay from '../../../components/common/ErrorOverlay';
+
+import { Icon } from '../../../components/ds/foundation/Icon';
+import { Modal } from '../../../components/ds/layout/Modal';
+import { Button } from '../../../components/ds/foundation/Button';
+import { Checkbox } from '../../../components/ds/forms/Checkbox';
+import { Typography } from '../../../components/ds/foundation/Typography';
 
 export default function CheckDatabaseModal() {
   const dispatch = useDispatch();
@@ -18,7 +22,7 @@ export default function CheckDatabaseModal() {
 
   const handleCheck = async () => {
     if (!selectedHostUid || !selectedDatabase) return;
-    
+
     setLoading(true);
     setError(null);
     try {
@@ -26,7 +30,7 @@ export default function CheckDatabaseModal() {
         repairdb: repair ? 'y' : 'n'
       };
       const response = await databaseApi.checkDatabase(selectedHostUid, selectedDatabase, payload);
-      
+
       dispatch(closeCheckDatabaseModal());
       dispatch(showStatusModal({
         type: 'success',
@@ -40,119 +44,128 @@ export default function CheckDatabaseModal() {
     }
   };
 
+  const scanSteps = [
+    { icon: 'search', label: 'Block Integrity Scan', desc: 'Verify physical page checksums' },
+    { icon: 'account_tree', label: 'Index Consistency', desc: 'Validate B-tree structures' },
+    { icon: 'fact_check', label: 'Catalog Verification', desc: 'Cross-check system metadata' },
+  ];
+
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans text-left">
-      <div className="bg-white dark:bg-bk-side w-full max-w-[440px] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col relative text-left">
-        
-        {/* Subtle Top Accent */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-bk-yellow/60"></div>
-
-        <LoadingOverlay 
-            isVisible={loading} 
-            title="Checking database" 
-            subtitle="Verifying consistency and integrity flags..." 
-        />
-        <ErrorOverlay 
-          isVisible={!!error} 
-          error={error} 
-          onRetry={handleCheck}
-          onClose={() => setError(null)}
-        />
-
-        {/* Header - Compact */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
-              <span className="material-symbols-outlined text-bk-yellow text-xl">verified</span>
-            </div>
-            <div>
-              <h3 className="text-[12px] font-medium text-slate-900 dark:text-white leading-none tracking-wide">Check database</h3>
-            </div>
-          </div>
-          <button 
-            disabled={loading}
-            onClick={() => dispatch(closeCheckDatabaseModal())}
-            className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
-          >
-            <span className="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform">close</span>
-          </button>
-        </div>
-
-        {/* Body */}
-        <div className="p-5 space-y-5 flex-1">
-          {/* Section: Target Information */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Verification target</span>
-              <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
-            </div>
-            
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">Database identifier</label>
-              <div className="w-full h-9 px-3 flex items-center bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded text-[12px] font-medium text-slate-700 dark:text-slate-100">
-                {selectedDatabase}
-              </div>
-            </div>
-          </div>
-
-          {/* Section: Integrity Parameters */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Integrity flags</span>
-              <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
-            </div>
-            
-            <div className="space-y-3">
-              <div className="p-3 bg-bk-yellow/5 border border-bk-yellow/10 rounded-lg">
-                <div className="flex gap-2.5 items-start">
-                  <span className="material-symbols-outlined text-bk-yellow text-sm mt-0.5">info</span>
-                  <div className="space-y-1.5 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400 font-medium">
-                    <p>Scanning for storage inconsistencies. If errors are found, the utility will attempt automatic recovery if flag is active.</p>
-                  </div>
-                </div>
-              </div>
-
-              <label className="flex items-center gap-3 p-3 bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-white/5 transition-all group active:scale-[0.99]">
-                <input 
-                  type="checkbox" 
-                  checked={repair}
-                  onChange={(e) => setRepair(e.target.checked)}
-                  className="w-4 h-4 cursor-pointer rounded border-slate-300 dark:border-slate-700 bg-white dark:bg-bk-main text-bk-yellow focus:ring-bk-yellow/50 accent-bk-yellow"
-                />
-                <div className="flex flex-col">
-                  <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300 group-hover:text-bk-yellow transition-colors tracking-tight">Auto-repair repair</span>
-                  <span className="text-[10px] text-slate-400 dark:text-slate-500">Attempt to fix inconsistencies if discovered</span>
-                </div>
-              </label>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 backdrop-blur-sm flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
-          <button 
-            disabled={loading}
-            className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-all"
-            onClick={() => dispatch(closeCheckDatabaseModal())}
-          >
+    <Modal
+      isOpen={isCheckDatabaseModalOpen}
+      onClose={() => dispatch(closeCheckDatabaseModal())}
+      title="Database Integrity Verification"
+      icon="verified"
+      maxWidth="480px"
+      loading={loading}
+      error={error}
+      onErrorRetry={handleCheck}
+      onErrorClose={() => setError(null)}
+      footer={
+        <div className="flex justify-end gap-3 w-full">
+          <Button variant="secondary" onClick={() => dispatch(closeCheckDatabaseModal())} disabled={loading}>
             Discard
-          </button>
-          <button 
-            disabled={loading}
-            className="px-6 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center gap-2 min-w-[130px] disabled:opacity-50"
+          </Button>
+          <Button
+            variant="primary"
             onClick={handleCheck}
+            loading={loading}
+            icon="play_circle"
           >
-            {loading ? (
-              <div className="w-3 h-3 border-2 border-bk-side/30 border-t-bk-side rounded-full animate-spin"></div>
-            ) : (
-              <>
-                <span className="material-symbols-outlined text-[16px]">play_circle</span>
-                <span>Run check</span>
-              </>
-            )}
-          </button>
+            Run Diagnostics
+          </Button>
+        </div>
+      }
+    >
+      <div className="space-y-6">
+        {/* Target */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-bk-yellow"></div>
+            <Typography variant="caption" className="font-black text-slate-400 uppercase tracking-[0.2em]">Verification Target</Typography>
+          </div>
+          <div className="flex items-center gap-4 p-4 bg-slate-50/50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/5 rounded-2xl">
+            <div className="w-10 h-10 rounded-xl bg-bk-yellow/10 border border-bk-yellow/20 flex items-center justify-center shrink-0">
+              <Icon name="database" size="sm" weight={300} className="text-bk-yellow" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <Typography variant="caption" className="text-slate-400 dark:text-slate-500 font-medium uppercase tracking-widest">Database</Typography>
+              <Typography variant="h4" className="text-slate-900 dark:text-white font-bold text-[14px] tracking-tight leading-none mt-0.5">{selectedDatabase}</Typography>
+            </div>
+          </div>
+        </div>
+
+        {/* Diagnostic Scan Pipeline */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-bk-yellow"></div>
+            <Typography variant="caption" className="font-black text-slate-400 uppercase tracking-[0.2em]">Diagnostic Pipeline</Typography>
+          </div>
+
+          <div className="bg-slate-50/50 dark:bg-bk-main/30 border border-slate-100 dark:border-white/5 rounded-2xl p-4 space-y-0">
+            {scanSteps.map((step, i) => (
+              <div key={i} className="flex items-start gap-4 group">
+                <div className="flex flex-col items-center shrink-0">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 shadow-sm group-hover:shadow-[0_0_12px_rgba(16,185,129,0.15)] transition-shadow">
+                    <Icon name={step.icon} size="xs" weight={300} />
+                  </div>
+                  {i < scanSteps.length - 1 && (
+                    <div className="w-[1px] h-6 bg-gradient-to-b from-emerald-500/30 to-transparent my-1"></div>
+                  )}
+                </div>
+                <div className={`flex-1 ${i < scanSteps.length - 1 ? 'pb-4' : 'pb-0'}`}>
+                  <div className="flex items-center gap-2.5">
+                    <Typography variant="caption" className="font-black text-emerald-500/40 tabular-nums">0{i + 1}</Typography>
+                    <Typography variant="p" className="font-bold text-slate-900 dark:text-white text-[11.5px] tracking-tight">{step.label}</Typography>
+                  </div>
+                  <Typography variant="caption" className="text-slate-400 dark:text-slate-500 font-medium mt-0.5">{step.desc}</Typography>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Repair Toggle */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-bk-yellow"></div>
+            <Typography variant="caption" className="font-black text-slate-400 uppercase tracking-[0.2em]">Recovery Options</Typography>
+          </div>
+
+          <div
+            className={`flex items-center gap-4 p-4 border rounded-2xl transition-all cursor-pointer select-none ${repair ? 'bg-bk-yellow/[0.04] border-bk-yellow/20 shadow-[0_2px_16px_rgba(255,188,4,0.06)]' : 'bg-white dark:bg-white/[0.02] border-slate-100 dark:border-white/5 hover:border-slate-200 dark:hover:border-white/10'}`}
+            onClick={() => setRepair(!repair)}
+          >
+            <div className={`w-9 h-9 rounded-xl flex items-center justify-center border transition-all shrink-0 ${repair ? 'bg-bk-yellow/10 border-bk-yellow/20 text-bk-yellow' : 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/5 text-slate-400'}`}>
+              <Icon name="build" size="xs" weight={300} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <Typography variant="p" className={`font-bold text-[11.5px] tracking-tight transition-colors ${repair ? 'text-bk-yellow' : 'text-slate-900 dark:text-white'}`}>
+                Autonomous Repair
+              </Typography>
+              <Typography variant="caption" className="text-slate-400 dark:text-slate-500 font-medium mt-0.5 leading-snug">
+                Auto-resolve physical inconsistencies discovered during the scan
+              </Typography>
+            </div>
+            <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
+              <Checkbox
+                className="!w-fit"
+                checked={repair}
+                onChange={(e) => setRepair(e.target.checked)}
+              />
+            </div>
+          </div>
+
+          {/* Info note */}
+          <div className="flex items-start gap-2.5 px-3 py-2 bg-slate-50/80 dark:bg-white/[0.02] border border-slate-100 dark:border-white/5 rounded-xl">
+            <Icon name="info" size="xs" weight={300} className="text-slate-400 shrink-0 mt-0.5" />
+            <Typography variant="caption" className="text-slate-400 dark:text-slate-500 font-medium leading-relaxed italic">
+              The integrity scanner checks for block inconsistencies, index corruptions, and catalog mismatches. Enable repair to attempt immediate restoration if anomalies are detected.
+            </Typography>
+          </div>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }
+

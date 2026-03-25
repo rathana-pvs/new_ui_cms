@@ -39,10 +39,9 @@ export default function Header({ theme, toggleTheme }) {
           <HeaderMenu />
           <div className="h-6 w-px bg-slate-200 dark:bg-white/5 opacity-50"></div>
           
-          <div className="flex items-center gap-1 ml-1 scale-95 origin-left">
+          <div className="flex items-center gap-2 ml-1">
             <button 
-              className={`size-9 flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-all group
-                ${(!selectedDatabase && !selectedBroker) ? 'opacity-30 cursor-not-allowed' : 'active:scale-95'}`} 
+              className="w-10 h-10 flex items-center justify-center rounded-xl transition-all group text-bk-yellow hover:text-amber-400 bg-bk-yellow/5 hover:bg-bk-yellow/10 border border-bk-yellow/20 hover:border-bk-yellow/40 active:scale-90 shadow-sm"
               title="Start Selected"
               onClick={() => {
                 if (selectedDatabase && !activeDatabases.includes(selectedDatabase)) {
@@ -61,53 +60,53 @@ export default function Header({ theme, toggleTheme }) {
                 }
               }}
             >
-              <Icon name="play_arrow" size="sm" className="text-slate-400 group-hover:text-bk-yellow transition-colors"  weight={300} />
+              <Icon name="play_arrow" size="24px" className="transition-colors" weight={400} />
             </button>
-            <button className="size-9 flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-all active:scale-95 group" title="Dashboard">
-              <Icon name="grid_view" size="sm" className="text-slate-400 group-hover:text-bk-yellow transition-colors"  weight={300} />
+            <button className="w-10 h-10 flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 border border-transparent hover:border-slate-300 dark:hover:border-white/10 rounded-xl transition-all active:scale-90 group" title="Dashboard">
+              <Icon name="grid_view" size="20px" className="text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors"  weight={300} />
             </button>
-            <button className="size-9 flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-all active:scale-95 group" title="Refresh">
-              <Icon name="refresh" size="sm" className="text-slate-400 group-hover:text-bk-yellow transition-colors"  weight={300} />
+            <button className="w-10 h-10 flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 border border-transparent hover:border-slate-300 dark:hover:border-white/10 rounded-xl transition-all active:scale-90 group" title="Refresh">
+              <Icon name="refresh" size="20px" className="text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors"  weight={300} />
             </button>
           </div>
         </div>
 
         <div className="flex items-center gap-4">
           <button
-            className="p-2.5 text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl transition-all active:scale-95 flex items-center justify-center"
+            className="w-10 h-10 text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 border border-transparent hover:border-slate-300 dark:hover:border-white/10 rounded-xl transition-all active:scale-90 flex items-center justify-center group"
             onClick={toggleTheme}
             title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
           >
-            <Icon name={theme === 'light' ? 'dark_mode' : 'light_mode'} size="sm"  weight={300} />
+            <Icon name={theme === 'light' ? 'dark_mode' : 'light_mode'} size="20px" className="group-hover:text-slate-900 dark:group-hover:text-white transition-colors" weight={300} />
           </button>
 
           <div
-            className="flex items-center gap-2.5 pl-3 pr-1.5 py-1.5 rounded-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 cursor-pointer hover:bg-slate-100 dark:hover:bg-white/10 transition-all group/profile"
+            className="flex items-center h-10 gap-2.5 pl-4 pr-3 rounded-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 cursor-pointer hover:bg-slate-100 dark:hover:bg-white/10 hover:border-slate-300 dark:hover:border-white/10 transition-all group/profile"
             onClick={() => setIsProfileOpen(true)}
           >
             {authLoading ? (
                <div className="flex items-center gap-2 px-2">
                  <div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded animate-pulse"></div>
-                 <div className="size-6 rounded-full bg-slate-200 dark:bg-slate-800 animate-pulse"></div>
+                 <div className="h-5 w-5 rounded-full bg-slate-200 dark:bg-slate-800 animate-pulse"></div>
                </div>
             ) : (
               <>
-                <Typography variant="caption" className="font-bold text-slate-600 dark:text-slate-400 tracking-wide uppercase text-[10px]">
+                <Typography variant="caption" className="font-bold text-slate-600 dark:text-slate-400 tracking-wide uppercase text-[11px]">
                   {user?.id || 'Admin'}
                 </Typography>
-                <div className="size-6 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center transition-transform group-hover/profile:scale-105 overflow-hidden">
-                   <Icon name={authError ? 'error' : 'person'} size="xs" className="text-slate-500"  weight={300} />
+                <div className="flex items-center justify-center transition-transform group-hover/profile:scale-110 ml-0.5">
+                   <Icon name={authError ? 'error' : 'person'} size="18px" className="text-slate-500 group-hover/profile:text-slate-900 dark:group-hover/profile:text-white transition-colors"  weight={400} />
                 </div>
               </>
             )}
           </div>
 
           <button
-            className="p-2.5 text-slate-400 hover:bg-accent-red/10 hover:text-accent-red rounded-xl transition-all active:scale-95 flex items-center justify-center"
+            className="w-10 h-10 text-slate-400 hover:bg-rose-500/10 hover:text-rose-500 border border-transparent hover:border-rose-500/20 rounded-xl transition-all active:scale-90 flex items-center justify-center"
             onClick={handleLogout}
             title="Logout"
           >
-            <Icon name="logout" size="sm"  weight={300} />
+            <Icon name="logout" size="20px"  weight={300} />
           </button>
         </div>
       </header>

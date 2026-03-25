@@ -3,7 +3,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { closeBackupDatabaseModal } from '../databaseSlice';
 import LoadingOverlay from '../../../components/common/LoadingOverlay';
 import ErrorOverlay from '../../../components/common/ErrorOverlay';
-import SelectField from '../../../components/common/SelectField';
+
+import { Icon } from '../../../components/ds/foundation/Icon';
+import { Modal } from '../../../components/ds/layout/Modal';
+import { Button } from '../../../components/ds/foundation/Button';
+import { Input } from '../../../components/ds/forms/Input';
+import { Select } from '../../../components/ds/forms/Select';
+import { Checkbox } from '../../../components/ds/forms/Checkbox';
+import { Divider } from '../../../components/ds/layout/Divider';
+import { Typography } from '../../../components/ds/foundation/Typography';
 
 export default function BackupDatabaseModal() {
   const dispatch = useDispatch();
@@ -47,16 +55,33 @@ export default function BackupDatabaseModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans text-left">
-      <div className="bg-white dark:bg-bk-side w-full max-w-[500px] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col relative text-left">
-        
-        {/* Subtle Top Accent */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-bk-yellow/60"></div>
-
+    <Modal
+      isOpen={isBackupDatabaseModalOpen}
+      onClose={() => dispatch(closeBackupDatabaseModal())}
+      title="Backup Database"
+      icon="backup"
+      maxWidth="max-w-[640px]"
+      footer={
+        <div className="flex justify-end gap-3 w-full">
+          <Button variant="secondary" onClick={() => dispatch(closeBackupDatabaseModal())}>
+            Discard
+          </Button>
+          <Button 
+            variant="primary" 
+            onClick={handleBackup} 
+            loading={loading}
+            icon="play_circle"
+          >
+            Run Backup Now
+          </Button>
+        </div>
+      }
+    >
+      <div className="relative">
         <LoadingOverlay 
-            isVisible={loading} 
-            title="Processing backup" 
-            subtitle="Creating database volume snapshots..." 
+          isVisible={loading} 
+          title="Processing Backup" 
+          subtitle="Creating persistent snapshot of database volumes..." 
         />
         <ErrorOverlay 
           isVisible={!!error} 
@@ -64,158 +89,138 @@ export default function BackupDatabaseModal() {
           onRetry={handleBackup}
           onClose={() => setError(null)}
         />
-        
-        {/* Header - Compact */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
-              <span className="material-symbols-outlined text-bk-yellow text-xl">backup</span>
+
+        <div className="space-y-8 pb-4">
+          {/* Header Status */}
+          <div className="flex items-center justify-between px-4 py-3.5 bg-slate-50/50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/5 rounded-2xl">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-bk-yellow/10 flex items-center justify-center text-bk-yellow border border-bk-yellow/20">
+                <Icon name="database" size="sm" weight={300} />
+              </div>
+              <div>
+                <Typography variant="label" className="text-slate-400 dark:text-slate-500 uppercase tracking-widest font-bold !text-[9px]">Target Instance</Typography>
+                <Typography variant="p" className="text-slate-900 dark:text-white font-black text-[13px]">{selectedDatabase || 'N/A'}</Typography>
+              </div>
             </div>
-            <div>
-              <h3 className="text-sm font-medium text-slate-900 dark:text-white leading-none">Backup database</h3>
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[10px] font-black text-emerald-500 uppercase tracking-wider">Ready for Snapshot</span>
             </div>
           </div>
-          <button 
-            disabled={loading}
-            onClick={() => dispatch(closeBackupDatabaseModal())}
-            className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
-          >
-            <span className="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform">close</span>
-          </button>
-        </div>
 
-        {/* Body */}
-        <div className="p-5 space-y-6 overflow-y-auto custom-scrollbar flex-1">
-          {/* Section: Configuration */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Archive configuration</span>
-              <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
+          {/* Backup Level Strategy */}
+          <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-400">
+            <Divider label="BACKUP STRATEGY" />
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                { level: 'level 0', label: 'L0', title: 'Full Backup', desc: 'Complete static dump', icon: 'auto_awesome_motion' },
+                { level: 'level 1', label: 'L1', title: 'Incremental', desc: 'Changes since last L0/L1', icon: 'trending_up' },
+                { level: 'level 2', label: 'L2', title: 'Differential', desc: 'Changes since last L1', icon: 'call_split' }
+              ].map(item => (
+                <button
+                  key={item.level}
+                  onClick={() => handleInputChange('backupLevel', item.level)}
+                  className={`flex flex-col items-center text-center p-4 rounded-2xl border transition-all group ${
+                    formData.backupLevel === item.level
+                      ? 'bg-bk-yellow/10 border-bk-yellow/40 shadow-lg shadow-bk-yellow/5'
+                      : 'bg-slate-50/20 dark:bg-white/[0.01] border-slate-100 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/20'
+                  }`}
+                >
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 transition-colors ${
+                    formData.backupLevel === item.level ? 'bg-bk-yellow text-slate-900' : 'bg-slate-100 dark:bg-white/5 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300'
+                  }`}>
+                    <Icon name={item.icon} size="md" weight={300} />
+                  </div>
+                  <Typography variant="label" className={`font-black text-[11px] mb-1 transition-colors ${
+                    formData.backupLevel === item.level ? 'text-bk-yellow' : 'text-slate-900 dark:text-white'
+                  }`}>{item.title}</Typography>
+                  <Typography variant="p" className="text-[9px] text-slate-500 dark:text-slate-400 font-medium leading-tight">{item.desc}</Typography>
+                </button>
+              ))}
             </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">Target database</label>
-                <input 
-                  type="text" 
-                  value={selectedDatabase || 'db1'} 
-                  readOnly
-                  className="w-full h-9 px-3 bg-slate-100 dark:bg-bk-main/10 border border-slate-100 dark:border-white/5 rounded text-[12px] text-slate-400 font-medium outline-none cursor-default"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">Volume path</label>
-                <input 
-                  type="text" 
-                  value={formData.volPath}
-                  onChange={(e) => handleInputChange('volPath', e.target.value)}
-                  placeholder="db_backup_path"
-                  className="w-full h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border border-slate-200 dark:border-slate-800 rounded focus:outline-none focus:border-bk-yellow/50 text-[12px] text-slate-900 dark:text-slate-100 font-medium placeholder:text-slate-400"
-                />
-              </div>
-            </div>
+          </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">Backup ID</label>
-                <input 
-                  type="text" 
-                  value={formData.backupId}
-                  onChange={(e) => handleInputChange('backupId', e.target.value)}
-                  className="w-full h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border border-slate-200 dark:border-slate-800 rounded focus:outline-none focus:border-bk-yellow/50 text-[12px] text-slate-900 dark:text-slate-100 font-medium"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">Backup level</label>
-                <div className="relative">
-                  <SelectField
-                    value={formData.backupLevel}
-                    onChange={(val) => handleInputChange('backupLevel', val)}
-                    options={[
-                      { value: 'level 0', label: 'Level 0 (Full)' },
-                      { value: 'level 1', label: 'Level 1 (Incremental)' },
-                      { value: 'level 2', label: 'Level 2 (Differential)' }
-                    ]}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">Backup directory</label>
-                <input 
-                  type="text" 
+          {/* Core Configuration */}
+          <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <Divider label="VOLUME & STORE CONFIGURATION" />
+            <div className="grid grid-cols-2 gap-x-6 gap-y-5">
+              <Input 
+                label="Volume Path Identifier"
+                value={formData.volPath}
+                onChange={(e) => handleInputChange('volPath', e.target.value)}
+                placeholder="db_backup_path"
+                icon="folder_zip"
+              />
+              <Input 
+                label="Backup Revision ID"
+                value={formData.backupId}
+                onChange={(e) => handleInputChange('backupId', e.target.value)}
+                icon="fingerprint"
+                placeholder="0"
+              />
+              <div className="col-span-2">
+                <Input 
+                  label="Target Storage Directory"
                   value={formData.backupDir}
                   onChange={(e) => handleInputChange('backupDir', e.target.value)}
-                  placeholder="/var/lib/backup"
-                  className="w-full h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border border-slate-200 dark:border-slate-800 rounded focus:outline-none focus:border-bk-yellow/50 text-[12px] text-slate-900 dark:text-slate-100 font-medium placeholder:text-slate-400"
+                  placeholder="/var/lib/cubrid/backup"
+                  icon="drive_file_move"
                 />
               </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">Parallel threads</label>
-                <input 
+              <div className="col-span-2">
+                <Input 
                   type="number" 
+                  label="Parallel Execution Streams"
+                  description="Optimize speed based on CPU cores available"
                   value={formData.parallelBackup}
                   onChange={(e) => handleInputChange('parallelBackup', e.target.value)}
-                  className="w-full h-9 px-3 bg-slate-50 dark:bg-bk-main/30 border border-slate-200 dark:border-slate-800 rounded focus:outline-none focus:border-bk-yellow/50 text-[12px] text-slate-900 dark:text-slate-100 font-medium"
+                  icon="speed"
+                  suffix="Threads"
                 />
               </div>
             </div>
           </div>
 
-          {/* Section: Advanced Options */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Process flags</span>
-              <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
-            </div>
-            
-            <div className="space-y-2 px-1">
+          {/* Advanced Flags */}
+          <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-600">
+            <Divider label="OPERATIONAL INTEGRITY" />
+            <div className="grid grid-cols-1 gap-3">
               {[
-                { label: 'Check database consistency', field: 'checkConsistency' },
-                { label: 'Delete unnecessary log archives', field: 'deleteUnnecessary' },
-                { label: 'Compress backup volumes', field: 'compress' },
+                { label: 'Consistency Verification', field: 'checkConsistency', icon: 'verified_user', desc: 'Perform block-level validation of database volumes' },
+                { label: 'Automated Log Retention', field: 'deleteUnnecessary', icon: 'cleaning_services', desc: 'Purge transaction logs that have been successfully archived' },
+                { label: 'Stream Compression', field: 'compress', icon: 'compress', desc: 'Apply LZ4-style compression to reduce storage footprint' },
               ].map(opt => (
-                <label key={opt.field} className="flex items-center gap-3 p-2.5 bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-white/5 transition-all group">
-                  <input 
-                    type="checkbox" 
+                <div 
+                  key={opt.field} 
+                  className={`group flex items-center gap-4 p-4 rounded-2xl border transition-all cursor-pointer ${
+                    formData[opt.field] 
+                      ? 'bg-bk-yellow/[0.03] border-bk-yellow/20' 
+                      : 'bg-slate-50/20 dark:bg-white/[0.01] border-slate-100 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/[0.03]'
+                  }`}
+                  onClick={() => handleInputChange(opt.field, !formData[opt.field])}
+                >
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all shrink-0 border ${
+                    formData[opt.field] 
+                      ? 'bg-bk-yellow/10 border-bk-yellow/20 text-bk-yellow' 
+                      : 'bg-slate-100 dark:bg-white/5 border-transparent text-slate-400'
+                  }`}>
+                    <Icon name={opt.icon} size="md" weight={300} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <Typography variant="label" className={`font-black tracking-tight transition-colors ${formData[opt.field] ? 'text-bk-yellow' : 'text-slate-900 dark:text-white'}`}>{opt.label}</Typography>
+                    <Typography variant="p" className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">{opt.desc}</Typography>
+                  </div>
+                  <Checkbox 
+                    className="shrink-0"
                     checked={formData[opt.field]}
                     onChange={(e) => handleInputChange(opt.field, e.target.checked)}
-                    className="w-4 h-4 cursor-pointer rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-bk-main text-bk-yellow focus:ring-bk-yellow/50 accent-bk-yellow transition-all"
                   />
-                  <span className="text-[11px] font-medium text-slate-600 dark:text-slate-300 group-hover:text-bk-yellow transition-colors tracking-tight">{opt.label}</span>
-                </label>
+                </div>
               ))}
             </div>
           </div>
         </div>
-
-        {/* Footer */}
-        <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 backdrop-blur-sm flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
-          <button 
-            disabled={loading}
-            className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-all"
-            onClick={() => dispatch(closeBackupDatabaseModal())}
-          >
-            Discard
-          </button>
-          <button 
-            disabled={loading}
-            className="px-6 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center gap-2 min-w-[120px] disabled:opacity-50"
-            onClick={handleBackup}
-          >
-            {loading ? (
-              <div className="w-3 h-3 border-2 border-bk-side/30 border-t-bk-side rounded-full animate-spin"></div>
-            ) : (
-              <>
-                <span className="material-symbols-outlined text-[16px]">play_circle</span>
-                <span>Run backup</span>
-              </>
-            )}
-          </button>
-        </div>
       </div>
-    </div>
+    </Modal>
   );
 }

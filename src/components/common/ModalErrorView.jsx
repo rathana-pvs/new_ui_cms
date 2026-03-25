@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { Icon } from '../ds/foundation/Icon';
+
 /**
  * A premium, reusable error view for use inside modals or empty states.
  * Centralizes error parsing and consistent design.
@@ -21,7 +23,7 @@ const ModalErrorView = ({ error, onRetry, retryText = "Try Again", title = "Oper
     <div className="flex flex-col items-center justify-center py-6 space-y-6 animate-in fade-in zoom-in-95 duration-150 min-h-[300px]">
       {/* Premium Icon Container */}
       <div className="w-20 h-20 bg-rose-500/10 rounded-full flex items-center justify-center border border-rose-500/20 shadow-xl shadow-rose-500/5">
-        <span className="material-symbols-outlined text-4xl text-rose-500 animate-pulse">error</span>
+        <Icon name="error" size="sm" weight={300} className="text-4xl text-rose-500 animate-pulse" />
       </div>
       
       {/* Content */}

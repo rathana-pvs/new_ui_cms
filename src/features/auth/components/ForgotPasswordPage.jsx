@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import { Icon } from '../../../components/ds/foundation/Icon';
+
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -30,7 +32,7 @@ export default function ForgotPasswordPage() {
           <div>
             <Link to="/login" className="flex items-center gap-4 mb-14 group w-fit transition-all hover:translate-x-[-4px]">
               <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center border border-white/10 group-hover:bg-white group-hover:border-white transition-all">
-                <span className="material-symbols-outlined text-slate-400 group-hover:text-bk-side">arrow_back</span>
+                <Icon name="arrow_back" size="sm" weight={300} className="text-slate-400 group-hover:text-bk-side" />
               </div>
               <span className="text-sm font-black text-slate-400 group-hover:text-white tracking-widest">Back to Login</span>
             </Link>
@@ -51,7 +53,7 @@ export default function ForgotPasswordPage() {
 
             <div className="p-6 rounded-3xl bg-white/[0.02] border border-white/5 max-w-sm">
                 <div className="flex items-center gap-3 mb-2">
-                    <span className="material-symbols-outlined text-bk-yellow">info</span>
+                    <Icon name="info" size="sm" weight={300} className="text-bk-yellow" />
                     <p className="text-xs font-bold text-white uppercase tracking-widest">Security Protocol</p>
                 </div>
                 <p className="text-xs text-slate-500 leading-relaxed">You will receive a one-time cryptographic link to authorize a new master password creation.</p>
@@ -80,13 +82,13 @@ export default function ForgotPasswordPage() {
                 <div className="space-y-2">
                   <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-wider ml-1">Email Address</label>
                   <div className="relative group">
-                    <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[20px] text-slate-400 group-focus-within:text-bk-yellow transition-colors">alternate_email</span>
+                    <Icon name="alternate_email" size="sm" weight={300} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-bk-yellow transition-colors" />
                     <input
                       type="email"
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-12 pr-4 py-4 bg-white dark:bg-bk-side border-2 border-slate-100 dark:border-transparent group-focus-within:border-bk-yellow/50 rounded-2xl outline-none shadow-sm transition-all dark:text-white text-sm"
+                      className="w-full pl-12 pr-4 py-4 bg-white dark:bg-bk-side border border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 focus:border-bk-yellow/50 rounded-2xl outline-none shadow-sm transition-all dark:text-white text-sm"
                       placeholder="admin@organization.com"
                     />
                   </div>
@@ -102,7 +104,7 @@ export default function ForgotPasswordPage() {
                   ) : (
                     <>
                       <span className="tracking-widest text-xs">Request Recovery Key</span>
-                      <span className="material-symbols-outlined text-[20px] group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform">rocket_launch</span>
+                      <Icon name="rocket_launch" size="sm" weight={300} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                     </>
                   )}
                 </button>
@@ -111,7 +113,7 @@ export default function ForgotPasswordPage() {
           ) : (
             <div className="text-center space-y-8 animate-in zoom-in-95 duration-300">
                <div className="w-24 h-24 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto border border-emerald-500/20 shadow-2xl shadow-emerald-500/10">
-                <span className="material-symbols-outlined text-5xl text-emerald-500">mark_email_read</span>
+                <Icon name="mark_email_read" size="sm" weight={300} className="text-5xl text-emerald-500" />
               </div>
               <div className="space-y-3 px-4">
                 <h2 className="text-3xl font-black text-slate-900 dark:text-white leading-tight">Link Transmitted</h2>
@@ -128,7 +130,7 @@ export default function ForgotPasswordPage() {
 
           <div className="pt-6 text-center">
              <Link to="/login" className="inline-flex items-center gap-2 text-xs font-black tracking-[0.2em] text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
-                <span className="material-symbols-outlined text-[18px]">verified_user</span>
+                <Icon name="verified_user" size="sm" weight={300} />
                 Authorize Login
              </Link>
           </div>

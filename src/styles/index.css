@@ -14,7 +14,6 @@
   }
   *:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.5);
   }
 
   /* Autocomplete Background Override */
@@ -22,9 +21,13 @@
   input:-webkit-autofill:hover, 
   input:-webkit-autofill:focus, 
   input:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 30px white inset !important;
-    -webkit-text-fill-color: inherit !important;
-    transition: background-color 5000s ease-in-out 0s;
+    -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+    -webkit-text-fill-color: #0f172a !important; /* slate-900 */
+    color: #0f172a !important;
+    caret-color: #0f172a !important;
+    font-weight: 500 !important;
+    font-family: inherit !important;
+    transition: background-color 5000s ease-in-out 0s, color 5000s ease-in-out 0s;
   }
 
   /* Dark mode autocomplete override */
@@ -32,8 +35,13 @@
   .dark input:-webkit-autofill:hover, 
   .dark input:-webkit-autofill:focus, 
   .dark input:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 30px #1a1a1a inset !important;
+    -webkit-box-shadow: 0 0 0px 1000px #1a1a1a inset !important;
     -webkit-text-fill-color: #f8fafc !important;
+    color: #f8fafc !important;
+    caret-color: #f8fafc !important;
+    font-weight: 500 !important;
+    font-family: inherit !important;
+    transition: background-color 5000s ease-in-out 0s, color 5000s ease-in-out 0s;
   }
 }
 

@@ -18,13 +18,13 @@ export default function SystemInfo({ hostUid }) {
 
   const cardTitle = (
     <div className="flex items-center gap-2">
-      <Icon name="info" size="sm" className="text-bk-yellow"  weight={300} />
-      <span>Environment Details</span>
+      <Icon name="info" size="sm" weight={300} className="text-amber-500" />
+      <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">Environment Details</span>
     </div>
   );
 
   return (
-    <Card title={cardTitle} className="bg-white dark:bg-bk-side">
+    <Card title={cardTitle} collapsible defaultCollapsed>
       {!envData ? (
         <div className="flex flex-col items-center justify-center py-8 opacity-40">
           <Icon name="cloud_off" size="md" className="mb-2"  weight={300} />

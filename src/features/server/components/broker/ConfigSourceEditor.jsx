@@ -1,3 +1,4 @@
+import React, { useRef } from 'react';
 import { Typography } from '../../../../components/ds/foundation/Typography';
 import { Icon } from '../../../../components/ds/foundation/Icon';
 

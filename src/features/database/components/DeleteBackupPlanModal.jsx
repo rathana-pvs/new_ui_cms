@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { closeDeleteBackupPlanModal, deleteBackupSchedule, fetchBackupSchedule } from '../databaseSlice';
 import { showStatusModal } from '../../layout/layoutSlice';
 
+import { Icon } from '../../../components/ds/foundation/Icon';
+
 export default function DeleteBackupPlanModal() {
   const dispatch = useDispatch();
   const { isDeleteBackupPlanModalOpen, selectedDatabase, selectedBackupId, actionLoading } = useSelector((state) => state.database);
@@ -50,7 +52,7 @@ export default function DeleteBackupPlanModal() {
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-rose-500/10 flex items-center justify-center border border-rose-500/20">
-              <span className="material-symbols-outlined text-rose-500 text-xl">delete_forever</span>
+              <Icon name="delete_forever" size="sm" weight={300} className="text-rose-500 text-xl" />
             </div>
             <div>
               <h3 className="text-[12px] font-medium text-slate-900 dark:text-white leading-none tracking-wide text-left">Confirm Deletion</h3>
@@ -61,7 +63,7 @@ export default function DeleteBackupPlanModal() {
             onClick={() => dispatch(closeDeleteBackupPlanModal())}
             className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
           >
-            <span className="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform">close</span>
+            <Icon name="close" size="sm" weight={300} className="text-lg group-hover:rotate-90 transition-transform" />
           </button>
         </div>
 
@@ -69,7 +71,7 @@ export default function DeleteBackupPlanModal() {
         <div className="p-6 space-y-6 flex-1 text-left overflow-visible">
           <div className="flex flex-col items-center justify-center space-y-4 py-2">
             <div className="w-16 h-16 bg-rose-500/5 rounded-full flex items-center justify-center border border-rose-500/10 shadow-inner">
-               <span className="material-symbols-outlined text-3xl text-rose-500 animate-pulse">warning</span>
+               <Icon name="warning" size="sm" weight={300} className="text-3xl text-rose-500 animate-pulse" />
             </div>
             
             <div className="text-center space-y-2">
@@ -82,7 +84,7 @@ export default function DeleteBackupPlanModal() {
 
           <div className="p-3 bg-slate-50 dark:bg-bk-main/30 border border-slate-100 dark:border-white/5 rounded-lg">
              <div className="flex items-start gap-3">
-                <span className="material-symbols-outlined text-amber-500 text-[18px] mt-0.5">info</span>
+                <Icon name="info" size="sm" weight={300} className="text-amber-500 mt-0.5" />
                 <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed italic">
                   Note: This only removes the schedule. Existing backup files on the disk will remain untouched.
                 </p>
@@ -108,7 +110,7 @@ export default function DeleteBackupPlanModal() {
               <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
             ) : (
               <>
-                <span className="material-symbols-outlined text-[16px]">delete</span>
+                <Icon name="delete" size="sm" weight={300} />
                 <span>Delete Plan</span>
               </>
             )}

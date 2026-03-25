@@ -3,12 +3,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { closeLoadDBModal } from '../databaseSlice';
 import { showStatusModal } from '../../layout/layoutSlice';
 import { databaseApi } from '../databaseApi';
-import LoadingOverlay from '../../../components/common/LoadingOverlay';
-import ErrorOverlay from '../../../components/common/ErrorOverlay';
 
 import LoadConfigSection from './load/LoadConfigSection';
 import LoadSourceSection from './load/LoadSourceSection';
 import LoadOptionsSection from './load/LoadOptionsSection';
+
+import { Icon } from '../../../components/ds/foundation/Icon';
+import { Modal } from '../../../components/ds/layout/Modal';
+import { Button } from '../../../components/ds/foundation/Button';
 
 export default function LoadDatabaseModal() {
   const dispatch = useDispatch();
@@ -181,96 +183,63 @@ export default function LoadDatabaseModal() {
     }
   };
 
+  const footer = (
+    <>
+      <Button 
+        variant="ghost" 
+        onClick={() => dispatch(closeLoadDBModal())}
+      >
+        Discard
+      </Button>
+      <Button 
+        onClick={handleLoadDatabase}
+        loading={isLoading}
+        icon="play_circle"
+        className="min-w-[130px]"
+      >
+        Run load
+      </Button>
+    </>
+  );
+
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans text-left">
-      <div className="bg-white dark:bg-bk-side w-full max-w-[640px] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col relative text-left">
-        
-        {/* Subtle Top Accent */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-bk-yellow/60"></div>
-
-        <LoadingOverlay 
-            isVisible={isLoading} 
-            title="Processing load" 
-            subtitle="Streaming volumes into target database..." 
+    <Modal
+      isOpen={isLoadDBModalOpen}
+      onClose={() => dispatch(closeLoadDBModal())}
+      title="Load database"
+      icon="download"
+      footer={footer}
+      loading={isLoading}
+      error={error}
+      onErrorClose={() => setError(null)}
+      onErrorRetry={handleLoadDatabase}
+      maxWidth="max-w-[720px]"
+    >
+      <div className="space-y-6">
+        <LoadConfigSection 
+          formData={formData} 
+          handleInputChange={handleInputChange} 
         />
-        <ErrorOverlay 
-          isVisible={!!error} 
-          error={error} 
-          onRetry={handleLoadDatabase}
-          onClose={() => setError(null)}
+
+        <LoadSourceSection 
+          radio={radio}
+          setRadio={setRadio}
+          selectedUnload={selectedUnload}
+          handleUnloadSelectChange={handleUnloadSelectChange}
+          unloadList={unloadList}
+          dataSource={dataSource}
+          handleTableCheckboxChange={handleTableCheckboxChange}
+          formData={formData}
+          handleCheckBoxChange={handleCheckBoxChange}
+          handleUnloadPathChange={handleUnloadPathChange}
         />
 
-        {/* Header - Compact */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
-              <span className="material-symbols-outlined text-bk-yellow text-xl">download</span>
-            </div>
-            <div>
-              <h3 className="text-sm font-medium text-slate-900 dark:text-white leading-none">Load database</h3>
-            </div>
-          </div>
-          <button 
-            onClick={() => dispatch(closeLoadDBModal())}
-            className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
-          >
-            <span className="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform">close</span>
-          </button>
-        </div>
-        
-        {/* Body */}
-        <div className="p-5 space-y-6 overflow-y-auto custom-scrollbar flex-1 max-h-[75vh]">
-          
-          <LoadConfigSection 
-            formData={formData} 
-            handleInputChange={handleInputChange} 
-          />
-
-          <LoadSourceSection 
-            radio={radio}
-            setRadio={setRadio}
-            selectedUnload={selectedUnload}
-            handleUnloadSelectChange={handleUnloadSelectChange}
-            unloadList={unloadList}
-            dataSource={dataSource}
-            handleTableCheckboxChange={handleTableCheckboxChange}
-            formData={formData}
-            handleCheckBoxChange={handleCheckBoxChange}
-            handleUnloadPathChange={handleUnloadPathChange}
-          />
-
-          <LoadOptionsSection 
-            formData={formData}
-            handleCheckBoxChange={handleCheckBoxChange}
-            handleValueChange={handleValueChange}
-          />
-        </div>
-        
-        {/* Footer */}
-        <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 backdrop-blur-sm flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
-          <button 
-            disabled={isLoading}
-            className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-all"
-            onClick={() => dispatch(closeLoadDBModal())}
-          >
-            Discard
-          </button>
-          <button 
-            disabled={isLoading}
-            className="px-6 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center gap-2 min-w-[130px] disabled:opacity-50"
-            onClick={handleLoadDatabase}
-          >
-            {isLoading ? (
-              <div className="w-3 h-3 border-2 border-bk-side/30 border-t-bk-side rounded-full animate-spin"></div>
-            ) : (
-              <>
-                <span className="material-symbols-outlined text-[16px]">play_circle</span>
-                <span>Run load</span>
-              </>
-            )}
-          </button>
-        </div>
+        <LoadOptionsSection 
+          formData={formData}
+          handleCheckBoxChange={handleCheckBoxChange}
+          handleValueChange={handleValueChange}
+        />
       </div>
-    </div>
+    </Modal>
   );
 }

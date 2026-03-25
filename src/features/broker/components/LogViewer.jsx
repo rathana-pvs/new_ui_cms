@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchLogContent } from '../brokerSlice';
 
+import { Icon } from '../../../components/ds/foundation/Icon';
+
 const HighlightedLine = ({ line }) => {
   if (!line) return <span>&nbsp;</span>;
 
@@ -137,7 +139,7 @@ function LogViewer({ hostUid, path }) {
       <div className="flex-shrink-0 px-4 py-2.5 bg-white dark:bg-bk-side border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center">
-            <span className="material-symbols-outlined text-amber-600 dark:text-bk-yellow text-[18px]">description</span>
+            <Icon name="description" size="sm" weight={300} className="text-amber-600 dark:text-bk-yellow" />
           </div>
           <div className="min-w-0">
             <h2 className="text-[12px] font-semibold text-slate-800 dark:text-slate-200 leading-tight truncate">{fileName}</h2>
@@ -153,7 +155,7 @@ function LogViewer({ hostUid, path }) {
               className="p-1.5 text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-white/10 hover:text-amber-600 dark:hover:text-bk-yellow rounded-md transition-all disabled:opacity-30 disabled:hover:bg-transparent"
               title="Previous 100 lines"
             >
-              <span className="material-symbols-outlined text-[20px]">chevron_left</span>
+              <Icon name="chevron_left" size="sm" weight={300} />
             </button>
             <div className="px-3 text-[11px] font-medium text-slate-600 dark:text-slate-300 min-w-[100px] text-center">
               {startLine} - {Math.min(endLine, totalLines)}
@@ -164,7 +166,7 @@ function LogViewer({ hostUid, path }) {
               className="p-1.5 text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-white/10 hover:text-amber-600 dark:hover:text-bk-yellow rounded-md transition-all disabled:opacity-30 disabled:hover:bg-transparent"
               title="Next 100 lines"
             >
-              <span className="material-symbols-outlined text-[20px]">chevron_right</span>
+              <Icon name="chevron_right" size="sm" weight={300} />
             </button>
           </div>
 

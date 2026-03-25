@@ -10,7 +10,7 @@ export const Checkbox = forwardRef(({
   ...props
 }, ref) => {
   return (
-    <div className={`flex flex-col gap-1 w-full ${className}`}>
+    <div className={`flex flex-col gap-1 w-fit ${className}`}>
       <label className={`flex items-start gap-2 cursor-pointer group ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
         <div className="relative flex items-center justify-center pt-0.5">
           <input
@@ -20,13 +20,13 @@ export const Checkbox = forwardRef(({
             className="peer sr-only"
             {...props}
           />
-          <div className="w-3.5 h-3.5 bg-slate-50 dark:bg-bk-main/30 border border-slate-300 dark:border-slate-800 rounded flex flex-shrink-0 justify-center items-center peer-checked:bg-bk-yellow peer-checked:border-bk-yellow/50 transition-all shadow-sm">
+          <div className="w-4.5 h-4.5 bg-slate-50 dark:bg-bk-main/30 border border-slate-300 dark:border-slate-800 rounded-md flex flex-shrink-0 justify-center items-center peer-checked:bg-bk-yellow peer-checked:border-bk-yellow/50 transition-all shadow-sm">
             <svg 
-              className="w-2.5 h-2.5 text-bk-side pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" 
+              className="w-3.5 h-3.5 text-bk-side pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" 
               viewBox="0 0 24 24" 
               fill="none" 
               stroke="currentColor" 
-              strokeWidth="4" 
+              strokeWidth="3.5" 
               strokeLinecap="round" 
               strokeLinejoin="round"
             >

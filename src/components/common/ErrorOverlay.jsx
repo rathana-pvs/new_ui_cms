@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { Icon } from '../ds/foundation/Icon';
+
 const ErrorOverlay = ({ isVisible, error, title = "Operation Failed", onRetry, onClose }) => {
   if (!isVisible || !error) return null;
 
@@ -18,7 +20,7 @@ const ErrorOverlay = ({ isVisible, error, title = "Operation Failed", onRetry, o
             {/* Pulsing Icon Container */}
             <div className="absolute inset-0 bg-rose-500/10 rounded-full animate-ping duration-[2s]"></div>
             <div className="relative h-12 w-12 bg-rose-500 rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(244,63,94,0.3)]">
-                <span className="material-symbols-outlined text-white text-[24px]">error</span>
+                <Icon name="error" size="sm" weight={300} className="text-white" />
             </div>
         </div>
 
@@ -43,7 +45,7 @@ const ErrorOverlay = ({ isVisible, error, title = "Operation Failed", onRetry, o
                 onClick={onRetry}
                 className="px-6 py-2 bg-rose-500 hover:bg-rose-600 text-white text-[11px] font-medium rounded shadow-lg shadow-rose-500/20 transition-all active:scale-95 tracking-wide flex items-center gap-2"
                 >
-                <span className="material-symbols-outlined text-[16px]">refresh</span>
+                <Icon name="refresh" size="sm" weight={300} />
                 Try again
                 </button>
             )}

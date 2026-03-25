@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 
+import { Icon } from '../ds/foundation/Icon';
+
 /**
  * Premium Select Field Component
  * 
@@ -91,7 +93,7 @@ export default function SelectField({
                 >
                   <span>{opt.label}</span>
                   {value === opt.value && (
-                    <span className="material-symbols-outlined text-[14px]">check</span>
+                    <Icon name="check" size="sm" weight={300} />
                   )}
                 </button>
               ))

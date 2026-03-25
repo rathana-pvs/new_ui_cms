@@ -2,8 +2,13 @@ import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { createDatabaseUser, updateDatabaseUser, fetchDatabaseUsers, clearUserError } from '../userSlice';
 import { fetchDatabaseClasses } from '../../database/databaseSlice';
-import LoadingOverlay from '../../../components/common/LoadingOverlay';
-import ErrorOverlay from '../../../components/common/ErrorOverlay';
+
+import { Icon } from '../../../components/ds/foundation/Icon';
+import { Modal } from '../../../components/ds/layout/Modal';
+import { Button } from '../../../components/ds/foundation/Button';
+import { Input } from '../../../components/ds/forms/Input';
+import { SearchInput } from '../../../components/ds/forms/SearchInput';
+import { Typography } from '../../../components/ds/foundation/Typography';
 
 const PERM_MAPPING = {
   'Select': 1,
@@ -302,171 +307,145 @@ export default function CreateUserModal({ isOpen, onClose, dbname, editingUser }
     )
     .filter(u => u.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
+  const footer = (
+    <>
+      <Button 
+        variant="ghost" 
+        onClick={handleClose}
+      >
+        Discard
+      </Button>
+      <Button 
+        onClick={handleSave}
+        loading={actionLoading}
+        icon="check_circle"
+        className="min-w-[140px]"
+      >
+        {isEditMode ? 'Update Account' : 'Create Account'}
+      </Button>
+    </>
+  );
+
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans text-left">
-      <div className="bg-white dark:bg-bk-side w-full max-w-[840px] h-[680px] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col relative text-left">
-        
-        {/* Subtle Top Accent */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-bk-yellow/60"></div>
-
-        <LoadingOverlay 
-          isVisible={actionLoading} 
-          title={isEditMode ? "Updating user" : "Creating user"} 
-          subtitle="Processing security protocols..." 
-        />
-        
-        <ErrorOverlay 
-          isVisible={!!userError} 
-          error={userError} 
-          onRetry={handleSave}
-          onClose={handleClearError}
-        />
-
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
-              <span className="material-symbols-outlined text-bk-yellow text-xl">
-                {isEditMode ? 'manage_accounts' : 'person_add'}
-              </span>
-            </div>
-            <div>
-              <h3 className="text-[12px] font-medium text-slate-900 dark:text-white leading-none tracking-wide">
-                {isEditMode ? 'Update database user' : 'Create database user'}
-              </h3>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1 font-medium italic">Target Database: {dbname}</p>
-            </div>
-          </div>
-          <button 
-            onClick={handleClose}
-            className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
-          >
-            <span className="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform">close</span>
-          </button>
-        </div>
-
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title={isEditMode ? 'Update database user' : 'Create database user'}
+      subtitle={`Target Database: ${dbname}`}
+      icon={isEditMode ? 'manage_accounts' : 'person_add'}
+      maxWidth="max-w-[840px]"
+      footer={footer}
+      loading={actionLoading}
+      error={userError}
+      onErrorClose={handleClearError}
+      onErrorRetry={handleSave}
+    >
+      <div className="flex flex-col h-[520px]">
         {/* Tabs */}
-        <div className="px-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-bk-main/30 flex gap-8">
+        <div className="flex gap-8 border-b border-slate-100 dark:border-white/5 mb-6">
           <button 
             onClick={() => setActiveTab('general')}
-            className={`py-3 text-[11px] font-medium tracking-wide relative transition-all ${activeTab === 'general' ? 'text-bk-yellow' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'}`}
+            className={`pb-3 text-[11px] font-bold uppercase tracking-wider relative transition-all ${activeTab === 'general' ? 'text-bk-yellow' : 'text-slate-400 hover:text-slate-600'}`}
           >
             General identification
-            {activeTab === 'general' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-bk-yellow animate-in slide-in-from-left-2"></div>}
+            {activeTab === 'general' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-bk-yellow shadow-[0_0_8px_rgba(255,215,0,0.4)]"></div>}
           </button>
           {editingUser !== 'DBA' && (
             <button 
               onClick={() => setActiveTab('auth')}
-              className={`py-3 text-[11px] font-medium tracking-wide relative transition-all ${activeTab === 'auth' ? 'text-bk-yellow' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'}`}
+              className={`pb-3 text-[11px] font-bold uppercase tracking-wider relative transition-all ${activeTab === 'auth' ? 'text-bk-yellow' : 'text-slate-400 hover:text-slate-600'}`}
             >
               Resource authorization
-              {activeTab === 'auth' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-bk-yellow animate-in slide-in-from-left-2"></div>}
+              {activeTab === 'auth' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-bk-yellow shadow-[0_0_8px_rgba(255,215,0,0.4)]"></div>}
             </button>
           )}
         </div>
 
-        {/* Body */}
-        <div className="p-5 space-y-6 flex-1 overflow-y-auto custom-scrollbar">
+        <div className="flex-1 overflow-y-auto custom-scrollbar pr-1">
           {activeTab === 'general' ? (
-            <div className="space-y-6 animate-in fade-in slide-in-from-top-1 duration-200">
+            <div className="space-y-8 animate-in fade-in slide-in-from-top-1 duration-200 pb-4">
               {/* Basic Identity section */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500 uppercase">Basic Identity</span>
-                  <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <Typography variant="caption" className="font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest pl-1">Basic Identity</Typography>
+                  <div className="flex-1 h-[1px] bg-slate-100 dark:bg-white/5"></div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5">User name</label>
-                    <input 
-                      type="text" 
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      className="w-full h-9 px-3 bg-white dark:bg-bk-main/20 border border-slate-200 dark:border-white/5 rounded text-[12px] font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:border-bk-yellow/50 transition-all placeholder:text-slate-400/50 disabled:opacity-50 disabled:bg-slate-100 dark:disabled:bg-bk-main/10"
-                      placeholder="e.g. cubrid_admin"
-                      disabled={isEditMode}
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5">User description/memo</label>
-                    <input 
-                      type="text" 
-                      name="memo"
-                      value={formData.memo}
-                      onChange={handleInputChange}
-                      className="w-full h-9 px-3 bg-white dark:bg-bk-main/20 border border-slate-200 dark:border-white/5 rounded text-[12px] font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:border-bk-yellow/50 transition-all placeholder:text-slate-400/50"
-                      placeholder="Account purpose"
-                    />
-                  </div>
+                <div className="grid grid-cols-2 gap-6">
+                  <Input 
+                    label="User name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    placeholder="e.g. cubrid_admin"
+                    disabled={isEditMode}
+                    required
+                  />
+                  <Input 
+                    label="User description/memo"
+                    name="memo"
+                    value={formData.memo}
+                    onChange={handleInputChange}
+                    placeholder="Account purpose"
+                  />
                 </div>
               </div>
 
               {/* Password Setting section */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500 uppercase">Security Configuration</span>
-                  <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <Typography variant="caption" className="font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest pl-1">Security Configuration</Typography>
+                  <div className="flex-1 h-[1px] bg-slate-100 dark:bg-white/5"></div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5">Primary password</label>
-                    <input 
-                      type="password" 
-                      name="password"
-                      value={formData.password}
-                      onChange={handleInputChange}
-                      className="w-full h-9 px-3 bg-white dark:bg-bk-main/20 border border-slate-200 dark:border-white/5 rounded text-[12px] font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:border-bk-yellow/50 transition-all placeholder:text-slate-400/50"
-                      placeholder="••••••••"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5">Verify password</label>
-                    <input 
-                      type="password" 
-                      name="confirmPassword"
-                      value={formData.confirmPassword}
-                      onChange={handleInputChange}
-                      className="w-full h-9 px-3 bg-white dark:bg-bk-main/20 border border-slate-200 dark:border-white/5 rounded text-[12px] font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:border-bk-yellow/50 transition-all placeholder:text-slate-400/50"
-                      placeholder="••••••••"
-                    />
-                  </div>
+                <div className="grid grid-cols-2 gap-6">
+                  <Input 
+                    label="Primary password"
+                    type="password" 
+                    name="password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    placeholder="••••••••"
+                  />
+                  <Input 
+                    label="Verify password"
+                    type="password" 
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleInputChange}
+                    placeholder="••••••••"
+                  />
                 </div>
               </div>
 
-              {/* Advanced Group Configuration with Drag and Drop - Refined per reference image */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500 uppercase">Group Configuration</span>
-                  <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
+              {/* Advanced Group Configuration */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <Typography variant="caption" className="font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest pl-1">Group & Role Configuration</Typography>
+                  <div className="flex-1 h-[1px] bg-slate-100 dark:bg-white/5"></div>
                 </div>
                 
-                <div className="grid grid-cols-12 gap-0 h-[300px] border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm">
+                <div className="grid grid-cols-12 gap-0 h-[320px] border border-slate-200 dark:border-white/5 rounded-2xl overflow-hidden bg-white/50 dark:bg-bk-side/50 shadow-sm backdrop-blur-sm">
                   {/* Panel 1: All Users */}
                   <div 
-                    className="col-span-5 flex flex-col bg-white dark:bg-bk-side border-r border-slate-100 dark:border-slate-800"
+                    className="col-span-5 flex flex-col border-r border-slate-100 dark:border-white/5"
                     onDragOver={handleDragOver}
                     onDrop={(e) => handleDrop(e, 'available')}
                   >
-                    <div className="px-4 py-2 border-b border-slate-50 dark:border-white/5 bg-slate-50/50 dark:bg-bk-main/20">
-                      <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-tight">All users</label>
+                    <div className="px-4 py-2.5 border-b border-slate-50 dark:border-white/5 bg-slate-50/50 dark:bg-bk-main/20">
+                      <Typography variant="caption" className="font-bold text-slate-500 uppercase tracking-wider">All users</Typography>
                     </div>
-                    <div className="p-2 border-b border-slate-50 dark:border-white/5 bg-slate-50/20 dark:bg-bk-main/10">
-                      <div className="relative">
-                        <span className="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-[14px] text-slate-400">search</span>
-                        <input 
-                          type="text" 
-                          placeholder="Search..." 
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                          className="w-full bg-white dark:bg-bk-main/40 border-none px-7 py-1 rounded text-[10px] h-7 focus:ring-0 focus:outline-none placeholder:text-slate-400/50" 
-                        />
-                      </div>
+                    <div className="p-2 border-b border-slate-50 dark:border-white/5">
+                      <SearchInput 
+                        placeholder="Search..." 
+                        value={searchTerm}
+                        onChange={setSearchTerm}
+                        onClear={() => setSearchTerm('')}
+                        size="sm"
+                      />
                     </div>
-                    <div className="flex-1 overflow-y-auto p-1 custom-scrollbar space-y-0.5">
+                    <div className="flex-1 overflow-y-auto p-1.5 custom-scrollbar space-y-1">
                       {loading ? (
                         <div className="h-full flex items-center justify-center opacity-30">
-                          <div className="w-4 h-4 border-2 border-bk-yellow/20 border-t-bk-yellow rounded-full animate-spin"></div>
+                          <Icon name="refresh" size="sm" className="animate-spin text-bk-yellow" />
                         </div>
                       ) : availableUsers.length > 0 ? (
                         availableUsers.map(user => (
@@ -479,56 +458,53 @@ export default function CreateUserModal({ isOpen, onClose, dbname, editingUser }
                               setSelectedInTarget(null);
                             }}
                             onDoubleClick={() => handleMove(user, 'available', 'groups')}
-                            className={`px-3 py-1.5 text-[11px] text-slate-700 dark:text-slate-300 hover:bg-bk-yellow/5 rounded cursor-grab active:cursor-grabbing transition-all flex items-center justify-between group/item ${draggedItem?.item?.name === user.name ? 'opacity-40 select-none' : ''} ${selectedAvailable?.name === user.name ? 'bg-bk-yellow/20 border-l-2 border-bk-yellow' : 'border-l-2 border-transparent'}`}
+                            className={`px-3 py-2 text-[11px] font-bold rounded-xl cursor-grab active:cursor-grabbing transition-all flex items-center justify-between group/item ${draggedItem?.item?.name === user.name ? 'opacity-40 select-none' : ''} ${selectedAvailable?.name === user.name ? 'bg-bk-yellow text-bk-side shadow-md' : 'text-slate-700 dark:text-slate-300 hover:bg-bk-yellow/10'}`}
                           >
-                            <div className="flex items-center gap-2">
-                              <span className={`material-symbols-outlined text-[15px] ${user.name === 'PUBLIC' || user.members ? 'text-indigo-400' : 'text-slate-400'}`}>
-                                {user.name === 'PUBLIC' || user.members ? 'groups' : 'person'}
-                              </span>
+                            <div className="flex items-center gap-2.5">
+                              <Icon name={user.name === 'PUBLIC' || user.members ? 'groups' : 'person'} size="sm" className={selectedAvailable?.name === user.name ? 'text-bk-side' : 'text-slate-400'} />
                               <span className="tracking-tight">{user.name}</span>
                             </div>
                           </div>
                         ))
                       ) : (
                         <div className="h-full flex flex-col items-center justify-center opacity-20 py-8">
-                           <span className="text-[10px] font-medium">Empty</span>
+                           <Typography variant="caption">Empty</Typography>
                         </div>
                       )}
                     </div>
                   </div>
 
-                  {/* Middle: Small Control Buttons */}
-                  <div className="col-span-1 flex flex-col items-center justify-center gap-2 bg-slate-50/30 dark:bg-bk-main/20 border-r border-slate-100 dark:border-slate-800">
+                  {/* Middle: Control Buttons */}
+                  <div className="col-span-1 flex flex-col items-center justify-center gap-3 bg-slate-50/30 dark:bg-white/[0.02] border-r border-slate-100 dark:border-white/5">
                      <button 
                         onClick={() => handleMove(selectedAvailable, 'available', 'groups')}
                         disabled={!selectedAvailable}
-                        className={`w-6 h-6 rounded border border-slate-200 dark:border-white/10 flex items-center justify-center transition-all shadow-sm active:scale-90 ${selectedAvailable ? 'text-bk-yellow bg-bk-yellow/10 border-bk-yellow/30 hover:bg-bk-yellow hover:text-bk-side' : 'text-slate-300 opacity-20 cursor-not-allowed'}`}
+                        className={`w-7 h-7 rounded-xl flex items-center justify-center transition-all active:scale-90 ${selectedAvailable ? 'text-bk-yellow bg-bk-yellow/10 border border-bk-yellow/30 hover:bg-bk-yellow hover:text-bk-side shadow-lg shadow-bk-yellow/20' : 'text-slate-300 opacity-20 cursor-not-allowed'}`}
                      >
-                        <span className="material-symbols-outlined text-sm">chevron_right</span>
+                        <Icon name="chevron_right" size="sm" />
                      </button>
                      <button 
                         onClick={() => handleMove(selectedInTarget?.item, selectedInTarget?.target, 'available')}
                         disabled={!selectedInTarget}
-                        className={`w-6 h-6 rounded border border-slate-200 dark:border-white/10 flex items-center justify-center transition-all shadow-sm active:scale-90 ${selectedInTarget ? 'text-bk-yellow bg-bk-yellow/10 border-bk-yellow/30 hover:bg-bk-yellow hover:text-bk-side' : 'text-slate-300 opacity-20 cursor-not-allowed'}`}
+                        className={`w-7 h-7 rounded-xl flex items-center justify-center transition-all active:scale-90 ${selectedInTarget ? 'text-bk-yellow bg-bk-yellow/10 border border-bk-yellow/30 hover:bg-bk-yellow hover:text-bk-side shadow-lg shadow-bk-yellow/20' : 'text-slate-300 opacity-20 cursor-not-allowed'}`}
                      >
-                        <span className="material-symbols-outlined text-sm">chevron_left</span>
+                        <Icon name="chevron_left" size="sm" />
                      </button>
                   </div>
 
-                  {/* Right Column: Stacked Targets */}
-                  <div className="col-span-6 flex flex-col">
-                    {/* Top: Group List (Parent Groups) */}
+                  {/* Right Column: Targets */}
+                  <div className="col-span-6 flex flex-col bg-white/50 dark:bg-bk-main/10">
                     <div 
-                      className={`flex-1 flex flex-col border-b border-slate-100 dark:border-slate-800 transition-colors ${draggedItem?.source === 'available' ? 'bg-indigo-500/[0.02]' : 'bg-white dark:bg-bk-side'}`}
+                      className={`flex-1 flex flex-col border-b border-slate-100 dark:border-white/5 transition-colors ${draggedItem?.source === 'available' ? 'bg-bk-yellow/5' : ''}`}
                       onDragOver={handleDragOver}
                       onDrop={(e) => handleDrop(e, 'groups')}
                     >
-                      <div className="px-4 py-2 border-b border-slate-50 dark:border-white/5 bg-slate-50/50 dark:bg-bk-main/20">
-                        <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-tight">Group list</label>
+                      <div className="px-4 py-2.5 border-b border-slate-50 dark:border-white/5 bg-slate-50/50 dark:bg-bk-main/20">
+                        <Typography variant="caption" className="font-bold text-slate-500 uppercase tracking-wider">Group list</Typography>
                       </div>
-                      <div className="flex-1 overflow-y-auto p-1.5 custom-scrollbar">
+                      <div className="flex-1 overflow-y-auto p-2.5 custom-scrollbar">
                          {formData.groups.length > 0 ? (
-                           <div className="flex flex-wrap gap-1.5 animate-in fade-in duration-200">
+                           <div className="flex flex-wrap gap-2 animate-in fade-in duration-200">
                              {formData.groups.map(group => (
                                <div 
                                  key={group.name} 
@@ -539,39 +515,39 @@ export default function CreateUserModal({ isOpen, onClose, dbname, editingUser }
                                    setSelectedAvailable(null);
                                  }}
                                  onDoubleClick={() => handleMove(group, 'groups', 'available')}
-                                 className={`flex items-center gap-1.5 pl-2 pr-1 py-1 rounded border text-[10.5px] font-medium transition-colors cursor-grab active:cursor-grabbing ${selectedInTarget?.item?.name === group.name ? 'bg-indigo-500/20 border-indigo-500/50 text-indigo-100' : 'bg-slate-100/50 dark:bg-white/5 border-indigo-500/10 text-slate-700 dark:text-slate-300 hover:border-indigo-500/30'}`}
+                                 className={`flex items-center gap-2 pl-3 pr-2 py-1.5 rounded-xl border text-[10.5px] font-bold transition-all cursor-grab active:cursor-grabbing ${selectedInTarget?.item?.name === group.name ? 'bg-indigo-500 text-white border-indigo-500 shadow-md' : 'bg-white dark:bg-bk-main/50 border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:border-indigo-500/50 hover:bg-indigo-500/5'}`}
                                >
-                                 <span className="material-symbols-outlined text-[13px] text-indigo-400">groups</span>
+                                 <Icon name="groups" size="sm" className={selectedInTarget?.item?.name === group.name ? 'text-white' : 'text-indigo-400'} />
                                  {group.name}
                                  <button 
                                    onClick={() => removeItem(group.name, 'groups')}
-                                   className="w-4 h-4 rounded-full hover:bg-rose-500/10 hover:text-rose-500 flex items-center justify-center transition-colors ml-1"
+                                   className="w-5 h-5 rounded-full hover:bg-black/10 flex items-center justify-center transition-colors ml-1"
                                  >
-                                    <span className="material-symbols-outlined text-[11px]">close</span>
+                                    <Icon name="close" size="xs" />
                                  </button>
                                </div>
                              ))}
                            </div>
                          ) : (
-                           <div className="h-full flex items-center justify-center opacity-10 pointer-events-none">
-                              <span className="text-[9px] font-bold tracking-widest">DRAG GROUPS HERE</span>
+                           <div className="h-full flex flex-col items-center justify-center opacity-10 pointer-events-none">
+                              <Icon name="drag_indicator" size="md" className="mb-1" />
+                              <Typography variant="caption" className="font-black tracking-widest">DRAG GROUPS HERE</Typography>
                            </div>
                          )}
                       </div>
                     </div>
 
-                    {/* Bottom: Member List (Child Users) */}
                     <div 
-                      className={`flex-1 flex flex-col transition-colors ${draggedItem?.source === 'available' ? 'bg-bk-yellow/[0.02]' : 'bg-white dark:bg-bk-side'}`}
+                      className={`flex-1 flex flex-col transition-colors ${draggedItem?.source === 'available' ? 'bg-bk-yellow/5' : ''}`}
                       onDragOver={handleDragOver}
                       onDrop={(e) => handleDrop(e, 'members')}
                     >
-                      <div className="px-4 py-2 border-b border-slate-50 dark:border-white/5 bg-slate-50/50 dark:bg-bk-main/20">
-                        <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-tight">Member list</label>
+                      <div className="px-4 py-2.5 border-b border-slate-50 dark:border-white/5 bg-slate-50/50 dark:bg-bk-main/20">
+                        <Typography variant="caption" className="font-bold text-slate-500 uppercase tracking-wider">Member list</Typography>
                       </div>
-                      <div className="flex-1 overflow-y-auto p-1.5 custom-scrollbar">
+                      <div className="flex-1 overflow-y-auto p-2.5 custom-scrollbar">
                         {formData.members.length > 0 ? (
-                           <div className="flex flex-wrap gap-1.5 animate-in fade-in duration-200">
+                           <div className="flex flex-wrap gap-2 animate-in fade-in duration-200">
                              {formData.members.map(member => (
                                <div 
                                  key={member.name}
@@ -582,22 +558,23 @@ export default function CreateUserModal({ isOpen, onClose, dbname, editingUser }
                                    setSelectedAvailable(null);
                                  }}
                                  onDoubleClick={() => handleMove(member, 'members', 'available')}
-                                 className={`flex items-center gap-1.5 pl-2 pr-1 py-1 rounded border text-[10.5px] font-medium transition-colors cursor-grab active:cursor-grabbing ${selectedInTarget?.item?.name === member.name ? 'bg-bk-yellow/20 border-bk-yellow/50 text-indigo-100' : 'bg-slate-100/50 dark:bg-white/5 border-bk-yellow/10 text-slate-700 dark:text-slate-300 hover:border-bk-yellow/30'}`}
+                                 className={`flex items-center gap-2 pl-3 pr-2 py-1.5 rounded-xl border text-[10.5px] font-bold transition-all cursor-grab active:cursor-grabbing ${selectedInTarget?.item?.name === member.name ? 'bg-bk-yellow text-bk-side border-bk-yellow shadow-md' : 'bg-white dark:bg-bk-main/50 border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:border-bk-yellow/50 hover:bg-bk-yellow/5'}`}
                                >
-                                 <span className="material-symbols-outlined text-[13px] text-bk-yellow/70">person</span>
+                                 <Icon name="person" size="sm" className={selectedInTarget?.item?.name === member.name ? 'text-bk-side' : 'text-bk-yellow'} />
                                  {member.name}
                                  <button 
                                    onClick={() => removeItem(member.name, 'members')}
-                                   className="w-4 h-4 rounded-full hover:bg-rose-500/10 hover:text-rose-500 flex items-center justify-center transition-colors ml-1"
+                                   className="w-5 h-5 rounded-full hover:bg-black/10 flex items-center justify-center transition-colors ml-1"
                                  >
-                                    <span className="material-symbols-outlined text-[11px]">close</span>
+                                    <Icon name="close" size="xs" />
                                  </button>
                                </div>
                              ))}
                            </div>
                          ) : (
-                           <div className="h-full flex items-center justify-center opacity-10 pointer-events-none">
-                              <span className="text-[9px] font-bold tracking-widest">DRAG MEMBERS HERE</span>
+                           <div className="h-full flex flex-col items-center justify-center opacity-10 pointer-events-none">
+                              <Icon name="drag_indicator" size="md" className="mb-1" />
+                              <Typography variant="caption" className="font-black tracking-widest">DRAG MEMBERS HERE</Typography>
                            </div>
                          )}
                       </div>
@@ -607,47 +584,44 @@ export default function CreateUserModal({ isOpen, onClose, dbname, editingUser }
               </div>
             </div>
           ) : (
-            <div className="space-y-6 animate-in fade-in slide-in-from-top-1 duration-200">
-              {/* Unauthorized section */}
-              {/* Unauthorized section - Modern Master-Detail Dashboard */}
-              <div className="flex bg-slate-50/50 dark:bg-bk-main/20 border border-slate-200 dark:border-white/5 rounded-2xl overflow-hidden h-[450px]">
+            <div className="space-y-6 animate-in fade-in slide-in-from-top-1 duration-200 h-full flex flex-col pb-4">
+              <div className="flex bg-white/50 dark:bg-bk-side/50 border border-slate-200 dark:border-white/5 rounded-2xl overflow-hidden flex-1 shadow-sm backdrop-blur-sm">
                 
-                {/* Left Panel: Searchable Objects List */}
-                <div className="w-[240px] border-r border-slate-200 dark:border-white/5 flex flex-col bg-white dark:bg-bk-side">
+                {/* Auth: Object List */}
+                <div className="w-[240px] border-r border-slate-200 dark:border-white/5 flex flex-col">
                   <div className="p-3 border-b border-slate-100 dark:border-white/5">
-                    <div className="relative">
-                      <span className="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-[14px] text-slate-400">search</span>
-                      <input 
-                        type="text" 
-                        placeholder="Search objects..." 
-                        value={objectSearchTerm}
-                        onChange={(e) => setObjectSearchTerm(e.target.value)}
-                        className="w-full bg-slate-50 dark:bg-bk-main/40 border-none px-7 py-2 rounded-lg text-[10px] h-8 focus:ring-0 focus:outline-none placeholder:text-slate-400/50" 
-                      />
-                    </div>
+                    <SearchInput 
+                      placeholder="Search objects..." 
+                      value={objectSearchTerm}
+                      onChange={setObjectSearchTerm}
+                      onClear={() => setObjectSearchTerm('')}
+                      size="sm"
+                    />
                   </div>
-                  <div className="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-1">
+                  <div className="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-1 bg-slate-50/30 dark:bg-transparent">
                     {isClassesLoading ? (
                       <div className="py-10 text-center opacity-20">
-                        <div className="w-5 h-5 border-2 border-bk-yellow border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-                        <span className="text-[9px] font-bold">SYMBOLS...</span>
+                        <Icon name="refresh" size="sm" className="animate-spin mx-auto mb-2" />
+                        <Typography variant="caption" className="font-bold">LOADING...</Typography>
                       </div>
                     ) : (
                       (() => {
                         const systemClasses = currentDbClasses?.systemclass?.[0]?.class?.map(c => ({ name: c.classname, type: 'system' })) || [];
                         const allObjects = systemClasses.filter(o => o.name.toLowerCase().includes(objectSearchTerm.toLowerCase()));
 
-                        if (allObjects.length === 0) return <div className="text-center py-10 opacity-20 text-[9px] font-bold">NO OBJECTS</div>;
+                        if (allObjects.length === 0) return <div className="text-center py-10 opacity-20"><Typography variant="caption" className="font-bold">NO OBJECTS</Typography></div>;
 
                         return allObjects.map(obj => (
                           <button 
                             key={obj.name}
                             onClick={() => setSelectedObjectId(obj.name)}
-                            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all group ${selectedObjectId === obj.name ? 'bg-bk-yellow text-bk-side shadow-lg shadow-bk-yellow/20' : 'text-slate-500 hover:bg-bk-yellow/10 hover:text-bk-yellow'}`}
+                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group ${selectedObjectId === obj.name ? 'bg-bk-yellow text-bk-side shadow-lg' : 'text-slate-500 hover:bg-bk-yellow/10 hover:text-bk-yellow'}`}
                           >
-                            <span className={`material-symbols-outlined text-[16px] ${selectedObjectId === obj.name ? 'text-bk-side' : obj.type === 'system' ? 'text-indigo-400/50' : 'text-slate-400'}`}>
-                              {obj.type === 'system' ? 'settings_suggest' : 'table_chart'}
-                            </span>
+                            <Icon 
+                              name={obj.type === 'system' ? 'settings_suggest' : 'table_chart'} 
+                              size="sm" 
+                              className={selectedObjectId === obj.name ? 'text-bk-side' : 'text-indigo-400/50 group-hover:text-bk-yellow/50'} 
+                            />
                             <span className="text-[10px] font-bold tracking-tight truncate">{obj.name}</span>
                           </button>
                         ));
@@ -656,104 +630,98 @@ export default function CreateUserModal({ isOpen, onClose, dbname, editingUser }
                   </div>
                 </div>
 
-                {/* Right Panel: Permission Dashboard */}
-                <div className="flex-1 flex flex-col bg-slate-50/30 dark:bg-bk-main/10 overflow-y-auto custom-scrollbar">
+                {/* Auth: Details */}
+                <div className="flex-1 flex flex-col bg-slate-50/10 dark:bg-white/[0.02] overflow-y-auto custom-scrollbar">
                   <div className="p-6 space-y-8">
-                    {/* Object Header */}
-                    <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-4">
-                      <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-5">
+                      <div className="flex items-center gap-3.5">
                         <div className="w-10 h-10 rounded-2xl bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
-                          <span className="material-symbols-outlined text-bk-yellow">shield_lock</span>
+                          <Icon name="shield_lock" size="md" className="text-bk-yellow" />
                         </div>
                         <div>
-                          <h4 className="text-[14px] font-bold text-slate-900 dark:text-white uppercase tracking-wider">{selectedObjectId}</h4>
-                          <p className="text-[10px] text-slate-400 font-medium">Configure individual access masks for this object</p>
+                          <Typography variant="p" className="text-[14px] font-black text-slate-900 dark:text-white uppercase tracking-wider">{selectedObjectId}</Typography>
+                          <Typography variant="caption" className="text-slate-400 font-medium">Individual access mask configuration</Typography>
                         </div>
                       </div>
                       <div className="flex gap-2">
-                         <button 
-                           onClick={() => handleSelectAll(selectedObjectId)}
-                           className="px-3 py-1.5 bg-indigo-500/10 text-indigo-500 rounded-lg text-[9px] font-bold uppercase hover:bg-indigo-500 hover:text-white transition-all active:scale-95"
-                         >
-                           Select All
-                         </button>
-                         <button 
-                           onClick={() => handleClearAll(selectedObjectId)}
-                           className="px-3 py-1.5 bg-rose-500/10 text-rose-500 rounded-lg text-[9px] font-bold uppercase hover:bg-rose-500 hover:text-white transition-all active:scale-95"
-                         >
-                           Clear All
-                         </button>
+                         <Button variant="ghost" size="sm" onClick={() => handleSelectAll(selectedObjectId)}>All</Button>
+                         <Button variant="ghost" size="sm" onClick={() => handleClearAll(selectedObjectId)}>Clear</Button>
                       </div>
                     </div>
 
-                    {/* Permission Groups */}
-                    <div className="grid grid-cols-1 gap-8">
+                    <div className="space-y-8">
                       {/* Data Group */}
                       <div className="space-y-4">
                          <div className="flex items-center gap-3">
-                            <span className="text-[10px] font-black uppercase text-blue-500 tracking-widest pl-1">Data Operations</span>
+                            <Typography variant="caption" className="font-black uppercase text-blue-500 tracking-widest pl-1">Data Operations</Typography>
                             <div className="flex-1 h-[1px] bg-blue-500/10"></div>
                          </div>
                          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                            {['Select', 'Insert', 'Update', 'Delete'].map(perm => (
-                              <div key={perm} className={`p-3 rounded-2xl border transition-all flex flex-col gap-3 ${objectAuths[selectedObjectId]?.[perm] ? 'bg-blue-500/5 border-blue-500/30' : 'bg-white dark:bg-bk-side border-slate-200 dark:border-white/5'}`}>
-                                <div className="flex items-center justify-between">
-                                  <span className={`text-[10px] font-bold ${objectAuths[selectedObjectId]?.[perm] ? 'text-blue-500' : 'text-slate-400'}`}>{perm}</span>
-                                  <button 
-                                    onClick={() => togglePermission(selectedObjectId, perm)}
-                                    className={`w-8 h-4 rounded-full relative transition-all duration-200 ${objectAuths[selectedObjectId]?.[perm] ? 'bg-blue-500' : 'bg-slate-200 dark:bg-white/10'}`}
-                                  >
-                                    <div className={`absolute top-1 w-2 h-2 rounded-full bg-white transition-all duration-200 ${objectAuths[selectedObjectId]?.[perm] ? 'left-5' : 'left-1'}`}></div>
-                                  </button>
-                                </div>
-                                <span className="text-[8px] text-slate-400 font-medium leading-tight">Allow user to {perm.toLowerCase()} records in the table.</span>
-                              </div>
-                            ))}
+                            {['Select', 'Insert', 'Update', 'Delete'].map(perm => {
+                              const isActive = objectAuths[selectedObjectId]?.[perm];
+                              return (
+                                <button 
+                                  key={perm} 
+                                  onClick={() => togglePermission(selectedObjectId, perm)}
+                                  className={`p-3.5 rounded-2xl border text-left transition-all ${isActive ? 'bg-blue-500/10 border-blue-500/30' : 'bg-white dark:bg-bk-main/40 border-slate-200 dark:border-white/5 opacity-60 hover:opacity-100 hover:border-blue-500/20'}`}
+                                >
+                                  <div className="flex items-center justify-between mb-2">
+                                    <span className={`text-[10px] font-black uppercase tracking-tight ${isActive ? 'text-blue-500' : 'text-slate-400'}`}>{perm}</span>
+                                    {isActive && <Icon name="check_circle" size="xs" className="text-blue-500" />}
+                                  </div>
+                                  <span className="text-[8px] text-slate-400 font-bold leading-tight block">Capability to {perm.toLowerCase()} records</span>
+                                </button>
+                              );
+                            })}
                          </div>
                       </div>
 
                       {/* Schema Group */}
                       <div className="space-y-4">
                          <div className="flex items-center gap-3">
-                            <span className="text-[10px] font-black uppercase text-amber-500 tracking-widest pl-1">Structure & Logic</span>
+                            <Typography variant="caption" className="font-black uppercase text-amber-500 tracking-widest pl-1">Structure Control</Typography>
                             <div className="flex-1 h-[1px] bg-amber-500/20"></div>
                          </div>
                          <div className="grid grid-cols-3 gap-4">
-                            {['Alter', 'Index', 'Execute'].map(perm => (
-                              <div key={perm} className={`p-3 rounded-2xl border transition-all flex items-center justify-between ${objectAuths[selectedObjectId]?.[perm] ? 'bg-amber-500/5 border-amber-500/30' : 'bg-white dark:bg-bk-side border-slate-200 dark:border-white/5'}`}>
-                                <div className="flex flex-col">
-                                  <span className={`text-[10px] font-bold ${objectAuths[selectedObjectId]?.[perm] ? 'text-amber-500' : 'text-slate-400'}`}>{perm}</span>
-                                  <span className="text-[8px] text-slate-400 font-medium">{perm === 'Execute' ? 'Run stored procedures' : `Change table ${perm.toLowerCase()}`}</span>
-                                </div>
+                            {['Alter', 'Index', 'Execute'].map(perm => {
+                              const isActive = objectAuths[selectedObjectId]?.[perm];
+                              return (
                                 <button 
+                                  key={perm} 
                                   onClick={() => togglePermission(selectedObjectId, perm)}
-                                  className={`w-8 h-4 rounded-full relative transition-all duration-200 ${objectAuths[selectedObjectId]?.[perm] ? 'bg-amber-500' : 'bg-slate-200 dark:bg-white/10'}`}
+                                  className={`p-3.5 rounded-2xl border text-left transition-all ${isActive ? 'bg-amber-500/10 border-amber-500/30' : 'bg-white dark:bg-bk-main/40 border-slate-200 dark:border-white/5 opacity-60 hover:opacity-100 hover:border-amber-500/20'}`}
                                 >
-                                  <div className={`absolute top-1 w-2 h-2 rounded-full bg-white transition-all duration-200 ${objectAuths[selectedObjectId]?.[perm] ? 'left-5' : 'left-1'}`}></div>
+                                  <div className="flex items-center justify-between mb-1">
+                                    <span className={`text-[10px] font-black uppercase tracking-tight ${isActive ? 'text-amber-500' : 'text-slate-400'}`}>{perm}</span>
+                                    {isActive && <Icon name="check_circle" size="xs" className="text-amber-500" />}
+                                  </div>
+                                  <span className="text-[8px] text-slate-400 font-bold">{perm === 'Execute' ? 'Procedure calls' : `Table ${perm.toLowerCase()}`}</span>
                                 </button>
-                              </div>
-                            ))}
+                              );
+                            })}
                          </div>
                       </div>
 
-                      {/* Grant Rights */}
+                      {/* Delegation */}
                       <div className="space-y-4">
                          <div className="flex items-center gap-3">
-                            <span className="text-[10px] font-black uppercase text-indigo-500 tracking-widest pl-1">Delegation (Grant Rights)</span>
+                            <Typography variant="caption" className="font-black uppercase text-indigo-500 tracking-widest pl-1">Delegation (Grant Rights)</Typography>
                             <div className="flex-1 h-[1px] bg-indigo-500/20"></div>
                          </div>
                          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                            {['G.Select', 'G.Insert', 'G.Update', 'G.Delete', 'G.Alter', 'G.Index', 'G.Execute'].map(perm => (
-                              <div key={perm} className={`px-3 py-2 rounded-xl border transition-all flex items-center justify-between ${objectAuths[selectedObjectId]?.[perm] ? 'bg-indigo-500/5 border-indigo-500/30 ring-1 ring-indigo-500/20' : 'bg-white dark:bg-bk-side border-slate-200 dark:border-white/5 opacity-50'}`}>
-                                <span className={`text-[9px] font-bold ${objectAuths[selectedObjectId]?.[perm] ? 'text-indigo-500' : 'text-slate-400'}`}>{perm}</span>
+                            {['G.Select', 'G.Insert', 'G.Update', 'G.Delete', 'G.Alter', 'G.Index', 'G.Execute'].map(perm => {
+                              const isActive = objectAuths[selectedObjectId]?.[perm];
+                              return (
                                 <button 
+                                  key={perm} 
                                   onClick={() => togglePermission(selectedObjectId, perm)}
-                                  className={`w-7 h-3.5 rounded-full relative transition-all duration-200 ${objectAuths[selectedObjectId]?.[perm] ? 'bg-indigo-500' : 'bg-slate-200 dark:bg-white/10'}`}
+                                  className={`px-3 py-2 rounded-xl border flex items-center justify-between transition-all ${isActive ? 'bg-indigo-500/10 border-indigo-500/30' : 'bg-white dark:bg-bk-main/40 border-slate-200 dark:border-white/5 opacity-40 hover:opacity-100'}`}
                                 >
-                                  <div className={`absolute top-0.5 w-2.5 h-2.5 rounded-full bg-white transition-all duration-200 ${objectAuths[selectedObjectId]?.[perm] ? 'left-4' : 'left-0.5'}`}></div>
+                                  <span className={`text-[9px] font-black uppercase ${isActive ? 'text-indigo-500' : 'text-slate-400'}`}>{perm}</span>
+                                  <div className={`w-3 h-3 rounded-full ${isActive ? 'bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]' : 'bg-slate-200 dark:bg-white/10'}`}></div>
                                 </button>
-                              </div>
-                            ))}
+                              );
+                            })}
                          </div>
                       </div>
                     </div>
@@ -763,42 +731,7 @@ export default function CreateUserModal({ isOpen, onClose, dbname, editingUser }
             </div>
           )}
         </div>
-
-        {/* Footer */}
-        <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 backdrop-blur-sm flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
-          <button 
-            className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-all"
-            onClick={handleClose}
-          >
-            Discard
-          </button>
-          <button 
-            disabled={actionLoading}
-            className="px-8 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center gap-2 min-w-[120px] disabled:opacity-50"
-            onClick={handleSave}
-          >
-            {actionLoading ? (
-              <div className="w-4 h-4 border-2 border-bk-side/30 border-t-bk-side rounded-full animate-spin"></div>
-            ) : (
-              <>
-                <span className="material-symbols-outlined text-[16px]">check_circle</span>
-                <span>{isEditMode ? 'Update Account' : 'Create Account'}</span>
-              </>
-            )}
-          </button>
-        </div>
       </div>
-      
-      {/* Dynamic Keyframe Animations for DND Feedback */}
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes pulse-subtle {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.8; }
-        }
-        .pulse-subtle {
-          animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-      `}} />
-    </div>
+    </Modal>
   );
 }

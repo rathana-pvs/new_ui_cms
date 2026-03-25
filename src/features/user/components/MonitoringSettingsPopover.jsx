@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updatePreferences } from '../userSlice';
 
+import { Icon } from '../../../components/ds/foundation/Icon';
+
 export default function MonitoringSettingsPopover() {
   const [isOpen, setIsOpen] = useState(false);
   const popoverRef = useRef(null);
@@ -45,9 +47,7 @@ export default function MonitoringSettingsPopover() {
           ${isOpen ? 'bg-bk-yellow/10 text-bk-yellow' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5'}`}
         title="Monitoring Settings"
       >
-        <span className="material-symbols-outlined text-[20px] transition-colors leading-none" style={{ fontVariationSettings: "'wght' 300" }}>
-          timer
-        </span>
+        <Icon name="timer" size="lg" weight={300} className="transition-colors leading-none" />
         {(preferences.dashboardInterval > 0 || preferences.brokerStatusInterval > 0) && (
           <div className="absolute top-2 right-2 w-1.5 h-1.5 bg-amber-500 rounded-full border border-white dark:border-bk-side animate-pulse"></div>
         )}

@@ -3,6 +3,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { closeAddQueryPlanModal, setAutoExecQuery } from '../databaseSlice';
 import { showStatusModal } from '../../layout/layoutSlice';
 
+import { Icon } from '../../../components/ds/foundation/Icon';
+import { Typography } from '../../../components/ds/foundation/Typography';
+
 const CustomSelect = ({ value, options, onChange, icon }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -27,7 +30,7 @@ const CustomSelect = ({ value, options, onChange, icon }) => {
         className="w-full bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded px-3 text-[12px] text-slate-900 dark:text-white flex items-center justify-between hover:border-bk-yellow/50 transition-all font-medium h-9"
       >
         <span className="flex items-center gap-2">
-          {icon && <span className="material-symbols-outlined text-[16px] text-slate-400">{icon}</span>}
+          {icon && <Icon name={icon} size="sm" weight={300} className="text-slate-400" />}
           {selectedOption ? selectedOption.label : 'Select...'}
         </span>
         <span className={`material-symbols-outlined text-slate-400 text-lg transition-transform duration-200 ${isOpen ? 'rotate-180 text-bk-yellow' : ''}`}>expand_more</span>
@@ -52,7 +55,7 @@ const CustomSelect = ({ value, options, onChange, icon }) => {
               >
                 <span>{opt.label}</span>
                 {value === opt.value && (
-                  <span className="material-symbols-outlined text-[16px]">check_circle</span>
+                  <Icon name="check_circle" size="sm" weight={300} />
                 )}
               </button>
             ))}
@@ -168,18 +171,18 @@ export default function AddQueryPlanModal() {
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
-              <span className="material-symbols-outlined text-bk-yellow text-xl">bolt</span>
+              <Icon name="bolt" size="sm" weight={300} className="text-bk-yellow text-xl" />
             </div>
             <div>
-              <h3 className="text-[12px] font-medium text-slate-900 dark:text-white leading-none tracking-wide">Add query plan</h3>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Configure automated query execution for <span className="text-bk-yellow font-medium uppercase">{selectedDatabase}</span></p>
+              <Typography variant="h3" className="text-[12px] font-medium text-slate-900 dark:text-white leading-none tracking-wide">Add query plan</Typography>
+              <Typography variant="caption" className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Configure automated query execution for <Typography variant="span" className="text-bk-yellow font-medium uppercase">{selectedDatabase}</Typography></Typography>
             </div>
           </div>
           <button 
             onClick={() => dispatch(closeAddQueryPlanModal())}
             className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
           >
-            <span className="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform">close</span>
+            <Icon name="close" size="sm" weight={300} className="text-lg group-hover:rotate-90 transition-transform" />
           </button>
         </div>
 
@@ -189,11 +192,11 @@ export default function AddQueryPlanModal() {
           {error && (
             <div className="bg-rose-500/10 border border-rose-500/20 p-4 rounded-2xl flex items-center gap-4 animate-in slide-in-from-top-4 duration-200">
                <div className="w-10 h-10 rounded-full bg-rose-500/20 flex items-center justify-center text-rose-500 shrink-0">
-                  <span className="material-symbols-outlined text-2xl font-black">error</span>
+                  <Icon name="error" size="sm" weight={300} className="text-2xl font-black" />
                </div>
                <div className="flex-1">
-                  <p className="text-[11px] font-black text-rose-500 uppercase tracking-widest mb-0.5">Submission Failed</p>
-                  <p className="text-[12px] font-medium text-rose-600/80 leading-relaxed">{error}</p>
+                  <Typography variant="label" className="text-[11px] font-black text-rose-500 uppercase tracking-widest mb-0.5">Submission Failed</Typography>
+                  <Typography variant="p" className="text-[12px] font-medium text-rose-600/80 leading-relaxed">{error}</Typography>
                </div>
             </div>
           )}
@@ -201,12 +204,12 @@ export default function AddQueryPlanModal() {
           {/* General Section */}
           <section className="space-y-4">
             <div className="flex items-center gap-2">
-               <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500 uppercase">General Identification</span>
+               <Typography variant="label" className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500 uppercase">General Identification</Typography>
                <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
             </div>
             <div className="grid grid-cols-12 gap-4">
               <div className="col-span-12 space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">Query ID</label>
+                <Typography variant="label" className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">Query ID</Typography>
                 <input 
                   type="text" 
                   value={formData.queryId}
@@ -216,7 +219,7 @@ export default function AddQueryPlanModal() {
                 />
               </div>
               <div className="col-span-6 space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">DB Username</label>
+                <Typography variant="label" className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">DB Username</Typography>
                 <input 
                   type="text" 
                   value={formData.username}
@@ -225,7 +228,7 @@ export default function AddQueryPlanModal() {
                 />
               </div>
               <div className="col-span-6 space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">DB Password</label>
+                <Typography variant="label" className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4">DB Password</Typography>
                 <input 
                   type="password" 
                   value={formData.password}
@@ -239,17 +242,17 @@ export default function AddQueryPlanModal() {
           {/* Schedule Section */}
           <section className="space-y-4">
             <div className="flex items-center gap-2">
-               <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500 uppercase">Execution Schedule</span>
+               <Typography variant="label" className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500 uppercase">Execution Schedule</Typography>
                <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
             </div>
             
             <div className="bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded-2xl p-5 space-y-5">
               <div className="grid grid-cols-12 gap-6">
                 <div className="col-span-6 space-y-1.5">
-                  <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4 gap-2">
-                    <span className="material-symbols-outlined text-[14px]">event_repeat</span>
+                  <Typography variant="label" className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4 gap-2">
+                    <Icon name="event_repeat" size="sm" weight={300} />
                     Period type
-                  </label>
+                  </Typography>
                   <CustomSelect
                     value={formData.periodType}
                     onChange={(val) => handleInputChange('periodType', val)}
@@ -262,17 +265,17 @@ export default function AddQueryPlanModal() {
                   />
                 </div>
                 <div className="col-span-6 space-y-1.5">
-                  <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4 gap-2">
-                    <span className="material-symbols-outlined text-[14px]">schedule</span>
+                  <Typography variant="label" className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5 flex items-center h-4 gap-2">
+                    <Icon name="schedule" size="sm" weight={300} />
                     Execution time
-                  </label>
+                  </Typography>
                   <div className="relative">
                     <button 
                       onClick={() => setShowTimePicker(!showTimePicker)}
                       className="w-full h-9 px-3 flex items-center justify-between bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded text-[12px] font-medium text-slate-900 dark:text-white hover:border-bk-yellow/50 transition-all"
                     >
                       <span>{formData.backupTime}</span>
-                      <span className="material-symbols-outlined text-bk-yellow text-lg">history_toggle_off</span>
+                      <Icon name="history_toggle_off" size="sm" weight={300} className="text-bk-yellow text-lg" />
                     </button>
 
                     {showTimePicker && (
@@ -337,7 +340,7 @@ export default function AddQueryPlanModal() {
 
               {formData.periodType === 'MONTH' && (
                 <div className="space-y-3">
-                  <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-1">Select Days of Month</label>
+                  <Typography variant="label" className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-1">Select Days of Month</Typography>
                   <div className="grid grid-cols-7 gap-2">
                     {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
                       <button
@@ -358,7 +361,7 @@ export default function AddQueryPlanModal() {
 
               {formData.periodType === 'WEEK' && (
                 <div className="space-y-3">
-                  <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-1">Select Days of Week</label>
+                  <Typography variant="label" className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-1">Select Days of Week</Typography>
                   <div className="grid grid-cols-7 gap-2">
                     {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, index) => {
                       const val = index + 1;
@@ -382,22 +385,22 @@ export default function AddQueryPlanModal() {
 
               {formData.periodType === 'DAY' && (
                 <div className="p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-xl flex items-center gap-3">
-                    <span className="material-symbols-outlined text-emerald-500 text-lg">check_circle</span>
-                    <span className="text-[12px] font-medium text-emerald-600/80 tracking-tight italic">Query will execute automatically every day at {formData.backupTime}</span>
+                    <Icon name="check_circle" size="sm" weight={300} className="text-emerald-500 text-lg" />
+                    <Typography variant="span" className="text-[12px] font-medium text-emerald-600/80 tracking-tight italic">Query will execute automatically every day at {formData.backupTime}</Typography>
                 </div>
               )}
 
               {formData.periodType === 'DATE' && (
                 <div className="bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded px-5 py-4 space-y-3">
                   <div className="flex items-center gap-4">
-                    <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 w-12 ">Date:</label>
+                    <Typography variant="label" className="text-[10px] font-medium text-slate-500 dark:text-slate-400 w-12 ">Date:</Typography>
                     <div className="relative flex-1">
                       <button 
                         onClick={() => setShowCalendar(!showCalendar)}
                         className="w-full h-9 px-3 flex items-center justify-between bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded text-[12px] font-medium text-slate-900 dark:text-white"
                       >
-                        <span>{formData.periodDetail || 'Select date'}</span>
-                        <span className="material-symbols-outlined text-bk-yellow text-lg">calendar_today</span>
+                        <Typography variant="span">{formData.periodDetail || 'Select date'}</Typography>
+                        <Icon name="calendar_today" size="sm" weight={300} className="text-bk-yellow text-lg" />
                       </button>
 
                       {showCalendar && (
@@ -408,16 +411,16 @@ export default function AddQueryPlanModal() {
                               onClick={() => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1))}
                               className="w-7 h-7 rounded-lg hover:bg-slate-200 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 transition-colors"
                             >
-                              <span className="material-symbols-outlined text-lg">chevron_left</span>
+                              <Icon name="chevron_left" size="sm" weight={300} className="text-lg" />
                             </button>
-                            <span className="text-[12px] font-medium text-slate-900 dark:text-white tracking-tight">
+                            <Typography variant="span" className="text-[12px] font-medium text-slate-900 dark:text-white tracking-tight">
                               {viewDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
-                            </span>
+                            </Typography>
                             <button 
                               onClick={() => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1))}
                               className="w-7 h-7 rounded-lg hover:bg-slate-200 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 transition-colors"
                             >
-                              <span className="material-symbols-outlined text-lg">chevron_right</span>
+                              <Icon name="chevron_right" size="sm" weight={300} className="text-lg" />
                             </button>
                           </div>
 
@@ -495,10 +498,10 @@ export default function AddQueryPlanModal() {
                       )}
                     </div>
                   </div>
-                  <p className="text-[10px] text-slate-400 flex items-center gap-1.5 ml-16 leading-relaxed font-medium">
-                    <span className="material-symbols-outlined text-[13px] text-bk-yellow">stars</span>
-                    Single execution scheduled for <span className="text-slate-900 dark:text-slate-200 font-medium decoration-bk-yellow/30 underline underline-offset-4 decoration-2">{formData.periodDetail}</span>
-                  </p>
+                  <Typography variant="p" className="text-[10px] text-slate-400 flex items-center gap-1.5 ml-16 leading-relaxed font-medium">
+                    <Icon name="stars" size="sm" weight={300} className="text-bk-yellow" />
+                    Single execution scheduled for <Typography variant="span" className="text-slate-900 dark:text-slate-200 font-medium decoration-bk-yellow/30 underline underline-offset-4 decoration-2">{formData.periodDetail}</Typography>
+                  </Typography>
                 </div>
               )}
             </div>
@@ -507,13 +510,13 @@ export default function AddQueryPlanModal() {
           {/* SQL Section */}
           <section className="space-y-4">
             <div className="flex items-center gap-2">
-               <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500 uppercase">Query Statement</span>
+               <Typography variant="label" className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500 uppercase">Query Statement</Typography>
                <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
             </div>
             <div className="space-y-1.5">
                <div className="relative group">
                   <div className="absolute top-3 left-3 flex flex-col gap-1 items-center opacity-40 group-focus-within:opacity-100 transition-opacity">
-                    <span className="material-symbols-outlined text-slate-400 dark:text-slate-500 text-lg">code</span>
+                    <Icon name="code" size="sm" weight={300} className="text-slate-400 dark:text-slate-500 text-lg" />
                   </div>
                   <textarea 
                     value={formData.queryString}
@@ -522,7 +525,7 @@ export default function AddQueryPlanModal() {
                     className="w-full h-40 pl-10 pr-4 py-3 bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded-2xl text-[13px] font-mono text-slate-900 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-bk-yellow/50 transition-all resize-none custom-scrollbar"
                   />
                </div>
-               <p className="text-[10px] text-slate-400 dark:text-slate-500 ml-1 italic font-medium">Tip: Ensure the query is valid and the user has appropriate permissions within the database.</p>
+               <Typography variant="p" className="text-[10px] text-slate-400 dark:text-slate-500 ml-1 italic font-medium">Tip: Ensure the query is valid and the user has appropriate permissions within the database.</Typography>
             </div>
           </section>
         </div>
@@ -545,7 +548,7 @@ export default function AddQueryPlanModal() {
               <div className="w-3 h-3 border-2 border-bk-side/30 border-t-bk-side rounded-full animate-spin"></div>
             ) : (
               <>
-                <span className="material-symbols-outlined text-[16px]">play_circle</span>
+                <Icon name="play_circle" size="sm" weight={300} />
                 <span>Run schedule</span>
               </>
             )}

@@ -60,6 +60,8 @@ import DatabasePropertyModal from '../features/database/components/DatabasePrope
 import RenameDatabaseModal from '../features/database/components/RenameDatabaseModal';
 import AddVolumeModal from '../features/database/components/AddVolumeModal';
 
+import { Icon } from '../components/ds/foundation/Icon';
+
 function DashboardLayout() {
   const dispatch = useDispatch();
   const { isLoginDatabaseModalOpen, selectedDatabase } = useSelector((state) => state.database);
@@ -157,7 +159,7 @@ function DashboardLayout() {
           {openTabs.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-slate-50 dark:bg-bk-main font-sans">
               <div className="w-24 h-24 bg-slate-100 dark:bg-bk-side rounded-full flex items-center justify-center mb-6 shadow-md border border-slate-200 dark:border-white/5">
-                <span className="material-symbols-outlined text-5xl text-slate-400 dark:text-bk-yellow/40" style={{ fontVariationSettings: "'wght' 200" }}>database</span>
+                <Icon name="database" size="sm" weight={300} className="text-5xl text-slate-400 dark:text-bk-yellow/40" />
               </div>
               <h3 className="text-xl font-medium text-slate-700 dark:text-bk-yellow tracking-tight">Cubrid Manager</h3>
               <p className="text-slate-500 dark:text-slate-400 mt-2 max-w-xs text-sm leading-relaxed">

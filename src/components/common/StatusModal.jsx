@@ -1,6 +1,8 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { closeStatusModal } from '../../features/layout/layoutSlice';
 
+import { Icon } from '../ds/foundation/Icon';
+
 export default function StatusModal() {
   const dispatch = useDispatch();
   const { statusModal } = useSelector((state) => state.layout);
@@ -59,7 +61,7 @@ export default function StatusModal() {
           onClick={() => dispatch(closeStatusModal())}
           className="absolute top-4 right-4 w-7 h-7 rounded-md hover:bg-slate-100 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-600 flex items-center justify-center group"
         >
-          <span className="material-symbols-outlined text-[18px] group-hover:rotate-90 transition-transform">close</span>
+          <Icon name="close" size="sm" weight={300} className="group-hover:rotate-90 transition-transform" />
         </button>
 
         {/* Icon Container */}

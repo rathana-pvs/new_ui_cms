@@ -5,6 +5,15 @@ import { showStatusModal } from '../../layout/layoutSlice';
 import { databaseApi } from '../databaseApi';
 import ModalErrorView from '../../../components/common/ModalErrorView';
 
+import { Icon } from '../../../components/ds/foundation/Icon';
+import { Modal } from '../../../components/ds/layout/Modal';
+import { Button } from '../../../components/ds/foundation/Button';
+import { Input } from '../../../components/ds/forms/Input';
+import { Checkbox } from '../../../components/ds/forms/Checkbox';
+import { Table } from '../../../components/ds/layout/Table';
+import { Divider } from '../../../components/ds/layout/Divider';
+import { Typography } from '../../../components/ds/foundation/Typography';
+
 export default function DeleteDatabaseModal() {
   const dispatch = useDispatch();
   const { isDeleteDBModalOpen, selectedDatabase } = useSelector((state) => state.database);
@@ -118,203 +127,156 @@ export default function DeleteDatabaseModal() {
 
   if (!isDeleteDBModalOpen) return null;
 
+  const volumeColumns = [
+    { header: 'Volume Name', accessor: 'spacename' },
+    { header: 'Volume Path', accessor: 'location', width: '200px' },
+    { header: 'Change Date', accessor: 'date' },
+    { header: 'Volume Type', accessor: 'type' },
+    { header: 'Total Pages', accessor: 'totalpage', className: 'text-right' },
+    { header: 'Free Pages', accessor: 'freepage', className: 'text-right' },
+    { header: 'Size (MB)', accessor: 'volumeSizeMB', className: 'text-right' }
+  ];
+
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans text-left">
-      <div className={`bg-white dark:bg-bk-side w-full ${step === 1 ? 'max-w-5xl' : (error ? 'max-w-[480px]' : 'max-w-[400px]')} rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col relative text-left transition-all`}>
-        
-        {/* Subtle Top Accent */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-rose-500/60"></div>
-
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-rose-500/10 flex items-center justify-center border border-rose-500/20">
-              <span className="material-symbols-outlined text-rose-500 text-xl">delete_forever</span>
-            </div>
-            <div>
-              <h3 className="text-[12px] font-medium text-slate-900 dark:text-white leading-none tracking-wide">
-                {step === 1 ? 'Delete database' : (error ? 'Operation failed' : 'Security verification')}
-              </h3>
-            </div>
+    <Modal
+      isOpen={isDeleteDBModalOpen}
+      onClose={handleClose}
+      title={step === 1 ? 'Delete database' : (error ? 'Operation failed' : 'Security verification')}
+      icon="delete_forever"
+      maxWidth={step === 1 ? '1024px' : '480px'}
+      footer={
+        <div className="flex w-full items-center justify-between">
+          <div className="flex-1">
+            {step === 2 && !error && !processing && (
+              <Button variant="secondary" onClick={() => setStep(1)} icon="arrow_back">
+                Back
+              </Button>
+            )}
           </div>
-          <button 
-            disabled={processing}
-            onClick={handleClose}
-            className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
-          >
-            <span className="material-symbols-outlined text-lg group-hover:rotate-90 transition-transform">close</span>
-          </button>
+          <div className="flex items-center gap-3">
+            {(step === 1 || error) && (
+              <Button variant="secondary" onClick={handleClose}>
+                Discard
+              </Button>
+            )}
+            <Button 
+              variant={error ? 'secondary' : (step === 1 ? 'primary' : 'primary')}
+              className={!error && step === 2 ? 'bg-emerald-500 hover:bg-emerald-600 text-white' : (step === 1 ? 'bg-rose-500 hover:bg-rose-600 text-white' : '')}
+              onClick={handleConfirmAction}
+              disabled={processing || loading}
+              loading={processing}
+              icon={error ? 'refresh' : (step === 1 ? 'arrow_forward' : 'check_circle')}
+            >
+              {error ? 'Try again' : (step === 1 ? 'Proceed' : 'Delete database')}
+            </Button>
+          </div>
         </div>
+      }
+    >
+      <div className="space-y-6">
+        {step === 1 && (
+          <div className="space-y-6 animate-in fade-in duration-300">
+            <div className="space-y-4">
+              <Divider label="Target Information" />
+              <Input 
+                label="Database identifier" 
+                value={selectedDatabase} 
+                disabled 
+                icon="database"
+              />
+            </div>
 
-        {/* Body */}
-        <div className="p-5 space-y-5 flex-1 overflow-y-auto custom-scrollbar">
-          {step === 1 && (
-            <div className="space-y-5 animate-in fade-in duration-200">
-               <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500 uppercase">Target information</span>
-                  <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
-                </div>
-                
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5">Database identifier</label>
-                  <div className="w-full h-9 px-3 flex items-center bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded text-[12px] font-medium text-slate-700 dark:text-slate-200">
-                    {selectedDatabase}
-                  </div>
-                </div>
+            <div className="space-y-4">
+              <Divider label="Volume Information" />
+              <div className="border border-slate-100 dark:border-white/5 rounded-2xl overflow-hidden shadow-sm bg-slate-50/20 dark:bg-bk-main/10">
+                <Table 
+                  columns={volumeColumns}
+                  data={volumeInfo.filter(v => v.spacename && v.spacename !== '\u00A0')}
+                  loading={loading}
+                />
               </div>
+            </div>
 
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500 uppercase">Volume information</span>
-                  <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
-                </div>
-                
-                <div className="border border-slate-100 dark:border-white/5 rounded-lg overflow-hidden bg-white dark:bg-bk-main/10 shadow-sm">
-                  <div className="overflow-x-auto custom-scrollbar">
-                    <table className="w-full text-left text-[11px] border-collapse min-w-[800px]">
-                      <thead>
-                        <tr className="bg-slate-50/80 dark:bg-bk-main/50 text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-white/5">
-                          <th className="px-4 py-2.5 font-medium border-r border-slate-100 dark:border-white/5 whitespace-nowrap">Volume Name</th>
-                          <th className="px-4 py-2.5 font-medium border-r border-slate-100 dark:border-white/5 whitespace-nowrap">Volume Path</th>
-                          <th className="px-4 py-2.5 font-medium border-r border-slate-100 dark:border-white/5 whitespace-nowrap">Change Date</th>
-                          <th className="px-4 py-2.5 font-medium border-r border-slate-100 dark:border-white/5 whitespace-nowrap">Volume Type</th>
-                          <th className="px-4 py-2.5 font-medium border-r border-slate-100 dark:border-white/5 whitespace-nowrap text-right">Total Pages</th>
-                          <th className="px-4 py-2.5 font-medium border-r border-slate-100 dark:border-white/5 whitespace-nowrap text-right">Free Pages</th>
-                          <th className="px-4 py-2.5 font-medium whitespace-nowrap text-right font-sans">Size (MB)</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-50 dark:divide-white/5 font-mono text-[10px]">
-                        {loading ? (
-                          <tr><td colSpan="7" className="px-4 py-8 text-center text-slate-400">Loading volumes...</td></tr>
-                        ) : (
-                          volumeInfo.map((vol, idx) => (
-                            <tr key={idx} className="hover:bg-slate-50/50 dark:hover:bg-white/[0.02] text-slate-600 dark:text-slate-400 transition-colors">
-                              <td className="px-4 py-2 border-r border-slate-100 dark:border-white/5">{vol.spacename}</td>
-                              <td className="px-4 py-2 border-r border-slate-100 dark:border-white/5 truncate max-w-[200px]" title={vol.location}>{vol.location}</td>
-                              <td className="px-4 py-2 border-r border-slate-100 dark:border-white/5">{vol.date}</td>
-                              <td className="px-4 py-2 border-r border-slate-100 dark:border-white/5">{vol.type}</td>
-                              <td className="px-4 py-2 border-r border-slate-100 dark:border-white/5 text-right">{vol.totalpage}</td>
-                              <td className="px-4 py-2 border-r border-slate-100 dark:border-white/5 text-right">{vol.freepage}</td>
-                              <td className="px-4 py-2 text-right">{vol.volumeSizeMB}</td>
-                            </tr>
-                          ))
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+            <div 
+              className={`p-4 border rounded-2xl flex items-start gap-4 transition-all group cursor-pointer ${deleteBackup ? 'bg-rose-500/[0.04] border-rose-500/20 shadow-[0_4px_20px_rgba(244,63,94,0.05)]' : 'bg-slate-50/50 dark:bg-white/[0.02] border-slate-100 dark:border-white/5 hover:bg-white/5'}`}
+              onClick={() => setDeleteBackup(!deleteBackup)}
+            >
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-all shrink-0 mt-0.5 ${deleteBackup ? 'bg-rose-500/10 border-rose-500/20 text-rose-500' : 'bg-slate-100 dark:bg-white/5 border-transparent text-slate-400'}`}>
+                <Icon name="folder_delete" size="sm" weight={300} />
               </div>
-
-              <label className="flex items-center gap-3 p-3 bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-white/5 transition-all group active:scale-[0.99]">
-                <input 
-                  type="checkbox" 
+              <div className="flex-1 flex flex-col gap-1 min-w-0">
+                <Typography variant="p" className={`font-bold text-[12px] tracking-tight transition-colors ${deleteBackup ? 'text-rose-500' : 'text-slate-900 dark:text-white'}`}>
+                  Delete backup volumes
+                </Typography>
+                <Typography variant="p" className="text-[10.5px] text-slate-500 dark:text-slate-400 font-medium leading-[1.6]">
+                  Remove all secondary backup data and snapshot volumes associated with this database instance.
+                </Typography>
+              </div>
+              <div className="pt-1.5 shrink-0">
+                <Checkbox 
+                  className="!w-fit"
                   checked={deleteBackup}
                   onChange={(e) => setDeleteBackup(e.target.checked)}
-                  className="w-4 h-4 cursor-pointer rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-bk-main text-rose-500 focus:ring-rose-500/50 accent-rose-500 transition-all"
                 />
-                <div className="flex flex-col">
-                  <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300 group-hover:text-rose-500 transition-colors tracking-tight">Delete backup volumes</span>
-                  <span className="text-[10px] text-slate-400 dark:text-slate-500">Remove all backup data associated with this database</span>
-                </div>
-              </label>
-            </div>
-          )}
-
-          {step === 2 && !error && !processing && (
-            <div className="flex flex-col items-center justify-center py-4 space-y-6 animate-in fade-in duration-200">
-              <div className="w-16 h-16 bg-rose-500/10 rounded-full flex items-center justify-center border border-rose-500/20 shadow-xl shadow-rose-500/5">
-                <span className="material-symbols-outlined text-3xl text-rose-500">lock</span>
-              </div>
-
-              <div className="w-full space-y-5">
-                <div className="text-center">
-                  <h4 className="text-[13px] font-medium text-slate-900 dark:text-white">Authorization required</h4>
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">Please enter database credentials to confirm removal of <span className="text-rose-500 font-bold">{selectedDatabase}</span>.</p>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5">Administrator username</label>
-                    <input 
-                      type="text" 
-                      value={dbId} 
-                      onChange={(e) => setDbId(e.target.value)}
-                      className="w-full h-9 px-3 bg-slate-50/50 dark:bg-bk-main/30 border border-slate-200 dark:border-slate-800 rounded outline-none focus:border-rose-500/50 transition-all text-[12px] text-slate-900 dark:text-white font-medium" 
-                      placeholder="dba" 
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-medium text-slate-500 dark:text-slate-400 ml-0.5">Password</label>
-                    <input 
-                      type="password" 
-                      value={password} 
-                      onChange={(e) => setPassword(e.target.value)} 
-                      onKeyDown={(e) => e.key === 'Enter' && handleConfirmAction()}
-                      className="w-full h-9 px-3 bg-slate-50/50 dark:bg-bk-main/30 border border-slate-200 dark:border-slate-800 rounded outline-none focus:border-rose-500/50 transition-all text-[12px] text-slate-900 dark:text-white font-medium" 
-                      placeholder="••••••••" 
-                    />
-                  </div>
-                </div>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          {step === 2 && processing && !error && (
-            <div className="flex flex-col items-center justify-center py-12 space-y-5 animate-in fade-in duration-200 min-h-[250px]">
-              <div className="relative">
-                <div className="w-20 h-20 border-[3px] border-rose-500/10 border-t-rose-500 rounded-full animate-spin"></div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="material-symbols-outlined text-2xl text-rose-500 animate-pulse">delete_sweep</span>
-                </div>
+        {step === 2 && !error && !processing && (
+          <div className="space-y-6 animate-in fade-in duration-300 py-4">
+            <div className="text-center space-y-3">
+              <div className="w-16 h-16 bg-rose-500/10 rounded-2xl flex items-center justify-center border border-rose-500/20 shadow-lg shadow-rose-500/5 mx-auto">
+                <Icon name="lock" size="lg" weight={300} className="text-rose-500" />
               </div>
-              <div className="text-center space-y-1.5 text-sans">
-                <h4 className="text-[13px] font-medium text-slate-900 dark:text-white">Deleting database...</h4>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400">Removing volumes and data assets</p>
+              <div>
+                <Typography variant="h3" className="text-slate-900 dark:text-white">Authorization Required</Typography>
+                <Typography variant="p" className="text-slate-500 dark:text-slate-400 mt-1">Please enter database credentials to confirm removal of <span className="text-rose-500 font-bold">{selectedDatabase}</span>.</Typography>
               </div>
             </div>
-          )}
 
-          {error && <div className="animate-in fade-in duration-200"><ModalErrorView error={error} /></div>}
-        </div>
+            <div className="space-y-4">
+              <Input 
+                label="Administrator Username"
+                value={dbId}
+                onChange={(e) => setDbId(e.target.value)}
+                placeholder="dba"
+                icon="person"
+              />
+              <Input 
+                type="password"
+                label="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleConfirmAction()}
+                placeholder="••••••••"
+                icon="key"
+              />
+            </div>
+          </div>
+        )}
 
-        {/* Footer */}
-        <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 backdrop-blur-sm flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
-          {step === 2 && !error && !processing && (
-            <button
-              onClick={() => setStep(1)}
-              className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-bk-yellow border border-bk-yellow/30 rounded hover:bg-bk-yellow/5 transition-all mr-auto"
-            >
-              Back
-            </button>
-          )}
+        {step === 2 && processing && !error && (
+          <div className="flex flex-col items-center justify-center py-12 space-y-6 min-h-[300px] animate-in fade-in duration-300">
+            <div className="relative">
+              <div className="w-20 h-20 border-[4px] border-rose-500/10 border-t-rose-500 rounded-full animate-spin"></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Icon name="delete_sweep" size="lg" weight={200} className="text-rose-500 animate-pulse" />
+              </div>
+            </div>
+            <div className="text-center space-y-2">
+              <Typography variant="h3" className="text-slate-900 dark:text-white">Deleting Database...</Typography>
+              <Typography variant="p" className="text-slate-500 dark:text-slate-400">Removing volumes and erasing data assets</Typography>
+            </div>
+          </div>
+        )}
 
-          <button 
-            disabled={processing || loading}
-            className={`px-6 py-1.5 ${error ? 'bg-slate-800 hover:bg-slate-900' : (step === 1 ? 'bg-rose-500 hover:bg-rose-600' : 'bg-emerald-500 hover:bg-emerald-600')} active:scale-[0.98] text-white text-[11px] font-medium tracking-wide rounded shadow-sm transition-all flex items-center justify-center gap-2 min-w-[130px] disabled:opacity-50`}
-            onClick={handleConfirmAction}
-          >
-            {processing ? (
-              <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-            ) : (
-              <>
-                <span className="material-symbols-outlined text-[16px]">{error ? 'refresh' : (step === 1 ? 'arrow_forward' : 'check_circle')}</span>
-                <span>{error ? 'Try again' : (step === 1 ? 'Proceed' : 'Delete database')}</span>
-              </>
-            )}
-          </button>
-
-          {(step === 1 || error) && (
-            <button 
-              className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-all"
-              onClick={handleClose}
-            >
-              Discard
-            </button>
-          )}
-        </div>
+        {error && (
+          <div className="animate-in fade-in duration-300">
+            <ModalErrorView error={error} />
+          </div>
+        )}
       </div>
-    </div>
+    </Modal>
   );
 }
