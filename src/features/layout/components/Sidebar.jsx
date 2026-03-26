@@ -259,12 +259,22 @@ export default function Sidebar({ isCollapsed, onAddHost }) {
                 <Icon
                   name="chevron_right"
                   size="xs"
-                  className={`transition-transform duration-200 text-slate-400 group-hover/host-header:text-bk-yellow ${!isServerListCollapsed ? 'rotate-90' : ''}`}
+                  className={`transition-transform duration-200 ${!isServerListCollapsed ? 'rotate-90 text-amber-500' : 'text-slate-400'} group-hover/host-header:text-amber-500`}
                  weight={300} />
-                <Typography variant="caption" className="font-medium text-slate-600 dark:text-slate-400 text-[13px]">Server List</Typography>
+                <Typography variant="caption" className="font-bold text-amber-600 dark:text-amber-500 text-[12px] uppercase tracking-wider">Server List</Typography>
               </div>
+
               {!isServerListCollapsed && (
-                <Typography variant="caption" className="text-[11px] bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-slate-400 px-2 py-0.5 rounded-full font-medium">{hosts.length} found</Typography>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-slate-400 px-2 py-0.5 rounded-full font-medium">{hosts.length} found</span>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onAddHost(); }}
+                    className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:text-amber-500 hover:bg-amber-500/10 transition-all active:scale-95"
+                    title="Add Host"
+                  >
+                    <Icon name="add" size="xs" weight={400} />
+                  </button>
+                </div>
               )}
             </div>
 
@@ -369,17 +379,7 @@ export default function Sidebar({ isCollapsed, onAddHost }) {
           </div>
         </SplitPane>
 
-        <div className="p-4 border-t border-slate-200 dark:border-white/10 bg-white dark:bg-bk-side">
-          <Button
-            variant="primary"
-            size="md"
-            className="w-full h-10 font-medium text-[13px] shadow-[0_4px_12px_rgba(255,193,7,0.25)]"
-            onClick={onAddHost}
-            icon="add_circle"
-          >
-            Add Host
-          </Button>
-        </div>
+
       </aside>
 
       {/* Context Menus */}

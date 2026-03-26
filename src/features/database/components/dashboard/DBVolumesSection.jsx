@@ -4,6 +4,26 @@ import { Typography } from '../../../../components/ds/foundation/Typography';
 import { Card } from '../../../../components/ds/layout/Card';
 
 export default function DBVolumesSection({ volumes }) {
+  const getFreeSeverity = (pct) => {
+    if (pct < 10) return 'text-rose-500';
+    if (pct < 25) return 'text-amber-500';
+    return 'text-emerald-500';
+  };
+
+  const getBarColor = (pct) => {
+    const usedPct = 100 - pct;
+    if (usedPct > 90) return 'bg-rose-500';
+    if (usedPct > 75) return 'bg-amber-500';
+    return 'bg-amber-500';
+  };
+
+  const cleanInt = (v) => {
+    if (typeof v === 'number') return v;
+    if (!v) return 0;
+    const cleaned = v.toString().replace(/,/g, '').split(' ')[0];
+    return parseInt(cleaned) || 0;
+  };
+
   const columns = [
     {
       header: 'Volume',
@@ -11,9 +31,9 @@ export default function DBVolumesSection({ volumes }) {
       render: (val) => {
         const name = val.split(/[/\\]/).pop() || val;
         return (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 min-w-0">
             <Icon name="draft" size="sm" weight={300} className="text-slate-300 dark:text-slate-600 shrink-0" />
-            <span className="font-mono text-[12px] font-semibold text-slate-700 dark:text-slate-200">{name}</span>
+            <span className="font-mono text-[12px] font-semibold text-slate-700 dark:text-slate-200 truncate">{name}</span>
           </div>
         );
       }
@@ -33,26 +53,45 @@ export default function DBVolumesSection({ volumes }) {
     },
     { header: 'Purpose', accessor: 'purpose', render: (val) => <span className="font-mono text-[12px] text-slate-400">{val}</span> },
     {
-      header: 'Free / Total',
+      header: 'Space Usage',
       accessor: 'free',
-      render: (val, row) => (
-        <div className="min-w-[200px] flex flex-col gap-1">
-          <div className="flex justify-between">
-            <span className="font-mono text-[12px] text-slate-600 dark:text-slate-300 font-semibold">{val} / {row.total}</span>
-            <span className="font-mono text-[10px] font-bold text-amber-500">{Math.round(row.freePct)}% free</span>
+      render: (val, row) => {
+        const rawFree = cleanInt(val);
+        const total = cleanInt(row.total);
+        const freePct = total > 0 ? (rawFree / total) * 100 : 0;
+        const used = Math.max(0, total - rawFree);
+        const usedPct = 100 - freePct;
+        const isNaNData = total === 0;
+
+        return (
+          <div className="min-w-[220px] flex flex-col gap-1">
+            <div className="flex justify-between items-end">
+              <span className="font-mono text-[11px] text-slate-500 dark:text-slate-400">
+                <span className="text-slate-700 dark:text-slate-200 font-bold">{used.toLocaleString()}</span> / {total.toLocaleString()}
+              </span>
+
+              <div className="flex items-center gap-2">
+                <span className={`font-mono text-[11px] font-black tracking-tight ${getFreeSeverity(freePct)}`}>
+                  {isNaNData ? '0' : Math.round(freePct)}% <span className="opacity-50 text-[9px] font-bold font-sans uppercase">free</span>
+                </span>
+              </div>
+            </div>
+            <div className="w-full h-1 bg-slate-100 dark:bg-white/[0.06] rounded-full overflow-hidden flex">
+               <div 
+                className={`h-full transition-all duration-700 ${getBarColor(freePct)}`}
+                style={{ width: `${isNaNData ? 0 : usedPct}%` }} 
+              />
+            </div>
           </div>
-          <div className="w-full h-1 bg-slate-100 dark:bg-white/[0.06] overflow-hidden">
-            <div className="h-full bg-amber-500 transition-all duration-500" style={{ width: `${row.freePct}%` }} />
-          </div>
-        </div>
-      )
+        );
+      }
     },
     { header: 'Modified', accessor: 'date', render: (val) => <span className="font-mono text-[11px] text-slate-400">{val}</span> },
     {
       header: 'Path',
       accessor: 'path',
       render: (val) => (
-        <div className="flex items-center gap-1.5 max-w-[280px]">
+        <div className="flex items-center gap-1.5 min-w-0">
           <Icon name="folder" size="sm" weight={300} className="text-slate-300 dark:text-slate-600 shrink-0" />
           <span className="font-mono text-[11px] text-slate-400 truncate" title={val}>{val}</span>
         </div>

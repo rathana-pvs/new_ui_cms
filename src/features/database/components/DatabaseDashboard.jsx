@@ -17,15 +17,15 @@ export default function DatabaseDashboard({ dbname }) {
   const { selectedHostUid, hosts } = useSelector((state) => state.host);
   const { dashboardData, dashboardLoading } = useSelector((state) => state.database);
 
-  const [autoRefresh, setAutoRefresh]   = useState(false);
+  const [autoRefresh, setAutoRefresh] = useState(false);
   const [refreshInterval, setRefreshInterval] = useState(10);
   const [showSettings, setShowSettings] = useState(false);
-  const [logModal, setLogModal]         = useState({ isOpen: false, brokerName: '', casId: '', type: 'sql' });
+  const [logModal, setLogModal] = useState({ isOpen: false, brokerName: '', casId: '', type: 'sql' });
 
   const activeHost = hosts.find(h => h.uid === selectedHostUid);
-  const hostUid    = selectedHostUid;
-  const data       = dashboardData[dbname] || { volumes: [], spaceInfo: [], locks: [], performance: {} };
-  const isLoading  = dashboardLoading[dbname];
+  const hostUid = selectedHostUid;
+  const data = dashboardData[dbname] || { volumes: [], spaceInfo: [], locks: [], performance: {} };
+  const isLoading = dashboardLoading[dbname];
 
   const handleRefresh = () => {
     if (hostUid && dbname) dispatch(fetchDashboardData({ hostUid, dbname }));
@@ -53,9 +53,9 @@ export default function DatabaseDashboard({ dbname }) {
     fileTablePages: f.file_table_size, reservedPages: f.reserved_size, totalPages: f.total_size
   }));
 
-  const perf      = data.performance || {};
+  const perf = data.performance || {};
   const brokersCAS = data.brokersCAS || [];
-  const totalQps   = brokersCAS.filter(c => c.dbname?.toLowerCase() === dbname.toLowerCase()).reduce((a, c) => a + parseInt(c.qps || 0), 0);
+  const totalQps = brokersCAS.filter(c => c.dbname?.toLowerCase() === dbname.toLowerCase()).reduce((a, c) => a + parseInt(c.qps || 0), 0);
 
   const dbStats = [{
     cpu: '0.0%', cpuPct: 0, memory: '0.0MB', memPct: 0,
@@ -67,7 +67,7 @@ export default function DatabaseDashboard({ dbname }) {
   }];
 
   const mappedBrokers = brokersCAS.map(c => ({ broker: c.broker, id: c.id, pid: c.pid, qps: c.qps, lqs: c.lqs, status: c.status, lastConn: c.lastConn, dbname: c.dbname }));
-  const mappedLocks   = (data.locks || []).map((l, i) => ({ index: l.index || i + 1, user: l.uid || '-', host: l.host || '-', pid: l.pid || '-', obj: l.object || '-', mode: l.granted_mode || '-' }));
+  const mappedLocks = (data.locks || []).map((l, i) => ({ index: l.index || i + 1, user: l.uid || '-', host: l.host || '-', pid: l.pid || '-', obj: l.object || '-', mode: l.granted_mode || '-' }));
 
   const handleExport = () => {
     const headers = ['Section', 'Key', 'Value'];
@@ -82,28 +82,32 @@ export default function DatabaseDashboard({ dbname }) {
       ['Performance', 'IO Writes', dbStats[0].ioWrites],
       ...mappedVolumes.map(v => ['Volume', v.name, `${v.free} / ${v.total}`])
     ];
-    const csv  = [headers, ...rows].map(r => r.join(',')).join('\n');
+    const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
-    link.href     = URL.createObjectURL(blob);
+    link.href = URL.createObjectURL(blob);
     link.download = `${dbname}_dashboard_${new Date().toISOString().slice(0, 10)}.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
+  const btnCls = "h-8 flex items-center justify-center rounded border transition-all active:scale-[0.98]";
+  const iconBtnCls = `${btnCls} w-8 bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/[0.06] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200`;
+
   return (
     <div className="flex-1 flex flex-col h-full bg-white dark:bg-background-dark overflow-hidden font-sans">
 
       {/* ── Header ── */}
-      <header className="px-6 py-3.5 border-b border-slate-100 dark:border-white/[0.04] flex items-center justify-between shrink-0 sticky top-0 z-20 bg-white dark:bg-background-dark">
+      <header className="px-6 py-3 border-b border-slate-100 dark:border-white/[0.04] flex items-center justify-between shrink-0 sticky top-0 z-20 bg-white dark:bg-background-dark">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
             <Icon name="database" size="sm" weight={300} className="text-amber-500" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <Typography variant="h1" className="text-sm font-bold text-slate-800 dark:text-slate-100 leading-tight">{dbname}</Typography>
+              <Typography variant="h1" className="text-sm font-bold text-amber-600 dark:text-amber-500 leading-tight uppercase tracking-tight">{dbname}</Typography>
+
               <span className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 <Typography variant="label" className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Running</Typography>
@@ -118,9 +122,9 @@ export default function DatabaseDashboard({ dbname }) {
           <button
             onClick={() => setAutoRefresh(!autoRefresh)}
             title={autoRefresh ? 'Live monitoring active' : 'Auto refresh off'}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold border transition-all ${autoRefresh ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20' : 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/[0.06] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'}`}
+            className={`${btnCls} px-2.5 gap-1.5 text-[11px] font-semibold ${autoRefresh ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20' : 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/[0.06] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'}`}
           >
-            <Icon name={autoRefresh ? 'sync' : 'sync_disabled'} size="sm" weight={300} />
+            <Icon name={autoRefresh ? 'sync' : 'sync_disabled'} size="16px" weight={300} />
             {autoRefresh ? 'Live' : 'Paused'}
           </button>
 
@@ -128,10 +132,10 @@ export default function DatabaseDashboard({ dbname }) {
           <button
             onClick={handleRefresh}
             disabled={isLoading}
-            className="p-1.5 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/[0.06] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-all disabled:opacity-50"
+            className={iconBtnCls}
             title="Manual refresh"
           >
-            <Icon name="refresh" size="sm" weight={300} className={isLoading ? 'animate-spin' : ''} />
+            <Icon name="refresh" size="16px" weight={300} className={isLoading ? 'animate-spin' : ''} />
           </button>
 
           <div className="w-px h-5 bg-slate-200 dark:bg-white/[0.08]" />
@@ -139,19 +143,19 @@ export default function DatabaseDashboard({ dbname }) {
           {/* Settings */}
           <button
             onClick={() => setShowSettings(!showSettings)}
-            className={`p-1.5 rounded-lg border transition-all ${showSettings ? 'bg-amber-500/10 border-amber-500/20 text-amber-500' : 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/[0.06] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
+            className={`${btnCls} w-8 transition-all ${showSettings ? 'bg-amber-500/10 border-amber-500/20 text-amber-500' : 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/[0.06] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
             title="Dashboard settings"
           >
-            <Icon name="tune" size="sm" weight={300} />
+            <Icon name="tune" size="16px" weight={300} />
           </button>
 
           {/* Export */}
           <button
             onClick={handleExport}
-            className="p-1.5 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/[0.06] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-all"
+            className={iconBtnCls}
             title="Export metrics as CSV"
           >
-            <Icon name="ios_share" size="sm" weight={300} />
+            <Icon name="ios_share" size="16px" weight={300} />
           </button>
         </div>
       </header>

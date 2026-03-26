@@ -58,7 +58,7 @@ export const Table = ({
               {columns.map((col, idx) => (
                 <th
                   key={col.accessor || idx}
-                  className={`px-3 py-2 text-[13px] font-medium text-slate-500 ${col.className || ''} ${sortable ? 'cursor-pointer hover:bg-slate-100 dark:hover:bg-white/5' : ''}`}
+                  className={`px-3 py-1 text-[13px] font-medium text-slate-500 ${col.className || ''} ${sortable ? 'cursor-pointer hover:bg-slate-100 dark:hover:bg-white/5' : ''}`}
                   style={{ width: col.width }}
                   onClick={() => handleSort(col.accessor)}
                 >
@@ -87,13 +87,14 @@ export const Table = ({
               {columns.map((col, colIdx) => (
                 <td
                   key={col.accessor || colIdx}
-                  className="px-3 py-2 text-[13px] font-mono font-medium text-slate-700 dark:text-slate-300 border-r border-transparent last:border-r-0"
+                  className="px-3 py-1 text-[12px] font-mono font-medium text-slate-700 dark:text-slate-300 border-r border-transparent last:border-r-0"
                 >
                   {col.render ? col.render(row[col.accessor], row) : row[col.accessor]}
                 </td>
               ))}
             </tr>
           ))}
+
         </tbody>
       </table>
     </div>

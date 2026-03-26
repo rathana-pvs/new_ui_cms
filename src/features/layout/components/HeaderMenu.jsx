@@ -22,10 +22,11 @@ export default function HeaderMenu() {
   };
 
   const MenuLabel = ({ children }) => (
-    <Typography variant="caption" className="font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest text-[10px] group-hover:text-bk-yellow transition-colors">
+    <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 tracking-wide group-hover:text-amber-500 transition-colors">
       {children}
-    </Typography>
+    </span>
   );
+
 
   return (
     <nav className="flex items-center gap-6 font-sans">

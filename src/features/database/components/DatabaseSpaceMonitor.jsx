@@ -10,18 +10,18 @@ import { Table } from '../../../components/ds/layout/Table';
 
 const TYPE_BADGE = (val = '') => {
   const t = val.toUpperCase();
-  if (t.includes('PERMANENT'))  return 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20';
-  if (t.includes('TEMPORARY'))  return 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20';
+  if (t.includes('PERMANENT')) return 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20';
+  if (t.includes('TEMPORARY')) return 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20';
   if (t.includes('ACTIVE_LOG')) return 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20';
-  if (t.includes('ARCHIVE_LOG'))return 'bg-violet-50 text-violet-600 border-violet-200 dark:bg-violet-500/10 dark:text-violet-400 dark:border-violet-500/20';
+  if (t.includes('ARCHIVE_LOG')) return 'bg-violet-50 text-violet-600 border-violet-200 dark:bg-violet-500/10 dark:text-violet-400 dark:border-violet-500/20';
   return 'bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20';
 };
 
 export default function DatabaseSpaceMonitor({ hostUid, dbname }) {
   const dispatch = useDispatch();
-  const [data, setData]               = useState(null);
-  const [loading, setLoading]         = useState(true);
-  const [error, setError]             = useState(null);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [lastRefreshed, setLastRefreshed] = useState(new Date());
 
   const fetchSpaceInfo = useCallback(async () => {
@@ -40,22 +40,29 @@ export default function DatabaseSpaceMonitor({ hostUid, dbname }) {
 
   useEffect(() => { fetchSpaceInfo(); }, [fetchSpaceInfo]);
 
+  const cleanInt = (v) => {
+    if (typeof v === 'number') return v;
+    if (!v) return 0;
+    const cleaned = v.toString().replace(/,/g, '').split(' ')[0];
+    return parseInt(cleaned) || 0;
+  };
+
   const formatSize = (bytes) => {
-    if (!bytes || bytes === '0') return '0 B';
-    const b = parseInt(bytes);
+    const b = cleanInt(bytes);
+    if (b === 0) return '0 B';
     if (b >= 1024 ** 4) return `${(b / 1024 ** 4).toFixed(2)} TB`;
     if (b >= 1024 ** 3) return `${(b / 1024 ** 3).toFixed(2)} GB`;
     if (b >= 1024 ** 2) return `${(b / 1024 ** 2).toFixed(2)} MB`;
-    if (b >= 1024)      return `${(b / 1024).toFixed(2)} KB`;
+    if (b >= 1024) return `${(b / 1024).toFixed(2)} KB`;
     return `${b} B`;
   };
 
-  const formatPages = (pages) => (!pages ? '0' : parseInt(pages).toLocaleString());
+  const formatPages = (pages) => cleanInt(pages).toLocaleString();
 
   const totals = useMemo(() => {
     if (!data?.dbinfo) return null;
     let total = 0, free = 0;
-    data.dbinfo.forEach(i => { total += parseInt(i.total_size || 0); free += parseInt(i.free_size || 0); });
+    data.dbinfo.forEach(i => { total += cleanInt(i.total_size); free += cleanInt(i.free_size); });
     return { total, free, used: total - free, pct: total > 0 ? ((total - free) / total) * 100 : 0 };
   }, [data]);
 
@@ -68,23 +75,30 @@ export default function DatabaseSpaceMonitor({ hostUid, dbname }) {
     );
   }
 
+  const getFreeSeverity = (pct) => {
+    if (pct < 10) return 'text-rose-500';
+    if (pct < 25) return 'text-amber-500';
+    return 'text-emerald-500';
+  };
+
   const usageSeverity = (pct) => pct > 85 ? 'text-rose-500' : pct > 60 ? 'text-amber-500' : 'text-emerald-500';
-  const barColor      = (pct) => pct > 85 ? 'bg-rose-500' : pct > 60 ? 'bg-amber-500' : 'bg-amber-500';
+  const barColor = (pct) => pct > 85 ? 'bg-rose-500' : 'bg-amber-500';
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-white dark:bg-background-dark overflow-hidden select-none">
+    <div className="flex-1 flex flex-col h-full bg-white dark:bg-background-dark overflow-hidden select-none text-[12px]">
 
       {/* ── Header ── */}
-      <header className="px-6 py-3.5 border-b border-slate-100 dark:border-white/[0.04] flex items-center justify-between shrink-0 sticky top-0 z-10 bg-white dark:bg-background-dark">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
-            <Icon name="donut_small" size="sm" weight={300} className="text-amber-500" />
+      <header className="px-6 py-2.5 border-b border-slate-100 dark:border-white/[0.04] flex items-center justify-between shrink-0 sticky top-0 z-10 bg-white dark:bg-background-dark">
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+            <Icon name="donut_small" size="xs" weight={300} className="text-amber-500" />
           </div>
           <div>
-            <Typography variant="h1" className="text-sm font-bold text-slate-800 dark:text-slate-100 leading-tight">
+            <Typography variant="h1" className="text-[13px] font-bold text-amber-600 dark:text-amber-500 leading-tight">
               Database Space Monitor
             </Typography>
-            <Typography variant="label" className="text-[10px] text-slate-400 font-mono">{dbname}</Typography>
+
+            <Typography variant="label" className="text-[9px] text-slate-400 font-mono tracking-tight">{dbname}</Typography>
           </div>
         </div>
 
@@ -95,61 +109,58 @@ export default function DatabaseSpaceMonitor({ hostUid, dbname }) {
           <button
             onClick={fetchSpaceInfo}
             disabled={loading}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-white/5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 transition-all active:scale-95 border border-slate-200 dark:border-white/[0.06] disabled:opacity-50"
+            className="h-8 flex items-center gap-1.5 px-2.5 rounded border bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/[0.06] text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 transition-all disabled:opacity-50"
           >
-            <Icon name="refresh" size="sm" weight={300} className={loading ? 'animate-spin text-amber-500' : ''} />
-            Refresh
+            <Icon name="refresh" size="16px" weight={300} className={loading ? 'animate-spin text-amber-500' : ''} />
+            Sync
           </button>
+
         </div>
       </header>
 
       {/* ── Body ── */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-5">
+      <div className="flex-1 overflow-y-auto p-5 space-y-4">
 
         {error && (
-          <div className="p-3 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 rounded-xl flex items-center gap-3 text-rose-600 dark:text-rose-400">
-            <Icon name="error" size="sm" weight={300} />
-            <span className="text-xs font-medium">{error}</span>
+          <div className="p-2.5 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 rounded flex items-center gap-2.5 text-rose-600 dark:text-rose-400">
+            <Icon name="error" size="xs" weight={300} />
+            <span className="text-[11px] font-medium">{error}</span>
           </div>
         )}
 
         {/* ── Summary Cards ── */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* DB name */}
-          <div className="bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.05] rounded-xl p-4 flex flex-col gap-2">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.05] rounded p-3.5 flex flex-col gap-1.5">
             <Typography variant="label" className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Database</Typography>
-            <Typography variant="p" className="text-sm font-bold text-slate-700 dark:text-slate-200 font-mono truncate">{data?.dbname || dbname}</Typography>
+            <Typography variant="p" className="text-[13px] font-bold text-slate-700 dark:text-slate-200 font-mono truncate">{data?.dbname || dbname}</Typography>
           </div>
 
-          {/* Consumed */}
-          <div className="bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.05] rounded-xl p-4 flex flex-col gap-2">
+          <div className="bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.05] rounded p-3.5 flex flex-col gap-1">
             <Typography variant="label" className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Used</Typography>
-            <Typography variant="p" className="text-lg font-black text-slate-700 dark:text-slate-100 font-mono leading-none">{formatSize(totals?.used)}</Typography>
-            <Typography variant="label" className="text-[9px] text-slate-400">of {formatSize(totals?.total)} total</Typography>
+            <Typography variant="p" className="text-base font-black text-slate-700 dark:text-slate-100 font-mono leading-none">{formatSize(totals?.used)}</Typography>
+            <Typography variant="label" className="text-[9px] text-slate-400">of {formatSize(totals?.total)}</Typography>
           </div>
 
-          {/* Free */}
-          <div className="bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.05] rounded-xl p-4 flex flex-col gap-2">
+          <div className="bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.05] rounded p-3.5 flex flex-col gap-1">
             <Typography variant="label" className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Free</Typography>
-            <Typography variant="p" className="text-lg font-black text-emerald-500 font-mono leading-none">{formatSize(totals?.free)}</Typography>
+            <Typography variant="p" className="text-base font-black text-emerald-500 font-mono leading-none">{formatSize(totals?.free)}</Typography>
             <Typography variant="label" className="text-[9px] text-slate-400">headroom available</Typography>
           </div>
 
-          {/* Utilization */}
-          <div className="bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.05] rounded-xl p-4 flex flex-col gap-2">
+          <div className="bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.05] rounded p-3.5 flex flex-col gap-1">
             <div className="flex items-center justify-between">
-              <Typography variant="label" className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Utilization</Typography>
+              <Typography variant="label" className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Usage</Typography>
               <Typography variant="label" className={`text-[9px] font-black font-mono ${usageSeverity(totals?.pct || 0)}`}>{(totals?.pct || 0).toFixed(1)}%</Typography>
             </div>
-            <div className="w-full h-1.5 bg-slate-100 dark:bg-white/[0.06] overflow-hidden mt-1">
+            <div className="w-full h-1 bg-slate-100 dark:bg-white/[0.06] overflow-hidden mt-1.5">
               <div
                 className={`h-full ${barColor(totals?.pct || 0)} transition-all duration-1000`}
                 style={{ width: `${totals?.pct || 0}%` }}
               />
             </div>
-            <div className="grid grid-cols-2 gap-1 mt-1">
-              <Typography variant="label" className="text-[9px] text-slate-400 font-mono">Page {data?.pagesize}B</Typography>
-              <Typography variant="label" className="text-[9px] text-slate-400 font-mono text-right">Log {data?.logpagesize}B</Typography>
+            <div className="flex justify-between mt-1">
+              <Typography variant="label" className="text-[9px] text-slate-400 font-mono">PG {data?.pagesize}B</Typography>
+              <Typography variant="label" className="text-[9px] text-slate-400 font-mono">LOG {data?.logpagesize}B</Typography>
             </div>
           </div>
         </div>
@@ -157,9 +168,9 @@ export default function DatabaseSpaceMonitor({ hostUid, dbname }) {
         {/* ── Volume Categorization ── */}
         <Card
           title={
-            <div className="flex items-center gap-2">
-              <Icon name="layers" size="sm" weight={300} className="text-amber-500" />
-              <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">Volume Categorization</span>
+            <div className="flex items-center gap-1.5">
+              <Icon name="layers" size="xs" weight={300} className="text-amber-500" />
+              <span className="text-[12px] font-semibold text-slate-800 dark:text-slate-100">Volume Categorization</span>
             </div>
           }
           bodyClassName="p-0"
@@ -168,27 +179,30 @@ export default function DatabaseSpaceMonitor({ hostUid, dbname }) {
           <Table
             columns={[
               {
-                header: 'Storage Type',
+                header: 'Type',
                 accessor: 'type',
+                width: '140px',
                 render: (val) => (
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border ${TYPE_BADGE(val)}`}>{val}</span>
+                  <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight border ${TYPE_BADGE(val)}`}>{val}</span>
                 )
               },
-              { header: 'Volumes', accessor: 'volume_count', className: 'text-center' },
-              { header: 'Used', accessor: 'used_size', render: (val) => <span className="font-mono text-[12px]">{formatSize(val)}</span> },
-              { header: 'Free', accessor: 'free_size', render: (val) => <span className="font-mono text-[12px] text-slate-400">{formatSize(val)}</span> },
-              { header: 'Total', accessor: 'total_size', render: (val) => <span className="font-mono text-[12px] font-bold">{formatSize(val)}</span> },
+              { header: 'Qty', accessor: 'volume_count', className: 'text-center', width: '60px' },
+              { header: 'Used', accessor: 'used_size', render: (val) => <span className="font-mono text-[11px]">{formatSize(val)}</span> },
+              { header: 'Free', accessor: 'free_size', render: (val) => <span className="font-mono text-[11px] text-slate-400">{formatSize(val)}</span> },
+              { header: 'Total', accessor: 'total_size', render: (val) => <span className="font-mono text-[11px] font-bold">{formatSize(val)}</span> },
               {
-                header: 'Utilization',
+                header: 'Usage',
                 accessor: 'pct',
                 render: (_, row) => {
-                  const pct = parseInt(row.total_size) > 0 ? (parseInt(row.used_size) / parseInt(row.total_size)) * 100 : 0;
+                  const used = cleanInt(row.used_size);
+                  const total = cleanInt(row.total_size);
+                  const pct = total > 0 ? (used / total) * 100 : 0;
                   return (
-                    <div className="flex items-center gap-2 min-w-[100px]">
-                      <div className="flex-1 h-1.5 bg-slate-100 dark:bg-white/[0.06] overflow-hidden">
-                        <div className={`h-full ${barColor(pct)} transition-all duration-700`} style={{ width: `${pct}%` }} />
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 h-1 bg-slate-100 dark:bg-white/[0.04] overflow-hidden">
+                        <div className={`h-full ${barColor(pct)}`} style={{ width: `${pct}%` }} />
                       </div>
-                      <span className={`text-[10px] font-bold font-mono w-8 text-right ${usageSeverity(pct)}`}>{pct.toFixed(0)}%</span>
+                      <span className={`text-[10px] font-bold font-mono w-7 text-right ${usageSeverity(pct)}`}>{pct.toFixed(0)}%</span>
                     </div>
                   );
                 }
@@ -201,9 +215,9 @@ export default function DatabaseSpaceMonitor({ hostUid, dbname }) {
         {/* ── Physical Volume Topology ── */}
         <Card
           title={
-            <div className="flex items-center gap-2">
-              <Icon name="dataset" size="sm" weight={300} className="text-amber-500" />
-              <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">Physical Volume Topology</span>
+            <div className="flex items-center gap-1.5">
+              <Icon name="dataset" size="xs" weight={300} className="text-amber-500" />
+              <span className="text-[12px] font-semibold text-slate-800 dark:text-slate-100">Physical Volume Topology</span>
             </div>
           }
           bodyClassName="p-0"
@@ -211,55 +225,64 @@ export default function DatabaseSpaceMonitor({ hostUid, dbname }) {
         >
           <Table
             columns={[
-              { header: 'ID', accessor: 'volid', className: 'text-center w-10', render: (val) => <span className="font-mono text-[12px] text-slate-400">{val}</span> },
+              { header: 'ID', accessor: 'volid', className: 'text-center', width: '40px' },
               {
                 header: 'Volume',
                 accessor: 'spacename',
+                width: '150px',
                 render: (val) => {
                   const name = val?.split(/[/\\]/).pop() || val;
                   return (
-                    <div className="flex items-center gap-2">
-                      <Icon name="draft" size="sm" weight={300} className="text-slate-300 dark:text-slate-600 shrink-0" />
-                      <span className="font-mono text-[12px] font-semibold text-slate-700 dark:text-slate-200 truncate max-w-[160px]" title={val}>{name}</span>
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <Icon name="draft" size="xs" weight={300} className="text-slate-300 dark:text-slate-600 shrink-0" />
+                      <span className="font-mono text-[11px] font-semibold text-slate-700 dark:text-slate-200 truncate" title={val}>{name}</span>
                     </div>
                   );
                 }
               },
               {
-                header: 'Class',
+                header: 'Type',
                 accessor: 'type',
+                width: '110px',
                 render: (val) => (
-                  <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tight border ${TYPE_BADGE(val)}`}>{val}</span>
+                  <span className={`px-1 py-0.5 rounded text-[10px] font-bold uppercase border ${TYPE_BADGE(val)}`}>{val}</span>
                 )
               },
               {
                 header: 'Allocation',
                 accessor: 'usedpage',
                 render: (val, row) => {
-                  const used  = parseInt(val || 0);
-                  const total = parseInt(row.totalpage || 0);
-                  const pct   = total > 0 ? (used / total) * 100 : 0;
+                  const usedPages = cleanInt(val);
+                  const totalPages = cleanInt(row.totalpage);
+                  const freePages = Math.max(0, totalPages - usedPages);
+                  const freePct = totalPages > 0 ? (freePages / totalPages) * 100 : 0;
+                  const usedPct = 100 - freePct;
+                  const isZero = totalPages === 0;
+
                   return (
-                    <div className="flex flex-col gap-1 min-w-[120px]">
-                      <div className="flex justify-between">
-                        <span className="text-[11px] font-bold font-mono text-slate-700 dark:text-slate-200">{formatPages(val)}</span>
-                        <span className={`text-[10px] font-mono font-bold ${usageSeverity(pct)}`}>{pct.toFixed(0)}%</span>
+                    <div className="flex flex-col gap-0.5 min-w-[140px]">
+                      <div className="flex justify-between items-end">
+                        <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
+                          <span className="text-slate-700 dark:text-slate-200 font-bold">{formatPages(usedPages)}</span> / {formatPages(totalPages)}
+                        </span>
+                        <span className={`text-[10px] font-mono font-black ${getFreeSeverity(freePct)} ml-2`}>
+                          {isZero ? '0' : Math.round(freePct)}% <span className="opacity-50 text-[8px] font-sans uppercase">free</span>
+                        </span>
                       </div>
-                      <div className="w-full h-1 bg-slate-100 dark:bg-white/[0.06] overflow-hidden">
-                        <div className={`h-full ${barColor(pct)} transition-all duration-500`} style={{ width: `${pct}%` }} />
+                      <div className="w-full h-0.5 bg-slate-100 dark:bg-white/[0.04] rounded-full overflow-hidden">
+                        <div className={`h-full ${usedPct > 90 ? 'bg-rose-500' : 'bg-amber-500/80'}`} style={{ width: `${isZero ? 0 : usedPct}%` }} />
                       </div>
                     </div>
                   );
                 }
               },
-              { header: 'Total', accessor: 'totalpage', render: (val) => <span className="font-mono text-[12px] text-slate-400">{formatPages(val)}</span>, className: 'text-right' },
-              {
-                header: 'Path',
+              { 
+                header: 'Path', 
                 accessor: 'location',
                 render: (val) => (
-                  <div className="flex items-center gap-1.5 max-w-[260px]">
-                    <Icon name="folder" size="sm" weight={300} className="text-slate-300 dark:text-slate-600 shrink-0" />
-                    <span className="text-[11px] text-slate-400 font-mono truncate" title={val}>{val}</span>
+                  <div className="flex items-center gap-1 group min-w-0">
+                    <Icon name="folder" size="xs" weight={300} className="text-slate-300 dark:text-slate-600 shrink-0 group-hover:text-amber-500/50 transition-colors" />
+                    <span className="text-[10px] text-slate-400 font-mono truncate" title={val}>{val?.toString().trim()}</span>
                   </div>
                 )
               }
@@ -268,110 +291,70 @@ export default function DatabaseSpaceMonitor({ hostUid, dbname }) {
           />
         </Card>
 
-        {/* ── Bottom Grid: File Space + Distribution ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-
-          {/* File Space Usage */}
+        {/* ── Bottom Grid ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <Card
             title={
-              <div className="flex items-center gap-2">
-                <Icon name="analytics" size="sm" weight={300} className="text-amber-500" />
-                <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">File Space Usage</span>
+              <div className="flex items-center gap-1.5">
+                <Icon name="analytics" size="xs" weight={300} className="text-amber-500" />
+                <span className="text-[12px] font-semibold text-slate-800 dark:text-slate-100">File Space Usage</span>
               </div>
             }
             bodyClassName="p-0"
           >
             <Table
               columns={[
-                {
-                  header: 'Type',
-                  accessor: 'data_type',
-                  render: (val) => (
-                    <span className="px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-500/20 font-bold text-[10px] uppercase tracking-wide">{val}</span>
-                  )
-                },
-                { header: 'Files', accessor: 'file_count', className: 'text-center', render: (val) => <span className="font-mono text-[12px]">{val}</span> },
-                { header: 'Used', accessor: 'used_size', className: 'text-right', render: (val) => <span className="font-mono text-[12px] font-bold">{formatPages(val)}</span> },
-                { header: 'Reserved', accessor: 'reserved_size', className: 'text-right', render: (val) => <span className="font-mono text-[12px] text-slate-400">{formatPages(val)}</span> },
-                { header: 'Total', accessor: 'total_size', className: 'text-right', render: (val) => <span className="font-mono text-[12px] text-slate-400">{formatPages(val)}</span> },
+                { header: 'Data Type', accessor: 'data_type' },
+                { header: 'Qty', accessor: 'file_count', className: 'text-center' },
+                { header: 'Used', accessor: 'used_size', className: 'text-right', render: (val) => <span className="font-mono text-[11px] font-bold">{formatPages(val)}</span> },
+                { header: 'Total', accessor: 'total_size', className: 'text-right', render: (val) => <span className="font-mono text-[11px] text-slate-400">{formatPages(val)}</span> },
               ]}
               data={data?.fileinfo || []}
             />
           </Card>
 
-          {/* Utilization Distribution */}
-          <div className="bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.05] rounded-xl p-5 flex flex-col gap-5">
-            <div className="flex items-center gap-2">
-              <Icon name="pie_chart" size="sm" weight={300} className="text-amber-500" />
-              <Typography variant="p" className="text-sm font-semibold text-slate-800 dark:text-slate-100">Utilization Distribution</Typography>
+          <div className="bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.05] rounded p-4 flex flex-col gap-4">
+            <div className="flex items-center gap-1.5">
+              <Icon name="pie_chart" size="xs" weight={300} className="text-amber-500" />
+              <Typography variant="p" className="text-[12px] font-semibold text-slate-800 dark:text-slate-100">Distribution</Typography>
             </div>
 
-            <div className="flex items-center gap-8">
-              {/* Donut */}
-              <div className="relative w-28 h-28 shrink-0">
+            <div className="flex items-center gap-6">
+              <div className="relative w-20 h-20 shrink-0">
                 <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
-                  <circle cx="50" cy="50" r="38" fill="none" stroke="#e2e8f0" strokeWidth="16" className="dark:opacity-20" />
-                  {(totals?.pct || 0) > 0 && (
-                    <circle
-                      cx="50" cy="50" r="38"
-                      fill="none"
-                      stroke="#ffc107"
-                      strokeWidth="16"
-                      strokeDasharray={`${(totals?.pct / 100) * 238.76} 238.76`}
-                      strokeLinecap="butt"
-                      style={{ transition: 'stroke-dasharray 1s ease-out' }}
-                    />
-                  )}
+                  <circle cx="50" cy="50" r="38" fill="none" stroke="#e2e8f0" strokeWidth="12" className="dark:opacity-10" />
+                  <circle
+                    cx="50" cy="50" r="38"
+                    fill="none"
+                    stroke="#ffc107"
+                    strokeWidth="12"
+                    strokeDasharray={`${(totals?.pct / 100) * 238.76} 238.76`}
+                    style={{ transition: 'stroke-dasharray 1s ease-out' }}
+                  />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className={`text-xl font-black font-mono leading-none ${usageSeverity(totals?.pct || 0)}`}>{(totals?.pct || 0).toFixed(0)}%</span>
-                  <span className="text-[8px] text-slate-400 uppercase tracking-wider mt-0.5">Used</span>
+                  <span className={`text-base font-black font-mono leading-none ${usageSeverity(totals?.pct || 0)}`}>{(totals?.pct || 0).toFixed(0)}%</span>
+                  <span className="text-[7px] text-slate-400 uppercase tracking-widest mt-0.5 font-bold">Used</span>
                 </div>
               </div>
 
-              {/* Legend */}
-              <div className="flex-1 space-y-3">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-sm bg-amber-500 shrink-0" />
-                  <div className="flex-1 flex justify-between">
-                    <Typography variant="label" className="text-[10px] text-slate-500 uppercase font-bold tracking-wide">Used</Typography>
-                    <Typography variant="label" className="text-[10px] font-black text-slate-700 dark:text-slate-200 font-mono">{formatSize(totals?.used)}</Typography>
+              <div className="flex-1 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-amber-500" />
+                    <span className="text-[10px] text-slate-400 uppercase font-bold tracking-tight">Used</span>
                   </div>
+                  <span className="text-[11px] font-black font-mono text-slate-700 dark:text-slate-200">{formatSize(totals?.used)}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-sm bg-slate-200 dark:bg-white/10 shrink-0" />
-                  <div className="flex-1 flex justify-between">
-                    <Typography variant="label" className="text-[10px] text-slate-500 uppercase font-bold tracking-wide">Free</Typography>
-                    <Typography variant="label" className="text-[10px] font-black text-slate-700 dark:text-slate-200 font-mono">{formatSize(totals?.free)}</Typography>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-slate-200 dark:bg-white/10" />
+                    <span className="text-[10px] text-slate-400 uppercase font-bold tracking-tight">Free</span>
                   </div>
-                </div>
-                <div className="pt-2 border-t border-slate-100 dark:border-white/[0.04]">
-                  <div className="flex justify-between">
-                    <Typography variant="label" className="text-[10px] text-slate-400 uppercase font-bold tracking-wide">Total</Typography>
-                    <Typography variant="label" className="text-[10px] font-black text-slate-600 dark:text-slate-300 font-mono">{formatSize(totals?.total)}</Typography>
-                  </div>
+                  <span className="text-[11px] font-black font-mono text-slate-700 dark:text-slate-200">{formatSize(totals?.free)}</span>
                 </div>
               </div>
             </div>
-
-            {/* Mini breakdown bars per category */}
-            {data?.dbinfo && data.dbinfo.length > 0 && (
-              <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-white/[0.04]">
-                <Typography variant="label" className="text-[9px] text-slate-400 uppercase tracking-widest font-bold">By Category</Typography>
-                {data.dbinfo.map((row, i) => {
-                  const pct = parseInt(row.total_size) > 0 ? (parseInt(row.used_size) / parseInt(row.total_size)) * 100 : 0;
-                  return (
-                    <div key={i} className="flex items-center gap-3">
-                      <span className="text-[10px] text-slate-400 w-28 truncate font-mono">{row.type}</span>
-                      <div className="flex-1 h-1 bg-slate-100 dark:bg-white/[0.06] overflow-hidden">
-                        <div className={`h-full ${barColor(pct)}`} style={{ width: `${pct}%` }} />
-                      </div>
-                      <span className={`text-[10px] font-mono font-bold w-8 text-right ${usageSeverity(pct)}`}>{pct.toFixed(0)}%</span>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
           </div>
         </div>
 

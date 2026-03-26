@@ -10,10 +10,10 @@ export default function ServerListItem({ host, isSelected, isAuthorized, onConte
   return (
     <div
       title={`${host.address}:${host.port}`}
-      className={`flex flex-col px-4 py-1.5 cursor-pointer transition-all select-none rounded-xl group relative mb-1 border
+      className={`flex flex-col px-4 py-2 cursor-pointer transition-all select-none rounded group relative mb-1 border
         ${isSelected
-          ? 'bg-bk-yellow/5 border-bk-yellow/40 dark:border-bk-yellow/20 shadow-lg shadow-bk-yellow/5'
-          : 'bg-white/40 dark:bg-white/5 border-slate-200 dark:border-white/5 hover:border-bk-yellow/30 hover:bg-slate-50 dark:hover:bg-white/[0.08]'
+          ? 'bg-slate-50 dark:bg-white/[0.06] border-slate-200 dark:border-white/10 shadow-sm'
+          : 'bg-transparent border-transparent hover:bg-slate-100 dark:hover:bg-white/[0.04]'
         }`}
       onClick={() => {
         dispatch(setSelectedHost(host.uid));
@@ -21,16 +21,16 @@ export default function ServerListItem({ host, isSelected, isAuthorized, onConte
       }}
       onContextMenu={(e) => onContextMenu(e, host.alias || host.id, host.uid, host.alias || host.id)}
     >
-      <div className="flex items-center gap-3">
-        <div className={`flex-shrink-0 w-7 h-7 rounded-xl transition-all duration-300 flex items-center justify-center border
+      <div className="flex items-center gap-3 relative z-10">
+        <div className={`flex-shrink-0 w-8 h-8 rounded flex items-center justify-center transition-all
           ${isSelected 
-            ? 'bg-bk-yellow border-bk-yellow/20 shadow-md shadow-bk-yellow/20 rotate-0' 
-            : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-white/10 text-slate-400 group-hover:rotate-6 group-hover:border-bk-yellow/30'}`}>
+            ? 'bg-amber-500 shadow-md shadow-amber-500/20' 
+            : 'bg-slate-100 dark:bg-white/5 text-slate-400 border border-slate-200 dark:border-white/10'}`}>
           <Icon 
             name={isSelected ? 'dns' : 'storage'} 
-            size="12px" 
-            className={isSelected ? 'text-bk-side' : 'text-slate-400 group-hover:text-bk-yellow'} 
-            weight={isSelected ? 900 : 300}
+            size="16px" 
+            className={isSelected ? 'text-white' : 'text-slate-400 group-hover:text-amber-500'} 
+            weight={isSelected ? 400 : 300}
           />
         </div>
 
@@ -38,25 +38,24 @@ export default function ServerListItem({ host, isSelected, isAuthorized, onConte
           <div className="flex items-center justify-between gap-2">
             <Typography 
               variant="span" 
-              className={`text-[13px] font-medium truncate tracking-tight transition-colors 
-                ${isSelected ? 'text-bk-yellow' : 'text-slate-700 dark:text-slate-300 group-hover:text-bk-yellow'}`}
+              className={`text-[13px] truncate tracking-tight transition-colors 
+                ${isSelected ? 'text-slate-600 dark:text-slate-400 font-bold' : 'text-slate-500 dark:text-slate-500 font-medium group-hover:text-slate-900 dark:group-hover:text-slate-200'}`}
+
             >
               {host.alias || host.id}
             </Typography>
             {isAuthorized && (
               <div className="relative group/status">
-                <span className="size-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)] flex-shrink-0 animate-pulse"></span>
-                <div className="absolute right-0 top-full mt-1 bg-bk-side text-[8px] px-1.5 py-0.5 rounded opacity-0 group-hover/status:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                  Authorized
-                </div>
+                <span className="size-1.5 rounded-full bg-emerald-500 flex-shrink-0"></span>
               </div>
             )}
           </div>
         </div>
       </div>
       {isSelected && (
-        <div className="absolute left-[-1px] top-3 bottom-3 w-[3px] bg-bk-yellow rounded-full shadow-[0_0_10px_rgba(255,193,7,0.5)]"></div>
+        <div className="absolute left-0 top-2 bottom-2 w-1 bg-amber-500 rounded-r-full"></div>
       )}
     </div>
+
   );
 }

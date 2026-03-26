@@ -103,7 +103,7 @@ export default function VolumeInfoMonitor({ tabId }) {
       <div className="flex-1 min-h-0 flex gap-0 overflow-hidden">
 
         {/* Left — Info sidebar */}
-        <aside className="w-64 shrink-0 border-r border-slate-100 dark:border-white/[0.04] flex flex-col overflow-y-auto">
+        <aside className="w-[380px] shrink-0 border-r border-slate-100 dark:border-white/[0.04] flex flex-col overflow-y-auto">
           {/* Info rows */}
           <div className="p-4 space-y-0 flex-1">
             <Typography variant="label" className="text-[9px] font-bold text-slate-400 uppercase tracking-widest px-2 pb-2 block">
@@ -112,10 +112,11 @@ export default function VolumeInfoMonitor({ tabId }) {
             {infoRows.map((row, i) => (
               <div key={i} className="flex flex-col px-2 py-2 border-b border-slate-50 dark:border-white/[0.03] last:border-0">
                 <Typography variant="label" className="text-[9px] text-slate-400 uppercase tracking-wider font-semibold">{row.label}</Typography>
-                <Typography variant="p" className="text-[12px] font-semibold text-slate-700 dark:text-slate-200 font-mono truncate" title={row.val}>{row.val}</Typography>
+                <Typography variant="p" className="text-[12px] font-semibold text-slate-700 dark:text-slate-200 font-mono" title={row.val}>{row.val}</Typography>
               </div>
             ))}
           </div>
+
 
           {/* Health note */}
           <div className="m-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-500/[0.06] border border-amber-100 dark:border-amber-500/20">

@@ -157,14 +157,71 @@ function DashboardLayout() {
 
 
           {openTabs.length === 0 ? (
-            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-slate-50 dark:bg-bk-main font-sans">
-              <div className="w-24 h-24 bg-slate-100 dark:bg-bk-side rounded-full flex items-center justify-center mb-6 shadow-md border border-slate-200 dark:border-white/5">
-                <Icon name="database" size="sm" weight={300} className="text-5xl text-slate-400 dark:text-bk-yellow/40" />
+            <div className="flex-1 flex flex-col items-center justify-center relative overflow-hidden bg-white dark:bg-bk-main select-none">
+
+              {/* Grid background */}
+              <div className="absolute inset-0 pointer-events-none"
+                style={{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px)', backgroundSize: '32px 32px' }}
+              />
+              <div className="absolute inset-0 dark:block hidden pointer-events-none"
+                style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)', backgroundSize: '32px 32px' }}
+              />
+
+              {/* Glow */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-amber-400/5 dark:bg-amber-500/8 rounded-full blur-3xl pointer-events-none" />
+
+              <div className="relative z-10 flex flex-col items-center gap-8 max-w-md">
+
+                {/* Icon cluster */}
+                <div className="relative flex items-center justify-center">
+                  {/* Orbit ring 1 */}
+                  <div className="absolute w-28 h-28 rounded-full border border-dashed border-amber-500/15 dark:border-amber-500/20 animate-[spin_18s_linear_infinite]" />
+                  {/* Orbit ring 2 */}
+                  <div className="absolute w-40 h-40 rounded-full border border-slate-200 dark:border-white/[0.06] animate-[spin_30s_linear_infinite_reverse]" />
+
+                  {/* Central badge */}
+                  <div className="w-16 h-16 rounded-2xl bg-white dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] shadow-lg flex items-center justify-center">
+                    <Icon name="database" weight={300} size="28px" className="text-amber-500" />
+                  </div>
+
+                  {/* Satellite dot – top right */}
+                  <div className="absolute top-2 right-2 w-3 h-3 rounded-full bg-emerald-400/80 border-2 border-white dark:border-bk-main shadow-sm shadow-emerald-500/30" />
+                  {/* Satellite dot – bottom left */}
+                  <div className="absolute bottom-3 left-3 w-2 h-2 rounded-full bg-amber-500/50" />
+                </div>
+
+                {/* Text */}
+                <div className="text-center space-y-2">
+                  <h2 className="text-base font-bold text-slate-800 dark:text-slate-100 tracking-tight uppercase">
+                    CUBRID Manager
+                  </h2>
+                  <p className="text-[12px] text-slate-400 dark:text-slate-500 max-w-[260px] leading-relaxed">
+                    Select a host from the sidebar to start monitoring databases, brokers, and logs.
+                  </p>
+                </div>
+
+                {/* Feature pills */}
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  {[
+                    { icon: 'dns', label: 'Host Management' },
+                    { icon: 'storage', label: 'Volume Monitor' },
+                    { icon: 'analytics', label: 'Performance' },
+                    { icon: 'lock', label: 'Lock Info' },
+                  ].map(f => (
+                    <div key={f.label} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.06]">
+                      <Icon name={f.icon} size="13px" weight={300} className="text-slate-400 dark:text-slate-500" />
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">{f.label}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Status bar */}
+                <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-slate-200 dark:border-white/[0.06] bg-slate-50 dark:bg-white/[0.02]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-[10px] text-slate-400 font-mono tracking-wider uppercase">System Ready</span>
+                </div>
+
               </div>
-              <h3 className="text-xl font-medium text-slate-700 dark:text-bk-yellow tracking-tight">Cubrid Manager</h3>
-              <p className="text-slate-500 dark:text-slate-400 mt-2 max-w-xs text-sm leading-relaxed">
-                Select a host or database from the sidebar to start exploring your data.
-              </p>
             </div>
 
           ) : (

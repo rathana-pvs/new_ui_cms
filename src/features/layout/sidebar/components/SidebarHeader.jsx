@@ -3,28 +3,28 @@ import { Icon } from '../../../../components/ds/foundation/Icon';
 
 export default function SidebarHeader() {
   return (
-    <div className="px-6 py-6 border-b border-slate-200 dark:border-white/5 flex items-center gap-4 bg-white dark:bg-bk-side relative overflow-hidden group/header transition-all duration-500 hover:bg-slate-50/50 dark:hover:bg-white/[0.02]">
-      {/* Background Accent */}
-      <div className="absolute top-0 right-0 w-24 h-24 bg-bk-yellow/5 rounded-full blur-3xl -mr-12 -mt-12 group-hover/header:bg-bk-yellow/10 transition-all duration-700"></div>
+    <div className="px-4 py-3 border-b border-slate-100 dark:border-white/[0.06] flex items-center gap-3 bg-white dark:bg-white/[0.01] relative overflow-hidden group/header transition-colors hover:bg-slate-50 dark:hover:bg-white/[0.03]">
+      {/* Background Accent - simplified */}
+      <div className="absolute top-0 right-0 w-16 h-16 bg-amber-500/5 rounded-full blur-2xl -mr-8 -mt-8 group-hover/header:bg-amber-500/10 transition-all duration-700"></div>
       
-      <div className="relative flex-shrink-0 animate-in zoom-in duration-700 delay-100">
-        <div className="relative w-10 h-10 rounded-2xl bg-gradient-to-br from-white to-slate-50 dark:from-white/[0.08] dark:to-transparent border border-slate-200/60 dark:border-white/10 shadow-sm flex items-center justify-center p-2.5 transition-all duration-500 group-hover/header:-translate-y-1 group-hover/header:rotate-[-4deg] group-hover/header:shadow-bk-yellow/30 group-hover/header:shadow-xl group-hover/header:border-bk-yellow/40">
-          <img src="/cubrid-logo.png" alt="CUBRID Logo" className="w-full h-full object-contain filter drop-shadow-sm group-hover/header:scale-110 transition-transform duration-500" />
-          
-          {/* Subtle Glow Ring */}
-          <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/20 pointer-events-none"></div>
+      <div className="relative flex-shrink-0 animate-in zoom-in duration-500">
+        <div className="relative w-8 h-8 rounded-lg bg-white dark:bg-white/[0.08] border border-slate-200/60 dark:border-white/10 shadow-sm flex items-center justify-center p-1.5 transition-all group-hover/header:border-amber-500/40 group-hover/header:shadow-amber-500/10 active:scale-95">
+          <img src="/cubrid-logo.png" alt="CUBRID Logo" className="w-full h-full object-contain filter group-hover/header:scale-110 transition-transform duration-500" />
         </div>
       </div>
       
-      <div className="flex flex-col min-w-0 relative z-10 transition-transform duration-500 group-hover/header:translate-x-0.5">
-        <div className="flex items-center gap-2">
-          <Typography variant="h1" className="text-[15px] font-black tracking-[0.12em] text-slate-800 dark:text-white leading-none uppercase group-hover/header:text-bk-yellow transition-colors duration-300">
+      <div className="flex flex-col min-w-0 relative z-10">
+        <div className="flex items-center gap-1.5 leading-none">
+          <span className="text-[13px] font-black text-slate-800 dark:text-slate-100 tracking-tight transition-colors group-hover/header:text-amber-500">
             CUBRID
-          </Typography>
+          </span>
+          <span className="text-[10px] font-bold text-amber-500/80 border border-amber-500/20 bg-amber-500/10 rounded px-1 py-0.5 leading-none tracking-tighter">
+            Admin
+          </span>
         </div>
-        <Typography variant="caption" className="text-[9px] font-black text-slate-400 dark:text-slate-500 leading-tight uppercase tracking-[0.2em] opacity-80 mt-1">
-          Manager
-        </Typography>
+        <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 leading-none uppercase tracking-[0.2em] opacity-80 mt-1">
+          Technical Console
+        </span>
       </div>
     </div>
   );

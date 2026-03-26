@@ -13,24 +13,21 @@ export const TreeNode = ({
   isActive = false,
   isLoading = false,
   hasChildren = false,
-  status, // "on" | "off" | "unknown" (optional)
+  status,
   onToggle,
   onSelect,
   onContextMenu,
   onDoubleClick,
   children,
-  open: controlledOpen, // allow external control over open state
+  open: controlledOpen,
 }) => {
   const indentClass = level === 1 ? theme.tree.levelOneIndent : theme.tree.levelDeepIndent;
 
   const handleToggle = (e) => {
-    if (e.target.open && onToggle) {
-      onToggle();
-    }
+    if (e.target.open && onToggle) onToggle();
   };
 
   const handleSelect = (e) => {
-    // Stop propagation so parent trees aren't selected
     e.stopPropagation();
     if (onSelect) onSelect();
   };
@@ -50,14 +47,21 @@ export const TreeNode = ({
     }
   };
 
-  // Common wrapper classes for the summary list item
-  const summaryClasses = `flex items-center gap-1.5 px-3 py-1.5 w-full text-left transition-all duration-200 cursor-pointer list-none rounded-r-md select-none group/node relative border border-transparent ${
-    isActive
-      ? 'text-amber-600 dark:text-bk-yellow font-medium bg-bk-yellow/5'
-      : 'text-slate-700 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-amber-600 dark:hover:text-bk-yellow'
-  }`;
+  const summaryClasses = `
+    flex items-center gap-1.5 px-2 py-[5px] w-full text-left transition-all duration-150
+    cursor-pointer list-none rounded select-none group/node relative border border-transparent
+    ${isActive
+      ? 'bg-amber-500/[0.06] dark:bg-amber-500/10 border-transparent text-amber-600 dark:text-amber-500'
+      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-white/[0.04] hover:text-slate-900 dark:hover:text-slate-200'
+    }
+  `;
 
-  // If node has no children dynamically (like a leaf node)
+  // Active left indicator bar
+  const ActiveBar = () => (
+    <div className="absolute left-0 top-1.5 bottom-1.5 w-[2px] bg-amber-500 rounded-full" />
+  );
+
+  // Leaf node (no children)
   if (!hasChildren && !children && !isLoading) {
     return (
       <button
@@ -66,24 +70,37 @@ export const TreeNode = ({
         onContextMenu={handleContextMenu}
         onDoubleClick={handleDoubleClick}
       >
-        <Icon 
-          name={icon} 
-          size="md" 
+        {isActive && <ActiveBar />}
+
+        {/* Spacer for chevron alignment */}
+        <span className="w-3 shrink-0" />
+
+        <Icon
+          name={icon}
+          size="16px"
           weight={300}
-          className={`transition-colors ${isActive ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500 group-hover/node:text-amber-600 dark:group-hover/node:text-bk-yellow'}`} 
+          className={`shrink-0 transition-colors ${
+            isActive
+              ? 'text-amber-500'
+              : 'text-slate-400 dark:text-slate-500 group-hover/node:text-slate-600 dark:group-hover/node:text-slate-300'
+          }`}
         />
-        <Typography variant="span" className={theme.typography.treeLabel + " truncate flex-1"}>
+
+        <Typography
+          variant="span"
+          className={`text-[13px] font-mono truncate flex-1 ${
+            isActive ? 'font-semibold' : 'font-medium'
+          }`}
+        >
           {label}
         </Typography>
+
         {status && <StatusIndicator status={status} animate={status === 'on'} />}
-        {isActive && (
-          <div className={`${theme.tree.activeBarClass} ${theme.tree.activeBarColor} rounded-full`}></div>
-        )}
       </button>
     );
   }
 
-  // Node with children or that can load children
+  // Parent node (with children / expandable)
   return (
     <details
       className="group/details block"
@@ -96,31 +113,47 @@ export const TreeNode = ({
         onContextMenu={handleContextMenu}
         onDoubleClick={handleDoubleClick}
       >
+        {isActive && <ActiveBar />}
+
+        {/* Chevron */}
         <Icon
           name="chevron_right"
-          size="sm"
-          weight={300}
-          className={`transition-transform duration-150 group-open/details:rotate-90 ${isActive ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500'}`}
+          size="14px"
+          weight={400}
+          className={`shrink-0 transition-transform duration-150 group-open/details:rotate-90 ${
+            isActive ? 'text-amber-500' : 'text-slate-400 dark:text-slate-600'
+          }`}
         />
-        <Icon 
-          name={icon} 
-          size="md" 
+
+        {/* Node icon */}
+        <Icon
+          name={icon}
+          size="16px"
           weight={300}
-          className={`transition-colors ${isActive ? 'text-amber-600 dark:text-bk-yellow' : 'text-slate-400 dark:text-slate-500 group-hover/node:text-amber-600 dark:group-hover/node:text-bk-yellow'}`} 
+          className={`shrink-0 transition-colors ${
+            isActive
+              ? 'text-amber-500'
+              : 'text-slate-400 dark:text-slate-500 group-hover/node:text-slate-600 dark:group-hover/node:text-slate-300'
+          }`}
         />
-        <Typography variant="span" className={theme.typography.treeLabel + " truncate flex-1"}>
+
+        <Typography
+          variant="span"
+          className={`text-[13px] font-mono truncate flex-1 ${
+            isActive ? 'font-semibold' : 'font-medium'
+          }`}
+        >
           {label}
         </Typography>
+
         {status && <StatusIndicator status={status} animate={status === 'on'} />}
-        {isActive && (
-          <div className={`${theme.tree.activeBarClass} ${theme.tree.activeBarColor} rounded-full shadow-[0_0_8px_rgba(217,119,6,0.2)]`}></div>
-        )}
       </summary>
 
-      <div className={`${indentClass} border-l ${theme.colors.treeBorder} dark:${theme.colors.treeBorderDark} space-y-0.5 mt-0.5`}>
+      {/* Children container with guide line */}
+      <div className={`${indentClass} border-l border-slate-200 dark:border-white/[0.06] space-y-px mt-0.5 ml-[13px]`}>
         {isLoading ? (
-          <div className="px-4 py-2 flex items-center gap-2">
-            <Skeleton variant="text" width="120px" height="16px" />
+          <div className="px-3 py-2 flex items-center gap-2 opacity-60">
+            <Skeleton variant="text" width="100px" height="13px" />
           </div>
         ) : (
           children

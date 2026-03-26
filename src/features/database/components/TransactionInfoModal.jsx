@@ -49,18 +49,24 @@ export default function TransactionInfoModal() {
   if (!isTransactionInfoModalOpen) return null;
 
   const handleOpenKillModal = () => {
-    const selectedTran = transactions.find(t => t.tranindex === selectedTranIndex);
+    const selectedTran = transactions.find(t => String(t.tranindex) === String(selectedTranIndex));
     if (selectedTran) {
       dispatch(openKillTransactionModal(selectedTran));
     }
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans">
-      <div className="bg-white dark:bg-bk-side w-full max-w-4xl rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh] relative text-left">
+    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div 
+        className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"
+        onClick={() => dispatch(closeTransactionInfoModal())}
+      />
+
+      <div className="relative bg-white dark:bg-background-dark w-full max-w-4xl rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-white/[0.08] overflow-hidden transform transition-all flex flex-col max-h-[90vh] text-left animate-in zoom-in-95 duration-200">
         
         {/* Subtle Top Accent */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-bk-yellow/60"></div>
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-amber-500/60"></div>
 
         <LoadingOverlay 
             isVisible={loading && transactions.length > 0} 
@@ -74,104 +80,101 @@ export default function TransactionInfoModal() {
           onClose={() => setError(null)}
         />
         
-        {/* Header - Compact */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-white/[0.06] bg-slate-50/50 dark:bg-white/[0.02] shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
-              <Icon name="swap_horiz" size="sm" weight={300} className="text-bk-yellow text-xl" />
+            <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center border border-amber-500/20">
+              <Icon name="swap_horiz" size="sm" weight={300} className="text-amber-500" />
             </div>
-            <div>
-              <Typography variant="h3" className="text-sm font-medium text-slate-900 dark:text-white leading-none">Transaction monitor</Typography>
-            </div>
+            <Typography variant="h3" className="text-sm font-semibold text-slate-900 dark:text-slate-100 leading-none">Transaction Monitor</Typography>
           </div>
           <button 
             disabled={loading}
             onClick={() => dispatch(closeTransactionInfoModal())}
-            className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
+            className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/10 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
           >
-            <Icon name="close" size="sm" weight={300} className="text-lg group-hover:rotate-90 transition-transform" />
+            <Icon name="close" size="sm" weight={300} className="group-hover:rotate-90 transition-transform" />
           </button>
         </div>
 
         {/* Body */}
-        <div className="p-5 space-y-5 overflow-y-auto custom-scrollbar flex-1">
-          
+        <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar flex-1">
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Typography variant="label" className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">
-                Database: <Typography variant="span" className="text-bk-yellow">{selectedDatabase}</Typography>
-              </Typography>
-              <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
+            <div className="flex items-center gap-3">
+              <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] whitespace-nowrap">
+                Database: <span className="text-amber-500">{selectedDatabase}</span>
+              </span>
+              <div className="flex-1 h-px bg-slate-100 dark:bg-white/[0.06]"></div>
             </div>
 
-            <div className="border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden bg-slate-50/20 dark:bg-bk-main/30">
+            <div className="border border-slate-200 dark:border-white/[0.08] rounded-lg overflow-hidden bg-white dark:bg-white/[0.01]">
               <div className="overflow-x-auto custom-scrollbar">
-                <table className="w-full text-left text-[11px] border-collapse">
-                  <thead className="bg-slate-50/80 dark:bg-bk-main/50 text-[10px] font-medium text-slate-400 dark:text-slate-500 tracking-wide border-b border-slate-100 dark:border-slate-800">
+                <table className="w-full text-left border-collapse">
+                  <thead className="bg-slate-50/50 dark:bg-white/[0.03] text-[11px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 dark:border-white/[0.06]">
                     <tr>
-                      <th className="px-4 py-3"><Typography variant="label">Transaction idx</Typography></th>
-                      <th className="px-4 py-3"><Typography variant="label">User session</Typography></th>
-                      <th className="px-4 py-3"><Typography variant="label">Host addr</Typography></th>
-                      <th className="px-4 py-3 text-center"><Typography variant="label">PID</Typography></th>
-                      <th className="px-4 py-3"><Typography variant="label">Program</Typography></th>
-                      <th className="px-4 py-3 text-right"><Typography variant="label">Exec time</Typography></th>
+                      <th className="px-4 py-3">Idx</th>
+                      <th className="px-4 py-3">User Session</th>
+                      <th className="px-4 py-3">Host Address</th>
+                      <th className="px-4 py-3 text-center">PID</th>
+                      <th className="px-4 py-3">Program</th>
+                      <th className="px-4 py-3 text-right">Exec Time</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                  <tbody className="divide-y divide-slate-100 dark:divide-white/[0.04]">
                   {loading && transactions.length === 0 ? (
                       <tr>
                         <td colSpan="6" className="px-4 py-16">
-                          <div className="flex flex-col items-center justify-center gap-3">
-                            <div className="w-5 h-5 border-2 border-bk-yellow/20 border-t-bk-yellow rounded-full animate-spin"></div>
-                             <Typography variant="span" className="text-[10px] font-medium text-slate-400 dark:text-slate-500 tracking-wide">Syncing...</Typography>
+                          <div className="flex flex-col items-center justify-center gap-4">
+                            <div className="w-6 h-6 border-2 border-amber-500/20 border-t-amber-500 rounded-full animate-spin"></div>
+                            <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Syncing diagnostics...</span>
                           </div>
                         </td>
                       </tr>
                     ) : transactions.length > 0 ? (
                       transactions.map((tran, idx) => {
                         const tranIndex = tran.tranindex;
-                        const isSelected = selectedTranIndex === tranIndex;
+                        const isSelected = String(selectedTranIndex) === String(tranIndex);
                         const isActive = String(tranIndex).includes('ACTIVE');
                         
                         return (
                           <tr 
                             key={idx} 
-                            className={`cursor-pointer transition-all ${isSelected ? 'bg-bk-yellow/5 dark:bg-bk-yellow/10' : 'hover:bg-slate-50 dark:hover:bg-white/5'}`}
+                            className={`cursor-pointer transition-colors group ${isSelected ? 'bg-amber-500/5 dark:bg-amber-500/10' : 'hover:bg-slate-50 dark:hover:bg-white/[0.02]'}`}
                             onClick={() => setSelectedTranIndex(tranIndex)}
                           >
                             <td className="px-4 py-3">
-                              <div className="flex items-center gap-2.5">
+                              <div className="flex items-center gap-3">
                                 {isActive ? (
                                   <div className="relative">
                                     <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                                    <div className="absolute inset-0 w-2 h-2 rounded-full bg-emerald-500 animate-ping"></div>
+                                    <div className="absolute inset-0 w-2 h-2 rounded-full bg-emerald-500 animate-ping opacity-75"></div>
                                   </div>
                                 ) : (
                                   <div className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-700"></div>
                                 )}
-                                <Typography variant="span" className={`font-mono text-[11px] ${isSelected ? 'text-bk-yellow font-medium' : 'text-slate-700 dark:text-slate-300'}`}>
+                                <span className={`font-mono text-[12px] ${isSelected ? 'text-amber-500 font-bold' : 'text-slate-700 dark:text-slate-300'}`}>
                                   {tranIndex}
-                                </Typography>
+                                </span>
                               </div>
                             </td>
-                            <td className={`px-4 py-3 font-medium ${isSelected ? 'text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-400'}`}>
-                              <Typography variant="span">{tran['@user'] || '-'}</Typography>
+                            <td className={`px-4 py-3 font-sans text-sm font-semibold transition-colors ${isSelected ? 'text-slate-800 dark:text-white' : 'text-slate-600 dark:text-slate-400'}`}>
+                              {tran['@user'] || '-'}
                             </td>
-                            <td className="px-4 py-3 font-mono text-[11px] text-slate-400">
-                              <Typography variant="span">{tran.host}</Typography>
+                            <td className="px-4 py-3 font-mono text-[12px] text-slate-500 dark:text-slate-400">
+                              {tran.host}
                             </td>
                             <td className="px-4 py-3 text-center">
-                              <Typography variant="span" className="bg-slate-100 dark:bg-bk-main/40 px-2 py-0.5 rounded text-[10px] font-mono text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-white/5">
+                              <span className="bg-slate-100 dark:bg-white/[0.06] px-2 py-0.5 rounded text-[11px] font-mono font-bold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/[0.1]">
                                 {tran.pid}
-                              </Typography>
+                              </span>
                             </td>
-                            <td className="px-4 py-3 text-[11px] font-medium text-slate-500 dark:text-slate-500 italic max-w-[150px] truncate">
-                              <Typography variant="span">{tran.program}</Typography>
+                            <td className="px-4 py-3 text-[12px] font-medium text-slate-500 dark:text-slate-500 italic max-w-[150px] truncate">
+                              {tran.program}
                             </td>
                             <td className="px-4 py-3 text-right">
-                              <Typography variant="span" className={`font-mono text-[11px] ${parseFloat(tran.query_time) > 5 ? 'text-rose-500 font-medium' : 'text-slate-400'}`}>
+                              <span className={`font-mono text-[12px] font-bold ${parseFloat(tran.query_time) > 5 ? 'text-rose-500' : 'text-slate-400'}`}>
                                 {tran.query_time}s
-                              </Typography>
+                              </span>
                             </td>
                           </tr>
                         );
@@ -179,9 +182,9 @@ export default function TransactionInfoModal() {
                     ) : (
                       <tr>
                         <td colSpan="6" className="px-4 py-20 text-center">
-                          <div className="flex flex-col items-center justify-center gap-3 opacity-30 grayscale items-center">
-                            <Icon name="inventory_2" size="sm" weight={300} className="text-4xl" />
-                             <Typography variant="p" className="text-[10px] font-medium tracking-wide">No active transactions</Typography>
+                          <div className="flex flex-col items-center justify-center gap-3 opacity-30">
+                            <Icon name="inventory_2" size="md" weight={100} className="text-4xl" />
+                            <span className="text-[11px] font-bold uppercase tracking-widest">No Active Transactions</span>
                           </div>
                         </td>
                       </tr>
@@ -194,21 +197,21 @@ export default function TransactionInfoModal() {
         </div>
 
         {/* Footer */}
-        <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 backdrop-blur-sm flex items-center justify-between border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
+        <div className="px-6 py-4 bg-slate-50/50 dark:bg-white/[0.03] backdrop-blur-md flex items-center justify-between border-t border-slate-100 dark:border-white/[0.06] shrink-0">
           <div className="flex items-center gap-3">
             <button 
               disabled={!selectedTranIndex || loading}
               onClick={handleOpenKillModal}
-              className="px-4 py-1.5 bg-rose-500 hover:bg-rose-600 active:scale-[0.98] text-white text-[10px] font-medium tracking-wide rounded shadow-sm transition-all flex items-center gap-2 disabled:opacity-30 disabled:grayscale disabled:cursor-not-allowed text-left"
+              className="px-4 py-2 bg-rose-500 hover:bg-rose-400 active:scale-95 text-white text-[11px] font-bold uppercase tracking-widest rounded-lg shadow-lg shadow-rose-500/20 transition-all flex items-center gap-2 disabled:opacity-30 disabled:grayscale disabled:cursor-not-allowed"
             >
-              <Icon name="cancel" size="sm" weight={300} />
-              Kill process
+              <Icon name="cancel" size="sm" weight={400} />
+              Kill Process
             </button>
           </div>
 
           <div className="flex items-center gap-3">
             <button 
-              className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-all text-left"
+              className="px-5 py-2 text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/[0.08] rounded-lg hover:bg-white dark:hover:bg-white/[0.04] hover:text-slate-700 dark:hover:text-slate-200 transition-all active:scale-95"
               onClick={() => dispatch(closeTransactionInfoModal())}
             >
               Discard
@@ -216,13 +219,13 @@ export default function TransactionInfoModal() {
             <button 
               onClick={fetchTransactionInfo}
               disabled={loading}
-              className="px-6 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center gap-2 min-w-[120px] disabled:opacity-50 text-left"
+              className="px-6 py-2 bg-amber-500 hover:bg-amber-400 active:scale-95 text-white text-[11px] font-bold uppercase tracking-widest rounded-lg shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2 min-w-[140px] disabled:opacity-50"
             >
               {loading ? (
-                <div className="w-3 h-3 border-2 border-bk-side/30 border-t-bk-side rounded-full animate-spin"></div>
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
               ) : (
                 <>
-                  <Icon name="refresh" size="sm" weight={300} />
+                  <Icon name="refresh" size="sm" weight={400} />
                   <span>Refresh</span>
                 </>
               )}

@@ -10,7 +10,7 @@ import { Spinner } from '../../../components/ds/foundation/Spinner';
 const getSizeFormat = (size) => {
   if (size >= 1024 ** 3) return `${(size / 1024 ** 3).toFixed(1)}GB`;
   if (size >= 1024 ** 2) return `${(size / 1024 ** 2).toFixed(1)}MB`;
-  if (size >= 1024)      return `${(size / 1024).toFixed(1)}KB`;
+  if (size >= 1024) return `${(size / 1024).toFixed(1)}KB`;
   return `${size}B`;
 };
 
@@ -22,7 +22,7 @@ const getVolumeColumn = (dbSpace, type) => {
   for (const space of dbSpace.spaceinfo) {
     if (space.type === type) {
       totalPage += parseInt(space.totalpage || 0);
-      freePage  += parseInt(space.freepage  || 0);
+      freePage += parseInt(space.freepage || 0);
     }
   }
   if (totalPage > 0) {
@@ -45,7 +45,7 @@ const getLogColumn = (dbSpace, type) => {
 
 const BarCell = ({ val, barColor = 'bg-amber-500' }) => (
   <div className="flex flex-col gap-1 min-w-[160px]">
-    <span className="text-[11px] font-mono font-semibold text-slate-600 dark:text-slate-300">{val.display}</span>
+    <span className="text-[12px] font-mono font-semibold text-slate-600 dark:text-slate-300">{val.display}</span>
     <div className="w-full h-1 bg-slate-100 dark:bg-white/[0.06] overflow-hidden">
       <div className={`h-full ${val.pct > 85 ? 'bg-rose-500' : barColor} transition-all duration-500`} style={{ width: `${val.pct}%` }} />
     </div>
@@ -69,10 +69,10 @@ export default function DatabaseVolumes({ hostUid }) {
     return {
       id: result.dbname,
       db: result.dbname,
-      permanent:   getVolumeColumn(result, 'PERMANENT'),
-      temporary:   getVolumeColumn(result, 'TEMPORARY'),
-      activeLog:   getLogColumn(result, 'Active_log'),
-      archiveLog:  getLogColumn(result, 'Archive_log'),
+      permanent: getVolumeColumn(result, 'PERMANENT'),
+      temporary: getVolumeColumn(result, 'TEMPORARY'),
+      activeLog: getLogColumn(result, 'Active_log'),
+      archiveLog: getLogColumn(result, 'Archive_log'),
       storageFree: result.freespace ? getSizeFormat(parseInt(result.freespace) * 1024) : '-',
     };
   }) || [];

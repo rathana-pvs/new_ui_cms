@@ -92,9 +92,10 @@ export default function ServerContent({ hostUid }) {
             <Icon name="dns" size="sm" weight={300} className="text-amber-500" />
           </div>
           <div>
-            <Typography variant="h1" className="text-sm font-bold text-slate-800 dark:text-slate-100 leading-tight">
+            <Typography variant="h1" className="text-sm font-bold text-amber-600 dark:text-amber-500 leading-tight">
               Server Dashboard
             </Typography>
+
             <Typography variant="label" className="text-[10px] text-slate-400 font-mono">{hostLabel}</Typography>
           </div>
         </div>

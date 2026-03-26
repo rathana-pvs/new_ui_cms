@@ -53,11 +53,17 @@ export default function LockInformationModal() {
   if (!isLockInfoModalOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-200 font-sans text-left">
-      <div className="bg-white dark:bg-bk-side w-full max-w-4xl rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh] relative text-left">
+    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div 
+        className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"
+        onClick={() => dispatch(closeLockInfoModal())}
+      />
+
+      <div className="relative bg-white dark:bg-background-dark w-full max-w-4xl rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-white/[0.08] overflow-hidden transform transition-all flex flex-col max-h-[90vh] text-left animate-in zoom-in-95 duration-200">
         
         {/* Subtle Top Accent */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-bk-yellow/60"></div>
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-amber-500/60"></div>
 
         <LoadingOverlay 
             isVisible={loading && transactions.length > 0} 
@@ -71,186 +77,200 @@ export default function LockInformationModal() {
           onClose={() => setError(null)}
         />
         
-        {/* Header - Compact */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-white/[0.06] bg-slate-50/50 dark:bg-white/[0.02] shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
-              <Icon name="lock" size="sm" weight={300} className="text-bk-yellow text-xl" />
+            <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center border border-amber-500/20">
+              <Icon name="lock" size="sm" weight={300} className="text-amber-500" />
             </div>
             <div>
-              <Typography variant="h3" className="text-sm font-medium text-slate-900 dark:text-white leading-none">Locking system monitor</Typography>
+              <Typography variant="h3" className="text-sm font-semibold text-slate-900 dark:text-slate-100 leading-none">Locking System Monitor</Typography>
             </div>
           </div>
           <button 
             disabled={loading}
             onClick={() => dispatch(closeLockInfoModal())}
-            className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/5 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
+            className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/10 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
           >
-            <Icon name="close" size="sm" weight={300} className="text-lg group-hover:rotate-90 transition-transform" />
+            <Icon name="close" size="sm" weight={300} className="group-hover:rotate-90 transition-transform" />
           </button>
         </div>
 
         {/* Tabs Control */}
-        <div className="flex bg-slate-50/50 dark:bg-bk-main/20 px-2 border-b border-slate-100 dark:border-slate-800 flex-shrink-0">
+        <div className="flex bg-slate-50/20 dark:bg-white/[0.01] px-2 border-b border-slate-100 dark:border-white/[0.06] shrink-0">
           {[
             { id: 'client', label: 'Client / Session Info' },
-            { id: 'object', label: 'Object lock status' }
+            { id: 'object', label: 'Object Lock Status' }
           ].map(tab => (
             <button 
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2.5 text-[10px] font-medium tracking-wide transition-all border-b-2 relative
+              className={`px-4 py-3 text-[11px] font-bold uppercase tracking-widest transition-all border-b-2 relative active:scale-95
                 ${activeTab === tab.id 
-                  ? 'text-bk-yellow border-bk-yellow' 
+                  ? 'text-amber-500 border-amber-500' 
                   : 'text-slate-400 border-transparent hover:text-slate-600 dark:hover:text-slate-200'}`}
             >
-              <Typography variant="label">{tab.label}</Typography>
+              {tab.label}
               {activeTab === tab.id && (
-                <div className="absolute inset-0 bg-bk-yellow/5 animate-pulse pointer-events-none"></div>
+                <div className="absolute inset-0 bg-amber-500/5 animate-pulse pointer-events-none rounded-t-lg"></div>
               )}
             </button>
           ))}
         </div>
 
         {/* Body */}
-        <div className="p-5 space-y-5 overflow-y-auto custom-scrollbar flex-1">
+        <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar flex-1">
           {loading && transactions.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-4 py-20 min-h-[400px]">
-              <div className="w-6 h-6 border-2 border-bk-yellow/20 border-t-bk-yellow rounded-full animate-spin"></div>
-              <Typography variant="p" className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Syncing diagnostics...</Typography>
+              <div className="w-6 h-6 border-2 border-amber-500/20 border-t-amber-500 rounded-full animate-spin"></div>
+              <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Syncing Diagnostics...</span>
             </div>
           ) : activeTab === 'client' ? (
-            <div className="space-y-6">
-              {/* Server Context */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Typography variant="label" className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Server parameters</Typography>
-                  <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 bg-bk-yellow/5 border border-bk-yellow/10 rounded-xl flex items-center justify-between">
-                    <Typography variant="label" className="text-[10px] font-medium text-slate-400 dark:text-slate-500 tracking-wide">Lock escalation</Typography>
-                    <Typography variant="span" className="text-sm font-mono font-medium text-slate-700 dark:text-slate-200">{settings.esc || '100,000'}</Typography>
+            <div className="animate-in fade-in duration-300">
+              <div className="space-y-6">
+                {/* Server Context */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] whitespace-nowrap">Server Parameters</span>
+                    <div className="flex-1 h-px bg-slate-100 dark:bg-white/[0.06]"></div>
                   </div>
-                  <div className="p-4 bg-bk-yellow/5 border border-bk-yellow/10 rounded-xl flex items-center justify-between">
-                    <Typography variant="label" className="text-[10px] font-medium text-slate-400 dark:text-slate-500 tracking-wide">Deadlock interval</Typography>
-                    <Typography variant="span" className="text-sm font-mono font-medium text-slate-700 dark:text-slate-200">{settings.dinterval || '0'} <Typography variant="span" className="text-[10px] opacity-60">ms</Typography></Typography>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-4 bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/[0.06] rounded-xl flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Lock Escalation</span>
+                      <span className="text-[13px] font-mono font-bold text-slate-700 dark:text-slate-200">{settings.esc || '100,000'}</span>
+                    </div>
+                    <div className="p-4 bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/[0.06] rounded-xl flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Deadlock Interval</span>
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-[13px] font-mono font-bold text-slate-700 dark:text-slate-200">{settings.dinterval || '0'}</span>
+                        <span className="text-[10px] font-bold text-slate-400">ms</span>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-
-              {/* Transactions Table */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Typography variant="label" className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Active client sessions</Typography>
-                  <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
                 </div>
 
-                <div className="border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden bg-slate-50/20 dark:bg-bk-main/30">
-                  <div className="overflow-x-auto custom-scrollbar">
-                    <table className="w-full text-left text-[11px] border-collapse">
-                      <thead className="bg-slate-50/80 dark:bg-bk-main/50 text-[10px] font-medium text-slate-400 tracking-wide border-b border-slate-100 dark:border-slate-800">
-                        <tr>
-                          <th className="px-3 py-2.5"><Typography variant="label">Idx</Typography></th>
-                          <th className="px-3 py-2.5"><Typography variant="label">Pname</Typography></th>
-                          <th className="px-3 py-2.5"><Typography variant="label">UID</Typography></th>
-                          <th className="px-3 py-2.5"><Typography variant="label">Host address</Typography></th>
-                          <th className="px-3 py-2.5 text-center"><Typography variant="label">PID</Typography></th>
-                          <th className="px-3 py-2.5"><Typography variant="label">Isolation</Typography></th>
-                          <th className="px-3 py-2.5 text-right"><Typography variant="label">Timeout</Typography></th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100 dark:divide-white/5 font-mono text-[10px]">
-                        {transactions.length > 0 ? transactions.map((client, idx) => (
-                          <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-all">
-                            <td className="px-3 py-2"><Typography variant="span" className="text-bk-yellow font-medium">{client.index}</Typography></td>
-                            <td className="px-3 py-2"><Typography variant="span" className="font-sans font-medium text-slate-700 dark:text-slate-300">{client.pname || '-'}</Typography></td>
-                            <td className="px-3 py-2"><Typography variant="span" className="text-slate-400">{client['@uid'] || '-'}</Typography></td>
-                            <td className="px-3 py-2"><Typography variant="span" className="text-slate-400">{client.host || '-'}</Typography></td>
-                            <td className="px-3 py-2 text-center">
-                              <Typography variant="span" className="bg-slate-100 dark:bg-bk-main/40 px-1.5 py-0.5 rounded text-[10px] border border-slate-200/50 dark:border-white/5">{client.pid}</Typography>
-                            </td>
-                            <td className="px-3 py-2"><Typography variant="span" className="text-slate-400">{client.isolevel}</Typography></td>
-                            <td className="px-3 py-2 text-right"><Typography variant="span" className="text-slate-400">{client.timeout} <Typography variant="span" className="opacity-50 text-[9px]">sec</Typography></Typography></td>
-                          </tr>
-                        )) : (
+                {/* Transactions Table */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] whitespace-nowrap">Active Client Sessions</span>
+                    <div className="flex-1 h-px bg-slate-100 dark:bg-white/[0.06]"></div>
+                  </div>
+
+                  <div className="border border-slate-200 dark:border-white/[0.08] rounded-lg overflow-hidden bg-white dark:bg-white/[0.01]">
+                    <div className="overflow-x-auto custom-scrollbar">
+                      <table className="w-full text-left border-collapse">
+                        <thead className="bg-slate-50/50 dark:bg-white/[0.03] text-[11px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 dark:border-white/[0.06]">
                           <tr>
-                            <td colSpan="7" className="px-3 py-16 text-center">
-                              <div className="flex flex-col items-center justify-center gap-2 opacity-30 grayscale">
-                                <Icon name="group_off" size="sm" weight={300} className="text-3xl" />
-                                <Typography variant="p" className="text-[10px] font-medium tracking-wide">No active sessions</Typography>
-                              </div>
-                            </td>
+                            <th className="px-4 py-3">Idx</th>
+                            <th className="px-4 py-3">Pname</th>
+                            <th className="px-4 py-3">UID</th>
+                            <th className="px-4 py-3">Host Address</th>
+                            <th className="px-4 py-3 text-center">PID</th>
+                            <th className="px-4 py-3">Isolation</th>
+                            <th className="px-4 py-3 text-right">Timeout</th>
                           </tr>
-                        )}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 dark:divide-white/[0.04] font-mono text-[12px]">
+                          {transactions.length > 0 ? transactions.map((client, idx) => (
+                            <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors group">
+                              <td className="px-4 py-2.5 font-bold text-amber-500">{client.index}</td>
+                              <td className="px-4 py-2.5">
+                                <span className="font-sans font-semibold text-slate-700 dark:text-slate-200">{client.pname || '-'}</span>
+                              </td>
+                              <td className="px-4 py-2.5 text-slate-500 dark:text-slate-400">{client['@uid'] || '-'}</td>
+                              <td className="px-4 py-2.5 text-slate-500 dark:text-slate-400">{client.host || '-'}</td>
+                              <td className="px-4 py-2.5 text-center">
+                                <span className="bg-slate-100 dark:bg-white/[0.06] px-2 py-0.5 rounded text-[11px] border border-slate-200 dark:border-white/[0.1] text-slate-600 dark:text-slate-300">
+                                  {client.pid}
+                                </span>
+                              </td>
+                              <td className="px-4 py-2.5 text-slate-500 dark:text-slate-400">{client.isolevel}</td>
+                              <td className="px-4 py-2.5 text-right">
+                                <span className="text-slate-600 dark:text-slate-300 font-semibold">{client.timeout}</span>
+                                <span className="text-[10px] text-slate-400 ml-1 font-bold">sec</span>
+                              </td>
+                            </tr>
+                          )) : (
+                            <tr>
+                              <td colSpan="7" className="px-4 py-16 text-center">
+                                <div className="flex flex-col items-center justify-center gap-3 opacity-30">
+                                  <Icon name="group_off" size="md" weight={100} className="text-4xl" />
+                                  <span className="text-[11px] font-bold uppercase tracking-widest">No Active Sessions</span>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           ) : (
-            <div className="space-y-6">
-              {/* Object Stats */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Typography variant="label" className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Lock usage statistics</Typography>
-                  <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
-                </div>
-                
-                <div className="grid grid-cols-3 gap-4">
-                  {[
-                    { label: 'Locked objects', value: settings.numlocked || 0, unit: 'count' },
-                    { label: 'Allocated limit', value: settings.numallocated || 5000, unit: 'count' },
-                    { label: 'Storage footprint', value: settings.sizelock || '1M', unit: 'B' }
-                  ].map(stat => (
-                    <div key={stat.label} className="p-4 bg-bk-yellow/5 border border-bk-yellow/10 rounded-xl space-y-1">
-                      <Typography variant="label" className="text-[9px] font-medium text-slate-400 tracking-wide">{stat.label}</Typography>
-                      <div className="flex items-baseline gap-1">
-                        <Typography variant="span" className="text-lg font-mono font-medium text-slate-700 dark:text-slate-200 tracking-tighter">{stat.value}</Typography>
-                        <Typography variant="span" className="text-[10px] font-medium text-slate-400 opacity-60">{stat.unit}</Typography>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Object Details */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Typography variant="label" className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500">Object level details</Typography>
-                  <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
-                </div>
-
-                <div className="border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden bg-slate-50/20 dark:bg-bk-main/30 relative">
-                  <div className="overflow-x-auto min-h-[200px] custom-scrollbar">
-                    <table className="w-full text-left text-[11px] border-collapse">
-                      <thead className="bg-slate-50/80 dark:bg-bk-main/50 text-[10px] font-medium text-slate-400 tracking-wide border-b border-slate-100 dark:border-slate-800">
-                        <tr>
-                          <th className="px-3 py-2.5"><Typography variant="label">Object ID (OID)</Typography></th>
-                          <th className="px-3 py-2.5"><Typography variant="label">Structure type</Typography></th>
-                          <th className="px-3 py-2.5 text-center"><Typography variant="label">Holders</Typography></th>
-                          <th className="px-3 py-2.5 text-center"><Typography variant="label">Blocked</Typography></th>
-                          <th className="px-3 py-2.5 text-right"><Typography variant="label">Waiters</Typography></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td colSpan="5" className="px-3 py-24 text-center">
-                            <div className="flex flex-col items-center justify-center gap-2 opacity-30 grayscale">
-                              <Icon name="key_off" size="sm" weight={300} className="text-3xl" />
-                                <Typography variant="p" className="text-[10px] font-medium tracking-wide">No lock contention discovered</Typography>
-                            </div>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
+            <div className="animate-in fade-in duration-300">
+              <div className="space-y-6">
+                {/* Object Stats */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] whitespace-nowrap">Lock Usage Statistics</span>
+                    <div className="flex-1 h-px bg-slate-100 dark:bg-white/[0.06]"></div>
                   </div>
-                  <div className="p-2 border-t border-slate-100 dark:border-white/5 flex justify-end">
-                    <button className="px-3 py-1 bg-bk-side dark:bg-bk-main text-white text-[10px] font-medium tracking-wide rounded border border-white/10 hover:bg-bk-main transition-all">
-                      <Typography variant="p">Detailed telemetry</Typography>
-                    </button>
+                  
+                  <div className="grid grid-cols-3 gap-4">
+                    {[
+                      { label: 'Locked Objects', value: settings.numlocked || 0, unit: 'items' },
+                      { label: 'Allocated Limit', value: settings.numallocated || 5000, unit: 'max' },
+                      { label: 'Memory Usage', value: settings.sizelock || '1M', unit: 'bytes' }
+                    ].map(stat => (
+                      <div key={stat.label} className="p-4 bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/[0.06] rounded-xl">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">{stat.label}</span>
+                        <div className="flex items-baseline gap-1.5">
+                          <span className="text-xl font-mono font-bold text-slate-700 dark:text-slate-100">{stat.value}</span>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{stat.unit}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Object Details */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] whitespace-nowrap">Object Level Details</span>
+                    <div className="flex-1 h-px bg-slate-100 dark:bg-white/[0.06]"></div>
+                  </div>
+
+                  <div className="border border-slate-200 dark:border-white/[0.08] rounded-lg overflow-hidden bg-white dark:bg-white/[0.01]">
+                    <div className="overflow-x-auto min-h-[220px] custom-scrollbar">
+                      <table className="w-full text-left border-collapse">
+                        <thead className="bg-slate-50/50 dark:bg-white/[0.03] text-[11px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 dark:border-white/[0.06]">
+                          <tr>
+                            <th className="px-4 py-3">Object ID (OID)</th>
+                            <th className="px-4 py-3">Structure Type</th>
+                            <th className="px-4 py-3 text-center">Holders</th>
+                            <th className="px-4 py-3 text-center">Blocked</th>
+                            <th className="px-4 py-3 text-right">Waiters</th>
+                          </tr>
+                        </thead>
+                        <tbody className="text-[12px] font-mono">
+                          <tr>
+                            <td colSpan="5" className="px-4 py-24 text-center">
+                              <div className="flex flex-col items-center justify-center gap-3 opacity-30">
+                                <Icon name="key_off" size="md" weight={100} className="text-4xl" />
+                                <span className="text-[11px] font-bold uppercase tracking-widest">No Lock Contention</span>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <div className="px-4 py-2.5 border-t border-slate-100 dark:border-white/[0.04] bg-slate-50/20 dark:bg-white/[0.01] flex justify-end">
+                      <button className="px-3 py-1.5 bg-slate-900 border border-slate-800 text-white text-[11px] font-bold uppercase tracking-widest rounded hover:bg-black transition-all active:scale-95 shadow-lg shadow-black/10">
+                        Detailed Telemetry
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -259,10 +279,10 @@ export default function LockInformationModal() {
         </div>
 
         {/* Footer */}
-        <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 backdrop-blur-sm flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
+        <div className="px-6 py-4 bg-slate-50/50 dark:bg-white/[0.03] backdrop-blur-md flex justify-end gap-3 border-t border-slate-100 dark:border-white/[0.06] shrink-0">
           <button 
             disabled={loading}
-            className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-all text-left"
+            className="px-5 py-2 text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/[0.08] rounded-lg hover:bg-white dark:hover:bg-white/[0.04] hover:text-slate-700 dark:hover:text-slate-200 transition-all active:scale-95"
             onClick={() => dispatch(closeLockInfoModal())}
           >
             Discard
@@ -270,14 +290,14 @@ export default function LockInformationModal() {
           <button 
             onClick={fetchLockInfo}
             disabled={loading}
-            className="px-6 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center gap-2 min-w-[120px] disabled:opacity-50 text-left"
+            className="px-6 py-2 bg-amber-500 hover:bg-amber-400 active:scale-95 text-white text-[11px] font-bold uppercase tracking-widest rounded-lg shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2 min-w-[140px] disabled:opacity-50"
           >
             {loading ? (
-              <div className="w-3 h-3 border-2 border-bk-side/30 border-t-bk-side rounded-full animate-spin"></div>
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
             ) : (
               <>
-                <Icon name="refresh" size="sm" weight={300} />
-                <span>Refresh stats</span>
+                <Icon name="refresh" size="sm" weight={400} />
+                <span>Refresh Stats</span>
               </>
             )}
           </button>

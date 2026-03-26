@@ -7,7 +7,6 @@ import { showStatusModal } from '../layoutSlice';
 import { fetchDatabaseStartInfo, startDatabase } from '../../database/databaseSlice';
 import { fetchBrokerList, startBroker } from '../../broker/brokerSlice';
 import { setAboutCubrid } from '../appBarSlice';
-import { Typography } from '../../../components/ds/foundation/Typography';
 import { Icon } from '../../../components/ds/foundation/Icon';
 import AboutModal from './AboutModal';
 import HeaderMenu from './HeaderMenu';
@@ -32,89 +31,102 @@ export default function Header({ theme, toggleTheme }) {
     window.location.href = '/login';
   };
 
+  const handleStart = () => {
+    if (selectedDatabase && !activeDatabases.includes(selectedDatabase)) {
+      dispatch(startDatabase({ hostUid: selectedHostUid, dbname: selectedDatabase }))
+        .unwrap()
+        .then(() => dispatch(fetchDatabaseStartInfo(selectedHostUid)))
+        .catch(err => dispatch(showStatusModal({ type: 'error', title: 'Start Failed', message: err })));
+    } else if (selectedBroker) {
+      const broker = brokers.find(b => b.name === selectedBroker);
+      if (broker && broker.state !== 'ON') {
+        dispatch(startBroker({ hostUid: selectedHostUid, brokerName: selectedBroker }))
+          .unwrap()
+          .then(() => dispatch(fetchBrokerList(selectedHostUid)))
+          .catch(err => dispatch(showStatusModal({ type: 'error', title: 'Start Failed', message: err })));
+      }
+    }
+  };
+
+  /* ── icon button shared style ── */
+  const btnBase = "h-8 flex items-center justify-center rounded border transition-all active:scale-[0.98]";
+  const iconBtn = `${btnBase} w-8 bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/[0.06] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200`;
+
   return (
     <>
-      <header className="bg-white dark:bg-bk-side border-b border-slate-200 dark:border-white/10 h-16 flex items-center justify-between px-6 z-40">
-        <div className="flex items-center gap-6">
+      <header className="bg-white dark:bg-background-dark border-b border-slate-100 dark:border-white/[0.06] h-14 flex items-center justify-between px-6 z-40 shrink-0 select-none">
+
+        {/* ── Left: logo + menus + quick actions ── */}
+        <div className="flex items-center gap-1">
+          {/* Dropdown menus */}
           <HeaderMenu />
-          <div className="h-6 w-px bg-slate-200 dark:bg-white/5 opacity-50"></div>
-          
-          <div className="flex items-center gap-2 ml-1">
-            <button 
-              className="w-10 h-10 flex items-center justify-center rounded-xl transition-all group text-bk-yellow hover:text-amber-400 bg-bk-yellow/5 hover:bg-bk-yellow/10 border border-bk-yellow/20 hover:border-bk-yellow/40 active:scale-90 shadow-sm"
-              title="Start Selected"
-              onClick={() => {
-                if (selectedDatabase && !activeDatabases.includes(selectedDatabase)) {
-                  dispatch(startDatabase({ hostUid: selectedHostUid, dbname: selectedDatabase }))
-                    .unwrap()
-                    .then(() => dispatch(fetchDatabaseStartInfo(selectedHostUid)))
-                    .catch(err => dispatch(showStatusModal({ type: 'error', title: 'Start Failed', message: err })));
-                } else if (selectedBroker) {
-                  const broker = brokers.find(b => b.name === selectedBroker);
-                  if (broker && broker.state !== 'ON') {
-                    dispatch(startBroker({ hostUid: selectedHostUid, brokerName: selectedBroker }))
-                      .unwrap()
-                      .then(() => dispatch(fetchBrokerList(selectedHostUid)))
-                      .catch(err => dispatch(showStatusModal({ type: 'error', title: 'Start Failed', message: err })));
-                  }
-                }
-              }}
-            >
-              <Icon name="play_arrow" size="24px" className="transition-colors" weight={400} />
-            </button>
-            <button className="w-10 h-10 flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 border border-transparent hover:border-slate-300 dark:hover:border-white/10 rounded-xl transition-all active:scale-90 group" title="Dashboard">
-              <Icon name="grid_view" size="20px" className="text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors"  weight={300} />
-            </button>
-            <button className="w-10 h-10 flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 border border-transparent hover:border-slate-300 dark:hover:border-white/10 rounded-xl transition-all active:scale-90 group" title="Refresh">
-              <Icon name="refresh" size="20px" className="text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors"  weight={300} />
-            </button>
-          </div>
+
+          <div className="w-px h-5 bg-slate-200 dark:bg-white/[0.08] mx-3" />
+
+          {/* Quick action: Start */}
+          <button
+            className={`${btnBase} px-3 gap-2 bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 hover:border-amber-500/30 font-bold text-[11px] uppercase tracking-wider`}
+            title="Start selected database / broker"
+            onClick={handleStart}
+          >
+            <Icon name="play_arrow" size="18px" weight={400} className="text-amber-500" />
+            Start
+          </button>
         </div>
 
-        <div className="flex items-center gap-4">
+        {/* ── Right: theme toggle + user + logout ── */}
+        <div className="flex items-center gap-2">
+          {/* Theme toggle */}
           <button
-            className="w-10 h-10 text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 border border-transparent hover:border-slate-300 dark:hover:border-white/10 rounded-xl transition-all active:scale-90 flex items-center justify-center group"
+            className={iconBtn}
             onClick={toggleTheme}
             title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
           >
-            <Icon name={theme === 'light' ? 'dark_mode' : 'light_mode'} size="20px" className="group-hover:text-slate-900 dark:group-hover:text-white transition-colors" weight={300} />
+            <Icon name={theme === 'light' ? 'dark_mode' : 'light_mode'} size="18px" weight={300} />
           </button>
 
-          <div
-            className="flex items-center h-10 gap-2.5 pl-4 pr-3 rounded-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 cursor-pointer hover:bg-slate-100 dark:hover:bg-white/10 hover:border-slate-300 dark:hover:border-white/10 transition-all group/profile"
+          <div className="w-px h-5 bg-slate-200 dark:bg-white/[0.08] mx-1" />
+
+          {/* User profile pill */}
+          <button
+            className={`${btnBase} px-2 gap-2 bg-slate-100 dark:bg-white/[0.04] border-slate-200 dark:border-white/[0.07] hover:bg-slate-200 dark:hover:bg-white/[0.08] group min-w-[120px] justify-between`}
             onClick={() => setIsProfileOpen(true)}
           >
             {authLoading ? (
-               <div className="flex items-center gap-2 px-2">
-                 <div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded animate-pulse"></div>
-                 <div className="h-5 w-5 rounded-full bg-slate-200 dark:bg-slate-800 animate-pulse"></div>
-               </div>
+              <div className="flex items-center gap-2 w-full justify-center">
+                <div className="h-3 w-16 bg-slate-200 dark:bg-white/10 rounded animate-pulse" />
+                <div className="w-6 h-6 rounded bg-slate-200 dark:bg-white/10 animate-pulse" />
+              </div>
             ) : (
               <>
-                <Typography variant="caption" className="font-bold text-slate-600 dark:text-slate-400 tracking-wide uppercase text-[11px]">
-                  {user?.id || 'Admin'}
-                </Typography>
-                <div className="flex items-center justify-center transition-transform group-hover/profile:scale-110 ml-0.5">
-                   <Icon name={authError ? 'error' : 'person'} size="18px" className="text-slate-500 group-hover/profile:text-slate-900 dark:group-hover/profile:text-white transition-colors"  weight={400} />
+                <div className="w-6 h-6 rounded bg-amber-500 shadow-sm shadow-amber-500/20 flex items-center justify-center shrink-0">
+                  <Icon
+                    name={authError ? 'error' : 'person'}
+                    size="16px"
+                    weight={400}
+                    className={authError ? 'text-white' : 'text-bk-side'}
+                  />
                 </div>
+                <span className="text-[12px] font-bold text-slate-700 dark:text-slate-200 tracking-tight flex-1 text-left px-1 truncate">
+                  {user?.id || 'Admin'}
+                </span>
+                <Icon name="expand_more" size="14px" className="text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200" />
               </>
             )}
-          </div>
+          </button>
 
+          {/* Logout */}
           <button
-            className="w-10 h-10 text-slate-400 hover:bg-rose-500/10 hover:text-rose-500 border border-transparent hover:border-rose-500/20 rounded-xl transition-all active:scale-90 flex items-center justify-center"
+            className={`${btnBase} w-8 bg-rose-500/5 border-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white hover:border-rose-500`}
             onClick={handleLogout}
             title="Logout"
           >
-            <Icon name="logout" size="20px"  weight={300} />
+            <Icon name="logout" size="18px" weight={300} />
           </button>
         </div>
       </header>
 
-      <UserProfileModal
-        isOpen={isProfileOpen}
-        onClose={() => setIsProfileOpen(false)}
-      />
+      <UserProfileModal isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
       <AboutModal />
     </>
   );
