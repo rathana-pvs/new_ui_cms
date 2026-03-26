@@ -1,21 +1,20 @@
 import { Input } from '../../../../components/ds/forms/Input';
-import { Typography } from '../../../../components/ds/foundation/Typography';
+import { Icon } from '../../../../components/ds/foundation/Icon';
+
+const SectionHeader = ({ label }) => (
+  <div className="flex items-center gap-3 mb-4">
+    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">{label}</span>
+    <div className="flex-1 h-px bg-slate-100 dark:bg-white/[0.05]" />
+  </div>
+);
 
 export default function UnloadConfigSection({ formData, handleInputChange }) {
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-3">
-        <Typography variant="caption" className="font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest pl-1">Target configuration</Typography>
-        <div className="flex-1 h-[1px] bg-slate-100 dark:bg-white/5"></div>
-      </div>
-      
-      <div className="grid grid-cols-2 gap-6">
-        <Input 
-          label="Database name"
-          value={formData.targetDbName}
-          disabled
-        />
-        <Input 
+    <div>
+      <SectionHeader label="Target Configuration" />
+      <div className="grid grid-cols-2 gap-4">
+        <Input label="Database name" value={formData.targetDbName} disabled />
+        <Input
           label="Target directory"
           name="targetDirectory"
           value={formData.targetDirectory}
@@ -24,9 +23,8 @@ export default function UnloadConfigSection({ formData, handleInputChange }) {
           icon="folder"
         />
       </div>
-
-      <div className="grid grid-cols-2 gap-6 pt-4 border-t border-slate-100 dark:border-white/5">
-        <Input 
+      <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-slate-100 dark:border-white/[0.04]">
+        <Input
           label="DB Username"
           name="dbUsername"
           value={formData.dbUsername}
@@ -34,7 +32,7 @@ export default function UnloadConfigSection({ formData, handleInputChange }) {
           placeholder="dba"
           icon="person"
         />
-        <Input 
+        <Input
           label="DB Password"
           type="password"
           name="dbPassword"

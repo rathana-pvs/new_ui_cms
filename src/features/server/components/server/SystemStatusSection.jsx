@@ -124,9 +124,13 @@ export default function SystemStatusSection({ hostUid }) {
             </span>
           </div>
           {isStopped && (
-            <Button variant="secondary" size="xs" icon="refresh" onClick={startPolling} className="text-[10px]">
+            <button 
+              onClick={startPolling}
+              className="px-2 py-0.5 rounded bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] font-bold text-amber-500 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors flex items-center gap-1"
+            >
+              <Icon name="refresh" size="12px" />
               Resume
-            </Button>
+            </button>
           )}
         </div>
       }

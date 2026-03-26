@@ -1,96 +1,82 @@
 import { Icon } from '../../../../components/ds/foundation/Icon';
 import { Table } from '../../../../components/ds/layout/Table';
-import { Button } from '../../../../components/ds/foundation/Button';
-import { Typography } from '../../../../components/ds/foundation/Typography';
 import { Card } from '../../../../components/ds/layout/Card';
 
 export default function DBBrokersCASSection({ brokersCAS, onViewSQLLog, onViewSlowQueryLog, onRestartCAS }) {
+  const readyCount = brokersCAS.filter(c => c.status === 'READY').length;
+  const busyCount  = brokersCAS.length - readyCount;
+
   const columns = [
-    { 
-      header: 'Broker Parent', 
+    {
+      header: 'Broker',
       accessor: 'broker',
-      render: (val) => <Typography variant="p" className="font-bold text-slate-700 dark:text-white uppercase tracking-tight">{val}</Typography>
+      render: (val) => <span className="font-mono text-[12px] font-semibold text-slate-700 dark:text-slate-200 uppercase">{val}</span>
     },
-    { header: 'CAS ID', accessor: 'id' },
-    { header: 'Process ID', accessor: 'pid' },
-    { header: 'QPS', accessor: 'qps' },
-    { header: 'LQS', accessor: 'lqs' },
-    { 
-      header: 'Service Status', 
+    { header: 'CAS', accessor: 'id',  render: (val) => <span className="font-mono text-[12px] text-slate-400">{val}</span> },
+    { header: 'PID', accessor: 'pid', render: (val) => <span className="font-mono text-[12px] text-slate-400">{val}</span> },
+    { header: 'QPS', accessor: 'qps', render: (val) => <span className="font-mono text-[12px] text-amber-600 dark:text-amber-400 font-semibold">{val}</span> },
+    { header: 'LQS', accessor: 'lqs', render: (val) => <span className="font-mono text-[12px] text-slate-500">{val}</span> },
+    {
+      header: 'Status',
       accessor: 'status',
-      render: (val) => (
-        <div className={`inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full border ${
-          val === 'READY' 
-            ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' 
-            : 'bg-amber-500/10 border-amber-500/20 text-amber-500'
-        }`}>
-          <div className={`w-1.5 h-1.5 rounded-full ${val === 'READY' ? 'bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-amber-500'}`}></div>
-          <Typography variant="caption" className="font-black uppercase tracking-widest">{val}</Typography>
-        </div>
-      )
+      render: (val) => {
+        const ready = val === 'READY';
+        return (
+          <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border
+            ${ready
+              ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'
+              : 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20'}`}
+          >
+            <span className={`w-1.5 h-1.5 rounded-full ${ready ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+            {val}
+          </span>
+        );
+      }
     },
-    { header: 'Last Connection', accessor: 'lastConn' },
-    { 
-      header: 'Control Actions', 
+    { header: 'Last Conn', accessor: 'lastConn', render: (val) => <span className="font-mono text-[11px] text-slate-400">{val}</span> },
+    {
+      header: 'Actions',
       accessor: 'actions',
       align: 'center',
       render: (_, row) => (
-        <div className="flex items-center justify-center gap-1.5">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            icon="restart_alt" 
-            title="Restart CAS Instance" 
-            onClick={() => onRestartCAS?.(row)} 
-            className="text-slate-400 hover:text-bk-yellow"
-          />
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            icon="terminal" 
-            title="View Real-time SQL Logs" 
-            onClick={() => onViewSQLLog?.(row)} 
-            className="text-slate-400 hover:text-sky-500"
-          />
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            icon="timer_off" 
-            title="Analyze Slow Query Logs" 
-            onClick={() => onViewSlowQueryLog?.(row)} 
-            className="text-slate-400 hover:text-rose-500"
-          />
+        <div className="flex items-center gap-1">
+          <button onClick={() => onRestartCAS?.(row)} title="Restart CAS" className="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-white/5 text-slate-400 hover:text-amber-500 transition-colors">
+            <Icon name="restart_alt" size="sm" weight={300} />
+          </button>
+          <button onClick={() => onViewSQLLog?.(row)} title="SQL Logs" className="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-white/5 text-slate-400 hover:text-sky-500 transition-colors">
+            <Icon name="terminal" size="sm" weight={300} />
+          </button>
+          <button onClick={() => onViewSlowQueryLog?.(row)} title="Slow Query Logs" className="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-white/5 text-slate-400 hover:text-rose-500 transition-colors">
+            <Icon name="timer_off" size="sm" weight={300} />
+          </button>
         </div>
       )
     },
   ];
 
-  const cardTitle = (
-    <div className="flex items-center justify-between w-full">
-      <div className="flex items-center gap-2">
-        <Icon name="dns" size="sm" weight={300} className="text-bk-yellow" />
-        <span>Application Server Brokers (CAS)</span>
-        <div className="flex items-center gap-3 ml-4 bg-slate-100 dark:bg-black/20 px-3 py-1 rounded-full border border-slate-200 dark:border-white/5">
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_4px_rgba(16,185,129,0.5)]"></span>
-            <span className="font-bold text-slate-500 uppercase tracking-tight text-[10px]">Ready: {brokersCAS.filter(c => c.status === 'READY').length}</span>
-          </div>
-          <div className="w-[1px] h-3 bg-slate-200 dark:bg-white/10"></div>
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-            <span className="font-bold text-slate-500 uppercase tracking-tight text-[10px]">Busy: {brokersCAS.filter(c => c.status !== 'READY').length}</span>
+  return (
+    <Card
+      title={
+        <div className="flex items-center gap-3">
+          <Icon name="dns" size="sm" weight={300} className="text-amber-500" />
+          <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">CAS Brokers</span>
+          <div className="flex items-center gap-2 ml-2">
+            <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              {readyCount} ready
+            </span>
+            <span className="text-slate-200 dark:text-white/10">·</span>
+            <span className="flex items-center gap-1 text-[10px] font-bold text-amber-600 dark:text-amber-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+              {busyCount} busy
+            </span>
           </div>
         </div>
-      </div>
-    </div>
-  );
-
-  return (
-    <Card title={cardTitle} bodyClassName="p-0" collapsible={true}>
-      <Table 
-        columns={columns}
-        data={brokersCAS}
-      />
+      }
+      bodyClassName="p-0"
+      collapsible
+    >
+      <Table columns={columns} data={brokersCAS} />
     </Card>
   );
 }

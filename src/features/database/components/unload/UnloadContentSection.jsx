@@ -1,93 +1,102 @@
 import { Icon } from '../../../../components/ds/foundation/Icon';
-import { Typography } from '../../../../components/ds/foundation/Typography';
 import { Checkbox } from '../../../../components/ds/forms/Checkbox';
 
-export default function UnloadContentSection({ 
-  formData, 
-  handleInputChange, 
-  handleSchemaChange, 
-  handleTableToggle, 
-  dynamicTables, 
-  isTablesLoading 
+const RadioOption = ({ label, checked, onClick }) => (
+  <div
+    className="flex items-center gap-2.5 cursor-pointer group py-1"
+    onClick={onClick}
+  >
+    <div className={`w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center transition-all shrink-0
+      ${checked ? 'border-amber-500' : 'border-slate-300 dark:border-slate-600 group-hover:border-slate-400'}`}
+    >
+      {checked && <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />}
+    </div>
+    <span className={`text-[12px] font-medium transition-colors ${checked ? 'text-slate-800 dark:text-slate-100' : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-400'}`}>
+      {label}
+    </span>
+  </div>
+);
+
+const SectionHeader = ({ label }) => (
+  <div className="flex items-center gap-3 mb-4">
+    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">{label}</span>
+    <div className="flex-1 h-px bg-slate-100 dark:bg-white/[0.05]" />
+  </div>
+);
+
+export default function UnloadContentSection({
+  formData,
+  handleInputChange,
+  handleSchemaChange,
+  handleTableToggle,
+  dynamicTables,
+  isTablesLoading
 }) {
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-3">
-        <Typography variant="caption" className="font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest pl-1">Unload parameters</Typography>
-        <div className="flex-1 h-[1px] bg-slate-100 dark:bg-white/5"></div>
-      </div>
-      
-      <div className="grid grid-cols-2 gap-4">
-        {/* Schema Option Panel */}
-        <div className="bg-slate-50/50 dark:bg-bk-main/20 p-4 rounded-2xl border border-slate-100 dark:border-white/5 space-y-4">
-          <div className="flex items-center gap-2.5">
-            <div className="w-6 h-6 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
-              <Icon name="terminal" size="xs" weight={300} className="text-bk-yellow" />
+    <div>
+      <SectionHeader label="Unload Parameters" />
+
+      {/* Schema + Data option panels */}
+      <div className="grid grid-cols-2 gap-3 mb-4">
+        {/* Objects / Schema */}
+        <div className="bg-slate-50 dark:bg-white/[0.02] rounded-lg border border-slate-200 dark:border-white/[0.05] p-3.5 space-y-1">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-5 h-5 rounded bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
+              <Icon name="terminal" size="sm" weight={300} className="text-amber-500" style={{ fontSize: '11px' }} />
             </div>
-            <Typography variant="label" className="font-bold text-slate-900 dark:text-white uppercase tracking-wider">Objects</Typography>
+            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Objects</span>
           </div>
-          <div className="space-y-2.5">
-            {['All', 'Selected tables', 'Not include'].map(opt => (
-              <div 
-                key={opt} 
-                className="flex items-center gap-3 cursor-pointer group"
-                onClick={() => handleSchemaChange({ target: { name: 'schemaOption', value: opt } })}
-              >
-                <div className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center transition-all ${formData.schemaOption === opt ? 'border-bk-yellow' : 'border-slate-300 dark:border-slate-600'}`}>
-                  {formData.schemaOption === opt && <div className="w-1.5 h-1.5 rounded-full bg-bk-yellow shadow-[0_0_8px_rgba(255,215,0,0.6)]"></div>}
-                </div>
-                <Typography variant="p" className={`transition-colors font-medium ${formData.schemaOption === opt ? 'text-slate-900 dark:text-white' : 'text-slate-400'}`}>Schema: {opt}</Typography>
-              </div>
-            ))}
-          </div>
+          {['All', 'Selected tables', 'Not include'].map(opt => (
+            <RadioOption
+              key={opt}
+              label={`Schema: ${opt}`}
+              checked={formData.schemaOption === opt}
+              onClick={() => handleSchemaChange({ target: { name: 'schemaOption', value: opt } })}
+            />
+          ))}
         </div>
 
-        {/* Data Option Panel */}
-        <div className="bg-slate-50/50 dark:bg-bk-main/20 p-4 rounded-2xl border border-slate-100 dark:border-white/5 space-y-4">
-          <div className="flex items-center gap-2.5">
-            <div className="w-6 h-6 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
-              <Icon name="dataset" size="xs" weight={300} className="text-bk-yellow" />
+        {/* Data */}
+        <div className="bg-slate-50 dark:bg-white/[0.02] rounded-lg border border-slate-200 dark:border-white/[0.05] p-3.5 space-y-1">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-5 h-5 rounded bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
+              <Icon name="dataset" size="sm" weight={300} className="text-amber-500" style={{ fontSize: '11px' }} />
             </div>
-            <Typography variant="label" className="font-bold text-slate-900 dark:text-white uppercase tracking-wider">Data</Typography>
+            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Data</span>
           </div>
-          <div className="space-y-2.5">
-            {['Selected tables', 'Not include'].map(opt => (
-              <div 
-                key={opt} 
-                className="flex items-center gap-3 cursor-pointer group"
-                onClick={() => handleInputChange({ target: { name: 'dataOption', value: opt } })}
-              >
-                <div className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center transition-all ${formData.dataOption === opt ? 'border-bk-yellow' : 'border-slate-300 dark:border-slate-600'}`}>
-                  {formData.dataOption === opt && <div className="w-1.5 h-1.5 rounded-full bg-bk-yellow shadow-[0_0_8px_rgba(255,215,0,0.6)]"></div>}
-                </div>
-                <Typography variant="p" className={`transition-colors font-medium ${formData.dataOption === opt ? 'text-slate-900 dark:text-white' : 'text-slate-400'}`}>Data: {opt}</Typography>
-              </div>
-            ))}
-          </div>
+          {['Selected tables', 'Not include'].map(opt => (
+            <RadioOption
+              key={opt}
+              label={`Data: ${opt}`}
+              checked={formData.dataOption === opt}
+              onClick={() => handleInputChange({ target: { name: 'dataOption', value: opt } })}
+            />
+          ))}
         </div>
       </div>
 
-      <div className="border border-slate-100 dark:border-white/5 rounded-2xl bg-white dark:bg-bk-side/30 overflow-hidden flex flex-col shadow-sm">
-        <div className="px-4 py-2.5 bg-slate-50/50 dark:bg-bk-main/40 border-b border-slate-100 dark:border-white/5 flex items-center justify-between">
-          <Typography variant="caption" className="font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest pl-1">Available classes</Typography>
-          <div className="px-2 py-0.5 rounded bg-bk-yellow/10 border border-bk-yellow/20">
-            <Typography variant="caption" className="font-black text-bk-yellow tabular-nums">{formData.selectedTables.length} selected</Typography>
-          </div>
+      {/* Class table picker */}
+      <div className="border border-slate-200 dark:border-white/[0.05] rounded-lg bg-white dark:bg-white/[0.01] overflow-hidden">
+        <div className="px-3.5 py-2 bg-slate-50 dark:bg-white/[0.02] border-b border-slate-200 dark:border-white/[0.05] flex items-center justify-between">
+          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Available Classes</span>
+          <span className="px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-[10px] font-bold text-amber-600 dark:text-amber-400 font-mono">
+            {formData.selectedTables.length} selected
+          </span>
         </div>
         <div className="max-h-[160px] overflow-y-auto p-3 custom-scrollbar">
           {isTablesLoading ? (
-            <div className="flex flex-col items-center justify-center py-8 gap-3">
-              <div className="w-5 h-5 border-2 border-bk-yellow/10 border-t-bk-yellow rounded-full animate-spin"></div>
-              <Typography variant="p" className="text-slate-400 dark:text-slate-500 font-medium tracking-wide">Fetching schema metadata...</Typography>
+            <div className="flex flex-col items-center justify-center py-8 gap-2">
+              <div className="w-5 h-5 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+              <span className="text-[11px] text-slate-400">Fetching schema…</span>
             </div>
           ) : dynamicTables.length === 0 ? (
             <div className="py-8 text-center">
-              <Typography variant="p" className="text-slate-400 dark:text-slate-500 italic font-medium">No system class objects detected.</Typography>
+              <span className="text-[12px] text-slate-400 italic">No class objects detected.</span>
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-y-1 gap-x-4">
               {dynamicTables.map(table => (
-                <Checkbox 
+                <Checkbox
                   key={table}
                   label={table}
                   checked={formData.selectedTables.includes(table)}
