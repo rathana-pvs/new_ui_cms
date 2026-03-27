@@ -136,7 +136,7 @@ function LogViewer({ hostUid, path }) {
   return (
     <div className="flex-1 flex flex-col bg-slate-50 dark:bg-bk-main overflow-hidden">
       {/* Log Header / Toolbar */}
-      <div className="flex-shrink-0 px-4 py-2.5 bg-white dark:bg-bk-side border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+      <div className="shrink-0 px-4 py-2.5 bg-white dark:bg-bk-side border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center">
             <Icon name="description" size="sm" weight={300} className="text-amber-600 dark:text-bk-yellow" />
@@ -184,7 +184,7 @@ function LogViewer({ hostUid, path }) {
       </div>
 
       {/* Log Content Area */}
-      <div className="flex-1 overflow-auto bg-white dark:bg-[#1e1e1e] selection:bg-bk-yellow/30 relative">
+      <div className="flex-1 overflow-auto bg-white dark:bg-bk-side selection:bg-bk-yellow/30 relative">
         {logState?.loading && logState?.data && (
           <div className="absolute inset-0 bg-black/5 dark:bg-black/20 backdrop-blur-[1px] flex items-center justify-center z-10">
             <div className="w-8 h-8 border-2 border-bk-yellow/20 border-t-bk-yellow rounded-full animate-spin"></div>
@@ -197,7 +197,7 @@ function LogViewer({ hostUid, path }) {
           ) : (
             logLines.map((line, idx) => (
               <div key={idx} className="flex hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group">
-                <div className="w-14 flex-shrink-0 text-right pr-4 text-slate-400 dark:text-slate-500 select-none border-r border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-[#1e1e1e] sticky left-0 group-hover:text-slate-500 dark:group-hover:text-slate-400">
+                <div className="w-14 shrink-0 text-right pr-4 text-slate-400 dark:text-slate-500 select-none border-r border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-bk-side sticky left-0 group-hover:text-slate-500 dark:group-hover:text-slate-400">
                   {startLine + idx}
                 </div>
                 <div className="px-4 text-slate-700 dark:text-slate-300 whitespace-pre min-w-0 flex-1">
@@ -210,7 +210,7 @@ function LogViewer({ hostUid, path }) {
       </div>
 
       {/* Footer / Stats */}
-      <div className="flex-shrink-0 px-4 py-2 bg-white dark:bg-bk-side border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider">
+      <div className="shrink-0 px-4 py-2 bg-white dark:bg-bk-side border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider">
         <div className="flex items-center gap-4">
           <span>Format: UTF-8</span>
           <span>Page: {currentPage} / {Math.ceil(totalLines / pageSize) || 1}</span>

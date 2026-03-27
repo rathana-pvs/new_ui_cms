@@ -46,11 +46,11 @@ export const Select = ({
           type="button"
           disabled={disabled}
           onClick={() => !disabled && setIsOpen(!isOpen)}
-          className={`relative w-full pl-3.5 pr-10 h-10 text-[13px] font-medium text-left bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 rounded-xl focus:outline-none transition-all flex items-center ${
+          className={`relative w-full pl-3.5 pr-10 h-10 text-[13px] font-medium text-left bg-slate-50 dark:bg-white/3 border border-slate-200 dark:border-white/10 rounded-xl focus:outline-hidden transition-all flex items-center ${
             error 
               ? 'border-rose-500/50' 
               : isOpen 
-                ? 'border-bk-yellow/50 dark:border-bk-yellow/50 bg-bk-yellow/[0.02] dark:bg-bk-yellow/[0.04]' 
+                ? 'border-bk-yellow/50 dark:border-bk-yellow/50 bg-bk-yellow/2 dark:bg-bk-yellow/4' 
                 : 'hover:border-slate-300/60 dark:hover:border-white/20'
           } ${
             disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
@@ -70,7 +70,7 @@ export const Select = ({
 
 
         {isOpen && (
-          <div className="absolute z-[100] w-full mt-1 bg-white dark:bg-[#1A1C1E] border border-slate-200 dark:border-white/10 rounded-lg shadow-[0_12px_40px_rgba(0,0,0,0.3)] overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150">
+          <div className="absolute z-100 w-full mt-1 bg-white dark:bg-[#1A1C1E] border border-slate-200 dark:border-white/10 rounded-lg shadow-[0_12px_40px_rgba(0,0,0,0.3)] overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150">
             <div className="p-1 max-h-[220px] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-white/10 scrollbar-track-transparent flex flex-col gap-0.5">
               {options.length === 0 ? (
                 <div className="px-3 py-2 text-[10px] text-slate-400 italic">No options available</div>
@@ -81,8 +81,8 @@ export const Select = ({
                     onClick={() => handleSelect(opt)}
                     className={`flex items-center justify-between px-3 h-9 rounded-lg text-[13px] font-bold transition-all cursor-pointer group relative overflow-hidden ${
                       opt.value === value
-                        ? 'bg-bk-yellow/10 text-bk-yellow shadow-sm border border-bk-yellow/20'
-                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/[0.06] hover:text-slate-900 dark:hover:text-white'
+                        ? 'bg-bk-yellow/10 text-bk-yellow shadow-xs border border-bk-yellow/20'
+                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/6 hover:text-slate-900 dark:hover:text-white'
                     } ${
                       opt.disabled ? 'opacity-30 cursor-not-allowed' : ''
                     }`}

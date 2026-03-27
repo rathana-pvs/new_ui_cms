@@ -56,14 +56,14 @@ export default function TransactionInfoModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-2000 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity"
         onClick={() => dispatch(closeTransactionInfoModal())}
       />
 
-      <div className="relative bg-white dark:bg-background-dark w-full max-w-4xl rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-white/[0.08] overflow-hidden transform transition-all flex flex-col max-h-[90vh] text-left animate-in zoom-in-95 duration-200">
+      <div className="relative bg-white dark:bg-background-dark w-full max-w-4xl rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-white/8 overflow-hidden transform transition-all flex flex-col max-h-[90vh] text-left animate-in zoom-in-95 duration-200">
         
         {/* Subtle Top Accent */}
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-amber-500/60"></div>
@@ -81,7 +81,7 @@ export default function TransactionInfoModal() {
         />
         
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-white/[0.06] bg-slate-50/50 dark:bg-white/[0.02] shrink-0">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-white/6 bg-slate-50/50 dark:bg-white/2 shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center border border-amber-500/20">
               <Icon name="swap_horiz" size="sm" weight={300} className="text-amber-500" />
@@ -104,13 +104,13 @@ export default function TransactionInfoModal() {
               <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] whitespace-nowrap">
                 Database: <span className="text-amber-500">{selectedDatabase}</span>
               </span>
-              <div className="flex-1 h-px bg-slate-100 dark:bg-white/[0.06]"></div>
+              <div className="flex-1 h-px bg-slate-100 dark:bg-white/6"></div>
             </div>
 
-            <div className="border border-slate-200 dark:border-white/[0.08] rounded-lg overflow-hidden bg-white dark:bg-white/[0.01]">
+            <div className="border border-slate-200 dark:border-white/8 rounded-lg overflow-hidden bg-white dark:bg-white/1">
               <div className="overflow-x-auto custom-scrollbar">
                 <table className="w-full text-left border-collapse">
-                  <thead className="bg-slate-50/50 dark:bg-white/[0.03] text-[11px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 dark:border-white/[0.06]">
+                  <thead className="bg-slate-50/50 dark:bg-white/3 text-[11px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 dark:border-white/6">
                     <tr>
                       <th className="px-4 py-3">Idx</th>
                       <th className="px-4 py-3">User Session</th>
@@ -120,7 +120,7 @@ export default function TransactionInfoModal() {
                       <th className="px-4 py-3 text-right">Exec Time</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-white/[0.04]">
+                  <tbody className="divide-y divide-slate-100 dark:divide-white/4">
                   {loading && transactions.length === 0 ? (
                       <tr>
                         <td colSpan="6" className="px-4 py-16">
@@ -139,7 +139,7 @@ export default function TransactionInfoModal() {
                         return (
                           <tr 
                             key={idx} 
-                            className={`cursor-pointer transition-colors group ${isSelected ? 'bg-amber-500/5 dark:bg-amber-500/10' : 'hover:bg-slate-50 dark:hover:bg-white/[0.02]'}`}
+                            className={`cursor-pointer transition-colors group ${isSelected ? 'bg-amber-500/5 dark:bg-amber-500/10' : 'hover:bg-slate-50 dark:hover:bg-white/2'}`}
                             onClick={() => setSelectedTranIndex(tranIndex)}
                           >
                             <td className="px-4 py-3">
@@ -164,7 +164,7 @@ export default function TransactionInfoModal() {
                               {tran.host}
                             </td>
                             <td className="px-4 py-3 text-center">
-                              <span className="bg-slate-100 dark:bg-white/[0.06] px-2 py-0.5 rounded text-[11px] font-mono font-bold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/[0.1]">
+                              <span className="bg-slate-100 dark:bg-white/6 px-2 py-0.5 rounded-sm text-[11px] font-mono font-bold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10">
                                 {tran.pid}
                               </span>
                             </td>
@@ -197,7 +197,7 @@ export default function TransactionInfoModal() {
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 bg-slate-50/50 dark:bg-white/[0.03] backdrop-blur-md flex items-center justify-between border-t border-slate-100 dark:border-white/[0.06] shrink-0">
+        <div className="px-6 py-4 bg-slate-50/50 dark:bg-white/3 backdrop-blur-md flex items-center justify-between border-t border-slate-100 dark:border-white/6 shrink-0">
           <div className="flex items-center gap-3">
             <button 
               disabled={!selectedTranIndex || loading}
@@ -211,7 +211,7 @@ export default function TransactionInfoModal() {
 
           <div className="flex items-center gap-3">
             <button 
-              className="px-5 py-2 text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/[0.08] rounded-lg hover:bg-white dark:hover:bg-white/[0.04] hover:text-slate-700 dark:hover:text-slate-200 transition-all active:scale-95"
+              className="px-5 py-2 text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/8 rounded-lg hover:bg-white dark:hover:bg-white/4 hover:text-slate-700 dark:hover:text-slate-200 transition-all active:scale-95"
               onClick={() => dispatch(closeTransactionInfoModal())}
             >
               Discard

@@ -33,7 +33,7 @@ export default function ConfigTableEditor({
                 <tr 
                   key={rowIdx} 
                   className={`group transition-colors ${
-                    (selectedCell.row === rowIdx) ? 'bg-emerald-500/[0.03]' : 'odd:bg-white dark:odd:bg-[#1a1c1e] even:bg-slate-50/[0.1] dark:even:bg-white/[0.01]'
+                    (selectedCell.row === rowIdx) ? 'bg-emerald-500/3' : 'odd:bg-white dark:odd:bg-[#1a1c1e] even:bg-slate-50/10 dark:even:bg-white/1'
                   }`}
                 >
                   <td className={`p-0 border border-slate-200 dark:border-white/5 font-medium ${
@@ -50,7 +50,7 @@ export default function ConfigTableEditor({
                         type="text"
                         value={key}
                         onChange={(e) => handleKeyChange(key, e.target.value)}
-                        className="w-full px-4 py-2 bg-transparent outline-none text-slate-700 dark:text-slate-300 text-[13px] font-medium transition-all focus:bg-white dark:focus:bg-white/5"
+                        className="w-full px-4 py-2 bg-transparent outline-hidden text-slate-700 dark:text-slate-300 text-[13px] font-medium transition-all focus:bg-white dark:focus:bg-white/5"
                         placeholder="Property Name"
                       />
                     )}
@@ -65,7 +65,7 @@ export default function ConfigTableEditor({
                         key={colIdx} 
                         onClick={() => setSelectedCell({ row: rowIdx, col: colIdx })}
                         className={`p-0 border border-slate-200 dark:border-white/5 relative ${
-                            isSelected ? 'bg-emerald-500/[0.08]' : ''
+                            isSelected ? 'bg-emerald-500/8' : ''
                         }`}
                       >
                         {isBoolean ? (
@@ -73,7 +73,7 @@ export default function ConfigTableEditor({
                             value={currentValue.toUpperCase()}
                             onChange={(val) => handleValueChange(colIdx, key, val)}
                             isHighlight={true}
-                            triggerClassName="!h-9 !border-0 bg-transparent !text-[13px]"
+                            triggerClassName="h-9! border-0! bg-transparent text-[13px]!"
                             options={[
                               { value: 'ON', label: 'ON' },
                               { value: 'OFF', label: 'OFF' }
@@ -84,7 +84,7 @@ export default function ConfigTableEditor({
                             type="text"
                             value={currentValue}
                             onChange={(e) => handleValueChange(colIdx, key, e.target.value)}
-                            className={`w-full px-4 py-2 bg-transparent outline-none transition-all text-[13px] ${
+                            className={`w-full px-4 py-2 bg-transparent outline-hidden transition-all text-[13px] ${
                                 isSelected ? 'text-slate-900 dark:text-white font-bold' : 'text-slate-800 dark:text-slate-400'
                             } ${key === 'BROKER_NAME' ? 'text-blue-600 dark:text-blue-400 font-bold italic' : ''}`}
                           />

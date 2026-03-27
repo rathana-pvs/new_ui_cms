@@ -105,11 +105,11 @@ export default function CompactDatabaseModal() {
               <div key={i} className="flex items-start gap-4 group">
                 {/* Step indicator column */}
                 <div className="flex flex-col items-center shrink-0">
-                  <div className="w-8 h-8 rounded-xl bg-bk-yellow/10 border border-bk-yellow/20 flex items-center justify-center text-bk-yellow shadow-sm group-hover:shadow-[0_0_12px_rgba(255,215,0,0.15)] transition-shadow">
+                  <div className="w-8 h-8 rounded-xl bg-bk-yellow/10 border border-bk-yellow/20 flex items-center justify-center text-bk-yellow shadow-xs group-hover:shadow-[0_0_12px_rgba(255,215,0,0.15)] transition-shadow">
                     <Icon name={step.icon} size="xs" weight={300} />
                   </div>
                   {i < pipelineSteps.length - 1 && (
-                    <div className="w-[1px] h-6 bg-gradient-to-b from-bk-yellow/30 to-transparent my-1"></div>
+                    <div className="w-px h-6 bg-linear-to-b from-bk-yellow/30 to-transparent my-1"></div>
                   )}
                 </div>
                 {/* Content */}
@@ -133,7 +133,7 @@ export default function CompactDatabaseModal() {
           </div>
 
           <div 
-            className={`flex items-center gap-4 p-4 border rounded-2xl transition-all cursor-pointer select-none ${verbose ? 'bg-bk-yellow/[0.04] border-bk-yellow/20 shadow-[0_2px_16px_rgba(255,188,4,0.06)]' : 'bg-white dark:bg-white/[0.02] border-slate-100 dark:border-white/5 hover:border-slate-200 dark:hover:border-white/10'}`}
+            className={`flex items-center gap-4 p-4 border rounded-2xl transition-all cursor-pointer select-none ${verbose ? 'bg-bk-yellow/4 border-bk-yellow/20 shadow-[0_2px_16px_rgba(255,188,4,0.06)]' : 'bg-white dark:bg-white/2 border-slate-100 dark:border-white/5 hover:border-slate-200 dark:hover:border-white/10'}`}
             onClick={() => setVerbose(!verbose)}
           >
             <div className={`w-9 h-9 rounded-xl flex items-center justify-center border transition-all shrink-0 ${verbose ? 'bg-bk-yellow/10 border-bk-yellow/20 text-bk-yellow' : 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/5 text-slate-400'}`}>
@@ -149,7 +149,7 @@ export default function CompactDatabaseModal() {
             </div>
             <div className="shrink-0">
               <Checkbox 
-                className="!w-fit"
+                className="w-fit!"
                 checked={verbose}
                 onChange={(e) => setVerbose(e.target.checked)}
               />

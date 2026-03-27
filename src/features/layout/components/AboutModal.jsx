@@ -22,16 +22,16 @@ export default function AboutModal() {
       className="p-0 overflow-hidden border-none shadow-2xl"
     >
       {/* Dynamic Header with Premium Gradients */}
-      <div className="h-28 bg-gradient-to-br from-bk-main via-slate-900 to-black relative flex items-center justify-center overflow-hidden">
+      <div className="h-28 bg-linear-to-br from-bk-main via-slate-900 to-black relative flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-30 mix-blend-overlay"></div>
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-bk-side/50"></div>
+        <div className="absolute top-0 left-0 w-full h-full bg-linear-to-b from-transparent to-bk-side/50"></div>
         
         {/* Animated Background Orbs */}
         <div className="absolute -top-10 -left-10 w-32 h-32 bg-bk-yellow/10 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-bk-yellow/5 rounded-full blur-3xl animate-pulse delay-700"></div>
 
         <div className="relative z-10 translate-y-8 animate-in slide-in-from-bottom-4 duration-500">
-          <div className="w-20 h-20 bg-white dark:bg-bk-side rounded-[2rem] flex items-center justify-center shadow-2xl border-4 border-white dark:border-bk-side ring-1 ring-slate-100 dark:ring-white/5 overflow-hidden">
+          <div className="w-20 h-20 bg-white dark:bg-bk-side rounded-4xl flex items-center justify-center shadow-2xl border-4 border-white dark:border-bk-side ring-1 ring-slate-100 dark:ring-white/5 overflow-hidden">
              <img src="/cubrid-logo.png" alt="CUBRID Logo" className="w-12 h-12 object-contain" />
           </div>
         </div>
@@ -54,7 +54,7 @@ export default function AboutModal() {
 
         <div className="relative group grayscale hover:grayscale-0 transition-all duration-500">
           <div className="absolute inset-0 bg-bk-yellow/5 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div className="relative text-xs text-slate-500 dark:text-slate-400 font-bold leading-loose px-6 py-5 bg-slate-50 dark:bg-white/[0.03] rounded-3xl border border-slate-200/50 dark:border-white/5 italic shadow-inner">
+          <div className="relative text-xs text-slate-500 dark:text-slate-400 font-bold leading-loose px-6 py-5 bg-slate-50 dark:bg-white/3 rounded-3xl border border-slate-200/50 dark:border-white/5 italic shadow-inner">
             "CUBRID represents the bridge between raw data silos and actionable insights. Our engine is engineered for mission-critical performance, driving the world's most demanding database environments with absolute reliability."
           </div>
         </div>

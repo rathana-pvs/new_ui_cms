@@ -72,7 +72,7 @@ export function SubMenu({ icon, iconColor = '', label, children, width = 'w-56',
           className={`absolute ${position.y === 'bottom' ? 'top-0' : 'bottom-0'} 
             ${position.x === 'right' ? 'left-full ml-1' : 'right-full mr-1'} 
             ${width} bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-xl 
-            shadow-[0_4px_20px_rgba(0,0,0,0.15)] p-1.5 z-[1000] animate-in fade-in transition-all duration-200
+            shadow-[0_4px_20px_rgba(0,0,0,0.15)] p-1.5 z-1000 animate-in fade-in transition-all duration-200
             ${isPositioned ? 'opacity-100 scale-100' : 'opacity-0 scale-95 origin-left'}`}
         >
           {/* Subtle Decorative Side Bar */}
@@ -141,11 +141,11 @@ export function DropdownMenu({ label, children, width = 'w-52' }) {
           ref={menuRef}
           className={`absolute ${align === 'left' ? 'left-0' : 'right-0'} top-full mt-2
             ${width} bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-xl 
-            shadow-[0_4px_25px_rgba(0,0,0,0.2)] p-1.5 z-[1000] animate-in fade-in transition-all duration-200
+            shadow-[0_4px_25px_rgba(0,0,0,0.2)] p-1.5 z-1000 animate-in fade-in transition-all duration-200
             ${isPositioned ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 -translate-y-2 scale-95'}`}
         >
           {/* Subtle Top Accent */}
-          <div className="absolute top-0 left-4 right-4 h-[2px] bg-gradient-to-r from-transparent via-bk-yellow/30 to-transparent"></div>
+          <div className="absolute top-0 left-4 right-4 h-[2px] bg-linear-to-r from-transparent via-bk-yellow/30 to-transparent"></div>
           
           <div className="space-y-0.5">
             {children}
@@ -200,7 +200,7 @@ export function MenuItem({ icon, iconColor = '', label, onClick, href, disabled 
 export function MenuDivider() {
   return (
     <div className="px-3 py-1.5 flex items-center gap-2 opacity-50">
-      <div className="h-px flex-1 bg-gradient-to-r from-slate-100 dark:from-slate-800 to-transparent"></div>
+      <div className="h-px flex-1 bg-linear-to-r from-slate-100 dark:from-slate-800 to-transparent"></div>
       <div className="flex gap-1">
         <div className="w-1 h-1 rounded-full bg-slate-200 dark:bg-slate-800"></div>
         <div className="w-1 h-1 rounded-full bg-slate-200 dark:bg-slate-800"></div>

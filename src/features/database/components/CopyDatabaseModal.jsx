@@ -147,7 +147,7 @@ export default function CopyDatabaseModal() {
                 <Typography variant="caption" className="text-slate-400">MB (Free)</Typography>
               </div>
             </div>
-            <div className="w-[1px] h-10 bg-bk-yellow/20"></div>
+            <div className="w-px h-10 bg-bk-yellow/20"></div>
             <div className="space-y-1 text-right">
               <Typography variant="caption" className="text-slate-400 dark:text-slate-500 font-medium">Database footprint</Typography>
               <div className="flex items-baseline gap-1.5 justify-end">

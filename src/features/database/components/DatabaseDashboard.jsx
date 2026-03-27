@@ -139,12 +139,12 @@ export default function DatabaseDashboard({ dbname }) {
     document.body.removeChild(link);
   };
 
-  const btnCls = "h-8 flex items-center justify-center rounded border transition-all active:scale-[0.98]";
-  const iconBtnCls = `${btnCls} w-8 bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/[0.06] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200`;
+  const btnCls = "h-8 flex items-center justify-center rounded-sm border transition-all active:scale-[0.98]";
+  const iconBtnCls = `${btnCls} w-8 bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/6 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200`;
 
   return (
     <div className="flex-1 flex flex-col h-full bg-white dark:bg-background-dark overflow-hidden font-sans">
-      <header className="px-6 py-3 border-b border-slate-100 dark:border-white/[0.04] flex items-center justify-between shrink-0 sticky top-0 z-20 bg-white dark:bg-background-dark">
+      <header className="px-6 py-3 border-b border-slate-100 dark:border-white/4 flex items-center justify-between shrink-0 sticky top-0 z-20 bg-white dark:bg-background-dark">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
             <Icon name="database" size="sm" weight={300} className="text-amber-500" />
@@ -164,7 +164,7 @@ export default function DatabaseDashboard({ dbname }) {
           <button
             onClick={() => setAutoRefresh(!autoRefresh)}
             title={autoRefresh ? 'Live monitoring active' : 'Auto refresh off'}
-            className={`${btnCls} px-2.5 gap-1.5 text-[11px] font-semibold ${autoRefresh ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20' : 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/[0.06] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'}`}
+            className={`${btnCls} px-2.5 gap-1.5 text-[11px] font-semibold ${autoRefresh ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20' : 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/6 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'}`}
           >
             <Icon name={autoRefresh ? 'sync' : 'sync_disabled'} size="16px" weight={300} />
             {autoRefresh ? 'Live' : 'Paused'}
@@ -179,11 +179,11 @@ export default function DatabaseDashboard({ dbname }) {
             <Icon name="refresh" size="16px" weight={300} className={isLoading ? 'animate-spin' : ''} />
           </button>
 
-          <div className="w-px h-5 bg-slate-200 dark:bg-white/[0.08]" />
+          <div className="w-px h-5 bg-slate-200 dark:bg-white/8" />
 
           <button
             onClick={() => setShowSettings(!showSettings)}
-            className={`${btnCls} w-8 transition-all ${showSettings ? 'bg-amber-500/10 border-amber-500/20 text-amber-500' : 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/[0.06] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
+            className={`${btnCls} w-8 transition-all ${showSettings ? 'bg-amber-500/10 border-amber-500/20 text-amber-500' : 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/6 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
             title="Dashboard settings"
           >
             <Icon name="tune" size="16px" weight={300} />
@@ -200,7 +200,7 @@ export default function DatabaseDashboard({ dbname }) {
       </header>
 
       {showSettings && (
-        <div className="mx-6 mt-4 p-4 bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.06] rounded-xl flex items-center gap-6">
+        <div className="mx-6 mt-4 p-4 bg-white dark:bg-white/2 border border-slate-200 dark:border-white/6 rounded-xl flex items-center gap-6">
           <div className="flex items-center gap-2 shrink-0">
             <Icon name="tune" size="sm" weight={300} className="text-amber-500" />
             <Typography variant="label" className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Auto Refresh</Typography>
@@ -221,7 +221,7 @@ export default function DatabaseDashboard({ dbname }) {
           <Typography variant="label" className="text-[10px] text-slate-400 italic leading-relaxed">
             Lower intervals increase polling frequency and may impact server performance.
           </Typography>
-          <button onClick={() => setShowSettings(false)} className="ml-auto p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors shrink-0">
+          <button onClick={() => setShowSettings(false)} className="ml-auto p-1 rounded-sm text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors shrink-0">
             <Icon name="close" size="sm" weight={300} />
           </button>
         </div>

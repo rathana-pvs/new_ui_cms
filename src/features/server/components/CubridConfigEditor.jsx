@@ -110,7 +110,7 @@ export default function CubridConfigEditor({ hostUid, confname }) {
   return (
     <div className="flex-1 flex flex-col bg-slate-50 dark:bg-bk-main overflow-hidden font-sans transition-colors">
       {/* ToolBar */}
-      <div className="flex items-center justify-between px-6 py-2 border-b border-slate-200 dark:border-white/5 bg-white dark:bg-bk-side shadow-sm">
+      <div className="flex items-center justify-between px-6 py-2 border-b border-slate-200 dark:border-white/5 bg-white dark:bg-bk-side shadow-xs">
         <div className="flex items-center gap-3">
           <div className="size-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
             <Icon name="settings_applications" size="20px" className="text-bk-yellow"  weight={300} />
@@ -123,7 +123,7 @@ export default function CubridConfigEditor({ hostUid, confname }) {
 
         <div className="flex items-center gap-4">
           {hasChanges && (
-            <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-amber-500/10 border border-amber-500/20 animate-pulse">
+            <div className="flex items-center gap-1.5 px-2 py-1 rounded-sm bg-amber-500/10 border border-amber-500/20 animate-pulse">
               <span className="size-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"></span>
               <Typography variant="span" className="text-[10px] font-bold text-amber-600 dark:text-amber-500 uppercase tracking-tighter">Modified</Typography>
             </div>
@@ -202,7 +202,7 @@ export default function CubridConfigEditor({ hostUid, confname }) {
                 onChange={handleContentChange}
                 onScroll={syncScroll}
                 spellCheck="false"
-                className="absolute inset-0 w-full h-full bg-transparent p-6 font-mono text-[13px] leading-relaxed text-transparent caret-slate-800 dark:caret-bk-yellow outline-none resize-none custom-scrollbar whitespace-pre-wrap break-all overflow-auto"
+                className="absolute inset-0 w-full h-full bg-transparent p-6 font-mono text-[13px] leading-relaxed text-transparent caret-slate-800 dark:caret-bk-yellow outline-hidden resize-none custom-scrollbar whitespace-pre-wrap break-all overflow-auto"
                 placeholder="# Enter configuration variables here..."
               />
             </div>

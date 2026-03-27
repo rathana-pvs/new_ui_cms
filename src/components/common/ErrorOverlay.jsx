@@ -6,7 +6,7 @@ const ErrorOverlay = ({ isVisible, error, title = "Operation Failed", onRetry, o
   if (!isVisible || !error) return null;
 
   return (
-    <div className="absolute inset-0 z-[200] flex flex-col items-center justify-center bg-white dark:bg-[#1e2230] animate-in fade-in duration-200 overflow-hidden">
+    <div className="absolute inset-0 z-200 flex flex-col items-center justify-center bg-white dark:bg-[#1e2230] animate-in fade-in duration-200 overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none">
         <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
@@ -43,7 +43,7 @@ const ErrorOverlay = ({ isVisible, error, title = "Operation Failed", onRetry, o
             {onRetry && (
                 <button 
                 onClick={onRetry}
-                className="px-6 py-2 bg-rose-500 hover:bg-rose-600 text-white text-[11px] font-medium rounded shadow-lg shadow-rose-500/20 transition-all active:scale-95 tracking-wide flex items-center gap-2"
+                className="px-6 py-2 bg-rose-500 hover:bg-rose-600 text-white text-[11px] font-medium rounded-sm shadow-lg shadow-rose-500/20 transition-all active:scale-95 tracking-wide flex items-center gap-2"
                 >
                 <Icon name="refresh" size="sm" weight={300} />
                 Try again

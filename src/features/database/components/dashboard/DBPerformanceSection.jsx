@@ -7,7 +7,7 @@ import { Typography } from '../../../../components/ds/foundation/Typography';
 import { Card } from '../../../../components/ds/layout/Card';
 
 const Bar = ({ pct, colorClass }) => (
-  <div className="w-full h-1 bg-slate-100 dark:bg-white/[0.06] overflow-hidden mt-1">
+  <div className="w-full h-1 bg-slate-100 dark:bg-white/6 overflow-hidden mt-1">
     <div className={`h-full ${colorClass} transition-all duration-500`} style={{ width: `${pct}%` }} />
   </div>
 );

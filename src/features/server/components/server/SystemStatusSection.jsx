@@ -9,7 +9,7 @@ import { Spinner } from '../../../../components/ds/foundation/Spinner';
 import { Typography } from '../../../../components/ds/foundation/Typography';
 
 const MetricBar = ({ pct, colorFn }) => (
-  <div className="w-full h-1 bg-slate-100 dark:bg-white/[0.06] overflow-hidden mt-1">
+  <div className="w-full h-1 bg-slate-100 dark:bg-white/6 overflow-hidden mt-1">
     <div className={`h-full transition-all duration-300 ${colorFn(pct)}`} style={{ width: `${pct}%` }} />
   </div>
 );
@@ -144,7 +144,7 @@ export default function SystemStatusSection({ hostUid, isTabActive = true }) {
           {isStopped && (
             <button 
               onClick={startPolling}
-              className="px-2 py-0.5 rounded bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] font-bold text-amber-500 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors flex items-center gap-1"
+              className="px-2 py-0.5 rounded-sm bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] font-bold text-amber-500 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors flex items-center gap-1"
             >
               <Icon name="refresh" size="12px" />
               Resume

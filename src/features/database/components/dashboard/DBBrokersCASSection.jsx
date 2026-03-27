@@ -68,13 +68,13 @@ export default function DBBrokersCASSection({ brokersCAS, pollingProps, onViewSQ
       align: 'center',
       render: (_, row) => (
         <div className="flex items-center gap-1">
-          <button onClick={() => onRestartCAS?.(row)} title="Restart CAS" className="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-white/5 text-slate-400 hover:text-amber-500 transition-colors">
+          <button onClick={() => onRestartCAS?.(row)} title="Restart CAS" className="p-1.5 rounded-sm hover:bg-slate-100 dark:hover:bg-white/5 text-slate-400 hover:text-amber-500 transition-colors">
             <Icon name="restart_alt" size="sm" weight={300} />
           </button>
-          <button onClick={() => onViewSQLLog?.(row)} title="SQL Logs" className="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-white/5 text-slate-400 hover:text-sky-500 transition-colors">
+          <button onClick={() => onViewSQLLog?.(row)} title="SQL Logs" className="p-1.5 rounded-sm hover:bg-slate-100 dark:hover:bg-white/5 text-slate-400 hover:text-sky-500 transition-colors">
             <Icon name="terminal" size="sm" weight={300} />
           </button>
-          <button onClick={() => onViewSlowQueryLog?.(row)} title="Slow Query Logs" className="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-white/5 text-slate-400 hover:text-rose-500 transition-colors">
+          <button onClick={() => onViewSlowQueryLog?.(row)} title="Slow Query Logs" className="p-1.5 rounded-sm hover:bg-slate-100 dark:hover:bg-white/5 text-slate-400 hover:text-rose-500 transition-colors">
             <Icon name="timer_off" size="sm" weight={300} />
           </button>
         </div>

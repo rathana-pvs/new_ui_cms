@@ -55,9 +55,9 @@ export default function SelectField({
         disabled={disabled}
         onClick={() => setIsOpen(!isOpen)}
         className={`
-          w-full h-9 rounded-lg px-3 py-1.5 text-xs font-medium outline-none transition-all flex items-center justify-between border
+          w-full h-9 rounded-lg px-3 py-1.5 text-xs font-medium outline-hidden transition-all flex items-center justify-between border
           ${!isHighlight 
-            ? 'bg-white/[0.05] border-white/5 text-slate-400 hover:bg-white/[0.08]' 
+            ? 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/8' 
             : 'bg-bk-side border-white/10 text-slate-100 hover:border-bk-yellow/50 focus:border-bk-yellow focus:ring-4 focus:ring-bk-yellow/10'
           }
           ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
@@ -73,7 +73,7 @@ export default function SelectField({
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute top-full left-0 w-full mt-2 z-[100] bg-bk-side border border-white/10 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div className="absolute top-full left-0 w-full mt-2 z-100 bg-bk-side border border-white/10 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
           <div className="max-h-60 overflow-y-auto custom-scrollbar">
             {options.length === 0 ? (
               <div className="px-4 py-3 text-[10px] text-slate-500 italic text-center">No options available</div>

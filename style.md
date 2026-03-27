@@ -60,7 +60,7 @@ Replace native HTML tags with Design System components:
 - Level 1 (root nodes: databases, logs, brokers): `ml-[22px]` — EXACT value, no exceptions.
 - Level 2+ (tables, columns, sub-items): `ml-4`.
 - Guide line: `border-l border-slate-200 dark:border-slate-800` — ALWAYS present.
-- Active indicator bar: `absolute left-[-1px] top-0 bottom-0 w-[2px] bg-amber-600` — NEVER remove.
+- Active indicator bar: `absolute -left-px top-0 bottom-0 w-[2px] bg-amber-600` — NEVER remove.
 - Status dot `animate-ping`: NEVER remove from the "On" state of `<StatusIndicator>`.
 
 ## 7. Infrastructure — Always Wrap Panels
@@ -80,4 +80,4 @@ These exact class strings must survive refactoring unchanged:
 - `shadow-[0_0_0_2px_rgba(217,119,6,0.3)]` — active node ring
 - `bg-bk-yellow/5`                          — CUBRID brand tint
 - `animate-ping`                            — StatusIndicator live state
-- `absolute left-[-1px]`                    — active tree node bar
+- `absolute -left-px`                    — active tree node bar

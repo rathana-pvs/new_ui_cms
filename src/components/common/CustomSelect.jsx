@@ -64,12 +64,12 @@ export default function CustomSelect({
             bg-white dark:bg-bk-side 
             border border-slate-200 dark:border-white/10 
             rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.3)] 
-            z-[100] overflow-hidden p-1
+            z-100 overflow-hidden p-1
             animate-in fade-in zoom-in-95 duration-150
           "
         >
           {/* Subtle Glow Accent */}
-          <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-bk-yellow/40 to-transparent"></div>
+          <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-linear-to-r from-transparent via-bk-yellow/40 to-transparent"></div>
 
           <div className="max-h-60 overflow-y-auto space-y-0.5 custom-scrollbar">
             {options.map((option, idx) => {

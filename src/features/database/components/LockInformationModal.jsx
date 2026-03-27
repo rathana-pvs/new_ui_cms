@@ -11,7 +11,7 @@ import { Spinner } from '../../../components/ds/foundation/Spinner';
 
 /* ─── micro helpers ──────────────────────────────────────────── */
 const Divider = () => (
-  <div className="h-px bg-slate-100 dark:bg-white/[0.05] my-5" />
+  <div className="h-px bg-slate-100 dark:bg-white/5 my-5" />
 );
 
 const SectionLabel = ({ children, count }) => (
@@ -20,11 +20,11 @@ const SectionLabel = ({ children, count }) => (
       {children}
     </span>
     {count !== undefined && (
-      <span className="text-[9px] font-black px-1.5 py-0.5 rounded-sm bg-amber-500/10 border border-amber-500/20 text-amber-500">
+      <span className="text-[9px] font-black px-1.5 py-0.5 rounded-xs bg-amber-500/10 border border-amber-500/20 text-amber-500">
         {count}
       </span>
     )}
-    <div className="flex-1 h-px bg-slate-100 dark:bg-white/[0.05]" />
+    <div className="flex-1 h-px bg-slate-100 dark:bg-white/5" />
   </div>
 );
 
@@ -35,11 +35,11 @@ const StatCard = ({ icon, label, value, unit, accent = 'amber' }) => {
     violet: { ring: 'border-violet-500/20 bg-violet-500/5',  icon: 'text-violet-500',  val: 'text-violet-600 dark:text-violet-400' },
     rose:   { ring: 'border-rose-500/20 bg-rose-500/5',      icon: 'text-rose-500',    val: 'text-rose-600 dark:text-rose-400' },
     emerald:{ ring: 'border-emerald-500/20 bg-emerald-500/5',icon: 'text-emerald-500', val: 'text-emerald-600 dark:text-emerald-400' },
-    slate:  { ring: 'border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/[0.02]', icon: 'text-slate-400', val: 'text-slate-700 dark:text-slate-200' },
+    slate:  { ring: 'border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/2', icon: 'text-slate-400', val: 'text-slate-700 dark:text-slate-200' },
   };
   const c = colors[accent] || colors.slate;
   return (
-    <div className={`rounded-xl border p-3.5 flex items-center gap-3 transition-all hover:shadow-sm ${c.ring}`}>
+    <div className={`rounded-xl border p-3.5 flex items-center gap-3 transition-all hover:shadow-xs ${c.ring}`}>
       <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-white/70 dark:bg-black/20 border border-white/60 dark:border-white/10`}>
         <Icon name={icon} size="sm" weight={300} className={c.icon} />
       </div>
@@ -61,7 +61,7 @@ const IsolationBadge = ({ level }) => {
     ? 'text-violet-500 bg-violet-500/10 border-violet-500/20'
     : 'text-sky-500 bg-sky-500/10 border-sky-500/20';
   return (
-    <span className={`text-[9px] font-black uppercase tracking-tight px-1.5 py-0.5 rounded border whitespace-nowrap ${color}`}>
+    <span className={`text-[9px] font-black uppercase tracking-tight px-1.5 py-0.5 rounded-sm border whitespace-nowrap ${color}`}>
       {level || 'UNKNOWN'}
     </span>
   );
@@ -180,8 +180,8 @@ export default function LockInformationModal() {
         {/* ── Context banner ─────────────────────────────────── */}
         <div className={`relative overflow-hidden rounded-xl border p-4 transition-colors duration-500
           ${isHighContention
-            ? 'border-rose-500/25 bg-gradient-to-r from-rose-500/8 to-transparent dark:from-rose-500/10'
-            : 'border-amber-500/20 bg-gradient-to-r from-amber-500/8 to-transparent dark:from-amber-500/10'
+            ? 'border-rose-500/25 bg-linear-to-r from-rose-500/8 to-transparent dark:from-rose-500/10'
+            : 'border-amber-500/20 bg-linear-to-r from-amber-500/8 to-transparent dark:from-amber-500/10'
           }`}
         >
           <div className="flex items-center justify-between flex-wrap gap-3">
@@ -222,7 +222,7 @@ export default function LockInformationModal() {
           </div>
 
           {/* Summary row */}
-          <div className="grid grid-cols-3 gap-3 mt-4 pt-3 border-t border-black/[0.04] dark:border-white/[0.05]">
+          <div className="grid grid-cols-3 gap-3 mt-4 pt-3 border-t border-black/4 dark:border-white/5">
             {[
               { icon: 'group',          label: 'Active Sessions', value: transactions.length,                            accent: 'amber' },
               { icon: 'swap_horiz',     label: 'Waiting Sessions', value: totalWaiters,                                  accent: totalWaiters > 0 ? 'rose' : 'emerald' },
@@ -242,7 +242,7 @@ export default function LockInformationModal() {
         </div>
 
         {/* ── Tabs ────────────────────────────────────────────── */}
-        <div className="flex gap-1 p-1 bg-slate-100 dark:bg-white/[0.04] rounded-xl">
+        <div className="flex gap-1 p-1 bg-slate-100 dark:bg-white/4 rounded-xl">
           {TABS.map(tab => (
             <button
               key={tab.id}
@@ -250,7 +250,7 @@ export default function LockInformationModal() {
               className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-[11px] font-bold uppercase tracking-widest transition-all duration-200
                 ${activeTab === tab.id
                   ? 'bg-white dark:bg-bk-side text-amber-500 shadow-md shadow-black/5 dark:shadow-white/5 border border-slate-200 dark:border-white/10'
-                  : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-50/50 dark:hover:bg-white/[0.03]'
+                  : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-50/50 dark:hover:bg-white/3'
                 }`}
             >
               <Icon name={tab.icon} size="sm" weight={300} className="shrink-0" />
@@ -279,32 +279,32 @@ export default function LockInformationModal() {
                   accent="emerald"
                 />
               ) : (
-                <div className="rounded-xl border border-slate-200 dark:border-white/[0.08] overflow-hidden">
+                <div className="rounded-xl border border-slate-200 dark:border-white/8 overflow-hidden">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="bg-slate-50 dark:bg-white/[0.03] border-b border-slate-100 dark:border-white/[0.06]">
+                      <tr className="bg-slate-50 dark:bg-white/3 border-b border-slate-100 dark:border-white/6">
                         {['#', 'Process', 'User', 'Host', 'PID', 'Isolation', 'Timeout', 'Locks'].map(h => (
                           <th key={h} className="px-3.5 py-3 text-[9px] font-black text-slate-500 uppercase tracking-[0.15em] whitespace-nowrap">{h}</th>
                         ))}
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-white/[0.04]">
+                    <tbody className="divide-y divide-slate-100 dark:divide-white/4">
                       {transactions.map((t, idx) => {
                         const isWaiting = !!t.waitfor;
                         const holdCount = Array.isArray(t.lock) ? t.lock.length : (t.lock ? 1 : 0);
                         return (
-                          <tr key={idx} className={`group transition-colors text-[12px] font-mono ${isWaiting ? 'bg-rose-50/30 dark:bg-rose-500/5' : 'hover:bg-amber-500/[0.03]'}`}>
+                          <tr key={idx} className={`group transition-colors text-[12px] font-mono ${isWaiting ? 'bg-rose-50/30 dark:bg-rose-500/5' : 'hover:bg-amber-500/3'}`}>
                             <td className="px-3.5 py-3 text-amber-500/70 font-black">{t.index ?? idx + 1}</td>
                             <td className="px-3.5 py-3">
                               <span className="font-sans font-bold text-slate-700 dark:text-slate-200 text-[12px]">{t.pname || 'cubrid'}</span>
                               {isWaiting && (
-                                <span className="ml-2 text-[9px] font-black text-rose-500 bg-rose-500/10 border border-rose-500/20 px-1.5 py-0.5 rounded">WAITING</span>
+                                <span className="ml-2 text-[9px] font-black text-rose-500 bg-rose-500/10 border border-rose-500/20 px-1.5 py-0.5 rounded-sm">WAITING</span>
                               )}
                             </td>
                             <td className="px-3.5 py-3 text-slate-500 dark:text-slate-400">{t['@uid'] ?? '-'}</td>
                             <td className="px-3.5 py-3 text-slate-400 dark:text-slate-500 max-w-[140px] truncate italic text-[11px]">{t.host ?? '-'}</td>
                             <td className="px-3.5 py-3">
-                              <span className="bg-slate-100 dark:bg-white/[0.05] px-2 py-0.5 rounded text-[11px] border border-slate-200/50 dark:border-white/10 text-slate-600 dark:text-slate-400 font-bold group-hover:border-amber-500/30 transition-colors">
+                              <span className="bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-sm text-[11px] border border-slate-200/50 dark:border-white/10 text-slate-600 dark:text-slate-400 font-bold group-hover:border-amber-500/30 transition-colors">
                                 {t.pid ?? '—'}
                               </span>
                             </td>
@@ -317,7 +317,7 @@ export default function LockInformationModal() {
                             </td>
                             <td className="px-3.5 py-3 text-center">
                               {holdCount > 0 ? (
-                                <span className="bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-[10px] font-black px-2 py-0.5 rounded">{holdCount}</span>
+                                <span className="bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-[10px] font-black px-2 py-0.5 rounded-sm">{holdCount}</span>
                               ) : (
                                 <span className="text-slate-300 dark:text-slate-600">—</span>
                               )}
@@ -343,10 +343,10 @@ export default function LockInformationModal() {
 
               <SectionLabel count={0}>Contending Object Records</SectionLabel>
 
-              <div className="rounded-xl border border-slate-200 dark:border-white/[0.08] overflow-hidden">
+              <div className="rounded-xl border border-slate-200 dark:border-white/8 overflow-hidden">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="bg-slate-50 dark:bg-white/[0.03] border-b border-slate-100 dark:border-white/[0.06]">
+                    <tr className="bg-slate-50 dark:bg-white/3 border-b border-slate-100 dark:border-white/6">
                       {['Object OID', 'Class Name', 'Held By', 'Lock Mode', 'Waiters'].map(h => (
                         <th key={h} className="px-3.5 py-3 text-[9px] font-black text-slate-500 uppercase tracking-[0.15em]">{h}</th>
                       ))}
@@ -386,7 +386,7 @@ export default function LockInformationModal() {
                 <StatCard icon="memory"         label="Memory Block Size"  value={lot.sizelock     ?? '—'}  unit="bytes"   accent="violet" />
               </div>
 
-              <div className="flex items-start gap-3 mt-2 p-4 bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.08] rounded-xl">
+              <div className="flex items-start gap-3 mt-2 p-4 bg-slate-50 dark:bg-white/2 border border-slate-200 dark:border-white/8 rounded-xl">
                 <div className="w-7 h-7 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center shrink-0 mt-0.5">
                   <Icon name="info" size="sm" weight={300} className="text-sky-500" />
                 </div>

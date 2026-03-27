@@ -33,7 +33,7 @@ export const Accordion = ({
         return (
           <div key={idx} className="bg-white dark:bg-slate-900">
             <button
-              className="flex items-center justify-between w-full px-4 py-3 text-left hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors focus:outline-none"
+              className="flex items-center justify-between w-full px-4 py-3 text-left hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors focus:outline-hidden"
               onClick={() => toggleItem(idx)}
             >
               <div className="flex items-center gap-3">

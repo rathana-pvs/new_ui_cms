@@ -46,7 +46,7 @@ function SectionLabel({ icon, children }) {
 // ── Read-only summary row ─────────────────────────────────────────────────────
 function SummaryRow({ label, value, accent }) {
   return (
-    <div className="flex items-center justify-between py-2 border-b border-slate-100 dark:border-white/[0.04] last:border-0">
+    <div className="flex items-center justify-between py-2 border-b border-slate-100 dark:border-white/4 last:border-0">
       <span className="text-[11px] text-slate-500 dark:text-slate-400">{label}</span>
       <span className={`text-[11px] font-bold font-mono ${accent ? 'text-amber-500' : 'text-slate-700 dark:text-slate-200'}`}>{value}</span>
     </div>
@@ -301,7 +301,7 @@ export default function CreateDatabaseModal() {
                 }`}>{s.label}</span>
               </div>
               {idx < STEPS.length - 1 && (
-                <div className={`flex-1 mx-2 h-px transition-all duration-500 ${step > s.id ? 'bg-amber-500/40' : 'bg-slate-100 dark:bg-white/[0.06]'}`} />
+                <div className={`flex-1 mx-2 h-px transition-all duration-500 ${step > s.id ? 'bg-amber-500/40' : 'bg-slate-100 dark:bg-white/6'}`} />
               )}
             </React.Fragment>
           ))}
@@ -312,7 +312,7 @@ export default function CreateDatabaseModal() {
           <div className="space-y-5 animate-in fade-in duration-200">
 
             {/* Basic Config */}
-            <div className="bg-white dark:bg-white/[0.02] border border-slate-100 dark:border-white/[0.05] rounded-lg p-4">
+            <div className="bg-white dark:bg-white/2 border border-slate-100 dark:border-white/5 rounded-lg p-4">
               <SectionLabel icon="settings">Basic Configuration</SectionLabel>
               <div className="grid grid-cols-2 gap-3">
                 <Input
@@ -332,7 +332,7 @@ export default function CreateDatabaseModal() {
             </div>
 
             {/* Locale */}
-            <div className="bg-white dark:bg-white/[0.02] border border-slate-100 dark:border-white/[0.05] rounded-lg p-4">
+            <div className="bg-white dark:bg-white/2 border border-slate-100 dark:border-white/5 rounded-lg p-4">
               <SectionLabel icon="language">Locale &amp; Encoding</SectionLabel>
               <Select
                 label="Region locale"
@@ -353,30 +353,30 @@ export default function CreateDatabaseModal() {
             </div>
 
             {/* Volume Paths */}
-            <div className="bg-white dark:bg-white/[0.02] border border-slate-100 dark:border-white/[0.05] rounded-lg p-4">
+            <div className="bg-white dark:bg-white/2 border border-slate-100 dark:border-white/5 rounded-lg p-4">
               <SectionLabel icon="folder_open">Initial Volume Paths</SectionLabel>
               <div className="grid grid-cols-2 gap-3">
                 {/* Generic Volume */}
-                <div className="space-y-2 p-3 bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/[0.04] rounded-lg">
+                <div className="space-y-2 p-3 bg-slate-50 dark:bg-white/2 border border-slate-100 dark:border-white/4 rounded-lg">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
                       <Icon name="storage" size="13px" weight={400} className="text-amber-500" />
                       Generic Volume
                     </span>
-                    <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20">Required</span>
+                    <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-500/10 text-amber-500 border border-amber-500/20">Required</span>
                   </div>
                   <Input label="Path" value={formData.genericVolPath} disabled size="sm" />
                   <Input label="Initial size (MB)" type="number" value={formData.genericVolSize} onChange={(e) => handleInputChange('genericVolSize', Number(e.target.value))} size="sm" />
                 </div>
 
                 {/* Log Volume */}
-                <div className="space-y-2 p-3 bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/[0.04] rounded-lg">
+                <div className="space-y-2 p-3 bg-slate-50 dark:bg-white/2 border border-slate-100 dark:border-white/4 rounded-lg">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
                       <Icon name="history" size="13px" weight={400} className="text-amber-500" />
                       Log Volume
                     </span>
-                    <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20">Required</span>
+                    <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-500/10 text-amber-500 border border-amber-500/20">Required</span>
                   </div>
                   <Input label="Path" value={formData.logVolPath} disabled size="sm" />
                   <div className="grid grid-cols-2 gap-2">
@@ -388,7 +388,7 @@ export default function CreateDatabaseModal() {
             </div>
 
             {/* Auto-start toggle */}
-            <div className="flex items-center justify-between px-4 py-3 bg-amber-500/[0.04] border border-amber-500/10 rounded-lg">
+            <div className="flex items-center justify-between px-4 py-3 bg-amber-500/4 border border-amber-500/10 rounded-lg">
               <div className="flex items-center gap-2.5">
                 <Icon name={formData.autoStart ? 'flash_on' : 'flash_off'} size="16px" weight={300} className="text-amber-500" />
                 <div>
@@ -411,25 +411,25 @@ export default function CreateDatabaseModal() {
               </div>
               <button
                 onClick={addVolume}
-                className="h-7 px-3 flex items-center gap-1.5 text-[11px] font-semibold bg-amber-500 text-white rounded hover:bg-amber-400 transition-all shadow-sm shadow-amber-500/20"
+                className="h-7 px-3 flex items-center gap-1.5 text-[11px] font-semibold bg-amber-500 text-white rounded-sm hover:bg-amber-400 transition-all shadow-xs shadow-amber-500/20"
               >
                 <Icon name="add" size="13px" weight={400} />
                 Add volume
               </button>
             </div>
 
-            <div className="border border-slate-100 dark:border-white/[0.06] rounded-lg">
+            <div className="border border-slate-100 dark:border-white/6 rounded-lg">
               {/* Table header */}
-              <div className="grid grid-cols-[1fr_100px_80px_1fr_36px] bg-slate-50 dark:bg-white/[0.02] border-b border-slate-100 dark:border-white/[0.06] px-3 py-2">
+              <div className="grid grid-cols-[1fr_100px_80px_1fr_36px] bg-slate-50 dark:bg-white/2 border-b border-slate-100 dark:border-white/6 px-3 py-2">
                 {['Name', 'Type', 'Size (MB)', 'Path', ''].map((h, i) => (
                   <span key={i} className="text-[9px] font-bold uppercase tracking-widest text-slate-400">{h}</span>
                 ))}
               </div>
 
               {/* Table body */}
-              <div className="divide-y divide-slate-100 dark:divide-white/[0.04]">
+              <div className="divide-y divide-slate-100 dark:divide-white/4">
                 {formData.volumes.map((vol, idx) => (
-                  <div key={idx} className="grid grid-cols-[1fr_100px_80px_1fr_36px] items-center gap-0 px-3 py-1.5 hover:bg-slate-50/50 dark:hover:bg-white/[0.02] transition-colors group">
+                  <div key={idx} className="grid grid-cols-[1fr_100px_80px_1fr_36px] items-center gap-0 px-3 py-1.5 hover:bg-slate-50/50 dark:hover:bg-white/2 transition-colors group">
                     <div className="pr-2">
                       <Input value={vol.name} onChange={(e) => handleVolumeChange(idx, 'name', e.target.value)} size="sm" />
                     </div>
@@ -444,7 +444,7 @@ export default function CreateDatabaseModal() {
                     </div>
                     <button
                       onClick={() => removeVolume(idx)}
-                      className="w-7 h-7 flex items-center justify-center rounded text-slate-300 dark:text-slate-600 hover:bg-rose-500/10 hover:text-rose-500 transition-all opacity-0 group-hover:opacity-100"
+                      className="w-7 h-7 flex items-center justify-center rounded-sm text-slate-300 dark:text-slate-600 hover:bg-rose-500/10 hover:text-rose-500 transition-all opacity-0 group-hover:opacity-100"
                     >
                       <Icon name="close" size="14px" weight={400} />
                     </button>
@@ -453,14 +453,14 @@ export default function CreateDatabaseModal() {
               </div>
 
               {/* Type legend */}
-              <div className="flex items-center gap-3 px-3 py-2 border-t border-slate-100 dark:border-white/[0.04] bg-slate-50/50 dark:bg-white/[0.01]">
+              <div className="flex items-center gap-3 px-3 py-2 border-t border-slate-100 dark:border-white/4 bg-slate-50/50 dark:bg-white/1">
                 {VOLUME_TYPES.map(vt => (
-                  <span key={vt.value} className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border ${typeBadge(vt.value)}`}>{vt.label}</span>
+                  <span key={vt.value} className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-sm border ${typeBadge(vt.value)}`}>{vt.label}</span>
                 ))}
               </div>
             </div>
 
-            <div className="flex items-start gap-2.5 p-3 bg-amber-500/[0.04] border border-amber-500/10 rounded-lg">
+            <div className="flex items-start gap-2.5 p-3 bg-amber-500/4 border border-amber-500/10 rounded-lg">
               <Icon name="info" size="14px" weight={300} className="text-amber-500 mt-px shrink-0" />
               <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
                 Distribute volumes across physical disks to optimize I/O. Separate data, index, and temp volumes for best performance.
@@ -502,7 +502,7 @@ export default function CreateDatabaseModal() {
             </div>
 
             {/* Password strength rules */}
-            <div className="p-3.5 bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/[0.05] rounded-lg space-y-2">
+            <div className="p-3.5 bg-slate-50 dark:bg-white/2 border border-slate-100 dark:border-white/5 rounded-lg space-y-2">
               <div className="flex items-center gap-1.5 mb-2">
                 <Icon name="security" size="13px" weight={400} className="text-amber-500" />
                 <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Password requirements</span>
@@ -528,7 +528,7 @@ export default function CreateDatabaseModal() {
         {step === 4 && (
           <div className="animate-in fade-in duration-200 space-y-4">
             {/* Ready banner */}
-            <div className="flex items-center gap-3 p-3.5 bg-emerald-500/[0.05] border border-emerald-500/15 rounded-lg">
+            <div className="flex items-center gap-3 p-3.5 bg-emerald-500/5 border border-emerald-500/15 rounded-lg">
               <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center text-white shrink-0">
                 <Icon name="done_all" size="16px" weight={400} />
               </div>
@@ -540,7 +540,7 @@ export default function CreateDatabaseModal() {
 
             <div className="grid grid-cols-2 gap-3">
               {/* Parameters */}
-              <div className="p-4 bg-white dark:bg-white/[0.02] border border-slate-100 dark:border-white/[0.05] rounded-lg">
+              <div className="p-4 bg-white dark:bg-white/2 border border-slate-100 dark:border-white/5 rounded-lg">
                 <SectionLabel icon="tune">Parameters</SectionLabel>
                 <SummaryRow label="Database Name" value={formData.dbName} accent />
                 <SummaryRow label="Page Size" value={`${formData.pageSize / 1024} KB`} />
@@ -549,13 +549,13 @@ export default function CreateDatabaseModal() {
               </div>
 
               {/* Storage */}
-              <div className="p-4 bg-white dark:bg-white/[0.02] border border-slate-100 dark:border-white/[0.05] rounded-lg">
+              <div className="p-4 bg-white dark:bg-white/2 border border-slate-100 dark:border-white/5 rounded-lg">
                 <SectionLabel icon="hard_drive">Storage</SectionLabel>
                 <SummaryRow label="Total Volumes" value={`${formData.volumes.length + 2}`} />
                 <SummaryRow label="Generic Volume" value={`${formData.genericVolSize} MB`} />
                 <SummaryRow label="Log Volume" value={`${formData.logVolSize} MB`} />
                 <SummaryRow label="Custom Volumes" value={`${formData.volumes.reduce((a, v) => a + v.size, 0)} MB`} />
-                <div className="flex items-center justify-between pt-2.5 mt-0.5 border-t border-slate-100 dark:border-white/[0.04]">
+                <div className="flex items-center justify-between pt-2.5 mt-0.5 border-t border-slate-100 dark:border-white/4">
                   <span className="text-[11px] font-bold text-slate-500">Total Footprint</span>
                   <span className="text-[14px] font-black font-mono text-emerald-500">{totalStorage} MB</span>
                 </div>
@@ -563,11 +563,11 @@ export default function CreateDatabaseModal() {
             </div>
 
             {/* Volume list */}
-            <div className="border border-slate-100 dark:border-white/[0.05] rounded-lg overflow-hidden">
-              <div className="px-3 py-2 bg-slate-50 dark:bg-white/[0.02] border-b border-slate-100 dark:border-white/[0.05]">
+            <div className="border border-slate-100 dark:border-white/5 rounded-lg overflow-hidden">
+              <div className="px-3 py-2 bg-slate-50 dark:bg-white/2 border-b border-slate-100 dark:border-white/5">
                 <SectionLabel icon="storage">Configured Volumes</SectionLabel>
               </div>
-              <div className="divide-y divide-slate-50 dark:divide-white/[0.03]">
+              <div className="divide-y divide-slate-50 dark:divide-white/3">
                 {/* Implicit volumes */}
                 {[
                   { name: `${formData.dbName}_generic`, type: 'generic', size: formData.genericVolSize, path: formData.genericVolPath },
@@ -577,7 +577,7 @@ export default function CreateDatabaseModal() {
                   <div key={idx} className="flex items-center gap-3 px-3 py-2">
                     <Icon name="storage" size="13px" weight={300} className="text-slate-300 dark:text-slate-600 shrink-0" />
                     <span className="text-[11px] font-mono text-slate-600 dark:text-slate-300 flex-1 truncate">{vol.name}</span>
-                    <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded border ${typeBadge(vol.type)}`}>{vol.type}</span>
+                    <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-sm border ${typeBadge(vol.type)}`}>{vol.type}</span>
                     <span className="text-[10px] font-bold font-mono text-slate-500 w-14 text-right">{vol.size} MB</span>
                   </div>
                 ))}

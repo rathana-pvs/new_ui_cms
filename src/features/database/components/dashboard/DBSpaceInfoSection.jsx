@@ -36,7 +36,7 @@ export default function DBSpaceInfoSection({ spaceInfo, pollingProps }) {
       header: 'Type',
       accessor: 'type',
       render: (val) => (
-        <span className="px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-500/20 font-bold text-[10px] uppercase tracking-wide">
+        <span className="px-2 py-0.5 rounded-sm bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-500/20 font-bold text-[10px] uppercase tracking-wide">
           {val}
         </span>
       )

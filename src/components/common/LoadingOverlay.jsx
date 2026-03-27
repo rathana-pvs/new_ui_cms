@@ -8,7 +8,7 @@ const LoadingOverlay = ({
   if (!isVisible) return null;
 
   return (
-    <div className="absolute inset-0 z-[200] flex flex-col items-center justify-center bg-white/97 dark:bg-bk-side animate-in fade-in duration-200 rounded-xl overflow-hidden">
+    <div className="absolute inset-0 z-200 flex flex-col items-center justify-center bg-white/97 dark:bg-bk-side animate-in fade-in duration-200 rounded-xl overflow-hidden">
 
       {/* Soft ambient glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[260px] h-[260px] bg-bk-yellow/5 rounded-full blur-[90px] pointer-events-none" />
@@ -18,10 +18,10 @@ const LoadingOverlay = ({
         {/* Spinner stack */}
         <div className="relative w-[68px] h-[68px]">
           {/* Outer track */}
-          <div className="absolute inset-0 rounded-full border-[2px] border-slate-100 dark:border-white/5" />
+          <div className="absolute inset-0 rounded-full border-2 border-slate-100 dark:border-white/5" />
           {/* Main arc */}
           <div
-            className="absolute inset-0 rounded-full border-[2px] border-transparent border-t-bk-yellow animate-spin"
+            className="absolute inset-0 rounded-full border-2 border-transparent border-t-bk-yellow animate-spin"
             style={{ animationDuration: '0.9s' }}
           />
           {/* Inner reversed arc */}
@@ -54,7 +54,7 @@ const LoadingOverlay = ({
         </div>
 
         {/* Status pill */}
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 dark:bg-white/[0.04] border border-slate-100 dark:border-white/5">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 dark:bg-white/4 border border-slate-100 dark:border-white/5">
           <div className="w-1.5 h-1.5 rounded-full bg-bk-yellow animate-pulse" />
           <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">
             In Progress

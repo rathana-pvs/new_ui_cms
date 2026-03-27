@@ -10,13 +10,13 @@ export const Button = React.forwardRef(({
   children,
   ...props
 }, ref) => {
-  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-hidden focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
   
   const variants = {
     primary: 'bg-amber-500 hover:bg-amber-400 text-white border border-amber-600/20 shadow-lg shadow-amber-500/10 active:scale-[0.98]',
-    secondary: 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-white/[0.05] dark:text-slate-200 dark:hover:bg-white/[0.1] border border-transparent active:scale-[0.98]',
-    outline: 'border border-slate-200 dark:border-white/[0.1] text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/[0.04] active:scale-[0.98]',
-    ghost: 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/[0.05] active:scale-[0.98]',
+    secondary: 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10 border border-transparent active:scale-[0.98]',
+    outline: 'border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/4 active:scale-[0.98]',
+    ghost: 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 active:scale-[0.98]',
     danger: 'bg-rose-500 hover:bg-rose-400 text-white border border-rose-600/20 shadow-lg shadow-rose-500/10 active:scale-[0.98]',
   };
 

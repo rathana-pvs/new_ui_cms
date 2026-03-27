@@ -75,7 +75,7 @@ export default function VolumeInfoMonitor({ tabId }) {
     <div className="flex-1 flex flex-col h-full bg-white dark:bg-background-dark overflow-hidden select-none animate-in fade-in duration-300">
 
       {/* ── Header ── */}
-      <header className="px-6 py-4 border-b border-slate-100 dark:border-white/[0.04] flex items-center justify-between shrink-0">
+      <header className="px-6 py-4 border-b border-slate-100 dark:border-white/4 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
             <Icon name="hard_drive" size="sm" weight={300} className="text-amber-500" />
@@ -92,7 +92,7 @@ export default function VolumeInfoMonitor({ tabId }) {
 
         <button
           onClick={() => dispatch(fetchDatabaseSpaceInfo({ hostUid, dbname }))}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-white/5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 transition-all active:scale-95 border border-slate-200 dark:border-white/[0.06]"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-white/5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 transition-all active:scale-95 border border-slate-200 dark:border-white/6"
         >
           <Icon name="refresh" size="sm" weight={300} />
           Refresh
@@ -103,14 +103,14 @@ export default function VolumeInfoMonitor({ tabId }) {
       <div className="flex-1 min-h-0 flex gap-0 overflow-hidden">
 
         {/* Left — Info sidebar */}
-        <aside className="w-[380px] shrink-0 border-r border-slate-100 dark:border-white/[0.04] flex flex-col overflow-y-auto">
+        <aside className="w-[380px] shrink-0 border-r border-slate-100 dark:border-white/4 flex flex-col overflow-y-auto">
           {/* Info rows */}
           <div className="p-4 space-y-0 flex-1">
             <Typography variant="label" className="text-[9px] font-bold text-slate-400 uppercase tracking-widest px-2 pb-2 block">
               Properties
             </Typography>
             {infoRows.map((row, i) => (
-              <div key={i} className="flex flex-col px-2 py-2 border-b border-slate-50 dark:border-white/[0.03] last:border-0">
+              <div key={i} className="flex flex-col px-2 py-2 border-b border-slate-50 dark:border-white/3 last:border-0">
                 <Typography variant="label" className="text-[9px] text-slate-400 uppercase tracking-wider font-semibold">{row.label}</Typography>
                 <Typography variant="p" className="text-[12px] font-semibold text-slate-700 dark:text-slate-200 font-mono" title={row.val}>{row.val}</Typography>
               </div>
@@ -119,7 +119,7 @@ export default function VolumeInfoMonitor({ tabId }) {
 
 
           {/* Health note */}
-          <div className="m-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-500/[0.06] border border-amber-100 dark:border-amber-500/20">
+          <div className="m-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-500/6 border border-amber-100 dark:border-amber-500/20">
             <div className="flex items-center gap-1.5 mb-1 text-amber-600 dark:text-amber-400">
               <Icon name="auto_awesome" size="sm" weight={300} />
               <Typography variant="label" className="text-[9px] font-bold uppercase tracking-wider">Volume Health</Typography>
@@ -169,7 +169,7 @@ export default function VolumeInfoMonitor({ tabId }) {
 
           {/* Legend cards */}
           <div className="flex gap-4 w-full max-w-sm">
-            <div className="flex-1 bg-amber-50 dark:bg-amber-500/[0.06] border border-amber-100 dark:border-amber-500/20 rounded-xl p-4">
+            <div className="flex-1 bg-amber-50 dark:bg-amber-500/6 border border-amber-100 dark:border-amber-500/20 rounded-xl p-4">
               <div className="flex items-center gap-2 mb-1">
                 <span className="w-2. h-2 rounded-full bg-amber-500 shrink-0" />
                 <Typography variant="label" className="text-[9px] text-amber-600 dark:text-amber-400 font-bold uppercase tracking-widest">Used</Typography>
@@ -178,7 +178,7 @@ export default function VolumeInfoMonitor({ tabId }) {
               <Typography variant="label" className="text-[9px] text-slate-400">MB Physical</Typography>
             </div>
 
-            <div className="flex-1 bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.06] rounded-xl p-4">
+            <div className="flex-1 bg-slate-50 dark:bg-white/2 border border-slate-200 dark:border-white/6 rounded-xl p-4">
               <div className="flex items-center gap-2 mb-1">
                 <span className="w-2 h-2 rounded-full bg-slate-300 dark:bg-white/20 shrink-0" />
                 <Typography variant="label" className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Free</Typography>
@@ -194,7 +194,7 @@ export default function VolumeInfoMonitor({ tabId }) {
               <Typography variant="label" className="text-[9px] text-slate-400 font-semibold uppercase tracking-widest">Utilization</Typography>
               <Typography variant="label" className={`text-[9px] font-black font-mono ${severity}`}>{usedPct.toFixed(2)}%</Typography>
             </div>
-            <div className="w-full h-1.5 bg-slate-100 dark:bg-white/[0.06] overflow-hidden">
+            <div className="w-full h-1.5 bg-slate-100 dark:bg-white/6 overflow-hidden">
               <div
                 className="h-full bg-amber-500 transition-all duration-1000 ease-out"
                 style={{ width: `${usedPct}%` }}

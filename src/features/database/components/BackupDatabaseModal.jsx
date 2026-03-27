@@ -22,10 +22,10 @@ const Toggle = ({ checked, onChange }) => (
   <button
     type="button"
     onClick={onChange}
-    className={`w-9 h-5 rounded-full border-2 relative flex-shrink-0 transition-all duration-200
+    className={`w-9 h-5 rounded-full border-2 relative shrink-0 transition-all duration-200
       ${checked ? 'bg-amber-500 border-amber-500' : 'bg-slate-200 dark:bg-white/10 border-slate-300 dark:border-white/15'}`}
   >
-    <span className={`absolute top-0.5 w-3 h-3 rounded-full bg-white shadow-sm transition-all duration-200 ${checked ? 'left-[18px]' : 'left-0.5'}`} />
+    <span className={`absolute top-0.5 w-3 h-3 rounded-full bg-white shadow-xs transition-all duration-200 ${checked ? 'left-[18px]' : 'left-0.5'}`} />
   </button>
 );
 
@@ -130,8 +130,8 @@ export default function BackupDatabaseModal() {
       <div className="space-y-6 pb-1">
 
         {/* Database Info Banner */}
-        <div className="relative overflow-hidden rounded-xl border border-amber-500/20 bg-gradient-to-r from-amber-500/8 via-amber-500/4 to-transparent dark:from-amber-500/10 dark:via-amber-500/5 dark:to-transparent p-4">
-          <div className="absolute right-0 top-0 w-32 h-full bg-gradient-to-l from-amber-500/5 to-transparent pointer-events-none" />
+        <div className="relative overflow-hidden rounded-xl border border-amber-500/20 bg-linear-to-r from-amber-500/8 via-amber-500/4 to-transparent dark:from-amber-500/10 dark:via-amber-500/5 dark:to-transparent p-4">
+          <div className="absolute right-0 top-0 w-32 h-full bg-linear-to-l from-amber-500/5 to-transparent pointer-events-none" />
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
               <Icon name="database" size="md" weight={300} className="text-amber-500" />
@@ -164,8 +164,8 @@ export default function BackupDatabaseModal() {
                   onClick={() => handleInputChange('backupLevel', item.level)}
                   className={`flex flex-col items-center text-center p-4 rounded-xl border transition-all duration-200 group
                     ${isSelected
-                      ? 'bg-amber-500/8 border-amber-500/30 dark:bg-amber-500/10 dark:border-amber-500/25 shadow-sm'
-                      : 'bg-slate-50/50 dark:bg-white/[0.02] border-slate-200 dark:border-white/8 hover:border-slate-300 dark:hover:border-white/15 hover:bg-white dark:hover:bg-white/[0.04]'
+                      ? 'bg-amber-500/8 border-amber-500/30 dark:bg-amber-500/10 dark:border-amber-500/25 shadow-xs'
+                      : 'bg-slate-50/50 dark:bg-white/2 border-slate-200 dark:border-white/8 hover:border-slate-300 dark:hover:border-white/15 hover:bg-white dark:hover:bg-white/4'
                     }`}
                 >
                   <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-2.5 transition-all
@@ -240,7 +240,7 @@ export default function BackupDatabaseModal() {
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-200 text-left
                     ${isOn
                       ? 'bg-amber-500/5 border-amber-500/20 dark:bg-amber-500/8 dark:border-amber-500/15'
-                      : 'bg-slate-50/50 dark:bg-white/[0.02] border-slate-200 dark:border-white/8 hover:border-slate-300 dark:hover:border-white/15'
+                      : 'bg-slate-50/50 dark:bg-white/2 border-slate-200 dark:border-white/8 hover:border-slate-300 dark:hover:border-white/15'
                     }`}
                 >
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border transition-all

@@ -153,14 +153,14 @@ export default function BrokerPropertyModal() {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[600] flex items-center justify-center bg-bk-main/40 backdrop-blur-sm animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-600 flex items-center justify-center bg-bk-main/40 backdrop-blur-xs animate-in fade-in duration-300">
       <div className="bg-bk-side w-full max-w-2xl rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] border border-white/10 flex flex-col max-h-[85vh] overflow-hidden animate-in zoom-in-95 duration-300">
         
         {/* Subtle Top Accent */}
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-bk-yellow/60"></div>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3 border-b border-white/5 bg-bk-side flex-shrink-0">
+        <div className="flex items-center justify-between px-5 py-3 border-b border-white/5 bg-bk-side shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
               <Icon name="tune" size="sm" weight={300} className="text-bk-yellow text-xl" />
@@ -226,7 +226,7 @@ export default function BrokerPropertyModal() {
                         <th className="px-6 py-2.5 w-[35%]">VALUE</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/[0.03]">
+                    <tbody className="divide-y divide-white/3">
                       {BROKER_PARAMETERS.map((p) => {
                         const isSpecific = specificParams.has(p.name);
                         const isCommon = p.category === 'common';
@@ -236,7 +236,7 @@ export default function BrokerPropertyModal() {
                         return (
                           <tr 
                             key={p.name} 
-                            className="group hover:bg-white/[0.02] border-b border-white/[0.03] transition-colors"
+                            className="group hover:bg-white/2 border-b border-white/3 transition-colors"
                           >
                             <td className="px-6 py-2.5 text-[12px] font-medium text-slate-100 tracking-tight">
                               {p.name}
@@ -262,7 +262,7 @@ export default function BrokerPropertyModal() {
                                   value={currentValue}
                                   onChange={(e) => handleParamChange(p.name, e.target.value)}
                                   placeholder={p.default}
-                                  className="w-full h-9 rounded-lg px-3 py-1.5 text-[12px] font-medium outline-none transition-all bg-bk-side border border-white/10 text-slate-100 placeholder:text-slate-600 focus:border-bk-yellow focus:ring-4 focus:ring-bk-yellow/10 shadow-lg"
+                                  className="w-full h-9 rounded-lg px-3 py-1.5 text-[12px] font-medium outline-hidden transition-all bg-bk-side border border-white/10 text-slate-100 placeholder:text-slate-600 focus:border-bk-yellow focus:ring-4 focus:ring-bk-yellow/10 shadow-lg"
                                 />
                               )}
                             </td>
@@ -277,7 +277,7 @@ export default function BrokerPropertyModal() {
           ) : (
             <div className="flex flex-col gap-10 max-w-lg mx-auto py-20 px-6">
               <div className="bg-bk-yellow/5 border border-bk-yellow/10 rounded-2xl p-6 flex gap-5 ring-1 ring-bk-yellow/20">
-                <div className="w-12 h-12 rounded-xl bg-bk-yellow/20 flex-shrink-0 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-xl bg-bk-yellow/20 shrink-0 flex items-center justify-center">
                   <Icon name="update" size="sm" weight={300} className="text-bk-yellow text-2xl" />
                 </div>
                 <div>
@@ -328,10 +328,10 @@ export default function BrokerPropertyModal() {
         </div>
 
         {/* Footer */}
-        <div className="px-5 py-3.5 bg-bk-main/80 backdrop-blur-sm border-t border-white/5 flex items-center justify-end gap-3 flex-shrink-0">
+        <div className="px-5 py-3.5 bg-bk-main/80 backdrop-blur-xs border-t border-white/5 flex items-center justify-end gap-3 shrink-0">
           <button 
             onClick={() => dispatch(closeBrokerPropertyModal())}
-            className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-400 border border-white/10 rounded hover:bg-white/5 transition-all uppercase"
+            className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-400 border border-white/10 rounded-sm hover:bg-white/5 transition-all uppercase"
           >
             DISCARD
           </button>
@@ -339,7 +339,7 @@ export default function BrokerPropertyModal() {
             onClick={handleSave}
             disabled={config.loading || actionLoading}
             className="
-              px-6 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center gap-2 min-w-[140px] uppercase
+              px-6 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium rounded border border-bk-yellow/50 shadow-xs transition-all flex items-center justify-center gap-2 min-w-[140px] uppercase
             "
           >
             {actionLoading ? (

@@ -28,10 +28,10 @@ export const Card = ({
   };
 
   return (
-    <div className={`bg-white dark:bg-bk-side border border-slate-200 dark:border-white/5 rounded-xl overflow-hidden shadow-sm transition-all duration-300 ${isCollapsed ? 'ring-0 shadow-none' : ''} ${className}`}>
+    <div className={`bg-white dark:bg-bk-side border border-slate-200 dark:border-white/5 rounded-xl overflow-hidden shadow-xs transition-all duration-300 ${isCollapsed ? 'ring-0 shadow-none' : ''} ${className}`}>
       {(title || subtitle) && (
         <div 
-          className={`px-5 py-3 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex items-center justify-between ${collapsible ? 'cursor-pointer hover:bg-slate-100/50 dark:hover:bg-white/[0.04] transition-colors group' : ''}`}
+          className={`px-5 py-3 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/2 flex items-center justify-between ${collapsible ? 'cursor-pointer hover:bg-slate-100/50 dark:hover:bg-white/4 transition-colors group' : ''}`}
           onClick={toggleCollapse}
         >
           <div className="flex-1">
@@ -49,7 +49,7 @@ export const Card = ({
           
           {collapsible && (
             <button 
-              className={`w-6 h-6 flex items-center justify-center rounded-md hover:bg-slate-200 dark:hover:bg-white/10 text-slate-400 dark:text-slate-500 transition-all ${isCollapsed ? 'rotate-[-90deg]' : ''}`}
+              className={`w-6 h-6 flex items-center justify-center rounded-md hover:bg-slate-200 dark:hover:bg-white/10 text-slate-400 dark:text-slate-500 transition-all ${isCollapsed ? '-rotate-90' : ''}`}
             >
               <Icon name="expand_more" size="sm" weight={300} />
             </button>
@@ -64,7 +64,7 @@ export const Card = ({
           </div>
           
           {footer && (
-            <div className="px-5 py-3 border-t border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-white/[0.02]">
+            <div className="px-5 py-3 border-t border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-white/2">
               {footer}
             </div>
           )}

@@ -58,7 +58,7 @@ export default function KillTransactionModal({ onTransactionKilled }) {
       isOpen={isKillTransactionModalOpen}
       onClose={() => dispatch(closeKillTransactionModal())}
       title="Dangerous: Terminate Transaction Handle"
-      headerClassName="!bg-rose-500/5"
+      headerClassName="bg-rose-500/5!"
       icon="cancel"
       iconClassName="text-rose-500"
       maxWidth="540px"

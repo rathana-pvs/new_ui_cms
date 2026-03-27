@@ -24,7 +24,7 @@
 
 ```tsx
 <Button
-  variant="primary | secondary | outline | ghost | danger"
+  variant="primary | secondary | outline-solid | ghost | danger"
   size="sm | md | lg | icon"
   loading={false}
   icon="material_icon"
@@ -330,7 +330,7 @@ useEffect(() => {
 
 | Pattern | Implementation |
 |---|---|
-| **Active indicator** | `absolute left-[-1px] top-0 bottom-0 w-[2px] bg-amber-600` |
+| **Active indicator** | `absolute -left-px top-0 bottom-0 w-[2px] bg-amber-600` |
 | **Status ping** | `<StatusIndicator status="on | off" animate />` |
 | **Expand icon** | `<Icon name="chevron_right" weight={300} className="group-open:rotate-90 transition-transform" />` |
 | **Hover state** | `hover:bg-slate-100 dark:hover:bg-slate-800/60` |
@@ -667,7 +667,7 @@ export const theme = {
     levelOneIndent:    "ml-[22px]",   // Database / Log / Broker root nodes
     levelDeepIndent:   "ml-4",        // Tables, columns, sub-brokers
     activeBarColor:    "bg-amber-600",
-    activeBarClass:    "absolute left-[-1px] top-0 bottom-0 w-[2px]",
+    activeBarClass:    "absolute -left-px top-0 bottom-0 w-[2px]",
     hoverClass:        "hover:bg-slate-100 dark:hover:bg-slate-800/60",
   },
 

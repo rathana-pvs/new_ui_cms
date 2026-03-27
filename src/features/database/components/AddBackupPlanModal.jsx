@@ -201,11 +201,11 @@ export default function AddBackupPlanModal() {
                   className={`flex flex-col items-center text-center p-3.5 rounded-2xl border transition-all group ${
                     formData.backupLevel === item.value
                       ? 'bg-bk-yellow/10 border-bk-yellow/40 shadow-lg shadow-bk-yellow/5'
-                      : 'bg-slate-50/20 dark:bg-white/[0.01] border-slate-100 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/20'
+                      : 'bg-slate-50/20 dark:bg-white/1 border-slate-100 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/20'
                   }`}
                 >
                   <div className={`w-9 h-9 rounded-xl flex items-center justify-center mb-2.5 transition-colors ${
-                    formData.backupLevel === item.value ? 'bg-bk-yellow text-slate-900 shadow-sm' : 'bg-slate-100 dark:bg-white/5 text-slate-400 group-hover:text-slate-300'
+                    formData.backupLevel === item.value ? 'bg-bk-yellow text-slate-900 shadow-xs' : 'bg-slate-100 dark:bg-white/5 text-slate-400 group-hover:text-slate-300'
                   }`}>
                     <Icon name={item.icon} size="sm" weight={300} />
                   </div>
@@ -281,7 +281,7 @@ export default function AddBackupPlanModal() {
                           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[9px] font-black transition-all uppercase tracking-widest ${
                             isPresetActive(preset.id)
                               ? 'bg-bk-yellow/10 border-bk-yellow/40 text-bk-yellow shadow-inner'
-                              : 'bg-white dark:bg-white/[0.02] border-slate-200 dark:border-white/5 text-slate-500 dark:text-slate-500 hover:border-bk-yellow/50'
+                              : 'bg-white dark:bg-white/2 border-slate-200 dark:border-white/5 text-slate-500 dark:text-slate-500 hover:border-bk-yellow/50'
                           }`}
                         >
                           <Icon name={preset.icon} size="xs" weight={300} />
@@ -299,7 +299,7 @@ export default function AddBackupPlanModal() {
                           className={`h-9 rounded-lg border text-[11px] font-black transition-all flex items-center justify-center ${
                             formData.periodDetail.includes(day)
                               ? 'bg-bk-yellow border-bk-yellow text-slate-900 shadow-md shadow-bk-yellow/10 scale-105 z-10'
-                              : 'bg-white dark:bg-white/[0.03] border-slate-200 dark:border-white/5 text-slate-500 hover:border-bk-yellow/40'
+                              : 'bg-white dark:bg-white/3 border-slate-200 dark:border-white/5 text-slate-500 hover:border-bk-yellow/40'
                           }`}
                         >
                           {day}
@@ -322,7 +322,7 @@ export default function AddBackupPlanModal() {
                           className={`h-11 w-full rounded-xl border text-[11px] font-black transition-all flex items-center justify-center ${
                             isActive
                               ? 'bg-bk-yellow border-bk-yellow text-slate-900 shadow-lg shadow-bk-yellow/10 scale-105 z-10'
-                              : 'bg-white dark:bg-white/[0.03] border-slate-200 dark:border-white/5 text-slate-500 hover:border-bk-yellow/40'
+                              : 'bg-white dark:bg-white/3 border-slate-200 dark:border-white/5 text-slate-500 hover:border-bk-yellow/40'
                           }`}
                         >
                           {day}
@@ -371,8 +371,8 @@ export default function AddBackupPlanModal() {
                   key={opt.field} 
                   className={`group flex items-center gap-3 p-3.5 rounded-2xl border transition-all cursor-pointer ${
                     formData[opt.field] 
-                      ? 'bg-bk-yellow/[0.03] border-bk-yellow/20' 
-                      : 'bg-slate-50/20 dark:bg-white/[0.01] border-slate-100 dark:border-white/5 hover:border-bk-yellow/20'
+                      ? 'bg-bk-yellow/3 border-bk-yellow/20' 
+                      : 'bg-slate-50/20 dark:bg-white/1 border-slate-100 dark:border-white/5 hover:border-bk-yellow/20'
                   }`}
                   onClick={() => handleInputChange(opt.field, !formData[opt.field])}
                 >
@@ -385,7 +385,7 @@ export default function AddBackupPlanModal() {
                   </div>
                   <Typography variant="label" className={`flex-1 text-[11px] font-black transition-colors ${formData[opt.field] ? 'text-bk-yellow' : 'text-slate-900 dark:text-white'}`}>{opt.label}</Typography>
                   <Checkbox 
-                    className="!w-fit !h-fit"
+                    className="w-fit! h-fit!"
                     checked={formData[opt.field]}
                     onChange={(e) => handleInputChange(opt.field, e.target.checked)}
                   />
@@ -427,7 +427,7 @@ export default function AddBackupPlanModal() {
                   className={`w-full flex items-start gap-4 p-4 rounded-2xl border transition-all text-left ${
                     formData.onlineType === mode.value 
                       ? 'bg-bk-yellow/10 border-bk-yellow/40 shadow-lg shadow-bk-yellow/5' 
-                      : 'bg-slate-50/10 dark:bg-white/[0.01] border-slate-100 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/20'
+                      : 'bg-slate-50/10 dark:bg-white/1 border-slate-100 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/20'
                   }`}
                 >
                   <div className={`w-11 h-11 rounded-xl flex items-center justify-center border transition-all shrink-0 ${

@@ -64,7 +64,7 @@ export default function DBLockTransactionSection({ locks, pollingProps }) {
           <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">Active Transactions & Locks</span>
           <span className="text-[10px] text-slate-400 font-normal ml-1">· Concurrency Status</span>
           {locks.length > 0 && (
-            <span className="ml-1 px-1.5 py-0.5 rounded bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20 text-[10px] font-bold">
+            <span className="ml-1 px-1.5 py-0.5 rounded-sm bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20 text-[10px] font-bold">
               {locks.length}
             </span>
           )}

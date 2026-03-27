@@ -40,7 +40,7 @@ export const ContextMenu = ({
   return (
     <div
       ref={menuRef}
-      className="fixed z-[9999] context-menu-container min-w-[220px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl rounded-lg py-1 flex flex-col"
+      className="fixed z-9999 context-menu-container min-w-[220px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl rounded-lg py-1 flex flex-col"
       style={{
         left: `${position.x}px`,
         top: `${position.y}px`,

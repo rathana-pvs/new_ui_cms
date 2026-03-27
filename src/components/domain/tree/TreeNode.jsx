@@ -53,8 +53,8 @@ export const TreeNode = React.memo(({
     flex items-center gap-1.5 px-2 py-[5px] w-full text-left transition-all duration-150
     cursor-pointer list-none rounded select-none group/node relative border border-transparent
     ${isActive
-      ? 'bg-amber-500/[0.06] dark:bg-amber-500/10 border-transparent text-amber-600 dark:text-amber-500'
-      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-white/[0.04] hover:text-slate-900 dark:hover:text-slate-200'
+      ? 'bg-amber-500/6 dark:bg-amber-500/10 border-transparent text-amber-600 dark:text-amber-500'
+      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-white/4 hover:text-slate-900 dark:hover:text-slate-200'
     }
   `;
 
@@ -152,7 +152,7 @@ export const TreeNode = React.memo(({
       </summary>
 
       {/* Children container with guide line */}
-      <div className={`${indentClass} border-l border-slate-200 dark:border-white/[0.06] space-y-px mt-0.5 ml-[13px]`}>
+      <div className={`${indentClass} border-l border-slate-200 dark:border-white/6 space-y-px mt-0.5 ml-[13px]`}>
         {isLoading ? (
           <div className="px-3 py-2 flex items-center gap-2 opacity-60">
             <Skeleton variant="text" width="100px" height="13px" />

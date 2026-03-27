@@ -17,8 +17,8 @@ export default function TabItem({
     <div 
       className={`group flex items-center gap-2 px-3 h-full border-r cursor-pointer min-w-[120px] max-w-[220px] transition-colors whitespace-nowrap relative select-none ${
         isActive 
-          ? 'bg-white dark:bg-bk-main border-r-slate-200 dark:border-r-white/[0.06] z-10' 
-          : 'bg-slate-100/80 dark:bg-bk-side border-r-slate-200 dark:border-r-white/[0.04] text-slate-500 hover:bg-white/70 dark:hover:bg-white/[0.03]'
+          ? 'bg-white dark:bg-bk-main border-r-slate-200 dark:border-r-white/6 z-10' 
+          : 'bg-slate-100/80 dark:bg-bk-side border-r-slate-200 dark:border-r-white/4 text-slate-500 hover:bg-white/70 dark:hover:bg-white/3'
       }`}
       onClick={onClick}
       onContextMenu={onContextMenu}
@@ -37,7 +37,7 @@ export default function TabItem({
            weight={isActive ? 400 : 300}
         />
         {isDirty && (
-          <div className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-amber-500 rounded-full border border-white dark:border-bk-side shadow-sm" />
+          <div className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-amber-500 rounded-full border border-white dark:border-bk-side shadow-xs" />
         )}
       </div>
       
@@ -51,7 +51,7 @@ export default function TabItem({
 
       {/* Close button */}
       <div 
-        className={`flex items-center justify-center w-5 h-5 rounded hover:bg-slate-200 dark:hover:bg-white/10 transition-all shrink-0 ${isActive ? 'opacity-60 hover:opacity-100' : 'opacity-0 group-hover:opacity-60 hover:!opacity-100'}`}
+        className={`flex items-center justify-center w-5 h-5 rounded-sm hover:bg-slate-200 dark:hover:bg-white/10 transition-all shrink-0 ${isActive ? 'opacity-60 hover:opacity-100' : 'opacity-0 group-hover:opacity-60 hover:opacity-100!'}`}
         onClick={(e) => {
           e.stopPropagation();
           onClose();

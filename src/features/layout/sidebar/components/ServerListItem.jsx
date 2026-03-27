@@ -12,8 +12,8 @@ export default function ServerListItem({ host, isSelected, isAuthorized, onConte
       title={`${host.address}:${host.port}`}
       className={`flex flex-col px-4 py-2 cursor-pointer transition-all select-none rounded group relative mb-1 border
         ${isSelected
-          ? 'bg-amber-50/60 dark:bg-white/[0.06] border-amber-200 dark:border-amber-500/30 shadow-sm'
-          : 'bg-white dark:bg-white/[0.02] border-slate-200 dark:border-white/[0.07] hover:bg-slate-50 dark:hover:bg-white/[0.04] hover:border-slate-300 dark:hover:border-white/[0.12]'
+          ? 'bg-amber-50/60 dark:bg-white/6 border-amber-200 dark:border-amber-500/30 shadow-xs'
+          : 'bg-white dark:bg-white/2 border-slate-200 dark:border-white/[0.07] hover:bg-slate-50 dark:hover:bg-white/4 hover:border-slate-300 dark:hover:border-white/12'
         }`}
       onClick={() => {
         dispatch(setSelectedHost(host.uid));
@@ -22,7 +22,7 @@ export default function ServerListItem({ host, isSelected, isAuthorized, onConte
       onContextMenu={(e) => onContextMenu(e, host.alias || host.id, host.uid, host.alias || host.id)}
     >
       <div className="flex items-center gap-3 relative z-10">
-        <div className={`flex-shrink-0 w-8 h-8 rounded flex items-center justify-center transition-all
+        <div className={`shrink-0 w-8 h-8 rounded flex items-center justify-center transition-all
           ${isSelected 
             ? 'bg-amber-500 shadow-md shadow-amber-500/20' 
             : 'bg-slate-100 dark:bg-white/5 text-slate-400 border border-slate-200 dark:border-white/10'}`}>
@@ -46,7 +46,7 @@ export default function ServerListItem({ host, isSelected, isAuthorized, onConte
             </Typography>
             {isAuthorized && (
               <div className="relative group/status">
-                <span className="size-1.5 rounded-full bg-emerald-500 flex-shrink-0"></span>
+                <span className="size-1.5 rounded-full bg-emerald-500 shrink-0"></span>
               </div>
             )}
           </div>

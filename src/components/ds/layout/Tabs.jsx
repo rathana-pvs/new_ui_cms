@@ -11,7 +11,7 @@ export const Tabs = ({
 
   return (
     <div className={`w-full ${className}`}>
-      <div className={`flex items-center gap-1 ${isPills ? 'bg-slate-100 dark:bg-bk-main/50 p-1 rounded' : 'border-b border-slate-100 dark:border-slate-800'}`}>
+      <div className={`flex items-center gap-1 ${isPills ? 'bg-slate-100 dark:bg-bk-main/50 p-1 rounded-sm' : 'border-b border-slate-100 dark:border-slate-800'}`}>
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           
@@ -22,7 +22,7 @@ export const Tabs = ({
                 onClick={() => onChange(tab.id)}
                 className={`flex-1 px-4 py-1.5 text-[11px] font-semibold rounded transition-all ${
                   isActive
-                    ? 'bg-white dark:bg-bk-side text-slate-900 dark:text-bk-yellow shadow-sm border border-slate-200 dark:border-white/5'
+                    ? 'bg-white dark:bg-bk-side text-slate-900 dark:text-bk-yellow shadow-xs border border-slate-200 dark:border-white/5'
                     : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-white/5'
                 }`}
               >

@@ -274,12 +274,12 @@ export default function Sidebar({ isCollapsed, onAddHost }) {
               className={`flex-none px-4 py-2 border-b border-slate-200 dark:border-white/5 flex items-center justify-between cursor-pointer transition-all duration-300 group/host-header
                 ${!isServerListCollapsed
                   ? 'bg-white dark:bg-bk-side'
-                  : 'bg-slate-50 dark:bg-white/[0.02] hover:bg-slate-100 dark:hover:bg-white/5'
+                  : 'bg-slate-50 dark:bg-white/2 hover:bg-slate-100 dark:hover:bg-white/5'
                 }`}
               onClick={toggleServerListCollapse}
             >
               <div className="flex items-center gap-2">
-                <div className={`w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-all duration-200
+                <div className={`w-5 h-5 rounded flex items-center justify-center shrink-0 transition-all duration-200
                   ${!isServerListCollapsed ? 'text-amber-500' : 'text-slate-400 group-hover/host-header:text-amber-500'}`}>
                   <Icon
                     name="chevron_right"
@@ -296,7 +296,7 @@ export default function Sidebar({ isCollapsed, onAddHost }) {
 
               <div className="flex items-center gap-2">
                 {isServerListCollapsed && (
-                  <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 shadow-sm animate-in zoom-in-95 duration-200">
+                  <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 shadow-xs animate-in zoom-in-95 duration-200">
                     <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse shadow-[0_0_5px_rgba(245,158,11,0.5)]" />
                     <span className="text-[10px] font-bold text-amber-600 dark:text-amber-500 font-mono tracking-tight">
                       {hosts.length}
@@ -306,7 +306,7 @@ export default function Sidebar({ isCollapsed, onAddHost }) {
                 {!isServerListCollapsed && (
                   <button
                     onClick={(e) => { e.stopPropagation(); onAddHost(); }}
-                    className="flex items-center gap-1 h-6 px-2 rounded border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.04] text-slate-400 hover:text-amber-500 hover:border-amber-400/50 hover:bg-amber-500/5 dark:hover:bg-amber-500/10 transition-all active:scale-95 shadow-sm"
+                    className="flex items-center gap-1 h-6 px-2 rounded-sm border border-slate-200 dark:border-white/10 bg-white dark:bg-white/4 text-slate-400 hover:text-amber-500 hover:border-amber-400/50 hover:bg-amber-500/5 dark:hover:bg-amber-500/10 transition-all active:scale-95 shadow-xs"
                     title="Add Host"
                   >
                     <Icon name="add" size="12px" weight={400} />
@@ -331,7 +331,7 @@ export default function Sidebar({ isCollapsed, onAddHost }) {
                 ) : hosts.length === 0 ? (
                   <button
                     onClick={onAddHost}
-                    className="w-full mt-1 flex flex-col items-center justify-center gap-2 py-6 px-3 rounded-lg border border-dashed border-slate-300 dark:border-white/10 bg-white dark:bg-white/[0.02] hover:border-amber-400/60 hover:bg-amber-500/5 dark:hover:bg-amber-500/10 transition-all group/add-host cursor-pointer"
+                    className="w-full mt-1 flex flex-col items-center justify-center gap-2 py-6 px-3 rounded-lg border border-dashed border-slate-300 dark:border-white/10 bg-white dark:bg-white/2 hover:border-amber-400/60 hover:bg-amber-500/5 dark:hover:bg-amber-500/10 transition-all group/add-host cursor-pointer"
                   >
                     <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover/add-host:bg-amber-500/10 group-hover/add-host:border-amber-400/40 transition-all">
                       <Icon name="add" size="16px" weight={300} className="text-slate-400 group-hover/add-host:text-amber-500 transition-colors" />
@@ -363,12 +363,12 @@ export default function Sidebar({ isCollapsed, onAddHost }) {
                   className={`flex-none px-3 py-2 border-b border-t border-slate-200 dark:border-white/5 flex items-center justify-between cursor-pointer transition-all duration-300 group/tree-header
                     ${!isTreeCollapsed
                       ? 'bg-white dark:bg-bk-side'
-                      : 'bg-slate-50 dark:bg-white/[0.02] hover:bg-slate-100 dark:hover:bg-white/5'
+                      : 'bg-slate-50 dark:bg-white/2 hover:bg-slate-100 dark:hover:bg-white/5'
                     }`}
                   onClick={toggleTreeCollapse}
                 >
                   <div className="flex items-center gap-2">
-                    <div className={`w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-all duration-200
+                    <div className={`w-5 h-5 rounded flex items-center justify-center shrink-0 transition-all duration-200
                       ${!isTreeCollapsed ? 'text-amber-500' : 'text-slate-400 group-hover/tree-header:text-amber-500'}`}>
                       <Icon
                         name="chevron_right"
@@ -384,7 +384,7 @@ export default function Sidebar({ isCollapsed, onAddHost }) {
                   </div>
                   <div className="flex items-center gap-1.5">
                     {isTreeCollapsed ? (
-                      <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 animate-in fade-in zoom-in-95 duration-200">
+                      <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-sm bg-amber-500/10 border border-amber-500/20 animate-in fade-in zoom-in-95 duration-200">
                         <Icon
                           name={activeTab === 'db' ? 'database' : activeTab === 'broker' ? 'hub' : 'description'}
                           size="11px"
@@ -413,7 +413,7 @@ export default function Sidebar({ isCollapsed, onAddHost }) {
                     <div className="flex-1 overflow-y-auto px-4 pb-4 relative min-h-[200px]">
                   {/* States Overlay */}
                   {isLoggingIntoHost && (
-                    <div className="absolute inset-0 bg-white/80 dark:bg-bk-side z-[210] flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-200">
+                    <div className="absolute inset-0 bg-white/80 dark:bg-bk-side z-210 flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-200">
                       <div className="size-16 border-4 border-bk-yellow/10 border-t-bk-yellow rounded-full animate-spin mb-6 shadow-[0_0_15px_rgba(255,193,7,0.2)]"></div>
                       <Typography variant="p" className="text-sm font-bold text-slate-900 dark:text-bk-yellow tracking-wide">Host login</Typography>
                       <Typography variant="caption" className="text-slate-500 mt-1 dark:text-slate-400">Establishing secure session...</Typography>
@@ -421,7 +421,7 @@ export default function Sidebar({ isCollapsed, onAddHost }) {
                   )}
 
                   {!isLoggingIntoHost && hostAuthErrors[selectedHostUid] && (
-                    <div className="absolute inset-0 bg-white dark:bg-bk-side z-[210] flex flex-col items-center justify-center p-6 text-center animate-in zoom-in-95 duration-200">
+                    <div className="absolute inset-0 bg-white dark:bg-bk-side z-210 flex flex-col items-center justify-center p-6 text-center animate-in zoom-in-95 duration-200">
                       <div className="size-12 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mb-4">
                         <Icon name="error" className="text-rose-500"  weight={300} />
                       </div>
@@ -432,7 +432,7 @@ export default function Sidebar({ isCollapsed, onAddHost }) {
                   )}
 
                   {(dbActionLoading || brokerActionLoading) && (
-                    <div className="absolute inset-0 bg-white/60 dark:bg-bk-main/60 z-[200] flex items-center justify-center backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="absolute inset-0 bg-white/60 dark:bg-bk-main/60 z-200 flex items-center justify-center backdrop-blur-xs animate-in fade-in duration-200">
                       <div className="flex flex-col items-center gap-3 bg-white dark:bg-bk-side px-8 py-6 rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10">
                         <Spinner size="lg" />
                         <Typography variant="caption" className="font-medium text-slate-900 dark:text-bk-yellow text-[13px]">Processing...</Typography>

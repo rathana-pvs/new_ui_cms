@@ -4,7 +4,7 @@ import { Input } from '../../../../components/ds/forms/Input';
 const SectionHeader = ({ label }) => (
   <div className="flex items-center gap-3 mb-4">
     <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">{label}</span>
-    <div className="flex-1 h-px bg-slate-100 dark:bg-white/[0.05]" />
+    <div className="flex-1 h-px bg-slate-100 dark:bg-white/5" />
   </div>
 );
 
@@ -45,7 +45,7 @@ export default function UnloadAdvancedOptions({ formData, handleInputChange }) {
       </div>
 
       {/* Conditional input fields */}
-      <div className="space-y-2.5 pt-4 border-t border-slate-100 dark:border-white/[0.04]">
+      <div className="space-y-2.5 pt-4 border-t border-slate-100 dark:border-white/4">
         {inputFields.map(field => (
           <div key={field.name} className="flex items-center gap-3">
             <div className="w-48 shrink-0">

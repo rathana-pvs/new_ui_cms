@@ -97,7 +97,7 @@ export default function DeleteHostModal() {
                     <Icon name={item.icon} size="xs" weight={300} />
                   </div>
                   {i < consequences.length - 1 && (
-                    <div className="w-[1px] h-3 bg-gradient-to-b from-rose-500/20 to-transparent my-0.5"></div>
+                    <div className="w-px h-3 bg-linear-to-b from-rose-500/20 to-transparent my-0.5"></div>
                   )}
                 </div>
                 <div className={`flex-1 ${i < consequences.length - 1 ? 'pb-2' : ''} pt-1`}>

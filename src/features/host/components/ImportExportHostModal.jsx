@@ -232,7 +232,7 @@ export default function ImportExportHostModal() {
                   onChange={handleToggleAll}
                   disabled={selectable.length === 0}
                   label="SELECT ALL"
-                  className="!text-[10px] font-bold tracking-wider text-slate-500"
+                  className="text-[10px]! font-bold tracking-wider text-slate-500"
                 />
               </div>
               <Badge variant="yellow" size="sm">
@@ -288,7 +288,7 @@ export default function ImportExportHostModal() {
                     const id = host.uid || host.address + host.port + host.id;
                     const isSelected = selectedHosts.includes(id);
                     return `
-                      ${isSelected ? 'bg-bk-yellow/[0.03]' : ''} 
+                      ${isSelected ? 'bg-bk-yellow/3' : ''} 
                       ${host.isDuplicate ? 'opacity-60 grayscale-[0.5]' : 'cursor-pointer'}
                     `;
                   }}

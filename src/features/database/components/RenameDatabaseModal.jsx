@@ -143,7 +143,7 @@ export default function RenameDatabaseModal() {
               </div>
 
               <div 
-                className={`flex items-start gap-4 p-4 border rounded-2xl transition-all group cursor-pointer ${forcedel ? 'bg-rose-500/[0.04] border-rose-500/20 shadow-[0_4px_20px_rgba(244,63,94,0.05)]' : 'bg-slate-50/50 dark:bg-white/[0.02] border-slate-100 dark:border-white/5 hover:bg-white/5'}`}
+                className={`flex items-start gap-4 p-4 border rounded-2xl transition-all group cursor-pointer ${forcedel ? 'bg-rose-500/4 border-rose-500/20 shadow-[0_4px_20px_rgba(244,63,94,0.05)]' : 'bg-slate-50/50 dark:bg-white/2 border-slate-100 dark:border-white/5 hover:bg-white/5'}`}
                 onClick={() => setForcedel(!forcedel)}
               >
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-all shrink-0 mt-0.5 ${forcedel ? 'bg-rose-500/10 border-rose-500/20 text-rose-500' : 'bg-slate-100 dark:bg-white/5 border-transparent text-slate-400'}`}>
@@ -159,7 +159,7 @@ export default function RenameDatabaseModal() {
                 </div>
                 <div className="pt-1.5 shrink-0">
                   <Checkbox 
-                    className="!w-fit"
+                    className="w-fit!"
                     checked={forcedel}
                     onChange={(e) => setForcedel(e.target.checked)}
                   />

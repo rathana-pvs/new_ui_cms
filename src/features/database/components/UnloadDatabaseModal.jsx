@@ -204,7 +204,7 @@ export default function UnloadDatabaseModal() {
       <div className="space-y-8 pb-4">
         
         {/* Source Instance Banner */}
-        <div className="relative overflow-hidden rounded-xl border border-amber-500/20 bg-gradient-to-r from-amber-500/8 to-transparent dark:from-amber-500/10 dark:to-transparent p-4">
+        <div className="relative overflow-hidden rounded-xl border border-amber-500/20 bg-linear-to-r from-amber-500/8 to-transparent dark:from-amber-500/10 dark:to-transparent p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0 shadow-inner">
@@ -218,13 +218,13 @@ export default function UnloadDatabaseModal() {
                   <Typography variant="p" className="text-[14px] font-bold text-amber-700 dark:text-amber-400 font-mono truncate">
                     {selectedDatabase}
                   </Typography>
-                  <span className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded-sm border ${activeDatabases.includes(selectedDatabase) ? 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20' : 'text-slate-400 bg-slate-500/10 border-slate-500/20'}`}>
+                  <span className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded-xs border ${activeDatabases.includes(selectedDatabase) ? 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20' : 'text-slate-400 bg-slate-500/10 border-slate-500/20'}`}>
                     {activeDatabases.includes(selectedDatabase) ? 'Active' : 'Standby'}
                   </span>
                 </div>
               </div>
             </div>
-            <div className="shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/50 dark:bg-black/20 border border-slate-200 dark:border-white/5 backdrop-blur-sm">
+            <div className="shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/50 dark:bg-black/20 border border-slate-200 dark:border-white/5 backdrop-blur-xs">
               <Icon name="description" size="sm" className="text-slate-400" />
               <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Target Type: .sql / .csv</span>
             </div>
@@ -253,8 +253,8 @@ export default function UnloadDatabaseModal() {
         </div>
 
         {/* Action Disclaimer */}
-        <div className="flex items-start gap-4 p-4 bg-slate-100 dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.08] rounded-xl">
-          <div className="w-8 h-8 rounded-lg bg-white dark:bg-white/5 flex items-center justify-center shrink-0 border border-slate-200 dark:border-white/10 shadow-sm">
+        <div className="flex items-start gap-4 p-4 bg-slate-100 dark:bg-white/2 border border-slate-200 dark:border-white/8 rounded-xl">
+          <div className="w-8 h-8 rounded-lg bg-white dark:bg-white/5 flex items-center justify-center shrink-0 border border-slate-200 dark:border-white/10 shadow-xs">
             <Icon name="info" size="sm" weight={300} className="text-sky-500" />
           </div>
           <div>

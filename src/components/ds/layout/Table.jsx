@@ -57,14 +57,14 @@ export const Table = ({
         {/* ── Header ── */}
         {headersVisible && (
           <thead>
-            <tr className="bg-slate-100 dark:bg-white/[0.03] border-b border-slate-200 dark:border-white/[0.07]">
+            <tr className="bg-slate-100 dark:bg-white/3 border-b border-slate-200 dark:border-white/[0.07]">
               {columns.map((col, idx) => {
                 const isSorted = sortConfig?.key === col.accessor;
                 const alignCls = col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : '';
                 return (
                   <th
                     key={col.accessor || idx}
-                    className={`group relative px-3 py-2 text-[11px] font-bold uppercase tracking-[0.1em]
+                    className={`group relative px-3 py-2 text-[11px] font-bold uppercase tracking-widest
                       ${isSorted ? 'text-amber-600 dark:text-amber-400' : 'text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}
                       transition-colors whitespace-nowrap ${alignCls}
                       ${col.className || ''} ${sortable ? 'cursor-pointer select-none' : ''}`}
@@ -97,7 +97,7 @@ export const Table = ({
         )}
 
         {/* ── Body ── */}
-        <tbody className="divide-y divide-slate-100 dark:divide-white/[0.04]">
+        <tbody className="divide-y divide-slate-100 dark:divide-white/4">
           {sortedData.map((row, rowIdx) => {
             const isEven = rowIdx % 2 === 0;
             return (
@@ -105,7 +105,7 @@ export const Table = ({
                 key={row.id || rowIdx}
                 className={`group transition-colors duration-100
                   ${zebra && isEven ? 'bg-slate-50/60 dark:bg-white/[0.012]' : ''}
-                  hover:bg-amber-500/[0.04] dark:hover:bg-amber-500/[0.05]
+                  hover:bg-amber-500/4 dark:hover:bg-amber-500/5
                   ${onRowClick ? 'cursor-pointer' : ''}`}
                 onClick={() => onRowClick && onRowClick(row)}
               >

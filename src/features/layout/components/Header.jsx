@@ -49,19 +49,19 @@ export default function Header({ theme, toggleTheme }) {
   };
 
   /* ── icon button shared style ── */
-  const btnBase = "h-8 flex items-center justify-center rounded border transition-all active:scale-[0.98]";
-  const iconBtn = `${btnBase} w-8 bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/[0.06] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200`;
+  const btnBase = "h-8 flex items-center justify-center rounded-sm border transition-all active:scale-[0.98]";
+  const iconBtn = `${btnBase} w-8 bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/6 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200`;
 
   return (
     <>
-      <header className="bg-white dark:bg-background-dark border-b border-slate-100 dark:border-white/[0.06] h-14 flex items-center justify-between px-6 z-40 shrink-0 select-none">
+      <header className="bg-white dark:bg-background-dark border-b border-slate-100 dark:border-white/6 h-14 flex items-center justify-between px-6 z-40 shrink-0 select-none">
 
         {/* ── Left: logo + menus + quick actions ── */}
         <div className="flex items-center gap-1">
           {/* Dropdown menus */}
           <HeaderMenu />
 
-          <div className="w-px h-5 bg-slate-200 dark:bg-white/[0.08] mx-3" />
+          <div className="w-px h-5 bg-slate-200 dark:bg-white/8 mx-3" />
 
           {/* Quick action: Start */}
           <button
@@ -85,21 +85,21 @@ export default function Header({ theme, toggleTheme }) {
             <Icon name={theme === 'light' ? 'dark_mode' : 'light_mode'} size="18px" weight={300} />
           </button>
 
-          <div className="w-px h-5 bg-slate-200 dark:bg-white/[0.08] mx-1" />
+          <div className="w-px h-5 bg-slate-200 dark:bg-white/8 mx-1" />
 
           {/* User profile pill */}
           <button
-            className={`${btnBase} px-2 gap-2 bg-slate-100 dark:bg-white/[0.04] border-slate-200 dark:border-white/[0.07] hover:bg-slate-200 dark:hover:bg-white/[0.08] group min-w-[120px] justify-between`}
+            className={`${btnBase} px-2 gap-2 bg-slate-100 dark:bg-white/4 border-slate-200 dark:border-white/[0.07] hover:bg-slate-200 dark:hover:bg-white/8 group min-w-[120px] justify-between`}
             onClick={() => setIsProfileOpen(true)}
           >
             {authLoading ? (
               <div className="flex items-center gap-2 w-full justify-center">
-                <div className="h-3 w-16 bg-slate-200 dark:bg-white/10 rounded animate-pulse" />
-                <div className="w-6 h-6 rounded bg-slate-200 dark:bg-white/10 animate-pulse" />
+                <div className="h-3 w-16 bg-slate-200 dark:bg-white/10 rounded-sm animate-pulse" />
+                <div className="w-6 h-6 rounded-sm bg-slate-200 dark:bg-white/10 animate-pulse" />
               </div>
             ) : (
               <>
-                <div className="w-6 h-6 rounded bg-amber-500 shadow-sm shadow-amber-500/20 flex items-center justify-center shrink-0">
+                <div className="w-6 h-6 rounded-sm bg-amber-500 shadow-xs shadow-amber-500/20 flex items-center justify-center shrink-0">
                   <Icon
                     name={authError ? 'error' : 'person'}
                     size="16px"

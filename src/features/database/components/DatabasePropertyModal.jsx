@@ -403,7 +403,7 @@ export default function DatabasePropertyModal() {
         {/* Content Pane */}
         <div className="flex-1 flex flex-col min-w-0 bg-white dark:bg-transparent overflow-hidden">
           {activeSidebar === 'Server Parameter' && (
-            <div className="flex px-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/30 dark:bg-white/[0.02] shrink-0">
+            <div className="flex px-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/30 dark:bg-white/2 shrink-0">
               {['General', 'Advanced'].map(tab => (
                 <button 
                   key={tab} 
@@ -596,7 +596,7 @@ export default function DatabasePropertyModal() {
               </div>
             ) : (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-400">
-                <div className="border border-slate-100 dark:border-white/5 rounded-2xl overflow-hidden shadow-sm bg-slate-50/20 dark:bg-black/10">
+                <div className="border border-slate-100 dark:border-white/5 rounded-2xl overflow-hidden shadow-xs bg-slate-50/20 dark:bg-black/10">
                   <Table 
                     columns={advancedColumns}
                     data={advancedData}

@@ -20,7 +20,7 @@ export const Checkbox = forwardRef(({
             className="peer sr-only"
             {...props}
           />
-          <div className="w-4.5 h-4.5 bg-slate-50 dark:bg-bk-main/30 border border-slate-300 dark:border-slate-800 rounded-md flex flex-shrink-0 justify-center items-center peer-checked:bg-bk-yellow peer-checked:border-bk-yellow/50 transition-all shadow-sm">
+          <div className="w-4.5 h-4.5 bg-slate-50 dark:bg-bk-main/30 border border-slate-300 dark:border-slate-800 rounded-md flex shrink-0 justify-center items-center peer-checked:bg-bk-yellow peer-checked:border-bk-yellow/50 transition-all shadow-xs">
             <svg 
               className="w-3.5 h-3.5 text-bk-side pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" 
               viewBox="0 0 24 24" 

@@ -9,7 +9,7 @@ export const Skeleton = ({
   const baseClasses = 'bg-slate-200 dark:bg-slate-800 animate-pulse';
   
   const variants = {
-    text: 'rounded-sm',
+    text: 'rounded-xs',
     rect: 'rounded-md',
     circle: 'rounded-full',
   };

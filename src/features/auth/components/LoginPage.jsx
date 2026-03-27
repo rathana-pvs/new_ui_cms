@@ -53,8 +53,8 @@ export default function LoginPage() {
     { label: 'Clients',  value: '12.4K' },
   ];
 
-  const inputBase = 'w-full h-11 text-[13px] font-medium bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 rounded-xl outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 dark:text-white';
-  const inputFocus = 'focus:border-amber-500/50 dark:focus:border-amber-500/40 focus:bg-amber-500/[0.02] dark:focus:bg-amber-500/[0.03]';
+  const inputBase = 'w-full h-11 text-[13px] font-medium bg-slate-50 dark:bg-white/3 border border-slate-200 dark:border-white/10 rounded-xl outline-hidden transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 dark:text-white';
+  const inputFocus = 'focus:border-amber-500/50 dark:focus:border-amber-500/40 focus:bg-amber-500/2 dark:focus:bg-amber-500/3';
   const inputError = 'border-rose-500/60 dark:border-rose-500/40';
   const inputNormal = 'hover:border-slate-300 dark:hover:border-white/20';
 
@@ -72,8 +72,8 @@ export default function LoginPage() {
         />
 
         {/* Glow blobs */}
-        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-amber-500/[0.06] rounded-full blur-[140px] pointer-events-none" />
-        <div className="absolute bottom-[-10%] right-[-5%] w-[400px] h-[400px] bg-sky-500/[0.04] rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-amber-500/6 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute bottom-[-10%] right-[-5%] w-[400px] h-[400px] bg-sky-500/4 rounded-full blur-[120px] pointer-events-none" />
 
         {/* Corner accent lines */}
         <div className="absolute top-0 left-0 w-24 h-24 border-l-2 border-t-2 border-amber-500/20 rounded-none pointer-events-none" />
@@ -102,7 +102,7 @@ export default function LoginPage() {
               </div>
               <h1 className="text-5xl font-black text-white leading-[1.08] tracking-tighter mb-5">
                 Total control<br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-white">of your data.</span>
+                <span className="text-transparent bg-clip-text bg-linear-to-r from-amber-400 via-amber-300 to-white">of your data.</span>
               </h1>
               <p className="text-[15px] text-slate-500 font-light leading-relaxed max-w-md">
                 Monitor, administer, and optimize your CUBRID database infrastructure from a single, unified interface.
@@ -110,7 +110,7 @@ export default function LoginPage() {
             </div>
 
             {/* Stats bar */}
-            <div className="flex items-center gap-0 mb-10 bg-white/[0.025] border border-white/[0.06] rounded-2xl overflow-hidden divide-x divide-white/[0.06]">
+            <div className="flex items-center gap-0 mb-10 bg-white/2.5 border border-white/6 rounded-2xl overflow-hidden divide-x divide-white/6">
               {stats.map((s) => (
                 <div key={s.label} className="flex-1 px-5 py-4 text-center">
                   <p className="text-xl font-black text-white font-mono tracking-tight">{s.value}</p>
@@ -122,7 +122,7 @@ export default function LoginPage() {
             {/* Feature list */}
             <div className="space-y-3">
               {features.map((f, i) => (
-                <div key={i} className="flex items-start gap-3.5 p-4 rounded-xl border border-white/[0.05] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/10 transition-all group">
+                <div key={i} className="flex items-start gap-3.5 p-4 rounded-xl border border-white/5 bg-white/2 hover:bg-white/4 hover:border-white/10 transition-all group">
                   <div className="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0 group-hover:bg-amber-500 group-hover:border-transparent transition-all">
                     <Icon name={f.icon} size="sm" weight={300} className="text-amber-400 group-hover:text-black transition-colors" />
                   </div>
@@ -151,8 +151,8 @@ export default function LoginPage() {
       <div className="w-full lg:w-[48%] flex flex-col items-center justify-center px-8 sm:px-14 md:px-20 bg-white dark:bg-[#0d0d0f] relative overflow-hidden">
 
         {/* Subtle ambient glow */}
-        <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/[0.04] rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-60 h-60 bg-amber-500/[0.03] rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/4 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-60 h-60 bg-amber-500/3 rounded-full blur-[100px] pointer-events-none" />
 
         <div className="w-full max-w-[360px] relative z-10">
 
@@ -234,7 +234,7 @@ export default function LoginPage() {
               <input type="checkbox" id="remember" className="peer sr-only" />
               <div
                 onClick={() => document.getElementById('remember').click()}
-                className="w-4 h-4 rounded-md border border-slate-300 dark:border-white/15 peer-checked:bg-amber-500 peer-checked:border-amber-500 flex items-center justify-center transition-all bg-white dark:bg-white/[0.03]"
+                className="w-4 h-4 rounded-md border border-slate-300 dark:border-white/15 peer-checked:bg-amber-500 peer-checked:border-amber-500 flex items-center justify-center transition-all bg-white dark:bg-white/3"
               >
                 <Icon name="check" size="12px" weight={600} className="text-white opacity-0 peer-checked:opacity-100" />
               </div>

@@ -68,14 +68,14 @@ export const SplitPane = ({
       className={`flex h-full w-full overflow-hidden ${isVertical ? 'flex-row' : 'flex-col'} ${className}`}
     >
       <div 
-        className="flex-shrink-0 relative h-full w-full overflow-hidden" 
+        className="shrink-0 relative h-full w-full overflow-hidden" 
         style={{ [isVertical ? 'width' : 'height']: `${size}px`, [isVertical ? 'height' : 'width']: '100%' }}
       >
         {pane1}
       </div>
       
       <div
-        className={`flex-shrink-0 z-10 group/resize relative flex items-center justify-center transition-colors ${
+        className={`shrink-0 z-10 group/resize relative flex items-center justify-center transition-colors ${
           isVertical ? 'w-1.5 cursor-col-resize h-full mx-[-3px]' : 'h-1.5 cursor-row-resize w-full my-[-3px]'
         } ${isDragging ? 'bg-bk-yellow/10' : 'bg-transparent hover:bg-bk-yellow/5'}`}
         onMouseDown={() => {

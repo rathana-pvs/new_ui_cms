@@ -62,8 +62,8 @@ export default function RegisterPage() {
   };
   const strength = getPasswordStrength();
 
-  const inputBase  = 'w-full h-11 text-[13px] font-medium bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 rounded-xl outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 dark:text-white';
-  const inputFocus = 'focus:border-amber-500/50 dark:focus:border-amber-500/40 focus:bg-amber-500/[0.02] dark:focus:bg-amber-500/[0.03]';
+  const inputBase  = 'w-full h-11 text-[13px] font-medium bg-slate-50 dark:bg-white/3 border border-slate-200 dark:border-white/10 rounded-xl outline-hidden transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 dark:text-white';
+  const inputFocus = 'focus:border-amber-500/50 dark:focus:border-amber-500/40 focus:bg-amber-500/2 dark:focus:bg-amber-500/3';
   const inputErr   = 'border-rose-500/60 dark:border-rose-500/40';
   const inputOk    = 'border-emerald-500/50 dark:border-emerald-500/40';
   const inputNorm  = 'hover:border-slate-300 dark:hover:border-white/20';
@@ -89,8 +89,8 @@ export default function RegisterPage() {
         />
 
         {/* Glow blobs */}
-        <div className="absolute top-[-10%] right-[-5%] w-[480px] h-[480px] bg-emerald-500/[0.05] rounded-full blur-[140px] pointer-events-none" />
-        <div className="absolute bottom-[-10%] left-[-5%]  w-[380px] h-[380px] bg-amber-500/[0.04]   rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-[-10%] right-[-5%] w-[480px] h-[480px] bg-emerald-500/5 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute bottom-[-10%] left-[-5%]  w-[380px] h-[380px] bg-amber-500/4   rounded-full blur-[120px] pointer-events-none" />
 
         {/* Corner accents */}
         <div className="absolute top-0 left-0 w-24 h-24 border-l-2 border-t-2 border-amber-500/20 pointer-events-none" />
@@ -103,7 +103,7 @@ export default function RegisterPage() {
               to="/login"
               className="inline-flex items-center gap-2 mb-14 group text-slate-600 hover:text-white transition-colors"
             >
-              <div className="w-7 h-7 rounded-lg bg-white/[0.04] border border-white/[0.07] flex items-center justify-center group-hover:bg-white/10 transition-colors">
+              <div className="w-7 h-7 rounded-lg bg-white/4 border border-white/[0.07] flex items-center justify-center group-hover:bg-white/10 transition-colors">
                 <Icon name="arrow_back" size="14px" weight={300} className="text-slate-500 group-hover:text-white" />
               </div>
               <span className="text-[11px] font-bold uppercase tracking-[0.2em]">Back to Login</span>
@@ -128,7 +128,7 @@ export default function RegisterPage() {
               </div>
               <h1 className="text-5xl font-black text-white leading-[1.08] tracking-tighter mb-5">
                 Build your<br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-white">data foundation.</span>
+                <span className="text-transparent bg-clip-text bg-linear-to-r from-amber-400 via-amber-300 to-white">data foundation.</span>
               </h1>
               <p className="text-[15px] text-slate-500 font-light leading-relaxed max-w-md">
                 Join the CUBRID ecosystem. A powerful open-source RDBMS built for modern web application performance and reliability.
@@ -138,7 +138,7 @@ export default function RegisterPage() {
             {/* Spec grid */}
             <div className="grid grid-cols-2 gap-3">
               {specs.map((s, i) => (
-                <div key={i} className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:border-amber-500/20 hover:bg-white/[0.04] transition-all group">
+                <div key={i} className="p-4 rounded-xl bg-white/2 border border-white/5 hover:border-amber-500/20 hover:bg-white/4 transition-all group">
                   <div className="flex items-center gap-2 mb-2">
                     <Icon name={s.icon} size="sm" weight={300} className="text-amber-500/40 group-hover:text-amber-400 transition-colors" />
                     <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">{s.label}</p>
@@ -160,8 +160,8 @@ export default function RegisterPage() {
       <div className="w-full lg:w-[48%] flex flex-col items-center justify-center px-8 sm:px-14 md:px-20 bg-white dark:bg-[#0d0d0f] relative overflow-hidden">
 
         {/* Ambient glows */}
-        <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/[0.03] rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-60 h-60 bg-amber-500/[0.03]   rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/3 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-60 h-60 bg-amber-500/3   rounded-full blur-[100px] pointer-events-none" />
 
         <div className="w-full max-w-[360px] relative z-10 py-10">
 
@@ -237,7 +237,7 @@ export default function RegisterPage() {
                 <div className="pt-1 animate-in fade-in duration-200">
                   <div className="flex gap-1 h-0.5 mb-1.5">
                     {[1, 2, 3, 4].map((i) => (
-                      <div key={i} className={`flex-1 rounded-full transition-all duration-300 ${i <= strength.level ? strength.color : 'bg-slate-200 dark:bg-white/[0.06]'}`} />
+                      <div key={i} className={`flex-1 rounded-full transition-all duration-300 ${i <= strength.level ? strength.color : 'bg-slate-200 dark:bg-white/6'}`} />
                     ))}
                   </div>
                   <p className={`text-[10px] font-bold uppercase tracking-widest font-mono ${strength.text}`}>{strength.label}</p>

@@ -23,7 +23,7 @@ export default function SidebarEmptyState() {
           <div className="absolute inset-0 rounded-full border border-dashed border-slate-200 dark:border-white/[0.07] scale-[1.75] animate-[spin_20s_linear_infinite] opacity-60" />
 
           {/* Central icon box */}
-          <div className="w-12 h-12 rounded-xl bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] flex items-center justify-center shadow-sm">
+          <div className="w-12 h-12 rounded-xl bg-slate-50 dark:bg-white/4 border border-slate-200 dark:border-white/8 flex items-center justify-center shadow-xs">
             <Icon name="dns" weight={300} size="22px" className="text-slate-400 dark:text-slate-500" />
           </div>
 
@@ -48,7 +48,7 @@ export default function SidebarEmptyState() {
         </div>
 
         {/* Hint badge */}
-        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.06]">
+        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-white/4 border border-slate-200 dark:border-white/6">
           <Icon name="arrow_upward" size="12px" weight={400} className="text-slate-400" />
           <Typography variant="span" className="text-[10px] text-slate-400 font-semibold tracking-wide">
             Server list above

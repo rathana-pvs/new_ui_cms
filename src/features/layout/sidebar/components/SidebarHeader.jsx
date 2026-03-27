@@ -2,10 +2,10 @@ import { Icon } from '../../../../components/ds/foundation/Icon';
 
 export default function SidebarHeader() {
   return (
-    <div className="flex items-center gap-2.5 px-3 py-2.5 border-b border-slate-200 dark:border-white/[0.06] bg-white dark:bg-bk-side shrink-0 select-none">
+    <div className="flex items-center gap-2.5 px-3 py-2.5 border-b border-slate-200 dark:border-white/6 bg-white dark:bg-bk-side shrink-0 select-none">
       
       {/* Logo */}
-      <div className="relative w-7 h-7 rounded-md bg-white dark:bg-white/[0.07] border border-slate-200 dark:border-white/10 shadow-sm flex items-center justify-center p-1 shrink-0">
+      <div className="relative w-7 h-7 rounded-md bg-white dark:bg-white/[0.07] border border-slate-200 dark:border-white/10 shadow-xs flex items-center justify-center p-1 shrink-0">
         <img src="/cubrid-logo.png" alt="CUBRID Logo" className="w-full h-full object-contain" />
       </div>
 
@@ -15,7 +15,7 @@ export default function SidebarHeader() {
           <span className="text-[13px] font-black text-slate-800 dark:text-slate-100 tracking-tight">
             CUBRID
           </span>
-          <span className="text-[9px] font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded px-1 py-0.5 leading-none uppercase tracking-wider">
+          <span className="text-[9px] font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-sm px-1 py-0.5 leading-none uppercase tracking-wider">
             Admin
           </span>
         </div>

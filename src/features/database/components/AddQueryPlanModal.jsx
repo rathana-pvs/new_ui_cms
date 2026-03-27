@@ -27,7 +27,7 @@ const CustomSelect = ({ value, options, onChange, icon }) => {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded px-3 text-[12px] text-slate-900 dark:text-white flex items-center justify-between hover:border-bk-yellow/50 transition-all font-medium h-9"
+        className="w-full bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded-sm px-3 text-[12px] text-slate-900 dark:text-white flex items-center justify-between hover:border-bk-yellow/50 transition-all font-medium h-9"
       >
         <span className="flex items-center gap-2">
           {icon && <Icon name={icon} size="sm" weight={300} className="text-slate-400" />}
@@ -37,7 +37,7 @@ const CustomSelect = ({ value, options, onChange, icon }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 z-[250] bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl shadow-black/40 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 max-h-[300px] overflow-y-auto custom-scrollbar">
+        <div className="absolute top-full left-0 right-0 mt-2 z-250 bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl shadow-black/40 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 max-h-[300px] overflow-y-auto custom-scrollbar">
           <div className="py-1">
             {options.map((opt) => (
               <button
@@ -161,14 +161,14 @@ export default function AddQueryPlanModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-bk-main/60 backdrop-blur-sm animate-in fade-in duration-200 font-sans text-left">
+    <div className="fixed inset-0 z-150 flex items-center justify-center p-4 bg-bk-main/60 backdrop-blur-xs animate-in fade-in duration-200 font-sans text-left">
       <div className="bg-white dark:bg-bk-side w-full max-w-[700px] h-auto max-h-[90vh] rounded-xl shadow-[0_10px_50px_rgba(0,0,0,0.3)] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col relative text-left">
         
         {/* ribbon accent */}
-        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-bk-yellow via-amber-500 to-bk-yellow z-[310]"></div>
+        <div className="absolute top-0 left-0 right-0 h-[3px] bg-linear-to-r from-bk-yellow via-amber-500 to-bk-yellow z-310"></div>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex-shrink-0">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-bk-yellow/10 flex items-center justify-center border border-bk-yellow/20">
               <Icon name="bolt" size="sm" weight={300} className="text-bk-yellow text-xl" />
@@ -205,7 +205,7 @@ export default function AddQueryPlanModal() {
           <section className="space-y-4">
             <div className="flex items-center gap-2">
                <Typography variant="label" className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500 uppercase">General Identification</Typography>
-               <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
+               <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800/50"></div>
             </div>
             <div className="grid grid-cols-12 gap-4">
               <div className="col-span-12 space-y-1.5">
@@ -215,7 +215,7 @@ export default function AddQueryPlanModal() {
                   value={formData.queryId}
                   onChange={(e) => handleInputChange('queryId', e.target.value)}
                   placeholder="e.g. daily_stats_update"
-                  className="w-full h-9 px-3 flex items-center bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded text-[12px] font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-bk-yellow/50 transition-all"
+                  className="w-full h-9 px-3 flex items-center bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded-sm text-[12px] font-medium text-slate-900 dark:text-white focus:outline-hidden focus:ring-1 focus:ring-bk-yellow/50 transition-all"
                 />
               </div>
               <div className="col-span-6 space-y-1.5">
@@ -224,7 +224,7 @@ export default function AddQueryPlanModal() {
                   type="text" 
                   value={formData.username}
                   onChange={(e) => handleInputChange('username', e.target.value)}
-                  className="w-full h-9 px-3 flex items-center bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded text-[12px] font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-bk-yellow/50 transition-all"
+                  className="w-full h-9 px-3 flex items-center bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded-sm text-[12px] font-medium text-slate-900 dark:text-white focus:outline-hidden focus:ring-1 focus:ring-bk-yellow/50 transition-all"
                 />
               </div>
               <div className="col-span-6 space-y-1.5">
@@ -233,7 +233,7 @@ export default function AddQueryPlanModal() {
                   type="password" 
                   value={formData.password}
                   onChange={(e) => handleInputChange('password', e.target.value)}
-                  className="w-full h-9 px-3 flex items-center bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded text-[12px] font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-bk-yellow/50 transition-all"
+                  className="w-full h-9 px-3 flex items-center bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded-sm text-[12px] font-medium text-slate-900 dark:text-white focus:outline-hidden focus:ring-1 focus:ring-bk-yellow/50 transition-all"
                 />
               </div>
             </div>
@@ -243,7 +243,7 @@ export default function AddQueryPlanModal() {
           <section className="space-y-4">
             <div className="flex items-center gap-2">
                <Typography variant="label" className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500 uppercase">Execution Schedule</Typography>
-               <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
+               <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800/50"></div>
             </div>
             
             <div className="bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded-2xl p-5 space-y-5">
@@ -272,14 +272,14 @@ export default function AddQueryPlanModal() {
                   <div className="relative">
                     <button 
                       onClick={() => setShowTimePicker(!showTimePicker)}
-                      className="w-full h-9 px-3 flex items-center justify-between bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded text-[12px] font-medium text-slate-900 dark:text-white hover:border-bk-yellow/50 transition-all"
+                      className="w-full h-9 px-3 flex items-center justify-between bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-sm text-[12px] font-medium text-slate-900 dark:text-white hover:border-bk-yellow/50 transition-all"
                     >
                       <span>{formData.backupTime}</span>
                       <Icon name="history_toggle_off" size="sm" weight={300} className="text-bk-yellow text-lg" />
                     </button>
 
                     {showTimePicker && (
-                      <div className="absolute top-full left-0 mt-2 z-[210] w-[200px] bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl shadow-black/40 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                      <div className="absolute top-full left-0 mt-2 z-210 w-[200px] bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl shadow-black/40 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                         <div className="flex divide-x divide-slate-100 dark:divide-slate-800 h-[220px]">
                           {/* Hours Column */}
                           <div className="flex-1 flex flex-col overflow-y-auto custom-scrollbar bg-slate-50/30 dark:bg-bk-main/20">
@@ -391,20 +391,20 @@ export default function AddQueryPlanModal() {
               )}
 
               {formData.periodType === 'DATE' && (
-                <div className="bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded px-5 py-4 space-y-3">
+                <div className="bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded-sm px-5 py-4 space-y-3">
                   <div className="flex items-center gap-4">
                     <Typography variant="label" className="text-[10px] font-medium text-slate-500 dark:text-slate-400 w-12 ">Date:</Typography>
                     <div className="relative flex-1">
                       <button 
                         onClick={() => setShowCalendar(!showCalendar)}
-                        className="w-full h-9 px-3 flex items-center justify-between bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded text-[12px] font-medium text-slate-900 dark:text-white"
+                        className="w-full h-9 px-3 flex items-center justify-between bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-sm text-[12px] font-medium text-slate-900 dark:text-white"
                       >
                         <Typography variant="span">{formData.periodDetail || 'Select date'}</Typography>
                         <Icon name="calendar_today" size="sm" weight={300} className="text-bk-yellow text-lg" />
                       </button>
 
                       {showCalendar && (
-                        <div className="absolute top-full left-0 mt-2 z-[200] w-[280px] bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl shadow-black/40 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                        <div className="absolute top-full left-0 mt-2 z-200 w-[280px] bg-white dark:bg-bk-side border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl shadow-black/40 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                           {/* Calendar Header */}
                           <div className="flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-bk-main/50 border-b border-slate-100 dark:border-slate-800">
                             <button 
@@ -458,7 +458,7 @@ export default function AddQueryPlanModal() {
                                       }}
                                       className={`h-8 w-full rounded-lg text-[11px] font-medium transition-all flex items-center justify-center relative ${
                                         isSelected 
-                                          ? 'bg-bk-yellow text-bk-side shadow-lg shadow-bk-yellow/20 translate-y-[-1px]' 
+                                          ? 'bg-bk-yellow text-bk-side shadow-lg shadow-bk-yellow/20 -translate-y-px' 
                                           : 'hover:bg-bk-yellow/10 hover:text-bk-yellow text-slate-700 dark:text-slate-300'
                                       }`}
                                     >
@@ -511,7 +511,7 @@ export default function AddQueryPlanModal() {
           <section className="space-y-4">
             <div className="flex items-center gap-2">
                <Typography variant="label" className="text-[10px] font-medium tracking-wide text-slate-400 dark:text-slate-500 uppercase">Query Statement</Typography>
-               <div className="flex-1 h-[1px] bg-slate-100 dark:bg-slate-800/50"></div>
+               <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800/50"></div>
             </div>
             <div className="space-y-1.5">
                <div className="relative group">
@@ -522,7 +522,7 @@ export default function AddQueryPlanModal() {
                     value={formData.queryString}
                     onChange={(e) => handleInputChange('queryString', e.target.value)}
                     placeholder="Enter your SQL query here... e.g. UPDATE stats SET total = total + 1 WHERE id = 1;"
-                    className="w-full h-40 pl-10 pr-4 py-3 bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded-2xl text-[13px] font-mono text-slate-900 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-bk-yellow/50 transition-all resize-none custom-scrollbar"
+                    className="w-full h-40 pl-10 pr-4 py-3 bg-slate-50/50 dark:bg-bk-main/20 border border-slate-100 dark:border-white/5 rounded-2xl text-[13px] font-mono text-slate-900 dark:text-slate-200 focus:outline-hidden focus:ring-1 focus:ring-bk-yellow/50 transition-all resize-none custom-scrollbar"
                   />
                </div>
                <Typography variant="p" className="text-[10px] text-slate-400 dark:text-slate-500 ml-1 italic font-medium">Tip: Ensure the query is valid and the user has appropriate permissions within the database.</Typography>
@@ -531,17 +531,17 @@ export default function AddQueryPlanModal() {
         </div>
 
         {/* Footer */}
-        <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 backdrop-blur-sm flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 flex-shrink-0">
+        <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 backdrop-blur-xs flex justify-end gap-3 border-t border-slate-100 dark:border-slate-800 shrink-0">
           <button 
             disabled={loading}
-            className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-all text-left"
+            className="px-5 py-1.5 text-[11px] font-medium tracking-wide text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50 rounded-sm hover:bg-slate-100 dark:hover:bg-white/5 transition-all text-left"
             onClick={() => dispatch(closeAddQueryPlanModal())}
           >
             Discard
           </button>
           <button 
             disabled={loading}
-            className="px-6 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded border border-bk-yellow/50 shadow-sm transition-all flex items-center justify-center gap-2 min-w-[130px] disabled:opacity-50 text-left"
+            className="px-6 py-1.5 bg-bk-yellow hover:bg-[#ffd700] active:scale-[0.98] text-bk-side text-[11px] font-medium tracking-wide rounded-sm border border-bk-yellow/50 shadow-xs transition-all flex items-center justify-center gap-2 min-w-[130px] disabled:opacity-50 text-left"
             onClick={handleSave}
           >
             {loading ? (

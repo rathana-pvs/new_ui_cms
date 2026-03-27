@@ -51,7 +51,7 @@ export default function ConfigSourceEditor({ rawContent, handleSourceChange }) {
             onChange={handleSourceChange}
             onScroll={syncScroll}
             spellCheck="false"
-            className="absolute inset-0 w-full h-full bg-transparent p-6 font-mono text-[13px] leading-relaxed text-transparent caret-slate-800 dark:caret-bk-yellow outline-none resize-none custom-scrollbar whitespace-pre-wrap break-all overflow-auto"
+            className="absolute inset-0 w-full h-full bg-transparent p-6 font-mono text-[13px] leading-relaxed text-transparent caret-slate-800 dark:caret-bk-yellow outline-hidden resize-none custom-scrollbar whitespace-pre-wrap break-all overflow-auto"
             placeholder="# Enter broker configuration here..."
           />
         </div>

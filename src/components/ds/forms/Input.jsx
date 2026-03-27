@@ -47,7 +47,7 @@ export const Input = forwardRef(({
           disabled={disabled}
           value={value}
           onChange={onChange}
-          className={`w-full h-10 text-[13px] font-medium bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 rounded-xl focus:outline-none focus:bg-bk-yellow/[0.03] dark:focus:bg-bk-yellow/[0.06] transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [appearance:textfield] ${
+          className={`w-full h-10 text-[13px] font-medium bg-slate-50 dark:bg-white/3 border border-slate-200 dark:border-white/10 rounded-xl focus:outline-hidden focus:bg-bk-yellow/3 dark:focus:bg-bk-yellow/6 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [appearance:textfield] ${
             icon ? 'pl-11' : 'pl-3.5'
           } ${
             isNumber && suffix ? 'pr-20' : (isNumber ? 'pr-9' : (suffix ? 'pr-12' : 'pr-3.5'))

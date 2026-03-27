@@ -143,7 +143,7 @@ function DashboardLayout() {
           <main className="w-full h-full flex flex-col bg-background-light dark:bg-bk-main overflow-hidden">
 
             <Header theme={theme} toggleTheme={() => dispatch(toggleTheme())} />
-          <div className="flex-shrink-0 bg-slate-50 dark:bg-bk-main">
+          <div className="shrink-0 bg-slate-50 dark:bg-bk-main">
 
             <Breadcrumb
               activeTab={activeMainTab}
@@ -179,15 +179,15 @@ function DashboardLayout() {
                   {/* Orbit ring 1 */}
                   <div className="absolute w-28 h-28 rounded-full border border-dashed border-amber-500/15 dark:border-amber-500/20 animate-[spin_18s_linear_infinite]" />
                   {/* Orbit ring 2 */}
-                  <div className="absolute w-40 h-40 rounded-full border border-slate-200 dark:border-white/[0.06] animate-[spin_30s_linear_infinite_reverse]" />
+                  <div className="absolute w-40 h-40 rounded-full border border-slate-200 dark:border-white/6 animate-[spin_30s_linear_infinite_reverse]" />
 
                   {/* Central badge */}
-                  <div className="w-16 h-16 rounded-2xl bg-white dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] shadow-lg flex items-center justify-center">
+                  <div className="w-16 h-16 rounded-2xl bg-white dark:bg-white/4 border border-slate-200 dark:border-white/8 shadow-lg flex items-center justify-center">
                     <Icon name="database" weight={300} size="28px" className="text-amber-500" />
                   </div>
 
                   {/* Satellite dot – top right */}
-                  <div className="absolute top-2 right-2 w-3 h-3 rounded-full bg-emerald-400/80 border-2 border-white dark:border-bk-main shadow-sm shadow-emerald-500/30" />
+                  <div className="absolute top-2 right-2 w-3 h-3 rounded-full bg-emerald-400/80 border-2 border-white dark:border-bk-main shadow-xs shadow-emerald-500/30" />
                   {/* Satellite dot – bottom left */}
                   <div className="absolute bottom-3 left-3 w-2 h-2 rounded-full bg-amber-500/50" />
                 </div>
@@ -210,7 +210,7 @@ function DashboardLayout() {
                     { icon: 'analytics', label: 'Performance' },
                     { icon: 'lock', label: 'Lock Info' },
                   ].map(f => (
-                    <div key={f.label} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.06]">
+                    <div key={f.label} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-white/4 border border-slate-200 dark:border-white/6">
                       <Icon name={f.icon} size="13px" weight={300} className="text-slate-400 dark:text-slate-500" />
                       <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">{f.label}</span>
                     </div>
@@ -218,7 +218,7 @@ function DashboardLayout() {
                 </div>
 
                 {/* Status bar */}
-                <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-slate-200 dark:border-white/[0.06] bg-slate-50 dark:bg-white/[0.02]">
+                <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-slate-200 dark:border-white/6 bg-slate-50 dark:bg-white/2">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   <span className="text-[10px] text-slate-400 font-mono tracking-wider uppercase">System Ready</span>
                 </div>

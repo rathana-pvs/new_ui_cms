@@ -45,7 +45,7 @@ export const MultiSelect = ({
   return (
     <div className={`relative w-full ${className}`} ref={containerRef}>
       <div
-        className={`flex items-center justify-between w-full min-h-[36px] px-3 py-1.5 text-sm bg-white dark:bg-slate-900 border rounded-md shadow-sm transition-shadow ${
+        className={`flex items-center justify-between w-full min-h-[36px] px-3 py-1.5 text-sm bg-white dark:bg-slate-900 border rounded-md shadow-xs transition-shadow ${
           disabled 
             ? 'opacity-60 cursor-not-allowed border-slate-200 dark:border-slate-800' 
             : `cursor-pointer hover:border-slate-300 dark:hover:border-slate-700 ${isOpen ? 'border-amber-500 ring-1 ring-amber-500' : 'border-slate-200 dark:border-slate-800'}`
@@ -70,7 +70,7 @@ export const MultiSelect = ({
             ))
           )}
         </div>
-        <Icon name="expand_more" size="sm" className={`text-slate-400 transition-transform flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`}  weight={300} />
+        <Icon name="expand_more" size="sm" className={`text-slate-400 transition-transform shrink-0 ${isOpen ? 'rotate-180' : ''}`}  weight={300} />
       </div>
 
       {isOpen && !disabled && (
@@ -90,7 +90,7 @@ export const MultiSelect = ({
                   }`}
                   onClick={(e) => toggleOption(option.value, e)}
                 >
-                  <div className={`flex items-center justify-center w-4 h-4 border rounded shadow-sm text-white ${isSelected ? 'bg-amber-600 border-amber-600' : 'border-slate-300 dark:border-slate-600 bg-transparent'}`}>
+                  <div className={`flex items-center justify-center w-4 h-4 border rounded-sm shadow-xs text-white ${isSelected ? 'bg-amber-600 border-amber-600' : 'border-slate-300 dark:border-slate-600 bg-transparent'}`}>
                     {isSelected && <Icon name="check" size="sm" className="text-[12px]"  weight={300} />}
                   </div>
                   {option.label}

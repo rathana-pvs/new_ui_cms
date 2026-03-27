@@ -23,7 +23,7 @@ export default function DatabaseListSection({ dbListDisplay, handleAutoStartTogg
       render: (val, row) => (
         <input
           type="checkbox"
-          className="size-3.5 rounded border-slate-300 dark:border-slate-700 bg-white dark:bg-background-dark text-amber-500 focus:ring-amber-500/50 cursor-pointer accent-amber-500"
+          className="size-3.5 rounded-sm border-slate-300 dark:border-slate-700 bg-white dark:bg-background-dark text-amber-500 focus:ring-amber-500/50 cursor-pointer accent-amber-500"
           checked={val}
           onChange={() => handleAutoStartToggle(row.db, val)}
         />

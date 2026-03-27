@@ -22,10 +22,10 @@ const Toggle = ({ checked, onChange }) => (
   <button
     type="button"
     onClick={onChange}
-    className={`w-9 h-5 rounded-full border-2 relative flex-shrink-0 transition-all duration-200
+    className={`w-9 h-5 rounded-full border-2 relative shrink-0 transition-all duration-200
       ${checked ? 'bg-amber-500 border-amber-500' : 'bg-slate-200 dark:bg-white/10 border-slate-300 dark:border-white/15'}`}
   >
-    <span className={`absolute top-0.5 w-3 h-3 rounded-full bg-white shadow-sm transition-all duration-200 ${checked ? 'left-[18px]' : 'left-0.5'}`} />
+    <span className={`absolute top-0.5 w-3 h-3 rounded-full bg-white shadow-xs transition-all duration-200 ${checked ? 'left-[18px]' : 'left-0.5'}`} />
   </button>
 );
 
@@ -118,8 +118,8 @@ export default function LoginDatabaseModal() {
       <form onSubmit={handleLogin} className="space-y-6 pb-2">
 
         {/* Target Database Banner */}
-        <div className="relative overflow-hidden rounded-xl border border-amber-500/20 bg-gradient-to-r from-amber-500/8 path-to-transparent dark:from-amber-500/10 dark:to-transparent p-4">
-          <div className="absolute right-0 top-0 w-24 h-full bg-gradient-to-l from-amber-500/5 path-to-transparent pointer-events-none" />
+        <div className="relative overflow-hidden rounded-xl border border-amber-500/20 bg-linear-to-r from-amber-500/8 path-to-transparent dark:from-amber-500/10 dark:to-transparent p-4">
+          <div className="absolute right-0 top-0 w-24 h-full bg-linear-to-l from-amber-500/5 path-to-transparent pointer-events-none" />
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
               <Icon name="database" size="md" weight={300} className="text-amber-500" />
@@ -192,8 +192,8 @@ export default function LoginDatabaseModal() {
             onClick={() => setRememberMe(v => !v)}
             className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all duration-200 text-left cursor-pointer group
               ${rememberMe 
-                ? 'bg-amber-500/5 border-amber-500/25 dark:border-amber-500/20 shadow-sm' 
-                : 'bg-slate-50/50 dark:bg-white/[0.02] border-slate-200 dark:border-white/8 hover:border-slate-300 dark:hover:border-white/15'
+                ? 'bg-amber-500/5 border-amber-500/25 dark:border-amber-500/20 shadow-xs' 
+                : 'bg-slate-50/50 dark:bg-white/2 border-slate-200 dark:border-white/8 hover:border-slate-300 dark:hover:border-white/15'
               }`}
           >
             <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 border transition-all
@@ -218,7 +218,7 @@ export default function LoginDatabaseModal() {
 
         {/* Security Hint */}
         <div className="flex items-center gap-2.5 px-1 py-1 group cursor-default">
-          <div className="p-1 rounded bg-slate-100 dark:bg-white/5 text-slate-400 group-hover:text-amber-500 transition-colors">
+          <div className="p-1 rounded-sm bg-slate-100 dark:bg-white/5 text-slate-400 group-hover:text-amber-500 transition-colors">
             <Icon name="info" size="14px" weight={300} />
           </div>
           <Typography variant="p" className="text-[11px] text-slate-400 dark:text-slate-500 leading-relaxed italic">

@@ -188,7 +188,7 @@ export default function DeleteDatabaseModal() {
 
             <div className="space-y-4">
               <Divider label="Volume Information" />
-              <div className="border border-slate-100 dark:border-white/5 rounded-2xl overflow-hidden shadow-sm bg-slate-50/20 dark:bg-bk-main/10">
+              <div className="border border-slate-100 dark:border-white/5 rounded-2xl overflow-hidden shadow-xs bg-slate-50/20 dark:bg-bk-main/10">
                 <Table 
                   columns={volumeColumns}
                   data={volumeInfo.filter(v => v.spacename && v.spacename !== '\u00A0')}
@@ -198,7 +198,7 @@ export default function DeleteDatabaseModal() {
             </div>
 
             <div 
-              className={`p-4 border rounded-2xl flex items-start gap-4 transition-all group cursor-pointer ${deleteBackup ? 'bg-rose-500/[0.04] border-rose-500/20 shadow-[0_4px_20px_rgba(244,63,94,0.05)]' : 'bg-slate-50/50 dark:bg-white/[0.02] border-slate-100 dark:border-white/5 hover:bg-white/5'}`}
+              className={`p-4 border rounded-2xl flex items-start gap-4 transition-all group cursor-pointer ${deleteBackup ? 'bg-rose-500/4 border-rose-500/20 shadow-[0_4px_20px_rgba(244,63,94,0.05)]' : 'bg-slate-50/50 dark:bg-white/2 border-slate-100 dark:border-white/5 hover:bg-white/5'}`}
               onClick={() => setDeleteBackup(!deleteBackup)}
             >
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-all shrink-0 mt-0.5 ${deleteBackup ? 'bg-rose-500/10 border-rose-500/20 text-rose-500' : 'bg-slate-100 dark:bg-white/5 border-transparent text-slate-400'}`}>
@@ -214,7 +214,7 @@ export default function DeleteDatabaseModal() {
               </div>
               <div className="pt-1.5 shrink-0">
                 <Checkbox 
-                  className="!w-fit"
+                  className="w-fit!"
                   checked={deleteBackup}
                   onChange={(e) => setDeleteBackup(e.target.checked)}
                 />
@@ -259,7 +259,7 @@ export default function DeleteDatabaseModal() {
         {step === 2 && processing && !error && (
           <div className="flex flex-col items-center justify-center py-12 space-y-6 min-h-[300px] animate-in fade-in duration-300">
             <div className="relative">
-              <div className="w-20 h-20 border-[4px] border-rose-500/10 border-t-rose-500 rounded-full animate-spin"></div>
+              <div className="w-20 h-20 border-4 border-rose-500/10 border-t-rose-500 rounded-full animate-spin"></div>
               <div className="absolute inset-0 flex items-center justify-center">
                 <Icon name="delete_sweep" size="lg" weight={200} className="text-rose-500 animate-pulse" />
               </div>

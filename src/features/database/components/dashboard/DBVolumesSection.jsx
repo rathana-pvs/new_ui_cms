@@ -76,7 +76,7 @@ export default function DBVolumesSection({ volumes, pollingProps }) {
                   : t.includes('ACTIVE_LOG')  ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'
                   : t.includes('ARCHIVE_LOG') ? 'bg-violet-50 text-violet-600 border-violet-200 dark:bg-violet-500/10 dark:text-violet-400 dark:border-violet-500/20'
                   : 'bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20';
-        return <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border ${cls}`}>{val}</span>;
+        return <span className={`px-2 py-0.5 rounded-sm text-[10px] font-bold uppercase tracking-wide border ${cls}`}>{val}</span>;
       }
     },
     { header: 'Purpose', accessor: 'purpose', render: (val) => <span className="font-mono text-[12px] text-slate-400">{val}</span> },
@@ -104,7 +104,7 @@ export default function DBVolumesSection({ volumes, pollingProps }) {
                 </span>
               </div>
             </div>
-            <div className="w-full h-1 bg-slate-100 dark:bg-white/[0.06] rounded-full overflow-hidden flex">
+            <div className="w-full h-1 bg-slate-100 dark:bg-white/6 rounded-full overflow-hidden flex">
                <div 
                 className={`h-full transition-all duration-700 ${getBarColor(freePct)}`}
                 style={{ width: `${isNaNData ? 0 : usedPct}%` }} 

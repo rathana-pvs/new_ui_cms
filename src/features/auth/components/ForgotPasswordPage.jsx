@@ -13,8 +13,8 @@ export default function ForgotPasswordPage() {
     setTimeout(() => { setSubmitted(true); setLoading(false); }, 1500);
   };
 
-  const inputBase  = 'w-full h-11 text-[13px] font-medium bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 rounded-xl outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 dark:text-white';
-  const inputFocus = 'focus:border-amber-500/50 dark:focus:border-amber-500/40 focus:bg-amber-500/[0.02] dark:focus:bg-amber-500/[0.03]';
+  const inputBase  = 'w-full h-11 text-[13px] font-medium bg-slate-50 dark:bg-white/3 border border-slate-200 dark:border-white/10 rounded-xl outline-hidden transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 dark:text-white';
+  const inputFocus = 'focus:border-amber-500/50 dark:focus:border-amber-500/40 focus:bg-amber-500/2 dark:focus:bg-amber-500/3';
   const inputNorm  = 'hover:border-slate-300 dark:hover:border-white/20';
 
   return (
@@ -31,8 +31,8 @@ export default function ForgotPasswordPage() {
         />
 
         {/* Glow blobs — rose-tinted for recovery context */}
-        <div className="absolute top-[-5%] right-[-5%]   w-[460px] h-[460px] bg-rose-500/[0.06]   rounded-full blur-[150px] pointer-events-none" />
-        <div className="absolute bottom-[-10%] left-[-5%] w-[380px] h-[380px] bg-amber-500/[0.04] rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-[-5%] right-[-5%]   w-[460px] h-[460px] bg-rose-500/6   rounded-full blur-[150px] pointer-events-none" />
+        <div className="absolute bottom-[-10%] left-[-5%] w-[380px] h-[380px] bg-amber-500/4 rounded-full blur-[120px] pointer-events-none" />
 
         {/* Corner accents */}
         <div className="absolute top-0 left-0 w-24 h-24 border-l-2 border-t-2 border-amber-500/20 pointer-events-none" />
@@ -45,7 +45,7 @@ export default function ForgotPasswordPage() {
               to="/login"
               className="inline-flex items-center gap-2 mb-14 group text-slate-600 hover:text-white transition-colors"
             >
-              <div className="w-7 h-7 rounded-lg bg-white/[0.04] border border-white/[0.07] flex items-center justify-center group-hover:bg-white/10 transition-colors">
+              <div className="w-7 h-7 rounded-lg bg-white/4 border border-white/[0.07] flex items-center justify-center group-hover:bg-white/10 transition-colors">
                 <Icon name="arrow_back" size="14px" weight={300} className="text-slate-500 group-hover:text-white" />
               </div>
               <span className="text-[11px] font-bold uppercase tracking-[0.2em]">Back to Login</span>
@@ -70,7 +70,7 @@ export default function ForgotPasswordPage() {
               </div>
               <h1 className="text-5xl font-black text-white leading-[1.08] tracking-tighter mb-5">
                 Reset your<br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 via-orange-300 to-amber-300">access credentials.</span>
+                <span className="text-transparent bg-clip-text bg-linear-to-r from-rose-400 via-orange-300 to-amber-300">access credentials.</span>
               </h1>
               <p className="text-[15px] text-slate-500 font-light leading-relaxed max-w-md">
                 Account recovery is handled with the same enterprise-grade security as our database clustering. We'll help you regain access.
@@ -78,7 +78,7 @@ export default function ForgotPasswordPage() {
             </div>
 
             {/* Security protocol info card */}
-            <div className="p-5 rounded-xl bg-white/[0.02] border border-white/[0.06] max-w-sm">
+            <div className="p-5 rounded-xl bg-white/2 border border-white/6 max-w-sm">
               <div className="flex items-center gap-2.5 mb-3">
                 <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
                   <Icon name="shield_lock" size="sm" weight={300} className="text-amber-400" />
@@ -116,8 +116,8 @@ export default function ForgotPasswordPage() {
       <div className="w-full lg:w-[48%] flex flex-col items-center justify-center px-8 sm:px-14 md:px-20 bg-white dark:bg-[#0d0d0f] relative overflow-hidden">
 
         {/* Ambient glows */}
-        <div className="absolute top-0 right-0 w-80 h-80 bg-rose-500/[0.03]   rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-60 h-60 bg-amber-500/[0.03] rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute top-0 right-0 w-80 h-80 bg-rose-500/3   rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-60 h-60 bg-amber-500/3 rounded-full blur-[100px] pointer-events-none" />
 
         <div className="w-full max-w-[360px] relative z-10">
 
@@ -204,7 +204,7 @@ export default function ForgotPasswordPage() {
               </div>
 
               {/* Expiry warning */}
-              <div className="my-6 px-4 py-3 bg-amber-500/5 dark:bg-amber-500/[0.06] border border-amber-500/20 rounded-xl flex items-center gap-2.5 text-left">
+              <div className="my-6 px-4 py-3 bg-amber-500/5 dark:bg-amber-500/6 border border-amber-500/20 rounded-xl flex items-center gap-2.5 text-left">
                 <Icon name="timer" size="sm" weight={300} className="text-amber-500 shrink-0" />
                 <p className="text-[12px] text-slate-600 dark:text-slate-400">
                   The link expires in <span className="text-amber-500 font-bold">15 minutes</span>. Check your spam folder if it doesn't arrive.
@@ -213,7 +213,7 @@ export default function ForgotPasswordPage() {
 
               <button
                 onClick={() => { setSubmitted(false); setEmail(''); }}
-                className="w-full h-10 text-[12px] font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] rounded-xl hover:border-slate-300 dark:hover:border-white/15 hover:text-slate-700 dark:hover:text-slate-200 transition-all"
+                className="w-full h-10 text-[12px] font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-white/4 border border-slate-200 dark:border-white/8 rounded-xl hover:border-slate-300 dark:hover:border-white/15 hover:text-slate-700 dark:hover:text-slate-200 transition-all"
               >
                 Resend recovery email
               </button>

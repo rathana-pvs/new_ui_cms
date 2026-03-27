@@ -46,7 +46,7 @@ const getLogColumn = (dbSpace, type) => {
 const BarCell = ({ val, barColor = 'bg-amber-500' }) => (
   <div className="flex flex-col gap-1 min-w-[160px]">
     <span className="text-[12px] font-mono font-semibold text-slate-600 dark:text-slate-300">{val.display}</span>
-    <div className="w-full h-1 bg-slate-100 dark:bg-white/[0.06] overflow-hidden">
+    <div className="w-full h-1 bg-slate-100 dark:bg-white/6 overflow-hidden">
       <div className={`h-full ${val.pct > 85 ? 'bg-rose-500' : barColor} transition-all duration-500`} style={{ width: `${val.pct}%` }} />
     </div>
   </div>

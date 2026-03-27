@@ -153,7 +153,7 @@ export default function DatabaseInfoModal() {
                 </div>
 
                 <div 
-                  className={`flex items-center gap-4 p-4 border rounded-2xl transition-all group ${isActive ? 'bg-slate-50/50 dark:bg-white/[0.02] border-slate-100 dark:border-white/5 cursor-pointer hover:bg-bk-yellow/5 hover:border-bk-yellow/20' : 'bg-slate-100/50 dark:bg-white/[0.01] border-transparent opacity-50 cursor-not-allowed'}`}
+                  className={`flex items-center gap-4 p-4 border rounded-2xl transition-all group ${isActive ? 'bg-slate-50/50 dark:bg-white/2 border-slate-100 dark:border-white/5 cursor-pointer hover:bg-bk-yellow/5 hover:border-bk-yellow/20' : 'bg-slate-100/50 dark:bg-white/1 border-transparent opacity-50 cursor-not-allowed'}`}
                   title={!isActive ? "Database must be active for cross-parameter dump" : ""}
                   onClick={() => isActive && setDumpBoth(!dumpBoth)}
                 >

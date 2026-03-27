@@ -26,7 +26,7 @@ export class ErrorBoundary extends Component {
         return this.props.fallback;
       }
       return (
-        <div className="flex-1 h-full w-full flex items-center justify-center p-4 bg-white dark:bg-bk-main rounded-xl border border-slate-200 dark:border-slate-800 m-4 shadow-sm">
+        <div className="flex-1 h-full w-full flex items-center justify-center p-4 bg-white dark:bg-bk-main rounded-xl border border-slate-200 dark:border-slate-800 m-4 shadow-xs">
           <EmptyState
             icon="error_outline"
             title="Something went wrong"

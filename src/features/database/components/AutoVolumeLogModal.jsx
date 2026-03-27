@@ -41,7 +41,7 @@ export default function AutoVolumeLogModal() {
     { 
       header: 'Purpose', accessor: 'purpose',
       render: (val) => (
-        <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 text-[9px] uppercase font-bold tracking-tighter text-slate-500">
+        <span className="px-1.5 py-0.5 rounded-sm bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 text-[9px] uppercase font-bold tracking-tighter text-slate-500">
           {val}
         </span>
       )

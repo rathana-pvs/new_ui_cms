@@ -47,7 +47,7 @@ export const BrokerChart = ({
                       className="w-full bg-amber-500/80 hover:bg-amber-600 rounded-t-sm transition-all"
                       style={{ height: `${heightPct}%` }}
                     />
-                    <div className="absolute bottom-full mb-2 opacity-0 group-hover:opacity-100 bg-slate-800 text-white text-[10px] py-1 px-2 rounded pointer-events-none transition-opacity whitespace-nowrap z-10">
+                    <div className="absolute bottom-full mb-2 opacity-0 group-hover:opacity-100 bg-slate-800 text-white text-[10px] py-1 px-2 rounded-sm pointer-events-none transition-opacity whitespace-nowrap z-10">
                       <div>Time: {point.timestamp}</div>
                       <div>QPS: {point.qps}</div>
                       <div>Conn: {point.activeConnections}</div>

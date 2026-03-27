@@ -148,7 +148,7 @@ export default function ServerContent({ hostUid }) {
     <div className="flex-1 flex flex-col h-full bg-white dark:bg-background-dark overflow-hidden">
 
       {/* ── Header ── */}
-      <header className="px-6 py-3 border-b border-slate-100 dark:border-white/[0.04] flex items-center justify-between shrink-0 sticky top-0 z-20 bg-white dark:bg-background-dark font-sans">
+      <header className="px-6 py-3 border-b border-slate-100 dark:border-white/4 flex items-center justify-between shrink-0 sticky top-0 z-20 bg-white dark:bg-background-dark font-sans">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
             <Icon name="dns" size="sm" weight={300} className="text-amber-500" />
@@ -166,13 +166,13 @@ export default function ServerContent({ hostUid }) {
             onClick={handleRefresh}
             className={`w-8 h-8 flex items-center justify-center rounded border transition-all active:scale-[0.98]
               ${isRefreshing
-                ? 'bg-slate-100 dark:bg-white/5 text-slate-300 dark:text-slate-600 border-slate-200 dark:border-white/[0.06] cursor-not-allowed'
-                : 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/[0.06] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-white/10 shadow-sm'}`}
+                ? 'bg-slate-100 dark:bg-white/5 text-slate-300 dark:text-slate-600 border-slate-200 dark:border-white/6 cursor-not-allowed'
+                : 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/6 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-white/10 shadow-xs'}`}
             title="Refresh dashboard"
           >
             <span className={`material-symbols-outlined text-[16px] ${isRefreshing ? 'animate-spin' : ''}`}>refresh</span>
           </button>
-          <div className="w-px h-5 bg-slate-200 dark:bg-white/[0.1]" />
+          <div className="w-px h-5 bg-slate-200 dark:bg-white/10" />
           <MonitoringSettingsPopover />
         </div>
       </header>

@@ -47,7 +47,7 @@ export const Tooltip = ({
     >
       {children}
       {isVisible && content && (
-        <div className={`absolute z-50 px-2 py-1 text-xs font-medium text-white bg-slate-800 dark:bg-slate-700 rounded shadow-md pointer-events-none whitespace-nowrap animate-fade-in ${positionClasses[position]}`}>
+        <div className={`absolute z-50 px-2 py-1 text-xs font-medium text-white bg-slate-800 dark:bg-slate-700 rounded-sm shadow-md pointer-events-none whitespace-nowrap animate-fade-in ${positionClasses[position]}`}>
           {content}
           <div className={`absolute w-0 h-0 ${arrowClasses[position]}`} />
         </div>

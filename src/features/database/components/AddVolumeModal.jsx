@@ -30,7 +30,7 @@ const PurposeSelect = ({ value, onChange }) => {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full h-9 px-3 flex items-center justify-between bg-white dark:bg-bk-main/40 border border-slate-200 dark:border-slate-800/50 rounded text-[11px] font-medium text-slate-700 dark:text-slate-200 focus:outline-none hover:border-bk-yellow/50 transition-all group"
+        className="w-full h-9 px-3 flex items-center justify-between bg-white dark:bg-bk-main/40 border border-slate-200 dark:border-slate-800/50 rounded-sm text-[11px] font-medium text-slate-700 dark:text-slate-200 focus:outline-hidden hover:border-bk-yellow/50 transition-all group"
       >
         <div className="flex items-center gap-2">
           <Icon name={selected.icon} size="sm" weight={300} className="text-bk-yellow/80" />
@@ -51,7 +51,7 @@ const PurposeSelect = ({ value, onChange }) => {
                 className={`w-full px-3 py-2.5 flex items-center justify-between text-left hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group ${value === opt.value ? 'bg-bk-yellow/5' : ''}`}
               >
                 <div className="flex items-center gap-3">
-                  <div className={`w-7 h-7 rounded flex items-center justify-center border ${value === opt.value ? 'bg-bk-yellow/10 border-bk-yellow/20' : 'bg-slate-50 dark:bg-bk-main/50 border-slate-100 dark:border-slate-800'}`}>
+                  <div className={`w-7 h-7 rounded-sm flex items-center justify-center border ${value === opt.value ? 'bg-bk-yellow/10 border-bk-yellow/20' : 'bg-slate-50 dark:bg-bk-main/50 border-slate-100 dark:border-slate-800'}`}>
                     <span className={`material-symbols-outlined text-[16px] ${value === opt.value ? 'text-bk-yellow' : 'text-slate-400'}`}>{opt.icon}</span>
                   </div>
                   <div className="flex flex-col">
@@ -191,7 +191,7 @@ export default function AddVolumeModal() {
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-1.5 px-1">
                 <Typography variant="label" className="text-slate-500 dark:text-slate-400 font-medium ml-1">Instance Free Space</Typography>
-                <div className="h-10 px-4 flex items-center bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/10 rounded-2xl text-[12px] font-bold text-emerald-600 dark:text-emerald-400 shadow-sm">
+                <div className="h-10 px-4 flex items-center bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/10 rounded-2xl text-[12px] font-bold text-emerald-600 dark:text-emerald-400 shadow-xs">
                   {fetchingStatus ? (
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin"></div>
@@ -207,7 +207,7 @@ export default function AddVolumeModal() {
               </div>
               <div className="space-y-1.5 px-1">
                 <Typography variant="label" className="text-slate-500 dark:text-slate-400 font-medium ml-1">Active Database</Typography>
-                <div className="h-10 px-4 flex items-center bg-bk-yellow/5 border border-bk-yellow/10 rounded-2xl text-[12px] font-bold text-bk-yellow shadow-sm">
+                <div className="h-10 px-4 flex items-center bg-bk-yellow/5 border border-bk-yellow/10 rounded-2xl text-[12px] font-bold text-bk-yellow shadow-xs">
                   <Icon name="database" size="sm" weight={300} className="mr-2" />
                   {selectedDatabase}
                 </div>
@@ -257,7 +257,7 @@ export default function AddVolumeModal() {
                 />
                 <div className="space-y-1.5 group">
                   <Typography variant="label" className="text-slate-500 dark:text-slate-400 font-medium ml-1">Computed Index Pages</Typography>
-                  <div className="h-10 px-4 flex items-center justify-between bg-slate-50/50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/5 rounded-2xl text-[12px] font-mono font-bold text-bk-yellow shadow-inner group-hover:border-bk-yellow/20 transition-all">
+                  <div className="h-10 px-4 flex items-center justify-between bg-slate-50/50 dark:bg-white/2 border border-slate-100 dark:border-white/5 rounded-2xl text-[12px] font-mono font-bold text-bk-yellow shadow-inner group-hover:border-bk-yellow/20 transition-all">
                     <span>{parseInt(numberOfPages).toLocaleString()}</span>
                     <span className="text-[9px] text-slate-400 uppercase tracking-widest font-sans">Units</span>
                   </div>

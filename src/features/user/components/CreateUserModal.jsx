@@ -368,7 +368,7 @@ export default function CreateUserModal({ isOpen, onClose, dbname, editingUser }
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <Typography variant="caption" className="font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest pl-1">Basic Identity</Typography>
-                  <div className="flex-1 h-[1px] bg-slate-100 dark:bg-white/5"></div>
+                  <div className="flex-1 h-px bg-slate-100 dark:bg-white/5"></div>
                 </div>
                 <div className="grid grid-cols-2 gap-6">
                   <Input 
@@ -394,7 +394,7 @@ export default function CreateUserModal({ isOpen, onClose, dbname, editingUser }
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <Typography variant="caption" className="font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest pl-1">Security Configuration</Typography>
-                  <div className="flex-1 h-[1px] bg-slate-100 dark:bg-white/5"></div>
+                  <div className="flex-1 h-px bg-slate-100 dark:bg-white/5"></div>
                 </div>
                 <div className="grid grid-cols-2 gap-6">
                   <Input 
@@ -420,10 +420,10 @@ export default function CreateUserModal({ isOpen, onClose, dbname, editingUser }
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <Typography variant="caption" className="font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest pl-1">Group & Role Configuration</Typography>
-                  <div className="flex-1 h-[1px] bg-slate-100 dark:bg-white/5"></div>
+                  <div className="flex-1 h-px bg-slate-100 dark:bg-white/5"></div>
                 </div>
                 
-                <div className="grid grid-cols-12 gap-0 h-[320px] border border-slate-200 dark:border-white/5 rounded-2xl overflow-hidden bg-white/50 dark:bg-bk-side/50 shadow-sm backdrop-blur-sm">
+                <div className="grid grid-cols-12 gap-0 h-[320px] border border-slate-200 dark:border-white/5 rounded-2xl overflow-hidden bg-white/50 dark:bg-bk-side/50 shadow-xs backdrop-blur-xs">
                   {/* Panel 1: All Users */}
                   <div 
                     className="col-span-5 flex flex-col border-r border-slate-100 dark:border-white/5"
@@ -475,7 +475,7 @@ export default function CreateUserModal({ isOpen, onClose, dbname, editingUser }
                   </div>
 
                   {/* Middle: Control Buttons */}
-                  <div className="col-span-1 flex flex-col items-center justify-center gap-3 bg-slate-50/30 dark:bg-white/[0.02] border-r border-slate-100 dark:border-white/5">
+                  <div className="col-span-1 flex flex-col items-center justify-center gap-3 bg-slate-50/30 dark:bg-white/2 border-r border-slate-100 dark:border-white/5">
                      <button 
                         onClick={() => handleMove(selectedAvailable, 'available', 'groups')}
                         disabled={!selectedAvailable}
@@ -585,7 +585,7 @@ export default function CreateUserModal({ isOpen, onClose, dbname, editingUser }
             </div>
           ) : (
             <div className="space-y-6 animate-in fade-in slide-in-from-top-1 duration-200 h-full flex flex-col pb-4">
-              <div className="flex bg-white/50 dark:bg-bk-side/50 border border-slate-200 dark:border-white/5 rounded-2xl overflow-hidden flex-1 shadow-sm backdrop-blur-sm">
+              <div className="flex bg-white/50 dark:bg-bk-side/50 border border-slate-200 dark:border-white/5 rounded-2xl overflow-hidden flex-1 shadow-xs backdrop-blur-xs">
                 
                 {/* Auth: Object List */}
                 <div className="w-[240px] border-r border-slate-200 dark:border-white/5 flex flex-col">
@@ -631,7 +631,7 @@ export default function CreateUserModal({ isOpen, onClose, dbname, editingUser }
                 </div>
 
                 {/* Auth: Details */}
-                <div className="flex-1 flex flex-col bg-slate-50/10 dark:bg-white/[0.02] overflow-y-auto custom-scrollbar">
+                <div className="flex-1 flex flex-col bg-slate-50/10 dark:bg-white/2 overflow-y-auto custom-scrollbar">
                   <div className="p-6 space-y-8">
                     <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-5">
                       <div className="flex items-center gap-3.5">
@@ -654,7 +654,7 @@ export default function CreateUserModal({ isOpen, onClose, dbname, editingUser }
                       <div className="space-y-4">
                          <div className="flex items-center gap-3">
                             <Typography variant="caption" className="font-black uppercase text-blue-500 tracking-widest pl-1">Data Operations</Typography>
-                            <div className="flex-1 h-[1px] bg-blue-500/10"></div>
+                            <div className="flex-1 h-px bg-blue-500/10"></div>
                          </div>
                          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                             {['Select', 'Insert', 'Update', 'Delete'].map(perm => {
@@ -680,7 +680,7 @@ export default function CreateUserModal({ isOpen, onClose, dbname, editingUser }
                       <div className="space-y-4">
                          <div className="flex items-center gap-3">
                             <Typography variant="caption" className="font-black uppercase text-amber-500 tracking-widest pl-1">Structure Control</Typography>
-                            <div className="flex-1 h-[1px] bg-amber-500/20"></div>
+                            <div className="flex-1 h-px bg-amber-500/20"></div>
                          </div>
                          <div className="grid grid-cols-3 gap-4">
                             {['Alter', 'Index', 'Execute'].map(perm => {
@@ -706,7 +706,7 @@ export default function CreateUserModal({ isOpen, onClose, dbname, editingUser }
                       <div className="space-y-4">
                          <div className="flex items-center gap-3">
                             <Typography variant="caption" className="font-black uppercase text-indigo-500 tracking-widest pl-1">Delegation (Grant Rights)</Typography>
-                            <div className="flex-1 h-[1px] bg-indigo-500/20"></div>
+                            <div className="flex-1 h-px bg-indigo-500/20"></div>
                          </div>
                          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                             {['G.Select', 'G.Insert', 'G.Update', 'G.Delete', 'G.Alter', 'G.Index', 'G.Execute'].map(perm => {

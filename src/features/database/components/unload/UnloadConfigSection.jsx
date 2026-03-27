@@ -4,7 +4,7 @@ import { Icon } from '../../../../components/ds/foundation/Icon';
 const SectionHeader = ({ label }) => (
   <div className="flex items-center gap-3 mb-4">
     <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">{label}</span>
-    <div className="flex-1 h-px bg-slate-100 dark:bg-white/[0.05]" />
+    <div className="flex-1 h-px bg-slate-100 dark:bg-white/5" />
   </div>
 );
 
@@ -23,7 +23,7 @@ export default function UnloadConfigSection({ formData, handleInputChange }) {
           icon="folder"
         />
       </div>
-      <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-slate-100 dark:border-white/[0.04]">
+      <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-slate-100 dark:border-white/4">
         <Input
           label="DB Username"
           name="dbUsername"

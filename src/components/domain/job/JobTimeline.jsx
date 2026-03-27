@@ -51,7 +51,7 @@ export const JobTimeline = ({
     {
       header: 'Cron Expression',
       accessor: 'cronExpr',
-      render: (val) => <span className="font-mono text-xs text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">{val}</span>,
+      render: (val) => <span className="font-mono text-xs text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-sm">{val}</span>,
     },
     {
       header: 'Next Run',

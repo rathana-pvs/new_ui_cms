@@ -50,7 +50,7 @@ export const SQLEditor = ({
             size="sm"
             icon="play_arrow"
             onClick={handleExecute}
-            className="px-3 py-1 text-xs shadow-sm"
+            className="px-3 py-1 text-xs shadow-xs"
           >
             Execute
           </Button>
@@ -59,7 +59,7 @@ export const SQLEditor = ({
       <div className="flex-1 relative">
         {/* Placeholder text area since we don't have Monaco or CodeMirror installed natively */}
         <textarea
-          className="absolute inset-0 w-full h-full p-4 resize-none font-mono text-sm bg-transparent text-slate-800 dark:text-slate-200 focus:outline-none"
+          className="absolute inset-0 w-full h-full p-4 resize-none font-mono text-sm bg-transparent text-slate-800 dark:text-slate-200 focus:outline-hidden"
           value={internalCode}
           onChange={handleChange}
           spellCheck={false}

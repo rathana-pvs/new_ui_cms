@@ -44,10 +44,10 @@ export const Modal = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-2000 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-bk-main/40 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-bk-main/40 backdrop-blur-xs transition-opacity"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -74,7 +74,7 @@ export const Modal = ({
 
         <div className="px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-bk-main/50 flex gap-3 items-center">
           {icon && (
-            <div className={`flex-shrink-0 flex items-center justify-center h-8 w-8 rounded-lg border ${iconStyles[iconVariant] || iconStyles.primary}`}>
+            <div className={`shrink-0 flex items-center justify-center h-8 w-8 rounded-lg border ${iconStyles[iconVariant] || iconStyles.primary}`}>
               <Icon name={icon} size="md"  weight={300} />
             </div>
           )}
@@ -95,7 +95,7 @@ export const Modal = ({
         </div>
 
         {footer && (
-          <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 backdrop-blur-sm rounded-b-xl border-t border-slate-100 dark:border-slate-800 flex justify-end gap-3">
+          <div className="px-5 py-3.5 bg-slate-50 dark:bg-bk-main/80 backdrop-blur-xs rounded-b-xl border-t border-slate-100 dark:border-slate-800 flex justify-end gap-3">
             {footer}
           </div>
         )}

@@ -12,7 +12,7 @@ const StatusBadge = ({ value }) => {
     <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border
       ${isActive
         ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'
-        : 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-white/[0.04] dark:text-slate-500 dark:border-white/[0.07]'}`}>
+        : 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-white/4 dark:text-slate-500 dark:border-white/[0.07]'}`}>
       <span className={`w-1 h-1 rounded-full ${isActive ? 'bg-emerald-500' : 'bg-slate-400'}`} />
       {value || 'IDLE'}
     </span>
@@ -51,7 +51,7 @@ export default function BrokerStatus({ hostUid, brokerName }) {
   if (status.error) {
     return (
       <div className="flex-1 flex items-center justify-center p-8 bg-white dark:bg-bk-main">
-        <div className="max-w-sm w-full p-5 bg-rose-50 dark:bg-rose-500/[0.06] border border-rose-200 dark:border-rose-500/20 rounded-xl flex items-start gap-3">
+        <div className="max-w-sm w-full p-5 bg-rose-50 dark:bg-rose-500/6 border border-rose-200 dark:border-rose-500/20 rounded-xl flex items-start gap-3">
           <Icon name="error_outline" size="sm" weight={300} className="text-rose-500 shrink-0 mt-0.5" />
           <div>
             <p className="text-[13px] font-bold text-rose-700 dark:text-rose-400 mb-1">Failed to load status</p>
@@ -112,10 +112,10 @@ export default function BrokerStatus({ hostUid, brokerName }) {
 
           <button
             onClick={() => dispatch(fetchDetailedBrokerStatus({ hostUid, brokerName }))}
-            className={`flex items-center justify-center w-7 h-7 rounded border transition-all shadow-sm
+            className={`flex items-center justify-center w-7 h-7 rounded border transition-all shadow-xs
               ${status.loading
-                ? 'bg-slate-50 dark:bg-white/[0.02] border-slate-200 dark:border-white/[0.07] text-slate-400 cursor-not-allowed'
-                : 'bg-white dark:bg-white/[0.05] border-slate-200 dark:border-white/[0.08] text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-white/[0.02]'}`}
+                ? 'bg-slate-50 dark:bg-white/2 border-slate-200 dark:border-white/[0.07] text-slate-400 cursor-not-allowed'
+                : 'bg-white dark:bg-white/5 border-slate-200 dark:border-white/8 text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-white/2'}`}
             title="Refresh status"
           >
             <span className={`material-symbols-outlined text-[16px] ${status.loading ? 'animate-spin' : ''}`}>refresh</span>
@@ -138,7 +138,7 @@ export default function BrokerStatus({ hostUid, brokerName }) {
           bodyClassName="p-0"
           collapsible
         >
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 divide-x divide-y divide-slate-100 dark:divide-white/[0.05]">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 divide-x divide-y divide-slate-100 dark:divide-white/5">
             {[
               { label: 'PID',             value: basicInfo.pid             || '—', accent: true },
               { label: 'Port',            value: basicInfo.port            || '—' },
@@ -172,7 +172,7 @@ export default function BrokerStatus({ hostUid, brokerName }) {
           }
           subtitle={
              <div className="flex items-center gap-2 mt-1">
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-500 dark:text-slate-500 px-2 py-0.5 bg-slate-100 dark:bg-white/[0.05] border border-slate-200 dark:border-white/[0.07] rounded-full">
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-500 dark:text-slate-500 px-2 py-0.5 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/[0.07] rounded-full">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                   {asInfo.length} active
                 </span>
@@ -201,7 +201,7 @@ export default function BrokerStatus({ hostUid, brokerName }) {
           subtitle={
             jobInfo.length > 0 && (
               <div className="mt-1">
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-600 dark:text-amber-400 px-2 py-0.5 bg-amber-50 dark:bg-amber-500/[0.08] border border-amber-200 dark:border-amber-500/20 rounded-full">
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-600 dark:text-amber-400 px-2 py-0.5 bg-amber-50 dark:bg-amber-500/8 border border-amber-200 dark:border-amber-500/20 rounded-full">
                   {jobInfo.length} queued
                 </span>
               </div>

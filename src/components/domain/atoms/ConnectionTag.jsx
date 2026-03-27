@@ -10,7 +10,7 @@ export const ConnectionTag = ({
   const isConnected = status === 'connected' || status === 'on';
   
   return (
-    <div className={`inline-flex items-center gap-1.5 px-2 py-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md shadow-sm ${className}`}>
+    <div className={`inline-flex items-center gap-1.5 px-2 py-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md shadow-xs ${className}`}>
       <Icon 
         name={isConnected ? 'lan' : 'wifi_off'} 
         size="sm" 

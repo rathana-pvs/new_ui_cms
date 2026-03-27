@@ -24,7 +24,7 @@ export const Breadcrumbs = ({
               ) : (
                 <button
                   onClick={() => onNavigate && onNavigate(item)}
-                  className="inline-flex items-center text-slate-500 hover:text-amber-600 dark:hover:text-amber-500 transition-colors focus:outline-none"
+                  className="inline-flex items-center text-slate-500 hover:text-amber-600 dark:hover:text-amber-500 transition-colors focus:outline-hidden"
                 >
                   {item.icon && <Icon name={item.icon} size="sm" className="mr-1"  weight={300} />}
                   {item.label}

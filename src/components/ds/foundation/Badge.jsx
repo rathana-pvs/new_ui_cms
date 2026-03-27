@@ -6,7 +6,7 @@ export const Badge = ({
   className = '',
   children,
 }) => {
-  const baseClasses = 'inline-flex items-center font-semibold rounded px-2 py-0.5 tracking-wide';
+  const baseClasses = 'inline-flex items-center font-semibold rounded-sm px-2 py-0.5 tracking-wide';
   
   const variants = {
     default: 'bg-slate-100 text-slate-600 dark:bg-bk-main/50 dark:text-slate-400',

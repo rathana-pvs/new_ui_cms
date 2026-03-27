@@ -43,7 +43,7 @@ export default function StatusModal() {
   const currentTheme = colorMap[themeColor];
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 font-sans text-left">
+    <div className="fixed inset-0 z-200 flex items-center justify-center p-4 font-sans text-left">
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-bk-main/60 backdrop-blur-md animate-in fade-in duration-200"
@@ -66,7 +66,7 @@ export default function StatusModal() {
 
         {/* Icon Container */}
         <div className={`w-16 h-16 ${currentTheme.bg} ${currentTheme.border} border rounded-2xl flex items-center justify-center mb-5 rotate-3 animate-in zoom-in duration-300`}>
-          <div className="w-11 h-11 rounded-xl bg-white dark:bg-bk-main shadow-sm flex items-center justify-center border border-white/10">
+          <div className="w-11 h-11 rounded-xl bg-white dark:bg-bk-main shadow-xs flex items-center justify-center border border-white/10">
             <span className={`material-symbols-outlined text-2xl font-medium ${currentTheme.text}`}>
               {icon}
             </span>

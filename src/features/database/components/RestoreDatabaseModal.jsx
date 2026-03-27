@@ -46,9 +46,9 @@ const SectionLabel = ({ children, count }) => (
   <div className="flex items-center gap-3 mb-3">
     <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 whitespace-nowrap">{children}</span>
     {count !== undefined && (
-      <span className="text-[9px] font-black px-1.5 py-0.5 rounded-sm bg-amber-500/10 border border-amber-500/20 text-amber-500">{count}</span>
+      <span className="text-[9px] font-black px-1.5 py-0.5 rounded-xs bg-amber-500/10 border border-amber-500/20 text-amber-500">{count}</span>
     )}
-    <div className="flex-1 h-px bg-slate-100 dark:bg-white/[0.05]" />
+    <div className="flex-1 h-px bg-slate-100 dark:bg-white/5" />
   </div>
 );
 
@@ -57,11 +57,11 @@ const Toggle = ({ checked, onChange, disabled }) => (
     type="button"
     onClick={onChange}
     disabled={disabled}
-    className={`w-9 h-5 rounded-full relative flex-shrink-0 transition-all duration-200 border-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-1
+    className={`w-9 h-5 rounded-full relative shrink-0 transition-all duration-200 border-2 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-1
       ${checked ? 'bg-amber-500 border-amber-500' : 'bg-slate-200 dark:bg-white/10 border-slate-300 dark:border-white/15'}
       ${disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}
   >
-    <span className={`absolute top-0.5 w-3 h-3 rounded-full bg-white shadow-sm transition-all duration-200 ${checked ? 'left-[18px]' : 'left-0.5'}`} />
+    <span className={`absolute top-0.5 w-3 h-3 rounded-full bg-white shadow-xs transition-all duration-200 ${checked ? 'left-[18px]' : 'left-0.5'}`} />
   </button>
 );
 
@@ -186,7 +186,7 @@ export default function RestoreDatabaseModal() {
       <div className="space-y-5 pb-2">
 
         {/* ── Context banner ── */}
-        <div className="relative rounded-xl border border-rose-500/20 bg-gradient-to-r from-rose-500/5 to-transparent dark:from-rose-500/8 p-4 overflow-hidden">
+        <div className="relative rounded-xl border border-rose-500/20 bg-linear-to-r from-rose-500/5 to-transparent dark:from-rose-500/8 p-4 overflow-hidden">
           {/* subtle top-right flourish */}
           <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-rose-500/5 blur-2xl pointer-events-none" />
           <div className="flex items-center justify-between flex-wrap gap-3">
@@ -213,7 +213,7 @@ export default function RestoreDatabaseModal() {
                 <div key={lvl} className="flex items-center gap-2">
                   <span className={`w-2 h-2 rounded-full shrink-0 ${m.dot}`} />
                   <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{m.title}</span>
-                  <span className={`ml-auto text-[10px] font-black px-1.5 py-0.5 rounded border ${m.badge}`}>{levelCounts[lvl]}</span>
+                  <span className={`ml-auto text-[10px] font-black px-1.5 py-0.5 rounded-sm border ${m.badge}`}>{levelCounts[lvl]}</span>
                 </div>
               );
             })}
@@ -236,7 +236,7 @@ export default function RestoreDatabaseModal() {
                       onClick={() => setFilter(f)}
                       className={`text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full border transition-all
                         ${isActive
-                          ? 'bg-slate-900 dark:bg-white dark:text-slate-900 text-white border-transparent shadow-sm'
+                          ? 'bg-slate-900 dark:bg-white dark:text-slate-900 text-white border-transparent shadow-xs'
                           : 'text-slate-400 border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 hover:text-slate-600 dark:hover:text-slate-200'
                         }`}
                     >
@@ -249,12 +249,12 @@ export default function RestoreDatabaseModal() {
           </div>
 
           {isLoadingBackups ? (
-            <div className="flex flex-col items-center justify-center py-14 gap-3 bg-slate-50/50 dark:bg-white/[0.02] border border-dashed border-slate-200 dark:border-white/10 rounded-xl">
+            <div className="flex flex-col items-center justify-center py-14 gap-3 bg-slate-50/50 dark:bg-white/2 border border-dashed border-slate-200 dark:border-white/10 rounded-xl">
               <Spinner size="sm" />
               <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Scanning catalog…</p>
             </div>
           ) : backups.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-14 gap-4 bg-slate-50/50 dark:bg-white/[0.02] border border-dashed border-slate-200 dark:border-white/10 rounded-xl text-center">
+            <div className="flex flex-col items-center justify-center py-14 gap-4 bg-slate-50/50 dark:bg-white/2 border border-dashed border-slate-200 dark:border-white/10 rounded-xl text-center">
               <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-white/5 flex items-center justify-center">
                 <Icon name="search_off" size="lg" weight={100} className="text-slate-300 dark:text-white/20" />
               </div>
@@ -284,14 +284,14 @@ export default function RestoreDatabaseModal() {
                     key={backup.pathname || idx}
                     onClick={() => handleInputChange('selectedBackup', isSel ? null : backup.pathname)}
                     type="button"
-                    className={`w-full text-left flex items-center gap-3.5 p-3.5 rounded-xl border transition-all duration-200 group focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500
+                    className={`w-full text-left flex items-center gap-3.5 p-3.5 rounded-xl border transition-all duration-200 group focus:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-500
                       ${isSel
-                        ? 'border-amber-500/40 bg-amber-500/5 dark:bg-amber-500/[0.07] shadow-sm'
-                        : `${meta.ring} hover:border-opacity-50 hover:shadow-sm`
+                        ? 'border-amber-500/40 bg-amber-500/5 dark:bg-amber-500/[0.07] shadow-xs'
+                        : `${meta.ring} hover:border-opacity-50 hover:shadow-xs`
                       }`}
                   >
                     {/* level badge */}
-                    <div className={`w-11 h-11 rounded-xl flex flex-col items-center justify-center shrink-0 border shadow-sm transition-all
+                    <div className={`w-11 h-11 rounded-xl flex flex-col items-center justify-center shrink-0 border shadow-xs transition-all
                       ${isSel ? `${meta.ringSelected} shadow-md` : `${meta.ring} ${meta.iconColor}`}`}
                     >
                       <Icon name={meta.icon} size="sm" weight={300} />
@@ -305,7 +305,7 @@ export default function RestoreDatabaseModal() {
                           {meta.title}
                         </span>
                         {backup.date && (
-                          <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-white/5 px-1.5 py-0.5 rounded border border-slate-200 dark:border-white/10">
+                          <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-white/5 px-1.5 py-0.5 rounded-sm border border-slate-200 dark:border-white/10">
                             {backup.date}
                           </span>
                         )}
@@ -343,10 +343,10 @@ export default function RestoreDatabaseModal() {
             <button
               type="button"
               onClick={() => handleInputChange('isPartial', !formData.isPartial)}
-              className={`flex items-center gap-3 p-4 rounded-xl border transition-all duration-200 text-left w-full group focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500
+              className={`flex items-center gap-3 p-4 rounded-xl border transition-all duration-200 text-left w-full group focus:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-500
                 ${formData.isPartial
-                  ? 'bg-amber-500/5 border-amber-500/30 dark:border-amber-500/25 shadow-sm'
-                  : 'bg-slate-50/50 dark:bg-white/[0.02] border-slate-200 dark:border-white/8 hover:border-slate-300 dark:hover:border-white/15'
+                  ? 'bg-amber-500/5 border-amber-500/30 dark:border-amber-500/25 shadow-xs'
+                  : 'bg-slate-50/50 dark:bg-white/2 border-slate-200 dark:border-white/8 hover:border-slate-300 dark:hover:border-white/15'
                 }`}
             >
               <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 border transition-all
@@ -381,7 +381,7 @@ export default function RestoreDatabaseModal() {
         </div>
 
         {/* ── Danger notice ── */}
-        <div className="flex items-start gap-3.5 p-4 bg-rose-500/[0.04] border border-rose-500/20 rounded-xl">
+        <div className="flex items-start gap-3.5 p-4 bg-rose-500/4 border border-rose-500/20 rounded-xl">
           <div className="w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center shrink-0 mt-0.5">
             <Icon name="priority_high" size="sm" weight={700} className="text-rose-500" />
           </div>

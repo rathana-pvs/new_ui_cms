@@ -84,7 +84,7 @@ export default function CheckDatabaseModal() {
             <div className="w-1.5 h-1.5 rounded-full bg-bk-yellow"></div>
             <Typography variant="caption" className="font-black text-slate-400 uppercase tracking-[0.2em]">Verification Target</Typography>
           </div>
-          <div className="flex items-center gap-4 p-4 bg-slate-50/50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/5 rounded-2xl">
+          <div className="flex items-center gap-4 p-4 bg-slate-50/50 dark:bg-white/3 border border-slate-200 dark:border-white/5 rounded-2xl">
             <div className="w-10 h-10 rounded-xl bg-bk-yellow/10 border border-bk-yellow/20 flex items-center justify-center shrink-0">
               <Icon name="database" size="sm" weight={300} className="text-bk-yellow" />
             </div>
@@ -106,11 +106,11 @@ export default function CheckDatabaseModal() {
             {scanSteps.map((step, i) => (
               <div key={i} className="flex items-start gap-4 group">
                 <div className="flex flex-col items-center shrink-0">
-                  <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 shadow-sm group-hover:shadow-[0_0_12px_rgba(16,185,129,0.15)] transition-shadow">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 shadow-xs group-hover:shadow-[0_0_12px_rgba(16,185,129,0.15)] transition-shadow">
                     <Icon name={step.icon} size="xs" weight={300} />
                   </div>
                   {i < scanSteps.length - 1 && (
-                    <div className="w-[1px] h-6 bg-gradient-to-b from-emerald-500/30 to-transparent my-1"></div>
+                    <div className="w-px h-6 bg-linear-to-b from-emerald-500/30 to-transparent my-1"></div>
                   )}
                 </div>
                 <div className={`flex-1 ${i < scanSteps.length - 1 ? 'pb-4' : 'pb-0'}`}>
@@ -133,7 +133,7 @@ export default function CheckDatabaseModal() {
           </div>
 
           <div
-            className={`flex items-center gap-4 p-4 border rounded-2xl transition-all cursor-pointer select-none ${repair ? 'bg-bk-yellow/[0.04] border-bk-yellow/20 shadow-[0_2px_16px_rgba(255,188,4,0.06)]' : 'bg-white dark:bg-white/[0.02] border-slate-100 dark:border-white/5 hover:border-slate-200 dark:hover:border-white/10'}`}
+            className={`flex items-center gap-4 p-4 border rounded-2xl transition-all cursor-pointer select-none ${repair ? 'bg-bk-yellow/4 border-bk-yellow/20 shadow-[0_2px_16px_rgba(255,188,4,0.06)]' : 'bg-white dark:bg-white/2 border-slate-100 dark:border-white/5 hover:border-slate-200 dark:hover:border-white/10'}`}
             onClick={() => setRepair(!repair)}
           >
             <div className={`w-9 h-9 rounded-xl flex items-center justify-center border transition-all shrink-0 ${repair ? 'bg-bk-yellow/10 border-bk-yellow/20 text-bk-yellow' : 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/5 text-slate-400'}`}>
@@ -149,7 +149,7 @@ export default function CheckDatabaseModal() {
             </div>
             <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
               <Checkbox
-                className="!w-fit"
+                className="w-fit!"
                 checked={repair}
                 onChange={(e) => setRepair(e.target.checked)}
               />
@@ -157,7 +157,7 @@ export default function CheckDatabaseModal() {
           </div>
 
           {/* Info note */}
-          <div className="flex items-start gap-2.5 px-3 py-2 bg-slate-50/80 dark:bg-white/[0.02] border border-slate-100 dark:border-white/5 rounded-xl">
+          <div className="flex items-start gap-2.5 px-3 py-2 bg-slate-50/80 dark:bg-white/2 border border-slate-100 dark:border-white/5 rounded-xl">
             <Icon name="info" size="xs" weight={300} className="text-slate-400 shrink-0 mt-0.5" />
             <Typography variant="caption" className="text-slate-400 dark:text-slate-500 font-medium leading-relaxed italic">
               The integrity scanner checks for block inconsistencies, index corruptions, and catalog mismatches. Enable repair to attempt immediate restoration if anomalies are detected.

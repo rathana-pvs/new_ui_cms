@@ -18,7 +18,7 @@ export const theme = {
     levelOneIndent: "ml-[22px]",   // Database / Log / Broker root nodes
     levelDeepIndent: "ml-4",        // Tables, columns, sub-brokers
     activeBarColor: "bg-amber-500",
-    activeBarClass: "absolute left-[-1px] top-0 bottom-0 w-[2px]",
+    activeBarClass: "absolute -left-px top-0 bottom-0 w-[2px]",
     hoverClass: "hover:bg-slate-100 dark:hover:bg-slate-800/60",
   },
 

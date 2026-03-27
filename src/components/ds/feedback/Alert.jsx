@@ -44,7 +44,7 @@ export const Alert = ({
 
   return (
     <div className={`flex p-4 rounded-lg border ${style.bg} ${style.border} ${className}`} role="alert">
-      <div className="flex-shrink-0 mr-3">
+      <div className="shrink-0 mr-3">
         <Icon name={style.iconUrl} size="md" className={style.iconColor}  weight={300} />
       </div>
       <div className={`flex-1 ${style.text}`}>
@@ -54,7 +54,7 @@ export const Alert = ({
       {onClose && (
         <button
           onClick={onClose}
-          className={`flex-shrink-0 ml-auto -mx-1.5 -my-1.5 p-1.5 rounded-lg focus:outline-none transition-colors ${style.iconColor} hover:bg-black/5 dark:hover:bg-white/10`}
+          className={`shrink-0 ml-auto -mx-1.5 -my-1.5 p-1.5 rounded-lg focus:outline-hidden transition-colors ${style.iconColor} hover:bg-black/5 dark:hover:bg-white/10`}
           aria-label="Dismiss"
         >
           <Icon name="close" size="sm"  weight={300} />
