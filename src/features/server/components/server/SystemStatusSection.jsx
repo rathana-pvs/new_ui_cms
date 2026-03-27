@@ -17,19 +17,34 @@ const MetricBar = ({ pct, colorFn }) => (
 const cpuColor  = (p) => p > 80 ? 'bg-rose-500' : p > 50 ? 'bg-amber-500' : 'bg-emerald-500';
 const memColor  = (p) => p > 80 ? 'bg-rose-500' : 'bg-amber-500';
 
-export default function SystemStatusSection({ hostUid }) {
+export default function SystemStatusSection({ hostUid, isTabActive = true }) {
   const dispatch = useDispatch();
   const { currentStatus, averages, history, loading, error } = useSelector((state) => state.monitoring);
   const { authorizedHosts } = useSelector((state) => state.host);
   const isAuthorized = hostUid && authorizedHosts.includes(hostUid);
 
   const [isStopped, setIsStopped] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true); // Default to expanded
   const pollTimer     = useRef(null);
   const fetchCountRef = useRef(0);
+  
+  // Monitoring is active only if tab is visible AND section is expanded
+  const isEffectivelyActive = isTabActive && isExpanded;
+  const isActiveRef = useRef(isEffectivelyActive);
+
+  // Sync ref with prop to avoid stale closures in timeouts
+  useEffect(() => {
+    isActiveRef.current = isEffectivelyActive;
+    if (!isEffectivelyActive && pollTimer.current) {
+      clearTimeout(pollTimer.current);
+    }
+  }, [isEffectivelyActive]);
 
   const scheduleNext = (delay) => {
+    if (!isActiveRef.current) return;
+    
     pollTimer.current = setTimeout(() => {
-      if (!isAuthorized) { setIsStopped(true); return; }
+      if (!isAuthorized || !isActiveRef.current) { setIsStopped(true); return; }
       dispatch(fetchMonitoringData(hostUid));
       fetchCountRef.current += 1;
       const nextDelay = fetchCountRef.current < 15 ? 1000 : 30000;
@@ -40,7 +55,7 @@ export default function SystemStatusSection({ hostUid }) {
 
   const startPolling = () => {
     if (pollTimer.current) clearTimeout(pollTimer.current);
-    if (!isAuthorized) return;
+    if (!isAuthorized || !isActiveRef.current) return;
     setIsStopped(false);
     fetchCountRef.current = 0;
     dispatch(clearMonitoring());
@@ -49,14 +64,17 @@ export default function SystemStatusSection({ hostUid }) {
   };
 
   useEffect(() => {
-    if (!hostUid || !isAuthorized) {
+    if (!hostUid || !isAuthorized || !isEffectivelyActive) {
       if (pollTimer.current) clearTimeout(pollTimer.current);
       return;
     }
+    
+    fetchCountRef.current = 0; 
     dispatch(fetchMonitoringData(hostUid));
     scheduleNext(1000);
+    
     return () => { if (pollTimer.current) clearTimeout(pollTimer.current); };
-  }, [hostUid, isAuthorized, dispatch]);
+  }, [hostUid, isAuthorized, isEffectivelyActive, dispatch]);
 
   const formatBytes = (bytes) => {
     if (bytes === undefined || bytes === null || isNaN(bytes)) return '-';
@@ -135,7 +153,8 @@ export default function SystemStatusSection({ hostUid }) {
         </div>
       }
       collapsible
-      defaultCollapsed
+      isCollapsed={!isExpanded}
+      onToggle={(collapsed) => setIsExpanded(!collapsed)}
     >
       {error && (
         <div className="px-4 py-2 text-[11px] text-rose-500 bg-rose-50 dark:bg-rose-500/10 border-b border-rose-200 dark:border-rose-500/20">

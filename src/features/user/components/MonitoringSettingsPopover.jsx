@@ -43,8 +43,10 @@ export default function MonitoringSettingsPopover() {
     <div className="relative" ref={popoverRef}>
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-8 h-8 flex items-center justify-center rounded border transition-all relative group
-          ${isOpen ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/[0.06] text-slate-500 hover:bg-slate-200 dark:hover:bg-white/10'}`}
+        className={`w-8 h-8 flex items-center justify-center rounded border transition-all active:scale-[0.98] relative group
+          ${isOpen ? 'bg-amber-500/10 text-amber-500 border-amber-500/20 shadow-sm' : 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/[0.06] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-white/10'}`}
+
+
         title="Monitoring Settings"
       >
         <Icon name="timer" size="16px" weight={300} />

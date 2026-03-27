@@ -1,3 +1,6 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { useDispatch } from 'react-redux';
+import { fetchDashboardPerformance } from '../../databaseSlice';
 import { Icon } from '../../../../components/ds/foundation/Icon';
 import { Table } from '../../../../components/ds/layout/Table';
 import { Typography } from '../../../../components/ds/foundation/Typography';
@@ -9,7 +12,35 @@ const Bar = ({ pct, colorClass }) => (
   </div>
 );
 
-export default function DBPerformanceSection({ dbStats }) {
+export default function DBPerformanceSection({ dbStats, pollingProps }) {
+  const dispatch = useDispatch();
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const { hostUid, dbname, isTabActive, autoRefresh, refreshInterval } = pollingProps;
+
+  // Manual refresh helper
+  const refresh = () => {
+    if (hostUid && dbname) dispatch(fetchDashboardPerformance({ hostUid, dbname }));
+  };
+
+  // Logic: Refresh once when becoming visible AND expanded
+  const wasActiveAndExpanded = useRef(isTabActive && !isCollapsed);
+  useEffect(() => {
+    const currentActiveAndExpanded = isTabActive && !isCollapsed;
+    if (currentActiveAndExpanded && !wasActiveAndExpanded.current) {
+      refresh();
+    }
+    wasActiveAndExpanded.current = currentActiveAndExpanded;
+  }, [isTabActive, isCollapsed, hostUid, dbname]);
+
+  // Logic: Interval polling when active AND expanded AND autoRefresh enabled
+  useEffect(() => {
+    let interval;
+    if (isTabActive && !isCollapsed && autoRefresh && hostUid && dbname) {
+      interval = setInterval(refresh, refreshInterval * 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isTabActive, isCollapsed, autoRefresh, refreshInterval, hostUid, dbname]);
+
   const columns = [
     {
       header: 'CPU',
@@ -28,6 +59,16 @@ export default function DBPerformanceSection({ dbStats }) {
         <div className="min-w-[100px]">
           <span className="font-mono text-[12px] font-semibold text-slate-700 dark:text-slate-200">{val}</span>
           <Bar pct={row.memPct} colorClass={row.memPct > 80 ? 'bg-rose-500' : 'bg-amber-500'} />
+        </div>
+      )
+    },
+    {
+      header: 'TPS',
+      accessor: 'tps',
+      render: (val) => (
+        <div className="flex flex-col">
+          <span className="font-mono text-[18px] font-black text-emerald-500 leading-none">{val}</span>
+          <span className="text-[9px] text-slate-400 uppercase tracking-widest font-bold mt-0.5">Trans/sec</span>
         </div>
       )
     },
@@ -51,10 +92,10 @@ export default function DBPerformanceSection({ dbStats }) {
         </div>
       )
     },
-    { header: 'Fetches',   accessor: 'fetch',    render: (val) => <span className="font-mono text-[12px] text-slate-500">{val}</span> },
-    { header: 'Dirty',     accessor: 'dirty',    render: (val) => <span className="font-mono text-[12px] text-slate-500">{val}</span> },
-    { header: 'IO Reads',  accessor: 'ioReads',  render: (val) => <span className="font-mono text-[12px] text-slate-500">{val}</span> },
-    { header: 'IO Writes', accessor: 'ioWrites', render: (val) => <span className="font-mono text-[12px] text-slate-500">{val}</span> },
+    { header: 'Fetches/s',   accessor: 'fetch',    render: (val) => <span className="font-mono text-[12px] text-slate-500">{val}</span> },
+    { header: 'Dirty/s',     accessor: 'dirty',    render: (val) => <span className="font-mono text-[12px] text-slate-500">{val}</span> },
+    { header: 'IO Reads/s',  accessor: 'ioReads',  render: (val) => <span className="font-mono text-[12px] text-slate-500">{val}</span> },
+    { header: 'IO Writes/s', accessor: 'ioWrites', render: (val) => <span className="font-mono text-[12px] text-slate-500">{val}</span> },
   ];
 
   return (
@@ -68,6 +109,8 @@ export default function DBPerformanceSection({ dbStats }) {
       }
       bodyClassName="p-0"
       collapsible
+      isCollapsed={isCollapsed}
+      onToggle={(v) => setIsCollapsed(v)}
     >
       <Table columns={columns} data={dbStats} hoverable={false} />
     </Card>

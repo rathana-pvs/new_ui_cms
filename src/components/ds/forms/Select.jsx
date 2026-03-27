@@ -46,12 +46,12 @@ export const Select = ({
           type="button"
           disabled={disabled}
           onClick={() => !disabled && setIsOpen(!isOpen)}
-          className={`relative w-full pl-3.5 pr-10 h-10 text-[13px] font-medium text-left bg-slate-50 dark:bg-white/[0.05] border border-slate-200 dark:border-white/8 rounded-xl focus:outline-none transition-all flex items-center ${
+          className={`relative w-full pl-3.5 pr-10 h-10 text-[13px] font-medium text-left bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 rounded-xl focus:outline-none transition-all flex items-center ${
             error 
               ? 'border-rose-500/50' 
               : isOpen 
-                ? 'border-bk-yellow/40 dark:border-bk-yellow/30' 
-                : 'hover:border-slate-300 dark:hover:border-white/12'
+                ? 'border-bk-yellow/50 dark:border-bk-yellow/50 bg-bk-yellow/[0.02] dark:bg-bk-yellow/[0.04]' 
+                : 'hover:border-slate-300/60 dark:hover:border-white/20'
           } ${
             disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
           }`}
@@ -64,9 +64,10 @@ export const Select = ({
             {selectedOption ? selectedOption.label : placeholder}
           </span>
           <div className={`absolute right-3.5 top-1/2 -translate-y-[52%] transition-transform duration-200 pointer-events-none ${isOpen ? 'rotate-180' : ''}`}>
-             <Icon name="expand_more" size="sm" weight={300} className="text-slate-400" />
+             <Icon name="expand_more" size="sm" weight={300} className="text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300" />
           </div>
         </button>
+
 
         {isOpen && (
           <div className="absolute z-[100] w-full mt-1 bg-white dark:bg-[#1A1C1E] border border-slate-200 dark:border-white/10 rounded-lg shadow-[0_12px_40px_rgba(0,0,0,0.3)] overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150">

@@ -1,9 +1,37 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { useDispatch } from 'react-redux';
+import { fetchDashboardVolumes } from '../../databaseSlice';
 import { Icon } from '../../../../components/ds/foundation/Icon';
 import { Table } from '../../../../components/ds/layout/Table';
 import { Typography } from '../../../../components/ds/foundation/Typography';
 import { Card } from '../../../../components/ds/layout/Card';
 
-export default function DBVolumesSection({ volumes }) {
+export default function DBVolumesSection({ volumes, pollingProps }) {
+  const dispatch = useDispatch();
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const { hostUid, dbname, isTabActive, autoRefresh, refreshInterval } = pollingProps;
+
+  const refresh = () => {
+    if (hostUid && dbname) dispatch(fetchDashboardVolumes({ hostUid, dbname }));
+  };
+
+  const wasActiveAndExpanded = useRef(isTabActive && !isCollapsed);
+  useEffect(() => {
+    const currentActiveAndExpanded = isTabActive && !isCollapsed;
+    if (currentActiveAndExpanded && !wasActiveAndExpanded.current) {
+      refresh();
+    }
+    wasActiveAndExpanded.current = currentActiveAndExpanded;
+  }, [isTabActive, isCollapsed, hostUid, dbname]);
+
+  useEffect(() => {
+    let interval;
+    if (isTabActive && !isCollapsed && autoRefresh && hostUid && dbname) {
+      interval = setInterval(refresh, refreshInterval * 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isTabActive, isCollapsed, autoRefresh, refreshInterval, hostUid, dbname]);
+
   const getFreeSeverity = (pct) => {
     if (pct < 10) return 'text-rose-500';
     if (pct < 25) return 'text-amber-500';
@@ -14,7 +42,7 @@ export default function DBVolumesSection({ volumes }) {
     const usedPct = 100 - pct;
     if (usedPct > 90) return 'bg-rose-500';
     if (usedPct > 75) return 'bg-amber-500';
-    return 'bg-amber-500';
+    return 'bg-amber-500'; // Default volume color
   };
 
   const cleanInt = (v) => {
@@ -109,6 +137,8 @@ export default function DBVolumesSection({ volumes }) {
       }
       bodyClassName="p-0"
       collapsible
+      isCollapsed={isCollapsed}
+      onToggle={(v) => setIsCollapsed(v)}
     >
       <Table columns={columns} data={volumes} />
     </Card>

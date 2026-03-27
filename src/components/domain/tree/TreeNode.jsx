@@ -5,7 +5,7 @@ import { Skeleton } from '../../ds/layout/Skeleton';
 import { StatusIndicator } from '../atoms/StatusIndicator';
 import { theme } from '../../../styles/theme';
 
-export const TreeNode = ({
+export const TreeNode = React.memo(({
   id,
   label,
   icon = 'folder',
@@ -21,9 +21,11 @@ export const TreeNode = ({
   children,
   open: controlledOpen,
 }) => {
+  const [isOpen, setIsOpen] = React.useState(controlledOpen || false);
   const indentClass = level === 1 ? theme.tree.levelOneIndent : theme.tree.levelDeepIndent;
 
   const handleToggle = (e) => {
+    setIsOpen(e.target.open);
     if (e.target.open && onToggle) onToggle();
   };
 
@@ -120,7 +122,7 @@ export const TreeNode = ({
           name="chevron_right"
           size="14px"
           weight={400}
-          className={`shrink-0 transition-transform duration-150 group-open/details:rotate-90 ${
+          className={`shrink-0 transition-transform duration-150 ${isOpen ? 'rotate-90' : ''} ${
             isActive ? 'text-amber-500' : 'text-slate-400 dark:text-slate-600'
           }`}
         />
@@ -161,4 +163,4 @@ export const TreeNode = ({
       </div>
     </details>
   );
-};
+});

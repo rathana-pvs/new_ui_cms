@@ -37,7 +37,7 @@ export const Modal = ({
   if (!isOpen) return null;
 
   const iconStyles = {
-    primary: 'bg-bk-yellow/10 text-bk-yellow border-bk-yellow/20',
+    primary: 'bg-amber-500/10 text-amber-600 dark:text-amber-500 border-amber-500/20',
     danger: 'bg-rose-500/10 text-rose-500 border-rose-500/20',
     warning: 'bg-amber-500/10 text-amber-500 border-amber-500/20',
     success: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
@@ -61,7 +61,7 @@ export const Modal = ({
         aria-modal="true"
       >
         {/* Subtle Top Accent */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-bk-yellow/60"></div>
+        <div className="absolute top-0 left-0 right-0 h-[2.5px] bg-amber-500"></div>
 
         <button
           type="button"

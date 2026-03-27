@@ -12,8 +12,8 @@ export default function ServerListItem({ host, isSelected, isAuthorized, onConte
       title={`${host.address}:${host.port}`}
       className={`flex flex-col px-4 py-2 cursor-pointer transition-all select-none rounded group relative mb-1 border
         ${isSelected
-          ? 'bg-slate-50 dark:bg-white/[0.06] border-slate-200 dark:border-white/10 shadow-sm'
-          : 'bg-transparent border-transparent hover:bg-slate-100 dark:hover:bg-white/[0.04]'
+          ? 'bg-amber-50/60 dark:bg-white/[0.06] border-amber-200 dark:border-amber-500/30 shadow-sm'
+          : 'bg-white dark:bg-white/[0.02] border-slate-200 dark:border-white/[0.07] hover:bg-slate-50 dark:hover:bg-white/[0.04] hover:border-slate-300 dark:hover:border-white/[0.12]'
         }`}
       onClick={() => {
         dispatch(setSelectedHost(host.uid));

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { closeUnloadDBModal, openUnloadResultModal } from '../databaseSlice';
 import { databaseApi } from '../databaseApi';
@@ -10,6 +10,7 @@ import UnloadAdvancedOptions from './unload/UnloadAdvancedOptions';
 import { Icon } from '../../../components/ds/foundation/Icon';
 import { Modal } from '../../../components/ds/layout/Modal';
 import { Button } from '../../../components/ds/foundation/Button';
+import { Typography } from '../../../components/ds/foundation/Typography';
 
 export default function UnloadDatabaseModal() {
   const dispatch = useDispatch();
@@ -155,63 +156,117 @@ export default function UnloadDatabaseModal() {
       dispatch(openUnloadResultModal(response));
     } catch (err) {
       console.error('Failed to unload database:', err);
-      setError(err.response?.data?.note || err.response?.data?.message || 'The unload operation failed. Check the target directory permissions and database state.');
+      setError(err.response?.data?.note || err.response?.data?.message || 'The unload operation failed. Check permissions.');
     } finally {
       setIsUnloading(false);
     }
   };
 
   const footer = (
-    <>
-      <Button 
-        variant="ghost" 
-        onClick={() => dispatch(closeUnloadDBModal())}
-      >
-        Discard
-      </Button>
-      <Button 
-        onClick={handleUnloadDatabase}
-        loading={isUnloading}
-        icon="play_circle"
-        className="min-w-[130px]"
-      >
-        Proceed unload
-      </Button>
-    </>
+    <div className="flex items-center justify-between w-full">
+      <div className="flex items-center gap-2 text-slate-400 dark:text-slate-500 text-[11px] font-bold uppercase tracking-widest italic group transition-colors hover:text-amber-500/70">
+        <Icon name="verified_user" size="14px" className="animate-pulse" />
+        <span>DBA credentials required for extraction</span>
+      </div>
+      <div className="flex items-center gap-3">
+        <button 
+          onClick={() => dispatch(closeUnloadDBModal())}
+          className="text-[12px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors px-4"
+        >
+          Discard
+        </button>
+        <Button 
+          onClick={handleUnloadDatabase}
+          loading={isUnloading}
+          icon="upload"
+          className="px-6 min-w-[140px]"
+        >
+          Initialize Export
+        </Button>
+      </div>
+    </div>
   );
 
   return (
     <Modal
       isOpen={isUnloadDBModalOpen}
       onClose={() => dispatch(closeUnloadDBModal())}
-      title="Unload database"
+      title="Extract Database Data"
+      subtitle="Export schema and records to portable flat files"
       icon="upload"
       footer={footer}
       loading={isUnloading}
       error={error}
       onErrorClose={() => setError(null)}
       onErrorRetry={handleUnloadDatabase}
-      maxWidth="max-w-[720px]"
+      maxWidth="max-w-[740px]"
     >
-      <div className="space-y-6">
-        <UnloadConfigSection 
-          formData={formData} 
-          handleInputChange={handleInputChange} 
-        />
+      <div className="space-y-8 pb-4">
+        
+        {/* Source Instance Banner */}
+        <div className="relative overflow-hidden rounded-xl border border-amber-500/20 bg-gradient-to-r from-amber-500/8 to-transparent dark:from-amber-500/10 dark:to-transparent p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0 shadow-inner">
+                <Icon name="database" size="md" weight={300} className="text-amber-500" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <Typography variant="p" className="text-[10px] font-bold uppercase tracking-widest text-amber-600/70 dark:text-amber-400/60 mb-0.5">
+                  Extraction Source
+                </Typography>
+                <div className="flex items-center gap-2">
+                  <Typography variant="p" className="text-[14px] font-bold text-amber-700 dark:text-amber-400 font-mono truncate">
+                    {selectedDatabase}
+                  </Typography>
+                  <span className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded-sm border ${activeDatabases.includes(selectedDatabase) ? 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20' : 'text-slate-400 bg-slate-500/10 border-slate-500/20'}`}>
+                    {activeDatabases.includes(selectedDatabase) ? 'Active' : 'Standby'}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/50 dark:bg-black/20 border border-slate-200 dark:border-white/5 backdrop-blur-sm">
+              <Icon name="description" size="sm" className="text-slate-400" />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Target Type: .sql / .csv</span>
+            </div>
+          </div>
+        </div>
 
-        <UnloadContentSection 
-          formData={formData}
-          handleInputChange={handleInputChange}
-          handleSchemaChange={handleSchemaChange}
-          handleTableToggle={handleTableToggle}
-          dynamicTables={dynamicTables}
-          isTablesLoading={isTablesLoading}
-        />
+        <div className="space-y-8">
+          <UnloadConfigSection 
+            formData={formData} 
+            handleInputChange={handleInputChange} 
+          />
 
-        <UnloadAdvancedOptions 
-          formData={formData}
-          handleInputChange={handleInputChange}
-        />
+          <UnloadContentSection 
+            formData={formData}
+            handleInputChange={handleInputChange}
+            handleSchemaChange={handleSchemaChange}
+            handleTableToggle={handleTableToggle}
+            dynamicTables={dynamicTables}
+            isTablesLoading={isTablesLoading}
+          />
+
+          <UnloadAdvancedOptions 
+            formData={formData}
+            handleInputChange={handleInputChange}
+          />
+        </div>
+
+        {/* Action Disclaimer */}
+        <div className="flex items-start gap-4 p-4 bg-slate-100 dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.08] rounded-xl">
+          <div className="w-8 h-8 rounded-lg bg-white dark:bg-white/5 flex items-center justify-center shrink-0 border border-slate-200 dark:border-white/10 shadow-sm">
+            <Icon name="info" size="sm" weight={300} className="text-sky-500" />
+          </div>
+          <div>
+            <Typography variant="p" className="text-[11px] font-bold text-slate-700 dark:text-slate-200 mb-1 leading-tight uppercase tracking-tight">
+              Export Logic Disclaimer
+            </Typography>
+            <Typography variant="p" className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+              Extraction is executed via the <span className="font-mono text-amber-500/80 italic">cubrid_unload</span> utility. Depending on data volume, this process may consume significant CPU cycles and temporarily reduce instance throughput.
+            </Typography>
+          </div>
+        </div>
+
       </div>
     </Modal>
   );

@@ -47,7 +47,7 @@ export const fetchBrokerList = createAsyncThunk(
 
         return {
           ...r.b,
-          key: generateId(),
+          key: r.b.name,
           qps: result.as_num_query || '0',
           tps: result.as_num_tran || '0',
         };

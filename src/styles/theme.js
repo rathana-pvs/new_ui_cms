@@ -1,8 +1,8 @@
 export const theme = {
   colors: {
     // Active/selected state — used by all three tree systems
-    primary: "amber-600",
-    primaryHover: "amber-700",
+    primary: "amber-500",
+    primaryHover: "amber-400",
 
     // Tree guide lines
     treeBorder: "slate-200",   // light mode  → border-l
@@ -17,7 +17,7 @@ export const theme = {
   tree: {
     levelOneIndent: "ml-[22px]",   // Database / Log / Broker root nodes
     levelDeepIndent: "ml-4",        // Tables, columns, sub-brokers
-    activeBarColor: "bg-amber-600",
+    activeBarColor: "bg-amber-500",
     activeBarClass: "absolute left-[-1px] top-0 bottom-0 w-[2px]",
     hoverClass: "hover:bg-slate-100 dark:hover:bg-slate-800/60",
   },

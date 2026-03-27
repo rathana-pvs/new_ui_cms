@@ -1,308 +1,410 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { closeLockInfoModal } from '../databaseSlice';
 import { databaseApi } from '../databaseApi';
-import LoadingOverlay from '../../../components/common/LoadingOverlay';
-import ErrorOverlay from '../../../components/common/ErrorOverlay';
 
 import { Icon } from '../../../components/ds/foundation/Icon';
+import { Modal } from '../../../components/ds/layout/Modal';
+import { Button } from '../../../components/ds/foundation/Button';
 import { Typography } from '../../../components/ds/foundation/Typography';
+import { Spinner } from '../../../components/ds/foundation/Spinner';
 
+/* ─── micro helpers ──────────────────────────────────────────── */
+const Divider = () => (
+  <div className="h-px bg-slate-100 dark:bg-white/[0.05] my-5" />
+);
+
+const SectionLabel = ({ children, count }) => (
+  <div className="flex items-center gap-3 mb-3">
+    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 whitespace-nowrap">
+      {children}
+    </span>
+    {count !== undefined && (
+      <span className="text-[9px] font-black px-1.5 py-0.5 rounded-sm bg-amber-500/10 border border-amber-500/20 text-amber-500">
+        {count}
+      </span>
+    )}
+    <div className="flex-1 h-px bg-slate-100 dark:bg-white/[0.05]" />
+  </div>
+);
+
+const StatCard = ({ icon, label, value, unit, accent = 'amber' }) => {
+  const colors = {
+    amber:  { ring: 'border-amber-500/20 bg-amber-500/5',    icon: 'text-amber-500',   val: 'text-amber-600 dark:text-amber-400' },
+    sky:    { ring: 'border-sky-500/20 bg-sky-500/5',        icon: 'text-sky-500',     val: 'text-sky-600 dark:text-sky-400' },
+    violet: { ring: 'border-violet-500/20 bg-violet-500/5',  icon: 'text-violet-500',  val: 'text-violet-600 dark:text-violet-400' },
+    rose:   { ring: 'border-rose-500/20 bg-rose-500/5',      icon: 'text-rose-500',    val: 'text-rose-600 dark:text-rose-400' },
+    emerald:{ ring: 'border-emerald-500/20 bg-emerald-500/5',icon: 'text-emerald-500', val: 'text-emerald-600 dark:text-emerald-400' },
+    slate:  { ring: 'border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/[0.02]', icon: 'text-slate-400', val: 'text-slate-700 dark:text-slate-200' },
+  };
+  const c = colors[accent] || colors.slate;
+  return (
+    <div className={`rounded-xl border p-3.5 flex items-center gap-3 transition-all hover:shadow-sm ${c.ring}`}>
+      <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-white/70 dark:bg-black/20 border border-white/60 dark:border-white/10`}>
+        <Icon name={icon} size="sm" weight={300} className={c.icon} />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="text-[9px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-0.5">{label}</div>
+        <div className="flex items-baseline gap-1.5">
+          <span className={`text-[17px] font-mono font-black leading-none ${c.val}`}>{value ?? '—'}</span>
+          {unit && <span className="text-[9px] font-bold text-slate-400 uppercase italic opacity-60">{unit}</span>}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const IsolationBadge = ({ level }) => {
+  const color = level?.toLowerCase().includes('serializable')
+    ? 'text-rose-500 bg-rose-500/10 border-rose-500/20'
+    : level?.toLowerCase().includes('repeatable')
+    ? 'text-violet-500 bg-violet-500/10 border-violet-500/20'
+    : 'text-sky-500 bg-sky-500/10 border-sky-500/20';
+  return (
+    <span className={`text-[9px] font-black uppercase tracking-tight px-1.5 py-0.5 rounded border whitespace-nowrap ${color}`}>
+      {level || 'UNKNOWN'}
+    </span>
+  );
+};
+
+const EmptyState = ({ icon = 'verified_user', title, subtitle, accent = 'emerald' }) => {
+  const accentClass = { emerald: 'text-emerald-500', amber: 'text-amber-500', slate: 'text-slate-400' };
+  return (
+    <div className="flex flex-col items-center justify-center py-16 gap-4 opacity-40">
+      <div className="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 flex items-center justify-center">
+        <Icon name={icon} size="lg" weight={100} className={accentClass[accent]} />
+      </div>
+      <div className="text-center">
+        <p className="text-[11px] font-bold font-sans uppercase tracking-[0.15em] text-slate-700 dark:text-slate-300 mb-1">{title}</p>
+        {subtitle && <p className="text-[10px] font-sans text-slate-400 dark:text-slate-500 italic max-w-[260px] leading-relaxed">{subtitle}</p>}
+      </div>
+    </div>
+  );
+};
+
+/* ─── main component ─────────────────────────────────────────── */
 export default function LockInformationModal() {
   const dispatch = useDispatch();
-  const { isLockInfoModalOpen, selectedDatabase } = useSelector((state) => state.database);
-  const { selectedHostUid } = useSelector((state) => state.host);
-  
-  const [activeTab, setActiveTab] = useState('client'); // 'client' or 'object'
+  const { isLockInfoModalOpen, selectedDatabase } = useSelector((s) => s.database);
+  const { selectedHostUid } = useSelector((s) => s.host);
+
+  const [activeTab, setActiveTab] = useState('sessions');
   const [settings, setSettings] = useState({});
+  const [lot, setLot] = useState({});
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState(null);
 
-  const fetchLockInfo = async () => {
+  const fetchLockInfo = useCallback(async () => {
     if (!selectedHostUid || !selectedDatabase) return;
     setLoading(true);
     setError(null);
     try {
       const response = await databaseApi.getLockInfo(selectedHostUid, selectedDatabase);
-      const resultData = response;
-      
-      if (resultData && resultData.lockinfo && resultData.lockinfo.length > 0) {
-        const { dinterval, esc, lot, transaction } = resultData.lockinfo[0];
-        setSettings({
-          dinterval,
-          esc,
-          ...(lot?.[0] || {})
-        });
-        setTransactions(transaction || []);
+      if (response?.lockinfo?.length > 0) {
+        const { dinterval, esc, lot: lotArr, transaction } = response.lockinfo[0];
+        setSettings({ dinterval, esc });
+        setLot(lotArr?.[0] || {});
+        setTransactions(Array.isArray(transaction) ? transaction : transaction ? [transaction] : []);
+        setLastUpdated(new Date());
+      } else {
+        setSettings({});
+        setLot({});
+        setTransactions([]);
       }
     } catch (err) {
-      console.error('Failed to fetch lock info:', err);
-      setError(err.response?.data?.note || err.response?.data?.message || 'Failed to retrieve locking information. The database might be under high contention.');
+      setError(err.response?.data?.note || err.response?.data?.message || 'Failed to retrieve locking information.');
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedHostUid, selectedDatabase]);
 
   useEffect(() => {
     if (isLockInfoModalOpen) {
+      setActiveTab('sessions');
       fetchLockInfo();
     }
   }, [isLockInfoModalOpen, selectedHostUid, selectedDatabase]);
 
   if (!isLockInfoModalOpen) return null;
 
+  const isHighContention = transactions.length > 5;
+  const totalWaiters = transactions.reduce((sum, t) => sum + (t.waitfor ? 1 : 0), 0);
+  const uniqueHosts = [...new Set(transactions.map(t => t.host).filter(Boolean))].length;
+
+  const TABS = [
+    { id: 'sessions', label: 'Active Sessions', icon: 'person_pin_circle', badge: transactions.length },
+    { id: 'objects',  label: 'Object Locks',    icon: 'lock_open',         badge: null },
+    { id: 'params',   label: 'System Params',   icon: 'tune',              badge: null },
+  ];
+
   return (
-    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div 
-        className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"
-        onClick={() => dispatch(closeLockInfoModal())}
-      />
+    <Modal
+      isOpen={isLockInfoModalOpen}
+      onClose={() => dispatch(closeLockInfoModal())}
+      title="Lock Information"
+      subtitle={`Concurrency diagnostics for ${selectedDatabase}`}
+      icon="lock"
+      maxWidth="max-w-[900px]"
+      loading={loading && transactions.length === 0}
+      error={error}
+      onErrorClose={() => setError(null)}
+      onErrorRetry={fetchLockInfo}
+      footer={
+        <div className="flex items-center justify-between w-full gap-3">
+          <div className="flex items-center gap-2 text-[10px] text-slate-400 dark:text-slate-500 font-medium">
+            <Icon name="history" size="12px" weight={300} />
+            {lastUpdated
+              ? <span>Last synced at <span className="font-mono">{lastUpdated.toLocaleTimeString()}</span></span>
+              : <span className="italic">Not yet synced</span>
+            }
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => dispatch(closeLockInfoModal())}
+              disabled={loading}
+              className="text-[12px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors px-4"
+            >
+              Close
+            </button>
+            <Button variant="primary" onClick={fetchLockInfo} loading={loading} icon="refresh" className="px-6 min-w-[120px]">
+              Refresh
+            </Button>
+          </div>
+        </div>
+      }
+    >
+      <div className="space-y-5 pb-2">
 
-      <div className="relative bg-white dark:bg-background-dark w-full max-w-4xl rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-slate-200 dark:border-white/[0.08] overflow-hidden transform transition-all flex flex-col max-h-[90vh] text-left animate-in zoom-in-95 duration-200">
-        
-        {/* Subtle Top Accent */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-amber-500/60"></div>
-
-        <LoadingOverlay 
-            isVisible={loading && transactions.length > 0} 
-            title="Refreshing lock data" 
-            subtitle="Syncing client and object statistics..." 
-        />
-        <ErrorOverlay 
-          isVisible={!!error} 
-          error={error} 
-          onRetry={fetchLockInfo}
-          onClose={() => setError(null)}
-        />
-        
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-white/[0.06] bg-slate-50/50 dark:bg-white/[0.02] shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center border border-amber-500/20">
-              <Icon name="lock" size="sm" weight={300} className="text-amber-500" />
+        {/* ── Context banner ─────────────────────────────────── */}
+        <div className={`relative overflow-hidden rounded-xl border p-4 transition-colors duration-500
+          ${isHighContention
+            ? 'border-rose-500/25 bg-gradient-to-r from-rose-500/8 to-transparent dark:from-rose-500/10'
+            : 'border-amber-500/20 bg-gradient-to-r from-amber-500/8 to-transparent dark:from-amber-500/10'
+          }`}
+        >
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border
+                ${isHighContention ? 'bg-rose-500/10 border-rose-500/20' : 'bg-amber-500/10 border-amber-500/20'}`}
+              >
+                <Icon name="database" size="md" weight={300} className={isHighContention ? 'text-rose-500' : 'text-amber-500'} />
+              </div>
+              <div>
+                <Typography variant="p" className="text-[9px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-0.5">
+                  Instance Under Inspection
+                </Typography>
+                <Typography variant="p" className={`text-[15px] font-bold font-mono ${isHighContention ? 'text-rose-700 dark:text-rose-400' : 'text-amber-700 dark:text-amber-400'}`}>
+                  {selectedDatabase}
+                </Typography>
+              </div>
             </div>
-            <div>
-              <Typography variant="h3" className="text-sm font-semibold text-slate-900 dark:text-slate-100 leading-none">Locking System Monitor</Typography>
+
+            {/* Live counters */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-widest
+                ${isHighContention
+                  ? 'bg-rose-500/10 border-rose-500/25 text-rose-600 dark:text-rose-400'
+                  : 'bg-emerald-500/10 border-emerald-500/25 text-emerald-600 dark:text-emerald-500'
+                }`}
+              >
+                <span className={`w-1.5 h-1.5 rounded-full ${isHighContention ? 'bg-rose-500 animate-ping' : 'bg-emerald-500'}`} />
+                {isHighContention ? 'High Contention' : 'Low Contention'}
+              </div>
+              {loading && (
+                <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-mono">
+                  <Spinner size="xs" />
+                  <span>Polling…</span>
+                </div>
+              )}
             </div>
           </div>
-          <button 
-            disabled={loading}
-            onClick={() => dispatch(closeLockInfoModal())}
-            className="w-7 h-7 rounded-md hover:bg-slate-200 dark:hover:bg-white/10 transition-all text-slate-400 dark:text-slate-500 flex items-center justify-center group"
-          >
-            <Icon name="close" size="sm" weight={300} className="group-hover:rotate-90 transition-transform" />
-          </button>
+
+          {/* Summary row */}
+          <div className="grid grid-cols-3 gap-3 mt-4 pt-3 border-t border-black/[0.04] dark:border-white/[0.05]">
+            {[
+              { icon: 'group',          label: 'Active Sessions', value: transactions.length,                            accent: 'amber' },
+              { icon: 'swap_horiz',     label: 'Waiting Sessions', value: totalWaiters,                                  accent: totalWaiters > 0 ? 'rose' : 'emerald' },
+              { icon: 'dns',            label: 'Unique Hosts',     value: uniqueHosts,                                   accent: 'slate' },
+            ].map(s => (
+              <div key={s.label} className="flex items-center gap-2.5">
+                <Icon name={s.icon} size="sm" weight={300} className="text-slate-400 dark:text-slate-500 shrink-0" />
+                <div>
+                  <div className="text-[9px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">{s.label}</div>
+                  <div className={`text-[16px] font-mono font-black leading-tight ${s.accent === 'rose' && s.value > 0 ? 'text-rose-500' : s.accent === 'emerald' ? 'text-emerald-500' : 'text-slate-700 dark:text-slate-100'}`}>
+                    {s.value}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Tabs Control */}
-        <div className="flex bg-slate-50/20 dark:bg-white/[0.01] px-2 border-b border-slate-100 dark:border-white/[0.06] shrink-0">
-          {[
-            { id: 'client', label: 'Client / Session Info' },
-            { id: 'object', label: 'Object Lock Status' }
-          ].map(tab => (
-            <button 
+        {/* ── Tabs ────────────────────────────────────────────── */}
+        <div className="flex gap-1 p-1 bg-slate-100 dark:bg-white/[0.04] rounded-xl">
+          {TABS.map(tab => (
+            <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-3 text-[11px] font-bold uppercase tracking-widest transition-all border-b-2 relative active:scale-95
-                ${activeTab === tab.id 
-                  ? 'text-amber-500 border-amber-500' 
-                  : 'text-slate-400 border-transparent hover:text-slate-600 dark:hover:text-slate-200'}`}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-[11px] font-bold uppercase tracking-widest transition-all duration-200
+                ${activeTab === tab.id
+                  ? 'bg-white dark:bg-bk-side text-amber-500 shadow-md shadow-black/5 dark:shadow-white/5 border border-slate-200 dark:border-white/10'
+                  : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-50/50 dark:hover:bg-white/[0.03]'
+                }`}
             >
-              {tab.label}
-              {activeTab === tab.id && (
-                <div className="absolute inset-0 bg-amber-500/5 animate-pulse pointer-events-none rounded-t-lg"></div>
+              <Icon name={tab.icon} size="sm" weight={300} className="shrink-0" />
+              <span>{tab.label}</span>
+              {tab.badge !== null && (
+                <span className={`text-[9px] font-black px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-none
+                  ${activeTab === tab.id ? 'bg-amber-500 text-white' : 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-slate-400'}`}>
+                  {tab.badge}
+                </span>
               )}
             </button>
           ))}
         </div>
 
-        {/* Body */}
-        <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar flex-1">
-          {loading && transactions.length === 0 ? (
-            <div className="flex-1 flex flex-col items-center justify-center gap-4 py-20 min-h-[400px]">
-              <div className="w-6 h-6 border-2 border-amber-500/20 border-t-amber-500 rounded-full animate-spin"></div>
-              <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Syncing Diagnostics...</span>
-            </div>
-          ) : activeTab === 'client' ? (
-            <div className="animate-in fade-in duration-300">
-              <div className="space-y-6">
-                {/* Server Context */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] whitespace-nowrap">Server Parameters</span>
-                    <div className="flex-1 h-px bg-slate-100 dark:bg-white/[0.06]"></div>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/[0.06] rounded-xl flex items-center justify-between">
-                      <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Lock Escalation</span>
-                      <span className="text-[13px] font-mono font-bold text-slate-700 dark:text-slate-200">{settings.esc || '100,000'}</span>
-                    </div>
-                    <div className="p-4 bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/[0.06] rounded-xl flex items-center justify-between">
-                      <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Deadlock Interval</span>
-                      <div className="flex items-baseline gap-1">
-                        <span className="text-[13px] font-mono font-bold text-slate-700 dark:text-slate-200">{settings.dinterval || '0'}</span>
-                        <span className="text-[10px] font-bold text-slate-400">ms</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+        {/* ── Tab Content ─────────────────────────────────────── */}
+        <div className="min-h-[340px] animate-in fade-in duration-200">
 
-                {/* Transactions Table */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] whitespace-nowrap">Active Client Sessions</span>
-                    <div className="flex-1 h-px bg-slate-100 dark:bg-white/[0.06]"></div>
-                  </div>
-
-                  <div className="border border-slate-200 dark:border-white/[0.08] rounded-lg overflow-hidden bg-white dark:bg-white/[0.01]">
-                    <div className="overflow-x-auto custom-scrollbar">
-                      <table className="w-full text-left border-collapse">
-                        <thead className="bg-slate-50/50 dark:bg-white/[0.03] text-[11px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 dark:border-white/[0.06]">
-                          <tr>
-                            <th className="px-4 py-3">Idx</th>
-                            <th className="px-4 py-3">Pname</th>
-                            <th className="px-4 py-3">UID</th>
-                            <th className="px-4 py-3">Host Address</th>
-                            <th className="px-4 py-3 text-center">PID</th>
-                            <th className="px-4 py-3">Isolation</th>
-                            <th className="px-4 py-3 text-right">Timeout</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-white/[0.04] font-mono text-[12px]">
-                          {transactions.length > 0 ? transactions.map((client, idx) => (
-                            <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors group">
-                              <td className="px-4 py-2.5 font-bold text-amber-500">{client.index}</td>
-                              <td className="px-4 py-2.5">
-                                <span className="font-sans font-semibold text-slate-700 dark:text-slate-200">{client.pname || '-'}</span>
-                              </td>
-                              <td className="px-4 py-2.5 text-slate-500 dark:text-slate-400">{client['@uid'] || '-'}</td>
-                              <td className="px-4 py-2.5 text-slate-500 dark:text-slate-400">{client.host || '-'}</td>
-                              <td className="px-4 py-2.5 text-center">
-                                <span className="bg-slate-100 dark:bg-white/[0.06] px-2 py-0.5 rounded text-[11px] border border-slate-200 dark:border-white/[0.1] text-slate-600 dark:text-slate-300">
-                                  {client.pid}
-                                </span>
-                              </td>
-                              <td className="px-4 py-2.5 text-slate-500 dark:text-slate-400">{client.isolevel}</td>
-                              <td className="px-4 py-2.5 text-right">
-                                <span className="text-slate-600 dark:text-slate-300 font-semibold">{client.timeout}</span>
-                                <span className="text-[10px] text-slate-400 ml-1 font-bold">sec</span>
-                              </td>
-                            </tr>
-                          )) : (
-                            <tr>
-                              <td colSpan="7" className="px-4 py-16 text-center">
-                                <div className="flex flex-col items-center justify-center gap-3 opacity-30">
-                                  <Icon name="group_off" size="md" weight={100} className="text-4xl" />
-                                  <span className="text-[11px] font-bold uppercase tracking-widest">No Active Sessions</span>
-                                </div>
-                              </td>
-                            </tr>
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="animate-in fade-in duration-300">
-              <div className="space-y-6">
-                {/* Object Stats */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] whitespace-nowrap">Lock Usage Statistics</span>
-                    <div className="flex-1 h-px bg-slate-100 dark:bg-white/[0.06]"></div>
-                  </div>
-                  
-                  <div className="grid grid-cols-3 gap-4">
-                    {[
-                      { label: 'Locked Objects', value: settings.numlocked || 0, unit: 'items' },
-                      { label: 'Allocated Limit', value: settings.numallocated || 5000, unit: 'max' },
-                      { label: 'Memory Usage', value: settings.sizelock || '1M', unit: 'bytes' }
-                    ].map(stat => (
-                      <div key={stat.label} className="p-4 bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/[0.06] rounded-xl">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">{stat.label}</span>
-                        <div className="flex items-baseline gap-1.5">
-                          <span className="text-xl font-mono font-bold text-slate-700 dark:text-slate-100">{stat.value}</span>
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{stat.unit}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Object Details */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] whitespace-nowrap">Object Level Details</span>
-                    <div className="flex-1 h-px bg-slate-100 dark:bg-white/[0.06]"></div>
-                  </div>
-
-                  <div className="border border-slate-200 dark:border-white/[0.08] rounded-lg overflow-hidden bg-white dark:bg-white/[0.01]">
-                    <div className="overflow-x-auto min-h-[220px] custom-scrollbar">
-                      <table className="w-full text-left border-collapse">
-                        <thead className="bg-slate-50/50 dark:bg-white/[0.03] text-[11px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 dark:border-white/[0.06]">
-                          <tr>
-                            <th className="px-4 py-3">Object ID (OID)</th>
-                            <th className="px-4 py-3">Structure Type</th>
-                            <th className="px-4 py-3 text-center">Holders</th>
-                            <th className="px-4 py-3 text-center">Blocked</th>
-                            <th className="px-4 py-3 text-right">Waiters</th>
-                          </tr>
-                        </thead>
-                        <tbody className="text-[12px] font-mono">
-                          <tr>
-                            <td colSpan="5" className="px-4 py-24 text-center">
-                              <div className="flex flex-col items-center justify-center gap-3 opacity-30">
-                                <Icon name="key_off" size="md" weight={100} className="text-4xl" />
-                                <span className="text-[11px] font-bold uppercase tracking-widest">No Lock Contention</span>
-                              </div>
+          {/* ··· Sessions ··· */}
+          {activeTab === 'sessions' && (
+            <div>
+              {transactions.length === 0 ? (
+                <EmptyState
+                  icon="sentiment_very_satisfied"
+                  title="No Active Sessions"
+                  subtitle="No client transactions are currently registered on this instance."
+                  accent="emerald"
+                />
+              ) : (
+                <div className="rounded-xl border border-slate-200 dark:border-white/[0.08] overflow-hidden">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-slate-50 dark:bg-white/[0.03] border-b border-slate-100 dark:border-white/[0.06]">
+                        {['#', 'Process', 'User', 'Host', 'PID', 'Isolation', 'Timeout', 'Locks'].map(h => (
+                          <th key={h} className="px-3.5 py-3 text-[9px] font-black text-slate-500 uppercase tracking-[0.15em] whitespace-nowrap">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-white/[0.04]">
+                      {transactions.map((t, idx) => {
+                        const isWaiting = !!t.waitfor;
+                        const holdCount = Array.isArray(t.lock) ? t.lock.length : (t.lock ? 1 : 0);
+                        return (
+                          <tr key={idx} className={`group transition-colors text-[12px] font-mono ${isWaiting ? 'bg-rose-50/30 dark:bg-rose-500/5' : 'hover:bg-amber-500/[0.03]'}`}>
+                            <td className="px-3.5 py-3 text-amber-500/70 font-black">{t.index ?? idx + 1}</td>
+                            <td className="px-3.5 py-3">
+                              <span className="font-sans font-bold text-slate-700 dark:text-slate-200 text-[12px]">{t.pname || 'cubrid'}</span>
+                              {isWaiting && (
+                                <span className="ml-2 text-[9px] font-black text-rose-500 bg-rose-500/10 border border-rose-500/20 px-1.5 py-0.5 rounded">WAITING</span>
+                              )}
+                            </td>
+                            <td className="px-3.5 py-3 text-slate-500 dark:text-slate-400">{t['@uid'] ?? '-'}</td>
+                            <td className="px-3.5 py-3 text-slate-400 dark:text-slate-500 max-w-[140px] truncate italic text-[11px]">{t.host ?? '-'}</td>
+                            <td className="px-3.5 py-3">
+                              <span className="bg-slate-100 dark:bg-white/[0.05] px-2 py-0.5 rounded text-[11px] border border-slate-200/50 dark:border-white/10 text-slate-600 dark:text-slate-400 font-bold group-hover:border-amber-500/30 transition-colors">
+                                {t.pid ?? '—'}
+                              </span>
+                            </td>
+                            <td className="px-3.5 py-3">
+                              <IsolationBadge level={t.isolevel} />
+                            </td>
+                            <td className="px-3.5 py-3 text-right">
+                              <span className="font-black text-slate-700 dark:text-slate-200">{t.timeout ?? '—'}</span>
+                              <span className="text-[9px] text-slate-400 ml-1 uppercase tracking-widest opacity-50">sec</span>
+                            </td>
+                            <td className="px-3.5 py-3 text-center">
+                              {holdCount > 0 ? (
+                                <span className="bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-[10px] font-black px-2 py-0.5 rounded">{holdCount}</span>
+                              ) : (
+                                <span className="text-slate-300 dark:text-slate-600">—</span>
+                              )}
                             </td>
                           </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                    <div className="px-4 py-2.5 border-t border-slate-100 dark:border-white/[0.04] bg-slate-50/20 dark:bg-white/[0.01] flex justify-end">
-                      <button className="px-3 py-1.5 bg-slate-900 border border-slate-800 text-white text-[11px] font-bold uppercase tracking-widest rounded hover:bg-black transition-all active:scale-95 shadow-lg shadow-black/10">
-                        Detailed Telemetry
-                      </button>
-                    </div>
-                  </div>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ··· Object Locks ··· */}
+          {activeTab === 'objects' && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-3 gap-3">
+                <StatCard icon="key_visualizer" label="Held Objects"      value={lot.numlocked    ?? 0}    unit="items"   accent="amber"  />
+                <StatCard icon="view_quilt"     label="Allocated Capacity" value={lot.numallocated ?? 5000} unit="entries" accent="sky"    />
+                <StatCard icon="memory"         label="Memory Footprint"   value={lot.sizelock     ?? '—'}  unit="bytes"   accent="violet" />
+              </div>
+
+              <SectionLabel count={0}>Contending Object Records</SectionLabel>
+
+              <div className="rounded-xl border border-slate-200 dark:border-white/[0.08] overflow-hidden">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-slate-50 dark:bg-white/[0.03] border-b border-slate-100 dark:border-white/[0.06]">
+                      {['Object OID', 'Class Name', 'Held By', 'Lock Mode', 'Waiters'].map(h => (
+                        <th key={h} className="px-3.5 py-3 text-[9px] font-black text-slate-500 uppercase tracking-[0.15em]">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td colSpan={5}>
+                        <EmptyState
+                          icon="verified_user"
+                          title="No Object Contention"
+                          subtitle="All object-level locks are clear. No active waiters or deadlock chains detected."
+                          accent="emerald"
+                        />
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* ··· System Params ··· */}
+          {activeTab === 'params' && (
+            <div className="space-y-5">
+              <div className="grid grid-cols-2 gap-4">
+                <StatCard icon="timer"      label="Deadlock Check Interval" value={settings.dinterval ?? '—'} unit="ms"     accent="sky"    />
+                <StatCard icon="auto_graph" label="Escalation Threshold"    value={settings.esc       ?? '—'} unit="pages"  accent="amber"  />
+              </div>
+
+              <Divider />
+
+              <SectionLabel>Lock Object Table (LOT) Parameters</SectionLabel>
+              <div className="grid grid-cols-3 gap-3">
+                <StatCard icon="key_visualizer" label="Currently Locked" value={lot.numlocked    ?? 0}    unit="objects" accent="amber"  />
+                <StatCard icon="view_quilt"     label="Max Allocatable"   value={lot.numallocated ?? '—'}  unit="entries" accent="sky"    />
+                <StatCard icon="memory"         label="Memory Block Size"  value={lot.sizelock     ?? '—'}  unit="bytes"   accent="violet" />
+              </div>
+
+              <div className="flex items-start gap-3 mt-2 p-4 bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.08] rounded-xl">
+                <div className="w-7 h-7 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                  <Icon name="info" size="sm" weight={300} className="text-sky-500" />
+                </div>
+                <div>
+                  <Typography variant="p" className="text-[11px] font-bold text-slate-700 dark:text-slate-200 mb-1 uppercase tracking-tight">
+                    Interpretation Guide
+                  </Typography>
+                  <Typography variant="p" className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                    <strong className="font-bold text-slate-600 dark:text-slate-300">Deadlock Interval</strong> — frequency in ms at which CUBRID checks for circular waiting dependencies.{' '}
+                    <strong className="font-bold text-slate-600 dark:text-slate-300">Escalation Threshold</strong> — page count after which row-level locks are promoted to table-level locks to conserve memory.
+                  </Typography>
                 </div>
               </div>
             </div>
           )}
-        </div>
 
-        {/* Footer */}
-        <div className="px-6 py-4 bg-slate-50/50 dark:bg-white/[0.03] backdrop-blur-md flex justify-end gap-3 border-t border-slate-100 dark:border-white/[0.06] shrink-0">
-          <button 
-            disabled={loading}
-            className="px-5 py-2 text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/[0.08] rounded-lg hover:bg-white dark:hover:bg-white/[0.04] hover:text-slate-700 dark:hover:text-slate-200 transition-all active:scale-95"
-            onClick={() => dispatch(closeLockInfoModal())}
-          >
-            Discard
-          </button>
-          <button 
-            onClick={fetchLockInfo}
-            disabled={loading}
-            className="px-6 py-2 bg-amber-500 hover:bg-amber-400 active:scale-95 text-white text-[11px] font-bold uppercase tracking-widest rounded-lg shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2 min-w-[140px] disabled:opacity-50"
-          >
-            {loading ? (
-              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-            ) : (
-              <>
-                <Icon name="refresh" size="sm" weight={400} />
-                <span>Refresh Stats</span>
-              </>
-            )}
-          </button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

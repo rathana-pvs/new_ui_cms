@@ -11,12 +11,19 @@ export const Card = ({
   bodyClassName = '',
   collapsible = false,
   defaultCollapsed = false,
+  isCollapsed: controlledCollapsed,
+  onToggle,
 }) => {
-  const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
+  const [internalCollapsed, setInternalCollapsed] = useState(defaultCollapsed);
+  const isCollapsed = controlledCollapsed !== undefined ? controlledCollapsed : internalCollapsed;
 
   const toggleCollapse = () => {
     if (collapsible) {
-      setIsCollapsed(!isCollapsed);
+      if (onToggle) {
+        onToggle(!isCollapsed);
+      } else {
+        setInternalCollapsed(!isCollapsed);
+      }
     }
   };
 

@@ -1,39 +1,75 @@
 import React from 'react';
 
-const LoadingOverlay = ({ isVisible, title = "Processing", subtitle = "Please wait while we complete your request..." }) => {
+const LoadingOverlay = ({
+  isVisible,
+  title = 'Processing',
+  subtitle = 'Please wait while we complete your request...',
+}) => {
   if (!isVisible) return null;
 
   return (
-    <div className="absolute inset-0 z-[200] flex flex-col items-center justify-center bg-[#1e2230] animate-in fade-in duration-300 overflow-hidden">
-      {/* Ambient Background Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
-      
-      <div className="relative z-10 flex flex-col items-center gap-6 text-center px-8">
-        <div className="relative h-20 w-20">
-          {/* Main Spinning Orb */}
-          <div className="absolute inset-0 border-[3px] border-primary/10 rounded-full"></div>
-          <div className="absolute inset-0 border-t-[3px] border-primary rounded-full animate-spin duration-[1.2s] ease-in-out shadow-[0_-4px_10px_rgba(var(--primary-rgb),0.3)]"></div>
-          {/* Secondary Ring */}
-          <div className="absolute inset-3 border-b-[2px] border-primary/30 rounded-full animate-spin duration-[2s] direction-reverse"></div>
-          {/* Pulsing Core */}
+    <div className="absolute inset-0 z-[200] flex flex-col items-center justify-center bg-white/97 dark:bg-bk-side animate-in fade-in duration-200 rounded-xl overflow-hidden">
+
+      {/* Soft ambient glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[260px] h-[260px] bg-bk-yellow/5 rounded-full blur-[90px] pointer-events-none" />
+
+      <div className="relative z-10 flex flex-col items-center gap-6 text-center px-10">
+
+        {/* Spinner stack */}
+        <div className="relative w-[68px] h-[68px]">
+          {/* Outer track */}
+          <div className="absolute inset-0 rounded-full border-[2px] border-slate-100 dark:border-white/5" />
+          {/* Main arc */}
+          <div
+            className="absolute inset-0 rounded-full border-[2px] border-transparent border-t-bk-yellow animate-spin"
+            style={{ animationDuration: '0.9s' }}
+          />
+          {/* Inner reversed arc */}
+          <div
+            className="absolute inset-[10px] rounded-full border-[1.5px] border-transparent border-b-bk-yellow/35 animate-spin"
+            style={{ animationDuration: '1.7s', animationDirection: 'reverse' }}
+          />
+          {/* Center dot */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="h-3 w-3 bg-primary rounded-full shadow-[0_0_20px_rgba(var(--primary-rgb),0.6)] animate-pulse"></div>
+            <div className="w-2.5 h-2.5 rounded-full bg-bk-yellow shadow-[0_0_10px_3px_rgba(255,193,7,0.3)] animate-pulse" />
           </div>
         </div>
 
-        <div className="space-y-2">
-          <h4 className="text-[16px] font-medium text-white tracking-tight">{title}</h4>
-          <div className="flex flex-col items-center gap-1">
-            <p className="text-[12px] text-slate-400 font-medium">{subtitle}</p>
-            <p className="text-[10px] text-slate-500 tracking-wide animate-pulse">In Progress</p>
-          </div>
+        {/* Text */}
+        <div className="space-y-1.5">
+          <h4 className="text-[14px] font-black text-slate-900 dark:text-white tracking-tight leading-none">
+            {title}
+          </h4>
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed max-w-[200px]">
+            {subtitle}
+          </p>
         </div>
 
-        {/* Modern Loading Strip */}
-        <div className="w-48 h-[2px] bg-white/5 rounded-full overflow-hidden mt-2">
-          <div className="h-full bg-primary w-1/3 animate-[reloading_1.5s_infinite_ease-in-out] rounded-full"></div>
+        {/* Sliding progress bar */}
+        <div className="w-40 h-[2px] bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-bk-yellow rounded-full"
+            style={{ animation: 'overlaySlide 1.5s ease-in-out infinite' }}
+          />
         </div>
+
+        {/* Status pill */}
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 dark:bg-white/[0.04] border border-slate-100 dark:border-white/5">
+          <div className="w-1.5 h-1.5 rounded-full bg-bk-yellow animate-pulse" />
+          <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">
+            In Progress
+          </span>
+        </div>
+
       </div>
+
+      <style>{`
+        @keyframes overlaySlide {
+          0%   { transform: translateX(-100%); width: 50%; }
+          50%  { transform: translateX(100%);  width: 60%; }
+          100% { transform: translateX(200%);  width: 50%; }
+        }
+      `}</style>
     </div>
   );
 };

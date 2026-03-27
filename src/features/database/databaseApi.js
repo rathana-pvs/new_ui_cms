@@ -114,4 +114,22 @@ export const databaseApi = {
   copyDatabase: (hostUid, payload) => {
     return apiClient.post(`/${hostUid}/database/copydb`, payload);
   },
+  createDatabase: (hostUid, payload) => {
+    return apiClient.post(`/${hostUid}/database/create`, payload);
+  },
+  getCreateInfo: (hostUid) => {
+    return apiClient.get(`/${hostUid}/database/create-info`);
+  },
+  getBackupDbInfo: (hostUid, dbname) => {
+    return apiClient.get(`/${hostUid}/database/backup-db-info/${encodeURIComponent(dbname)}`);
+  },
+  getBackupList: (hostUid, dbname) => {
+    return apiClient.get(`/${hostUid}/database/backup-db-list/${encodeURIComponent(dbname)}`);
+  },
+  restoreDatabase: (hostUid, dbname, payload) => {
+    return apiClient.post(`/${hostUid}/database/restore-db/${encodeURIComponent(dbname)}`, payload);
+  },
+  backupDatabase: (hostUid, dbname, payload) => {
+    return apiClient.post(`/${hostUid}/database/backup-db/${encodeURIComponent(dbname)}`, payload);
+  },
 };

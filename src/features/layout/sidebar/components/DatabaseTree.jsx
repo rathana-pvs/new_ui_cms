@@ -1,4 +1,5 @@
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useCallback, useMemo } from 'react';
+import { useDispatch, useSelector, shallowEqual } from 'react-redux';
 import { 
   setSelectedDatabase, 
   setSelectedDatabaseSubItem, 
@@ -16,6 +17,24 @@ import { Icon } from '../../../../components/ds/foundation/Icon';
 import { Typography } from '../../../../components/ds/foundation/Typography';
 import { Spinner } from '../../../../components/ds/foundation/Spinner';
 
+// Granular selectors to avoid unnecessary re-renders when dashboard data or other slice state changes
+const selectDatabases = (state) => state.database.databases;
+const selectActiveDatabases = (state) => state.database.activeDatabases;
+const selectLoading = (state) => state.database.loading;
+const selectSelection = (state) => ({
+  selectedDatabase: state.database.selectedDatabase,
+  selectedDatabaseSubItem: state.database.selectedDatabaseSubItem
+});
+const selectStatusStates = (state) => ({
+  loggedInDatabases: state.database.loggedInDatabases,
+  backupSchedules: state.database.backupSchedules,
+  backupSchedulesLoading: state.database.backupSchedulesLoading,
+  queryPlans: state.database.queryPlans,
+  queryPlansLoading: state.database.queryPlansLoading,
+  spaceInfo: state.database.spaceInfo,
+  spaceInfoLoading: state.database.spaceInfoLoading
+});
+
 export default function DatabaseTree({ 
   onContextMenu, 
   onRootContextMenu, 
@@ -28,22 +47,60 @@ export default function DatabaseTree({
   onBackupItemContextMenu
 }) {
   const dispatch = useDispatch();
+  const selectedHostUid = useSelector((state) => state.host.selectedHostUid);
+  
+  const databases = useSelector(selectDatabases, shallowEqual);
+  const activeDatabases = useSelector(selectActiveDatabases, shallowEqual);
+  const loading = useSelector(selectLoading);
+  const { selectedDatabase, selectedDatabaseSubItem } = useSelector(selectSelection, shallowEqual);
   const { 
-    databases, 
-    activeDatabases, 
-    loading, 
-    selectedDatabase, 
-    selectedDatabaseSubItem,
-    backupSchedules,
-    backupSchedulesLoading,
-    queryPlans,
-    queryPlansLoading,
-    loggedInDatabases,
-    spaceInfo,
-    spaceInfoLoading
-  } = useSelector((state) => state.database);
-  const { selectedHostUid } = useSelector((state) => state.host);
-  const { databaseUsers, databaseUsersLoading } = useSelector((state) => state.user);
+    loggedInDatabases, 
+    backupSchedules, 
+    backupSchedulesLoading, 
+    queryPlans, 
+    queryPlansLoading, 
+    spaceInfo, 
+    spaceInfoLoading 
+  } = useSelector(selectStatusStates, shallowEqual);
+  
+  const { databaseUsers, databaseUsersLoading } = useSelector((state) => state.user, shallowEqual);
+
+  const handleDbToggle = useCallback((db, isActive, isLoggedIn) => {
+    if (isActive) {
+      if (!isLoggedIn) {
+        if (db.isProfileExists) {
+          dispatch(loginDatabase({ hostUid: selectedHostUid, dbname: db.dbname })).unwrap()
+            .then(() => {
+              dispatch(fetchDatabaseUsers({ hostUid: selectedHostUid, dbname: db.dbname }));
+              dispatch(fetchBackupSchedule({ hostUid: selectedHostUid, dbname: db.dbname }));
+              dispatch(fetchQueryPlan({ hostUid: selectedHostUid, dbname: db.dbname }));
+            });
+        } else {
+          dispatch(openLoginDatabaseModal(db.dbname));
+        }
+      } else {
+        if (!databaseUsers[db.dbname] && !databaseUsersLoading[db.dbname]) {
+          dispatch(fetchDatabaseUsers({ hostUid: selectedHostUid, dbname: db.dbname }));
+        }
+        if (!backupSchedules[db.dbname] && !backupSchedulesLoading[db.dbname]) {
+          dispatch(fetchBackupSchedule({ hostUid: selectedHostUid, dbname: db.dbname }));
+        }
+        if (!queryPlans[db.dbname] && !queryPlansLoading[db.dbname]) {
+          dispatch(fetchQueryPlan({ hostUid: selectedHostUid, dbname: db.dbname }));
+        }
+      }
+    }
+  }, [selectedHostUid, databaseUsers, databaseUsersLoading, backupSchedules, backupSchedulesLoading, queryPlans, queryPlansLoading, dispatch]);
+
+  const handleSelectSubItem = useCallback((dbname, subId, onClick) => {
+    dispatch(setSelectedDatabase(dbname));
+    dispatch(setSelectedDatabaseSubItem(subId));
+    if (onClick) onClick();
+  }, [dispatch]);
+
+  const handleTabOpen = useCallback((tabId) => {
+    dispatch(setActiveMainTab(tabId));
+  }, [dispatch]);
 
   if (loading) {
     return (
@@ -59,19 +116,15 @@ export default function DatabaseTree({
             </div>
           </div>
         ))}
-        <div className="flex items-center justify-center py-6 gap-3">
-          <Spinner size="xs" color="bk-yellow" />
-          <Typography variant="caption" className="text-slate-500 font-bold uppercase tracking-[0.2em] text-[9px] opacity-60">Initializing Engine...</Typography>
-        </div>
       </div>
     );
   }
 
   if (!databases || databases.length === 0) {
     return (
-      <div className="px-6 py-12 flex flex-col items-center justify-center text-center space-y-3 opacity-40 animate-in zoom-in-95 duration-500">
+      <div className="px-6 py-12 flex flex-col items-center justify-center text-center space-y-3 opacity-40">
         <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-white/5 flex items-center justify-center mb-2">
-          <Icon name="database" size="md" className="text-slate-400" weight={300} />
+          <Icon name="database" size="md" className="text-slate-400" weight={100} />
         </div>
         <Typography variant="caption" className="text-slate-500 font-black uppercase tracking-widest text-[10px]">
           No databases found
@@ -97,468 +150,269 @@ export default function DatabaseTree({
             isActive={isDbSelected}
             hasChildren={true}
             status={isActive ? 'on' : 'off'}
-            onToggle={() => {
-              if (isActive) {
-                if (!isLoggedIn) {
-                  if (db.isProfileExists) {
-                    dispatch(loginDatabase({ hostUid: selectedHostUid, dbname: db.dbname })).unwrap()
-                      .then(() => {
-                        dispatch(fetchDatabaseUsers({ hostUid: selectedHostUid, dbname: db.dbname }));
-                        dispatch(fetchBackupSchedule({ hostUid: selectedHostUid, dbname: db.dbname }));
-                        dispatch(fetchQueryPlan({ hostUid: selectedHostUid, dbname: db.dbname }));
-                      });
-                  } else {
-                    dispatch(openLoginDatabaseModal(db.dbname));
-                  }
-                } else {
-                  if (!databaseUsers[db.dbname] && !databaseUsersLoading[db.dbname]) {
-                    dispatch(fetchDatabaseUsers({ hostUid: selectedHostUid, dbname: db.dbname }));
-                  }
-                  if (!backupSchedules[db.dbname] && !backupSchedulesLoading[db.dbname]) {
-                    dispatch(fetchBackupSchedule({ hostUid: selectedHostUid, dbname: db.dbname }));
-                  }
-                  if (!queryPlans[db.dbname] && !queryPlansLoading[db.dbname]) {
-                    dispatch(fetchQueryPlan({ hostUid: selectedHostUid, dbname: db.dbname }));
-                  }
-                }
-              }
-            }}
+            onToggle={() => handleDbToggle(db, isActive, isLoggedIn)}
             onSelect={() => {
               dispatch(setSelectedDatabase(db.dbname));
               dispatch(setSelectedDatabaseSubItem(null));
             }}
-            onDoubleClick={() => dispatch(setActiveMainTab('db:' + db.dbname))}
+            onDoubleClick={() => handleTabOpen('db:' + db.dbname)}
             onContextMenu={(e) => onContextMenu(e, db.dbname, isActive)}
           >
             {/* Level 2 items */}
-            {[
-              { 
-                id: 'Users', 
-                icon: 'group',
-                hasChildren: true,
-                isLoading: databaseUsersLoading[db.dbname],
-                children: (databaseUsers[db.dbname] || []).map(u => ({
-                  id: typeof u === 'string' ? u : u.name,
-                  icon: 'person'
-                }))
-              },
-              { 
-                id: 'Job automation', 
-                icon: 'bolt',
-                hasChildren: true,
-                children: [
-                   { id: 'Backup Plan', icon: 'backup' },
-                   { id: 'Query Plan', icon: 'schema' }
-                ]
-              },
-              { 
-                id: 'Space', 
-                icon: 'donut_small',
-                onClick: () => dispatch(setActiveMainTab(`db_space:${selectedHostUid}:${db.dbname}`)),
-                hasChildren: true,
-                children: [
-                  { id: 'Permanent_PermanentData', icon: 'data_usage' },
-                  { id: 'Permanent_TemporaryData', icon: 'layers' },
-                  { id: 'Temporary_TemporaryData', icon: 'auto_delete' },
-                  { 
-                    id: 'Log', 
-                    icon: 'history',
-                    hasChildren: true,
-                    children: [
-                      { id: 'Active', icon: 'radio_button_checked' },
-                      { id: 'Archive', icon: 'inventory_2' }
-                    ]
-                  }
-                ]
-              }
-            ].map((item) => {
-              const isItemSelected = selectedDatabase === db.dbname && selectedDatabaseSubItem === item.id;
-              
-              if (item.hasChildren) {
-                return (
-                  <TreeNode
-                    key={item.id}
-                    id={item.id}
-                    label={item.id}
-                    icon={item.icon}
-                    level={2}
-                    isActive={isItemSelected}
-                    hasChildren={true}
-                    onToggle={() => {
-                      if (selectedHostUid) {
-                        if (item.id === 'Users') {
-                          if (!databaseUsers[db.dbname] && !databaseUsersLoading[db.dbname]) {
-                            dispatch(fetchDatabaseUsers({ hostUid: selectedHostUid, dbname: db.dbname }));
-                          }
-                        } else if (item.id === 'Job automation') {
-                          if (!backupSchedules[db.dbname] && !backupSchedulesLoading[db.dbname]) {
-                            dispatch(fetchBackupSchedule({ hostUid: selectedHostUid, dbname: db.dbname }));
-                          }
-                          if (!queryPlans[db.dbname] && !queryPlansLoading[db.dbname]) {
-                            dispatch(fetchQueryPlan({ hostUid: selectedHostUid, dbname: db.dbname }));
-                          }
-                        } else if (item.id === 'Space') {
-                          if (!spaceInfo[db.dbname] && !spaceInfoLoading[db.dbname]) {
-                            dispatch(fetchDatabaseSpaceInfo({ hostUid: selectedHostUid, dbname: db.dbname }));
-                          }
-                        }
-                      }
-                    }}
-                    onSelect={() => {
-                      dispatch(setSelectedDatabase(db.dbname));
-                      dispatch(setSelectedDatabaseSubItem(item.id));
-                      if (item.onClick) item.onClick();
-                    }}
-                    onContextMenu={(e) => {
-                      if (item.id === 'Users') {
-                        onUsersContextMenu(e, db.dbname);
-                      } else if (item.id === 'Space') {
-                        dispatch(setSelectedDatabaseSubItem('Space'));
-                        if (!spaceInfo[db.dbname] && !spaceInfoLoading[db.dbname]) {
-                          dispatch(fetchDatabaseSpaceInfo({ hostUid: selectedHostUid, dbname: db.dbname }));
-                        }
-                        onSpaceContextMenu(e, db.dbname);
-                      } else if (item.id === 'Job automation') {
-                        if (onJobAutomationContextMenu) onJobAutomationContextMenu(e, db.dbname);
-                      }
-                    }}
-                  >
-                    {/* Render level 3 items */}
-                    {item.isLoading ? (
-                      <div className="px-6 py-3 flex items-center gap-3">
-                         <Spinner size="xs" color="bk-yellow" />
-                         <Typography variant="caption" className="text-slate-500 font-bold uppercase tracking-widest text-[8px] animate-pulse">Synchronizing...</Typography>
-                      </div>
-                    ) : item.children?.length === 0 && item.id === 'Users' ? (
-                       <div className="px-10 py-3 opacity-30 flex items-center gap-2">
-                          <Icon name="block" size="xs"  weight={300} />
-                          <Typography variant="caption" className="italic font-bold uppercase tracking-widest text-[8px]">Index Empty</Typography>
-                       </div>
-                    ) : (
-                      item.children?.map(child => {
-                        const isChildSelected = selectedDatabase === db.dbname && selectedDatabaseSubItem === child.id;
-                        
-                        // Handle special Backup Plan folder
-                        if (child.id === 'Backup Plan') {
-                          const schedules = backupSchedules[db.dbname] || [];
-                          return (
-                            <TreeNode
-                              key={child.id}
-                              id={child.id}
-                              label="Backup Plan"
-                              icon={child.icon}
-                              level={3}
-                              isActive={isChildSelected}
-                              hasChildren={true}
-                              isLoading={backupSchedulesLoading[db.dbname]}
-                              onToggle={() => {
-                                if (selectedHostUid && !backupSchedules[db.dbname] && !backupSchedulesLoading[db.dbname]) {
-                                  dispatch(fetchBackupSchedule({ hostUid: selectedHostUid, dbname: db.dbname }));
-                                }
-                              }}
-                              onSelect={() => {
-                                dispatch(setSelectedDatabase(db.dbname));
-                                dispatch(setSelectedDatabaseSubItem(child.id));
-                              }}
-                              onContextMenu={(e) => onBackupPlanContextMenu(e, db.dbname)}
-                            >
-                              {schedules.length === 0 && !backupSchedulesLoading[db.dbname] ? (
-                                <div className="px-10 py-3 opacity-30 flex items-center gap-2">
-                                   <Icon name="block" size="xs"  weight={300} />
-                                   <Typography variant="caption" className="italic font-bold uppercase tracking-widest text-[8px]">No Policy Found</Typography>
-                                </div>
-                              ) : (
-                                schedules.map(plan => {
-                                  const planId = plan.backupid;
-                                  const isPlanSelected = selectedDatabase === db.dbname && selectedDatabaseSubItem === `backup:${planId}`;
-                                  return (
-                                    <TreeNode
-                                      key={planId}
-                                      id={planId}
-                                      label={planId}
-                                      icon="event_note"
-                                      level={4}
-                                      isActive={isPlanSelected}
-                                      hasChildren={false}
-                                      onSelect={() => {
-                                        dispatch(setSelectedDatabase(db.dbname));
-                                        dispatch(setSelectedDatabaseSubItem(`backup:${planId}`));
-                                      }}
-                                      onContextMenu={(e) => onBackupItemContextMenu(e, db.dbname, planId)}
-                                    />
-                                  );
-                                })
-                              )}
-                            </TreeNode>
-                          );
-                        }
+            <UsersFolder 
+              db={db}
+              selectedDatabase={selectedDatabase}
+              selectedDatabaseSubItem={selectedDatabaseSubItem}
+              users={databaseUsers[db.dbname]}
+              isLoading={databaseUsersLoading[db.dbname]}
+              onUsersContextMenu={onUsersContextMenu}
+              onUserContextMenu={onUserContextMenu}
+              onSelect={handleSelectSubItem}
+              selectedHostUid={selectedHostUid}
+            />
 
-                        // Handle special Query Plan folder
-                        if (child.id === 'Query Plan') {
-                          const queryP = queryPlans[db.dbname] || [];
-                          return (
-                            <TreeNode
-                              key={child.id}
-                              id={child.id}
-                              label="Query Plan"
-                              icon={child.icon}
-                              level={3}
-                              isActive={isChildSelected}
-                              hasChildren={true}
-                              isLoading={queryPlansLoading[db.dbname]}
-                              onToggle={() => {
-                                if (selectedHostUid && !queryPlans[db.dbname] && !queryPlansLoading[db.dbname]) {
-                                  dispatch(fetchQueryPlan({ hostUid: selectedHostUid, dbname: db.dbname }));
-                                }
-                              }}
-                              onSelect={() => {
-                                dispatch(setSelectedDatabase(db.dbname));
-                                dispatch(setSelectedDatabaseSubItem(child.id));
-                              }}
-                              onContextMenu={(e) => onQueryPlanContextMenu(e, db.dbname)}
-                            >
-                              {queryP.length === 0 && !queryPlansLoading[db.dbname] ? (
-                                <div className="px-10 py-3 opacity-30 flex items-center gap-2">
-                                   <Icon name="block" size="xs"  weight={300} />
-                                   <Typography variant="caption" className="italic font-bold uppercase tracking-widest text-[8px]">No Optimizer Plan</Typography>
-                                </div>
-                              ) : (
-                                queryP.map(plan => {
-                                  const qId = plan.query_id;
-                                  const isQSelected = selectedDatabase === db.dbname && selectedDatabaseSubItem === `query:${qId}`;
-                                  return (
-                                    <TreeNode
-                                      key={qId}
-                                      id={qId}
-                                      label={qId}
-                                      icon="sticky_note_2"
-                                      level={4}
-                                      isActive={isQSelected}
-                                      hasChildren={false}
-                                      onSelect={() => {
-                                        dispatch(setSelectedDatabase(db.dbname));
-                                        dispatch(setSelectedDatabaseSubItem(`query:${qId}`));
-                                      }}
-                                    />
-                                  );
-                                })
-                              )}
-                            </TreeNode>
-                          );
-                        }
+            <JobAutomationFolder 
+              db={db}
+              selectedDatabase={selectedDatabase}
+              selectedDatabaseSubItem={selectedDatabaseSubItem}
+              backupSchedules={backupSchedules[db.dbname]}
+              backupSchedulesLoading={backupSchedulesLoading[db.dbname]}
+              queryPlans={queryPlans[db.dbname]}
+              queryPlansLoading={queryPlansLoading[db.dbname]}
+              onJobAutomationContextMenu={onJobAutomationContextMenu}
+              onBackupPlanContextMenu={onBackupPlanContextMenu}
+              onQueryPlanContextMenu={onQueryPlanContextMenu}
+              onBackupItemContextMenu={onBackupItemContextMenu}
+              onSelect={handleSelectSubItem}
+              selectedHostUid={selectedHostUid}
+            />
 
-                        // Space Volumes
-                        const isCategoryFolder = ['Permanent_PermanentData', 'Permanent_TemporaryData', 'Temporary_TemporaryData', 'Log', 'Active', 'Archive'].includes(child.id);
-                        let volumes = [];
-                        if (spaceInfo[db.dbname] && isCategoryFolder) {
-                          const allVolumes = spaceInfo[db.dbname].volumes || [];
-                          if (child.id === 'Permanent_PermanentData') {
-                            volumes = allVolumes.filter(v => v.type === 'PERMANENT' && (v.purpose === 'PERMANENT' || !v.purpose));
-                          } else if (child.id === 'Permanent_TemporaryData') {
-                            volumes = allVolumes.filter(v => v.type === 'PERMANENT' && v.purpose === 'TEMPORARY');
-                          } else if (child.id === 'Temporary_TemporaryData') {
-                            volumes = allVolumes.filter(v => v.type === 'TEMPORARY');
-                          } else if (child.id === 'Active') {
-                            volumes = allVolumes.filter(v => v.type === 'Active_log');
-                          } else if (child.id === 'Archive') {
-                            volumes = allVolumes.filter(v => v.type === 'Archive_log');
-                          }
-                        }
-
-                        if (child.hasChildren || isCategoryFolder) {
-                          return (
-                            <TreeNode
-                              key={child.id}
-                              id={child.id}
-                              label={child.id}
-                              icon={child.icon}
-                              level={3}
-                              isActive={isChildSelected}
-                              hasChildren={true}
-                              isLoading={isCategoryFolder && spaceInfoLoading[db.dbname] && !spaceInfo[db.dbname]}
-                              onToggle={() => {
-                                if (isCategoryFolder && !spaceInfo[db.dbname] && !spaceInfoLoading[db.dbname]) {
-                                  dispatch(fetchDatabaseSpaceInfo({ hostUid: selectedHostUid, dbname: db.dbname }));
-                                }
-                              }}
-                              onSelect={() => {
-                                dispatch(setSelectedDatabase(db.dbname));
-                                dispatch(setSelectedDatabaseSubItem(child.id));
-                                if (child.onClick) child.onClick();
-                              }}
-                              onDoubleClick={() => {
-                                if (isCategoryFolder) dispatch(setActiveMainTab(`vol_category:${selectedHostUid}:${db.dbname}:${child.id}`));
-                              }}
-                            >
-                              {child.children?.map(sub => {
-                                const isSubSelected = selectedDatabase === db.dbname && selectedDatabaseSubItem === sub.id;
-                                let subVolumes = [];
-                                if (spaceInfo[db.dbname]) {
-                                  const allVolumes = spaceInfo[db.dbname].volumes || [];
-                                  if (sub.id === 'Active') subVolumes = allVolumes.filter(v => v.type === 'Active_log');
-                                  else if (sub.id === 'Archive') subVolumes = allVolumes.filter(v => v.type === 'Archive_log');
-                                }
-                                
-                                const isSubCategory = ['Active', 'Archive'].includes(sub.id);
-                                if (isSubCategory) {
-                                  return (
-                                    <TreeNode
-                                      key={sub.id}
-                                      id={sub.id}
-                                      label={sub.id}
-                                      icon={sub.icon}
-                                      level={4}
-                                      isActive={isSubSelected}
-                                      hasChildren={true}
-                                      onSelect={() => {
-                                        dispatch(setSelectedDatabase(db.dbname));
-                                        dispatch(setSelectedDatabaseSubItem(sub.id));
-                                      }}
-                                      onDoubleClick={() => dispatch(setActiveMainTab(`vol_category:${selectedHostUid}:${db.dbname}:${sub.id}`))}
-                                    >
-                                      {subVolumes.length === 0 && !spaceInfoLoading[db.dbname] ? (
-                                        <div className="px-10 py-3 opacity-30 flex items-center gap-2">
-                                            <Icon name="block" size="xs"  weight={300} />
-                                            <Typography variant="caption" className="italic font-bold uppercase tracking-widest text-[8px]">Storage Empty</Typography>
-                                        </div>
-                                      ) : (
-                                        subVolumes.map(vol => {
-                                          const fileName = vol.spacename.split(/[\\/]/).pop();
-                                          const subItemId = `vol:${vol.spacename}`;
-                                          const isVolSelected = selectedDatabase === db.dbname && selectedDatabaseSubItem === subItemId;
-                                          return (
-                                            <TreeNode
-                                              key={vol.spacename}
-                                              id={vol.spacename}
-                                              label={fileName}
-                                              icon="description"
-                                              level={5}
-                                              isActive={isVolSelected}
-                                              hasChildren={false}
-                                              onSelect={() => {
-                                                dispatch(setSelectedDatabase(db.dbname));
-                                                dispatch(setSelectedDatabaseSubItem(subItemId));
-                                              }}
-                                              onDoubleClick={() => dispatch(setActiveMainTab(`vol_info:${selectedHostUid}:${db.dbname}:${vol.spacename}`))}
-                                            />
-                                          );
-                                        })
-                                      )}
-                                    </TreeNode>
-                                  );
-                                }
-                                
-                                return (
-                                  <TreeNode
-                                    key={sub.id}
-                                    id={sub.id}
-                                    label={sub.id}
-                                    icon={sub.icon}
-                                    level={4}
-                                    isActive={isSubSelected}
-                                    hasChildren={false}
-                                    onSelect={() => {
-                                      dispatch(setSelectedDatabase(db.dbname));
-                                      dispatch(setSelectedDatabaseSubItem(sub.id));
-                                    }}
-                                  />
-                                );
-                              })}
-
-                              {/* Direct Volumes in Category Folder */}
-                              {volumes.length === 0 && !child.children && spaceInfo[db.dbname] && (
-                                <div className="px-10 py-3 opacity-30 flex items-center gap-2">
-                                    <Icon name="block" size="xs"  weight={300} />
-                                    <Typography variant="caption" className="italic font-bold uppercase tracking-widest text-[8px]">No volumes</Typography>
-                                </div>
-                              )}
-                              {volumes.map(vol => {
-                                const fileName = vol.spacename.split(/[\\/]/).pop();
-                                const subItemId = `vol:${vol.spacename}`;
-                                const isVolSelected = selectedDatabase === db.dbname && selectedDatabaseSubItem === subItemId;
-                                return (
-                                  <TreeNode
-                                    key={vol.spacename}
-                                    id={vol.spacename}
-                                    label={fileName}
-                                    icon="description"
-                                    level={4}
-                                    isActive={isVolSelected}
-                                    hasChildren={false}
-                                    onSelect={() => {
-                                      dispatch(setSelectedDatabase(db.dbname));
-                                      dispatch(setSelectedDatabaseSubItem(subItemId));
-                                    }}
-                                    onDoubleClick={() => dispatch(setActiveMainTab(`vol_info:${selectedHostUid}:${db.dbname}:${vol.spacename}`))}
-                                  />
-                                );
-                              })}
-                            </TreeNode>
-                          );
-                        }
-
-                        // Users leaf nodes (since Users children are populated here)
-                        if (item.id === 'Users') {
-                          return (
-                            <TreeNode
-                              key={child.id}
-                              id={child.id}
-                              label={child.id}
-                              icon={child.icon}
-                              level={3}
-                              isActive={isChildSelected}
-                              hasChildren={false}
-                              onSelect={() => {
-                                dispatch(setSelectedDatabase(db.dbname));
-                                dispatch(setSelectedDatabaseSubItem(child.id));
-                              }}
-                              onContextMenu={(e) => onUserContextMenu(e, db.dbname, child.id)}
-                            />
-                          );
-                        }
-
-                        return (
-                          <TreeNode
-                            key={child.id}
-                            id={child.id}
-                            label={child.id}
-                            icon={child.icon}
-                            level={3}
-                            isActive={isChildSelected}
-                            hasChildren={false}
-                            onSelect={() => {
-                              dispatch(setSelectedDatabase(db.dbname));
-                              dispatch(setSelectedDatabaseSubItem(child.id));
-                            }}
-                          />
-                        );
-                      })
-                    )}
-                  </TreeNode>
-                );
-              }
-
-              // Normal flat level 2 nodes without children
-              return (
-                <TreeNode
-                  key={item.id}
-                  id={item.id}
-                  label={item.id}
-                  icon={item.icon}
-                  level={2}
-                  isActive={isItemSelected}
-                  hasChildren={false}
-                  onSelect={() => {
-                    dispatch(setSelectedDatabase(db.dbname));
-                    dispatch(setSelectedDatabaseSubItem(item.id));
-                    if(item.onClick) item.onClick();
-                  }}
-                />
-              );
-            })}
+            <SpaceFolder 
+              db={db}
+              selectedDatabase={selectedDatabase}
+              selectedDatabaseSubItem={selectedDatabaseSubItem}
+              spaceInfo={spaceInfo[db.dbname]}
+              spaceInfoLoading={spaceInfoLoading[db.dbname]}
+              onSpaceContextMenu={onSpaceContextMenu}
+              onSelect={handleSelectSubItem}
+              onTabOpen={handleTabOpen}
+              selectedHostUid={selectedHostUid}
+            />
           </TreeNode>
         );
       })}
     </div>
   );
 }
+
+// Sub-components to isolate re-renders and logic
+const UsersFolder = React.memo(({ db, selectedDatabase, selectedDatabaseSubItem, users, isLoading, onUsersContextMenu, onUserContextMenu, onSelect, selectedHostUid }) => {
+  const dispatch = useDispatch();
+  const isSelected = selectedDatabase === db.dbname && selectedDatabaseSubItem === 'Users';
+
+  return (
+    <TreeNode
+      id="Users"
+      label="Users"
+      icon="group"
+      level={2}
+      isActive={isSelected}
+      hasChildren={true}
+      isLoading={isLoading}
+      onToggle={() => {
+        if (selectedHostUid && !users && !isLoading) {
+          dispatch(fetchDatabaseUsers({ hostUid: selectedHostUid, dbname: db.dbname }));
+        }
+      }}
+      onSelect={() => onSelect(db.dbname, 'Users')}
+      onContextMenu={(e) => onUsersContextMenu(e, db.dbname)}
+    >
+      {!isLoading && users?.length === 0 ? (
+        <div className="px-10 py-3 opacity-30 flex items-center gap-2">
+           <Icon name="block" size="xs" weight={300} />
+           <Typography variant="caption" className="italic font-bold uppercase tracking-widest text-[8px]">Index Empty</Typography>
+        </div>
+      ) : (
+        (users || []).map(u => {
+          const uName = typeof u === 'string' ? u : u.name;
+          const isUSelected = selectedDatabase === db.dbname && selectedDatabaseSubItem === uName;
+          return (
+            <TreeNode
+              key={uName}
+              id={uName}
+              label={uName}
+              icon="person"
+              level={3}
+              isActive={isUSelected}
+              onSelect={() => onSelect(db.dbname, uName)}
+              onContextMenu={(e) => onUserContextMenu(e, db.dbname, uName)}
+            />
+          );
+        })
+      )}
+    </TreeNode>
+  );
+});
+
+const JobAutomationFolder = React.memo(({ db, selectedDatabase, selectedDatabaseSubItem, backupSchedules, backupSchedulesLoading, queryPlans, queryPlansLoading, onJobAutomationContextMenu, onBackupPlanContextMenu, onQueryPlanContextMenu, onBackupItemContextMenu, onSelect, selectedHostUid }) => {
+  const dispatch = useDispatch();
+  const isSelected = selectedDatabase === db.dbname && selectedDatabaseSubItem === 'Job automation';
+
+  return (
+    <TreeNode
+      id="Job automation"
+      label="Job automation"
+      icon="bolt"
+      level={2}
+      isActive={isSelected}
+      hasChildren={true}
+      onToggle={() => {
+        if (selectedHostUid) {
+          if (!backupSchedules && !backupSchedulesLoading) {
+            dispatch(fetchBackupSchedule({ hostUid: selectedHostUid, dbname: db.dbname }));
+          }
+          if (!queryPlans && !queryPlansLoading) {
+            dispatch(fetchQueryPlan({ hostUid: selectedHostUid, dbname: db.dbname }));
+          }
+        }
+      }}
+      onSelect={() => onSelect(db.dbname, 'Job automation')}
+      onContextMenu={(e) => onJobAutomationContextMenu?.(e, db.dbname)}
+    >
+       <TreeNode
+          id="Backup Plan"
+          label="Backup Plan"
+          icon="backup"
+          level={3}
+          isActive={selectedDatabase === db.dbname && selectedDatabaseSubItem === 'Backup Plan'}
+          hasChildren={true}
+          isLoading={backupSchedulesLoading}
+          onSelect={() => onSelect(db.dbname, 'Backup Plan')}
+          onContextMenu={(e) => onBackupPlanContextMenu(e, db.dbname)}
+        >
+          {backupSchedules?.map(plan => {
+            const planId = plan.backupid;
+            const isPlanSelected = selectedDatabase === db.dbname && selectedDatabaseSubItem === `backup:${planId}`;
+            return (
+              <TreeNode
+                key={planId}
+                id={planId}
+                label={planId}
+                icon="event_note"
+                level={4}
+                isActive={isPlanSelected}
+                onSelect={() => onSelect(db.dbname, `backup:${planId}`)}
+                onContextMenu={(e) => onBackupItemContextMenu(e, db.dbname, planId)}
+              />
+            );
+          })}
+        </TreeNode>
+
+        <TreeNode
+          id="Query Plan"
+          label="Query Plan"
+          icon="schema"
+          level={3}
+          isActive={selectedDatabase === db.dbname && selectedDatabaseSubItem === 'Query Plan'}
+          hasChildren={true}
+          isLoading={queryPlansLoading}
+          onSelect={() => onSelect(db.dbname, 'Query Plan')}
+          onContextMenu={(e) => onQueryPlanContextMenu(e, db.dbname)}
+        >
+          {queryPlans?.map(plan => {
+            const qId = plan.query_id;
+            return (
+              <TreeNode
+                key={qId}
+                id={qId}
+                label={qId}
+                icon="sticky_note_2"
+                level={4}
+                isActive={selectedDatabase === db.dbname && selectedDatabaseSubItem === `query:${qId}`}
+                onSelect={() => onSelect(db.dbname, `query:${qId}`)}
+              />
+            );
+          })}
+        </TreeNode>
+    </TreeNode>
+  );
+});
+
+const SpaceFolder = React.memo(({ db, selectedDatabase, selectedDatabaseSubItem, spaceInfo, spaceInfoLoading, onSpaceContextMenu, onSelect, onTabOpen, selectedHostUid }) => {
+  const dispatch = useDispatch();
+  const isSelected = selectedDatabase === db.dbname && selectedDatabaseSubItem === 'Space';
+
+  const renderCategory = (id, label, icon, filterFn) => {
+    const isCatSelected = selectedDatabase === db.dbname && selectedDatabaseSubItem === id;
+    const volumes = spaceInfo?.volumes?.filter(filterFn) || [];
+
+    return (
+      <TreeNode
+        id={id}
+        label={label}
+        icon={icon}
+        level={3}
+        isActive={isCatSelected}
+        hasChildren={true}
+        isLoading={spaceInfoLoading && !spaceInfo}
+        onSelect={() => onSelect(db.dbname, id, () => onTabOpen(`vol_category:${selectedHostUid}:${db.dbname}:${id}`))}
+        onToggle={() => {
+           if (selectedHostUid && !spaceInfo && !spaceInfoLoading) {
+             dispatch(fetchDatabaseSpaceInfo({ hostUid: selectedHostUid, dbname: db.dbname }));
+           }
+        }}
+      >
+        {volumes.map(vol => {
+          const fileName = vol.spacename.split(/[\\/]/).pop();
+          const subItemId = `vol:${vol.spacename}`;
+          return (
+            <TreeNode
+              key={vol.spacename}
+              id={vol.spacename}
+              label={fileName}
+              icon="description"
+              level={4}
+              isActive={selectedDatabase === db.dbname && selectedDatabaseSubItem === subItemId}
+              onSelect={() => onSelect(db.dbname, subItemId)}
+              onDoubleClick={() => onTabOpen(`vol_info:${selectedHostUid}:${db.dbname}:${vol.spacename}`)}
+            />
+          );
+        })}
+      </TreeNode>
+    );
+  };
+
+  return (
+    <TreeNode
+      id="Space"
+      label="Space"
+      icon="donut_small"
+      level={2}
+      isActive={isSelected}
+      hasChildren={true}
+      onSelect={() => onSelect(db.dbname, 'Space', () => onTabOpen(`db_space:${selectedHostUid}:${db.dbname}`))}
+      onContextMenu={(e) => onSpaceContextMenu(e, db.dbname)}
+      onToggle={() => {
+        if (selectedHostUid && !spaceInfo && !spaceInfoLoading) {
+          dispatch(fetchDatabaseSpaceInfo({ hostUid: selectedHostUid, dbname: db.dbname }));
+        }
+      }}
+    >
+      {renderCategory('Permanent_PermanentData', 'Permanent Data', 'data_usage', v => v.type === 'PERMANENT' && (v.purpose === 'PERMANENT' || !v.purpose))}
+      {renderCategory('Permanent_TemporaryData', 'Permanent Temp', 'layers', v => v.type === 'PERMANENT' && v.purpose === 'TEMPORARY')}
+      {renderCategory('Temporary_TemporaryData', 'Temporary', 'auto_delete', v => v.type === 'TEMPORARY')}
+      
+      <TreeNode
+        id="Log"
+        label="Log"
+        icon="history"
+        level={3}
+        isActive={selectedDatabase === db.dbname && selectedDatabaseSubItem === 'Log'}
+        hasChildren={true}
+      >
+        {renderCategory('Active', 'Active', 'radio_button_checked', v => v.type === 'Active_log')}
+        {renderCategory('Archive', 'Archive', 'inventory_2', v => v.type === 'Archive_log')}
+      </TreeNode>
+    </TreeNode>
+  );
+});

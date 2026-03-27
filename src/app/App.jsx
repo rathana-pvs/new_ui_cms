@@ -34,6 +34,7 @@ import DatabasePlanDumpModal from '../features/database/components/DatabasePlanD
 import CreateDatabaseModal from '../features/database/components/CreateDatabaseModal';
 import EditBackupPlanModal from '../features/database/components/EditBackupPlanModal';
 import LoginDatabaseModal from '../features/database/components/LoginDatabaseModal';
+import RestoreDatabaseModal from '../features/database/components/RestoreDatabaseModal';
 
 import LockInformationModal from '../features/database/components/LockInformationModal';
 import UnloadResultModal from '../features/database/components/UnloadResultModal';
@@ -170,7 +171,8 @@ function DashboardLayout() {
               {/* Glow */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-amber-400/5 dark:bg-amber-500/8 rounded-full blur-3xl pointer-events-none" />
 
-              <div className="relative z-10 flex flex-col items-center gap-8 max-w-md">
+              <div className="relative z-10 flex flex-col items-center gap-14 max-w-md mt-[-40px]">
+
 
                 {/* Icon cluster */}
                 <div className="relative flex items-center justify-center">
@@ -333,6 +335,7 @@ function DashboardLayout() {
         <EditBackupPlanModal />
         <CreateDatabaseModal />
         <LoginDatabaseModal />
+        <RestoreDatabaseModal />
 
         <LockInformationModal />
         <UnloadResultModal />

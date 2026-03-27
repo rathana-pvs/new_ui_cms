@@ -133,6 +133,30 @@ export const fetchBackupSchedule = createAsyncThunk(
   }
 );
 
+export const backupDatabase = createAsyncThunk(
+  'database/backupDatabase',
+  async ({ hostUid, dbname, payload }, { rejectWithValue }) => {
+    try {
+      const response = await databaseApi.backupDatabase(hostUid, dbname, payload);
+      return response;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.response?.data?.error || `Failed to backup database ${dbname}`);
+    }
+  }
+);
+
+export const fetchBackupDbInfo = createAsyncThunk(
+  'database/fetchBackupDbInfo',
+  async ({ hostUid, dbname }, { rejectWithValue }) => {
+    try {
+      const response = await databaseApi.getBackupDbInfo(hostUid, dbname);
+      return response;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.response?.data?.error || `Failed to fetch backup info for ${dbname}`);
+    }
+  }
+);
+
 export const fetchDatabaseSpaceInfo = createAsyncThunk(
   'database/fetchDatabaseSpaceInfo',
   async ({ hostUid, dbname }, { rejectWithValue }) => {
@@ -232,22 +256,54 @@ export const addVolume = createAsyncThunk(
   }
 );
 
-export const fetchDashboardData = createAsyncThunk(
-  'database/fetchDashboardData',
+export const fetchDashboardVolumes = createAsyncThunk(
+  'database/fetchDashboardVolumes',
   async ({ hostUid, dbname }, { rejectWithValue }) => {
-    if (!hostUid || !dbname) return rejectWithValue('Missing hostUid or dbname');
     try {
-      // 1. Fetch core DB stats
-      const [volumeInfo, lockInfo, statDumpRaw, brokerList] = await Promise.all([
-        databaseApi.getVolumeInfo(hostUid, dbname),
-        databaseApi.getLockInfo(hostUid, dbname),
-        databaseApi.getStatDump(hostUid, dbname),
-        brokerApi.getBrokerList(hostUid)
-      ]);
+      const response = await databaseApi.getVolumeInfo(hostUid, dbname);
+      return { 
+        dbname, 
+        volumes: response.spaceinfo || [],
+        pagesize: response.pagesize,
+        logpagesize: response.logpagesize
+      };
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Failed to fetch volumes');
+    }
+  }
+);
 
-      // 2. Fetch CAS info for each broker to find processes serving this DB
-      const brokersCAS = [];
+export const fetchDashboardLocks = createAsyncThunk(
+  'database/fetchDashboardLocks',
+  async ({ hostUid, dbname }, { rejectWithValue }) => {
+    try {
+      const response = await databaseApi.getLockInfo(hostUid, dbname);
+      return { dbname, locks: response.locks || [] };
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Failed to fetch locks');
+    }
+  }
+);
+
+export const fetchDashboardPerformance = createAsyncThunk(
+  'database/fetchDashboardPerformance',
+  async ({ hostUid, dbname }, { rejectWithValue }) => {
+    try {
+      const response = await databaseApi.getStatDump(hostUid, dbname);
+      return { dbname, performance: response };
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Failed to fetch performance stats');
+    }
+  }
+);
+
+export const fetchDashboardCAS = createAsyncThunk(
+  'database/fetchDashboardCAS',
+  async ({ hostUid, dbname }, { rejectWithValue }) => {
+    try {
+      const brokerList = await brokerApi.getBrokerList(hostUid);
       const actualBrokerList = brokerList?.[0]?.broker || [];
+      const brokersCAS = [];
 
       const brokerDetails = await Promise.all(
         actualBrokerList.map(b => {
@@ -259,7 +315,6 @@ export const fetchDashboardData = createAsyncThunk(
       brokerDetails.forEach((status, idx) => {
         if (!status || !status.asinfo) return;
         const brokerName = actualBrokerList[idx]?.name;
-
         status.asinfo.forEach(cas => {
           if (cas.as_dbname?.toLowerCase() === dbname.toLowerCase()) {
             brokersCAS.push({
@@ -269,21 +324,46 @@ export const fetchDashboardData = createAsyncThunk(
               qps: cas.as_num_query,
               lqs: cas.as_long_query,
               status: cas.as_status,
-              lastConn: cas.as_lct
+              lastConn: cas.as_lct,
+              cpu: cas.as_cpu,
+              psize: cas.as_psize
             });
           }
         });
       });
+      return { dbname, brokersCAS };
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Failed to fetch CAS stats');
+    }
+  }
+);
 
-      return {
-        dbname,
-        volumeInfo,
-        lockInfo,
-        statDump: statDumpRaw, // It is already flat properties
-        brokersCAS
+export const fetchDashboardData = createAsyncThunk(
+  'database/fetchDashboardData',
+  async ({ hostUid, dbname }, { rejectWithValue, dispatch }) => {
+    if (!hostUid || !dbname) return rejectWithValue('Missing hostUid or dbname');
+    try {
+      // Parallel fetch for initial load
+      const [vol, lock, perf, cas, space] = await Promise.all([
+        dispatch(fetchDashboardVolumes({ hostUid, dbname })).unwrap(),
+        dispatch(fetchDashboardLocks({ hostUid, dbname })).unwrap(),
+        dispatch(fetchDashboardPerformance({ hostUid, dbname })).unwrap(),
+        dispatch(fetchDashboardCAS({ hostUid, dbname })).unwrap(),
+        dispatch(fetchDatabaseSpaceInfo({ hostUid, dbname })).unwrap()
+      ]);
+      return { 
+        dbname, 
+        volumes: vol.volumes, 
+        locks: lock.locks, 
+        performance: perf.performance, 
+        brokersCAS: cas.brokersCAS,
+        spaceInfo: space.data?.fileinfo || [],
+        volumeSummary: space.data?.dbinfo || [],
+        pagesize: vol.pagesize,
+        logpagesize: vol.logpagesize
       };
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || `Failed to fetch dashboard data for ${dbname}`);
+      return rejectWithValue(err || `Failed to fetch dashboard data for ${dbname}`);
     }
   }
 );
@@ -360,6 +440,54 @@ export const copyDatabase = createAsyncThunk(
   }
 );
 
+export const createDatabase = createAsyncThunk(
+  'database/createDatabase',
+  async ({ hostUid, payload }, { rejectWithValue }) => {
+    try {
+      const response = await databaseApi.createDatabase(hostUid, payload);
+      return response;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.response?.data?.error || `Failed to create database`);
+    }
+  }
+);
+
+export const fetchCreateDatabaseInfo = createAsyncThunk(
+  'database/fetchCreateDatabaseInfo',
+  async ({ hostUid }, { rejectWithValue }) => {
+    try {
+      const response = await databaseApi.getCreateInfo(hostUid);
+      return response;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.response?.data?.error || `Failed to fetch database creation info`);
+    }
+  }
+);
+
+export const fetchBackupList = createAsyncThunk(
+  'database/fetchBackupList',
+  async ({ hostUid, dbname }, { rejectWithValue }) => {
+    try {
+      const response = await databaseApi.getBackupList(hostUid, dbname);
+      return { dbname, data: response.data || response || {} };
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.response?.data?.error || `Failed to fetch backup list for ${dbname}`);
+    }
+  }
+);
+
+export const restoreDatabase = createAsyncThunk(
+  'database/restoreDatabase',
+  async ({ hostUid, dbname, payload }, { rejectWithValue }) => {
+    try {
+      const response = await databaseApi.restoreDatabase(hostUid, dbname, payload);
+      return response;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.response?.data?.error || `Failed to restore database ${dbname}`);
+    }
+  }
+);
+
 export const loginDatabase = createAsyncThunk(
   'database/loginDatabase',
   async ({ hostUid, dbname, payload = {} }, { rejectWithValue }) => {
@@ -428,6 +556,7 @@ const initialState = {
   isCompactDatabaseModalOpen: false,
   isCopyDatabaseModalOpen: false,
   isBackupDatabaseModalOpen: false,
+  isRestoreDatabaseModalOpen: false,
   isOptimizeDatabaseModalOpen: false,
   isAddBackupPlanModalOpen: false,
   isEditBackupPlanModalOpen: false,
@@ -468,11 +597,15 @@ const initialState = {
   databaseClassesError: {},
   backupSchedules: {}, // { [dbname]: [] }
   backupSchedulesLoading: {},
+  databaseBackups: {}, // { [dbname]: [] }
+  databaseBackupsLoading: {},
+  databaseBackupInfo: {}, // { [dbname]: { dbdir: '', freespace: '' } }
+  backupLevels: {},
   queryPlans: {}, // { [dbname]: [] }
   queryPlansLoading: {},
   selectedBackupId: null,
   selectedQueryPlanId: null,
-  dashboardData: {}, // { [dbname]: { volumes: [], spaceInfo: [], locks: [] } }
+  dashboardData: {}, // { [dbname]: { volumes: [], locks: [], performance: {}, prevPerformance: {}, lastUpdateTime: 0, brokersCAS: [], spaceInfo: [], volumeSummary: [] } }
   dashboardLoading: {},
   dashboardError: {},
   spaceInfo: {}, // { [dbname]: { volumes: [], summary: [], files: [] } }
@@ -535,6 +668,14 @@ const databaseSlice = createSlice({
     },
     closeBackupDatabaseModal: (state) => {
       state.isBackupDatabaseModalOpen = false;
+    },
+    openRestoreDatabaseModal: (state) => {
+      state.isRestoreDatabaseModalOpen = true;
+      state.error = null;
+    },
+    closeRestoreDatabaseModal: (state) => {
+      state.isRestoreDatabaseModalOpen = false;
+      state.error = null;
     },
     openOptimizeDatabaseModal: (state) => {
       state.isOptimizeDatabaseModalOpen = true;
@@ -766,6 +907,71 @@ const databaseSlice = createSlice({
         state.actionLoading = false;
         state.error = action.payload;
       })
+      // Create database
+      .addCase(createDatabase.pending, (state) => {
+        state.actionLoading = true;
+        state.error = null;
+      })
+      .addCase(createDatabase.fulfilled, (state, action) => {
+        state.actionLoading = false;
+        state.isCreateDatabaseModalOpen = false;
+        // The create API returns result object with startDatabase containing latest list
+        if (action.payload.startDatabase?.success) {
+          parseDbResponse(state, action.payload.startDatabase.data);
+        }
+      })
+      .addCase(createDatabase.rejected, (state, action) => {
+        state.actionLoading = false;
+        state.error = action.payload;
+      })
+      // Fetch backup list
+      .addCase(fetchBackupList.pending, (state, action) => {
+        const { dbname } = action.meta.arg;
+        state.databaseBackupsLoading[dbname] = true;
+      })
+      .addCase(fetchBackupList.fulfilled, (state, action) => {
+        const { dbname, data } = action.payload;
+        state.databaseBackupsLoading[dbname] = false;
+        state.databaseBackups[dbname] = data;
+      })
+      .addCase(fetchBackupList.rejected, (state, action) => {
+        const { dbname } = action.meta.arg;
+        state.databaseBackupsLoading[dbname] = false;
+      })
+      // Fetch backup db info
+      .addCase(fetchBackupDbInfo.fulfilled, (state, action) => {
+        const { dbname } = action.meta.arg;
+        state.databaseBackupInfo[dbname] = {
+          dbdir: action.payload.dbdir,
+          freespace: action.payload.freespace
+        };
+      })
+      // Restore database
+      .addCase(restoreDatabase.pending, (state) => {
+        state.actionLoading = true;
+        state.error = null;
+      })
+      .addCase(restoreDatabase.fulfilled, (state) => {
+        state.actionLoading = false;
+        state.isRestoreDatabaseModalOpen = false;
+      })
+      .addCase(restoreDatabase.rejected, (state, action) => {
+        state.actionLoading = false;
+        state.error = action.payload;
+      })
+      // Backup database (Immediate)
+      .addCase(backupDatabase.pending, (state) => {
+        state.actionLoading = true;
+        state.error = null;
+      })
+      .addCase(backupDatabase.fulfilled, (state) => {
+        state.actionLoading = false;
+        state.isBackupDatabaseModalOpen = false;
+      })
+      .addCase(backupDatabase.rejected, (state, action) => {
+        state.actionLoading = false;
+        state.error = action.payload;
+      })
       // Fetch database classes
       .addCase(fetchDatabaseClasses.pending, (state, action) => {
         const { dbname } = action.meta.arg;
@@ -936,22 +1142,81 @@ const databaseSlice = createSlice({
         state.logsError = action.payload;
       })
       // Fetch Dashboard Data
+      // fetchDashboardVolumes
+      .addCase(fetchDashboardVolumes.fulfilled, (state, action) => {
+        const { dbname, volumes, pagesize, logpagesize } = action.payload;
+        if (!state.dashboardData[dbname]) {
+          state.dashboardData[dbname] = { 
+            volumes: [], locks: [], performance: {}, prevPerformance: {}, lastUpdateTime: 0, brokersCAS: [], spaceInfo: [], volumeSummary: [] 
+          };
+        }
+        state.dashboardData[dbname].volumes = volumes;
+        state.dashboardData[dbname].pagesize = pagesize;
+        state.dashboardData[dbname].logpagesize = logpagesize;
+      })
+      // fetchDashboardLocks
+      .addCase(fetchDashboardLocks.fulfilled, (state, action) => {
+        const { dbname, locks } = action.payload;
+        if (!state.dashboardData[dbname]) state.dashboardData[dbname] = { volumes: [], locks: [], performance: {}, brokersCAS: [] };
+        state.dashboardData[dbname].locks = locks;
+      })
+      // fetchDashboardPerformance (Delta-based logic)
+      .addCase(fetchDashboardPerformance.fulfilled, (state, action) => {
+        const { dbname, performance } = action.payload;
+        const now = Date.now();
+        
+        if (!state.dashboardData[dbname]) {
+          state.dashboardData[dbname] = { 
+            volumes: [], locks: [], performance: {}, prevPerformance: {}, lastUpdateTime: 0, brokersCAS: [] 
+          };
+        }
+        
+        const db = state.dashboardData[dbname];
+        const prev = db.prevPerformance || {};
+        const lastTime = db.lastUpdateTime;
+        const interval = lastTime ? (now - lastTime) / 1000 : 0;
+        
+        // Helper: Calculate rate per second
+        const getRate = (curField, prevField) => {
+          if (!interval || interval <= 0) return 0;
+          const cur = parseInt(performance[curField] || 0);
+          const prv = parseInt(prev[prevField || curField] || 0);
+          return Math.max(0, (cur - prv) / interval);
+        };
+
+        // Enrich performance with calculated rates
+        const stats = { ...performance };
+        if (interval > 0) {
+          stats.calculatedRates = {
+            tps: getRate('num_tran_commits') + getRate('num_tran_rollbacks'),
+            qps: getRate('num_query_selects') + getRate('num_query_inserts') + getRate('num_query_updates') + getRate('num_query_deletes'),
+            fetchPerSec: getRate('num_data_page_fetches'),
+            dirtyPerSec: getRate('num_data_page_dirties'),
+            ioReadPerSec: getRate('num_data_page_ioreads'),
+            ioWritePerSec: getRate('num_data_page_iowrites'),
+          };
+        } else {
+          stats.calculatedRates = { tps: 0, qps: 0, fetchPerSec: 0, dirtyPerSec: 0, ioReadPerSec: 0, ioWritePerSec: 0 };
+        }
+
+        db.prevPerformance = performance;
+        db.lastUpdateTime = now;
+        db.performance = stats;
+      })
+      // fetchDashboardCAS
+      .addCase(fetchDashboardCAS.fulfilled, (state, action) => {
+        const { dbname, brokersCAS } = action.payload;
+        if (!state.dashboardData[dbname]) state.dashboardData[dbname] = { volumes: [], locks: [], performance: {}, brokersCAS: [] };
+        state.dashboardData[dbname].brokersCAS = brokersCAS;
+      })
       .addCase(fetchDashboardData.pending, (state, action) => {
-        const { dbname } = action.meta.arg;
-        state.dashboardLoading[dbname] = true;
-        delete state.dashboardError[dbname];
+        state.dashboardLoading[action.meta.arg.dbname] = true;
+        delete state.dashboardError[action.meta.arg.dbname];
       })
       .addCase(fetchDashboardData.fulfilled, (state, action) => {
-        const { dbname, volumeInfo, lockInfo, statDump, brokersCAS } = action.payload;
+        const { dbname, volumes, locks, performance, brokersCAS, spaceInfo, volumeSummary, pagesize, logpagesize } = action.payload;
+        state.dashboardData[dbname] = { volumes, locks, performance, brokersCAS, spaceInfo, volumeSummary, pagesize, logpagesize };
         state.dashboardLoading[dbname] = false;
-
-        state.dashboardData[dbname] = {
-          volumes: volumeInfo.spaceinfo || [],
-          spaceInfo: volumeInfo.fileinfo || [],
-          locks: lockInfo.lockinfo?.[0]?.transaction || [],
-          performance: statDump || {},
-          brokersCAS: brokersCAS || []
-        };
       })
       .addCase(fetchDashboardData.rejected, (state, action) => {
         const { dbname } = action.meta.arg;
@@ -970,6 +1235,12 @@ const databaseSlice = createSlice({
           summary: data.dbinfo || [],
           files: data.fileinfo || []
         };
+        // Keep dashboard data synchronized
+        if (!state.dashboardData[dbname]) {
+          state.dashboardData[dbname] = { volumes: [], locks: [], performance: {}, prevPerformance: {}, lastUpdateTime: 0, brokersCAS: [], spaceInfo: [], volumeSummary: [] };
+        }
+        state.dashboardData[dbname].spaceInfo = data.fileinfo || [];
+        state.dashboardData[dbname].volumeSummary = data.dbinfo || [];
       })
       .addCase(fetchDatabaseSpaceInfo.rejected, (state, action) => {
         const { dbname } = action.meta.arg;
@@ -1100,6 +1371,8 @@ export const {
   closeCopyDatabaseModal,
   openBackupDatabaseModal,
   closeBackupDatabaseModal,
+  openRestoreDatabaseModal,
+  closeRestoreDatabaseModal,
   openOptimizeDatabaseModal,
   closeOptimizeDatabaseModal,
   openAddBackupPlanModal,

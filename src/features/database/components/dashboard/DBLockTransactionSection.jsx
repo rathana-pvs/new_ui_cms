@@ -1,8 +1,36 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { useDispatch } from 'react-redux';
+import { fetchDashboardLocks } from '../../databaseSlice';
 import { Icon } from '../../../../components/ds/foundation/Icon';
 import { Table } from '../../../../components/ds/layout/Table';
 import { Card } from '../../../../components/ds/layout/Card';
 
-export default function DBLockTransactionSection({ locks }) {
+export default function DBLockTransactionSection({ locks, pollingProps }) {
+  const dispatch = useDispatch();
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const { hostUid, dbname, isTabActive, autoRefresh, refreshInterval } = pollingProps;
+
+  const refresh = () => {
+    if (hostUid && dbname) dispatch(fetchDashboardLocks({ hostUid, dbname }));
+  };
+
+  const wasActiveAndExpanded = useRef(isTabActive && !isCollapsed);
+  useEffect(() => {
+    const currentActiveAndExpanded = isTabActive && !isCollapsed;
+    if (currentActiveAndExpanded && !wasActiveAndExpanded.current) {
+      refresh();
+    }
+    wasActiveAndExpanded.current = currentActiveAndExpanded;
+  }, [isTabActive, isCollapsed, hostUid, dbname]);
+
+  useEffect(() => {
+    let interval;
+    if (isTabActive && !isCollapsed && autoRefresh && hostUid && dbname) {
+      interval = setInterval(refresh, refreshInterval * 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isTabActive, isCollapsed, autoRefresh, refreshInterval, hostUid, dbname]);
+
   const columns = [
     { header: '#',       accessor: 'index', render: (val) => <span className="font-mono text-[12px] text-slate-400">{val}</span> },
     { header: 'User',    accessor: 'user',  render: (val) => <span className="font-mono text-[12px] font-semibold text-slate-700 dark:text-slate-200">{val}</span> },
@@ -44,6 +72,8 @@ export default function DBLockTransactionSection({ locks }) {
       }
       bodyClassName="p-0"
       collapsible
+      isCollapsed={isCollapsed}
+      onToggle={(v) => setIsCollapsed(v)}
     >
       <Table columns={columns} data={locks} />
     </Card>

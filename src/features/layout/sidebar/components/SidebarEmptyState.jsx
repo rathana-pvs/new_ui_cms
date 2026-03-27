@@ -35,10 +35,13 @@ export default function SidebarEmptyState() {
         </div>
 
         {/* Text content */}
-        <div className="space-y-1.5 max-w-[200px]">
-          <Typography variant="h4" className="text-[12px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-widest leading-none">
+        <div className="space-y-1.5 max-w-[240px]">
+
+          <Typography variant="h6" className="text-[11px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.2em] leading-none whitespace-nowrap">
             No Host Selected
           </Typography>
+
+
           <Typography variant="p" className="text-[11px] leading-relaxed text-slate-400 dark:text-slate-600 font-medium">
             Select a server from the list above to begin monitoring.
           </Typography>

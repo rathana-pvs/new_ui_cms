@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchDashboardData } from '../databaseSlice';
 import DBPerformanceSection from './dashboard/DBPerformanceSection';
@@ -21,51 +21,97 @@ export default function DatabaseDashboard({ dbname }) {
   const [refreshInterval, setRefreshInterval] = useState(10);
   const [showSettings, setShowSettings] = useState(false);
   const [logModal, setLogModal] = useState({ isOpen: false, brokerName: '', casId: '', type: 'sql' });
+  
+  const [isTabActive, setIsTabActive] = useState(document.visibilityState === 'visible');
 
   const activeHost = hosts.find(h => h.uid === selectedHostUid);
   const hostUid = selectedHostUid;
   const data = dashboardData[dbname] || { volumes: [], spaceInfo: [], locks: [], performance: {} };
   const isLoading = dashboardLoading[dbname];
 
+  useEffect(() => {
+    const handleVisibilityChange = () => setIsTabActive(document.visibilityState === 'visible');
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
+
   const handleRefresh = () => {
     if (hostUid && dbname) dispatch(fetchDashboardData({ hostUid, dbname }));
   };
 
-  useEffect(() => { handleRefresh(); }, [hostUid, dbname, dispatch]);
+  // Initial load or tab activation
+  // Requirement: "when switching back to active. it should refresh once... then start checking time interval"
+  const wasActiveRef = useRef(isTabActive);
+  useEffect(() => {
+    if (isTabActive && !wasActiveRef.current) {
+      handleRefresh();
+    }
+    wasActiveRef.current = isTabActive;
+  }, [isTabActive, hostUid, dbname]);
 
   useEffect(() => {
-    let interval;
-    if (autoRefresh && hostUid && dbname)
-      interval = setInterval(() => dispatch(fetchDashboardData({ hostUid, dbname })), refreshInterval * 1000);
-    return () => clearInterval(interval);
-  }, [autoRefresh, refreshInterval, hostUid, dbname, dispatch]);
+    if (hostUid && dbname) handleRefresh();
+  }, [hostUid, dbname]);
+
+  // Pass polling props to sections
+  const pollingProps = { hostUid, dbname, isTabActive, autoRefresh, refreshInterval };
 
   const mappedVolumes = (data.volumes || []).map(v => ({
-    name: v.spacename, type: v.type, purpose: v.purpose || '-',
-    free: v.freepage ? `${v.freepage} pages` : '-',
-    total: v.totalpage ? `${v.totalpage} pages` : '-',
-    freePct: v.totalpage && v.totalpage !== '0' ? (parseInt(v.freepage) / parseInt(v.totalpage)) * 100 : 0,
-    date: v.date || '-', path: v.location
+    name: v.spacename, 
+    type: v.type, 
+    purpose: v.purpose || '-',
+    free: v.freepage && v.freepage.trim() !== '' ? `${v.freepage} pages` : '-',
+    total: v.totalpage && v.totalpage.trim() !== '' ? `${v.totalpage} pages` : '-',
+    freePct: v.totalpage && parseInt(v.totalpage) > 0 && v.freepage && v.freepage.trim() !== '' ? (parseInt(v.freepage) / parseInt(v.totalpage)) * 100 : 0,
+    date: v.date || '-', 
+    path: v.location
   }));
 
   const mappedSpaceInfo = (data.spaceInfo || []).map(f => ({
-    type: f.data_type, fileCount: f.file_count, usedPages: f.used_size,
-    fileTablePages: f.file_table_size, reservedPages: f.reserved_size, totalPages: f.total_size
+    type: f.data_type, 
+    fileCount: f.file_count, 
+    usedPages: f.used_size ? `${f.used_size} pages` : '-',
+    fileTablePages: f.file_table_size ? `${f.file_table_size} pages` : '-', 
+    reservedPages: f.reserved_size ? `${f.reserved_size} pages` : '-', 
+    totalPages: f.total_size ? `${f.total_size} pages` : '-'
+  }));
+
+  const mappedSummary = (data.volumeSummary || []).map(s => ({
+    purpose: s.purpose,
+    type: s.type,
+    volCount: s.volume_count,
+    used: s.used_size ? `${s.used_size} pages` : '-',
+    free: s.free_size ? `${s.free_size} pages` : '-',
+    total: s.total_size ? `${s.total_size} pages` : '-'
   }));
 
   const perf = data.performance || {};
   const brokersCAS = data.brokersCAS || [];
-  const totalQps = brokersCAS.filter(c => c.dbname?.toLowerCase() === dbname.toLowerCase()).reduce((a, c) => a + parseInt(c.qps || 0), 0);
+  
+  // d-cms Logic: Aggregate stats from all CAS processes serving this database
+  const casStats = brokersCAS.reduce((acc, cas) => {
+    acc.cpu += parseFloat(cas.cpu || 0);
+    acc.memKB += parseFloat(cas.psize || 0);
+    acc.activeCount += (cas.status?.toLowerCase() === 'busy' ? 1 : 0);
+    return acc;
+  }, { cpu: 0, memKB: 0, activeCount: 0 });
 
+  const totalQps = brokersCAS.reduce((a, c) => a + parseInt(c.qps || 0), 0);
+  const totalMemMB = (casStats.memKB / 1024).toFixed(1);  const rates = perf.calculatedRates || { tps: 0, qps: 0, fetchPerSec: 0, dirtyPerSec: 0, ioReadPerSec: 0, ioWritePerSec: 0 };
   const dbStats = [{
-    cpu: '0.0%', cpuPct: 0, memory: '0.0MB', memPct: 0,
-    qps: totalQps.toString(),
+    cpu: casStats.cpu.toFixed(1) + '%', 
+    cpuPct: Math.min(casStats.cpu, 100),
+    memory: totalMemMB + 'MB', 
+    memPct: Math.min((casStats.memKB / 1024) / 4, 100),
+    tps: rates.tps.toFixed(1),
+    qps: totalQps.toLocaleString(), 
     hitRatio: (perf.data_page_buffer_hit_ratio || '0.00') + '%',
     hitPct: parseFloat(perf.data_page_buffer_hit_ratio || '0'),
-    fetch: perf.num_data_page_fetches || '0', dirty: perf.num_data_page_dirties || '0',
-    ioReads: perf.num_data_page_ioreads || '0', ioWrites: perf.num_data_page_iowrites || '0'
+    fetch: rates.fetchPerSec.toFixed(1),
+    dirty: rates.dirtyPerSec.toFixed(1),
+    ioReads: rates.ioReadPerSec.toFixed(1),
+    ioWrites: rates.ioWritePerSec.toFixed(1)
   }];
-
   const mappedBrokers = brokersCAS.map(c => ({ broker: c.broker, id: c.id, pid: c.pid, qps: c.qps, lqs: c.lqs, status: c.status, lastConn: c.lastConn, dbname: c.dbname }));
   const mappedLocks = (data.locks || []).map((l, i) => ({ index: l.index || i + 1, user: l.uid || '-', host: l.host || '-', pid: l.pid || '-', obj: l.object || '-', mode: l.granted_mode || '-' }));
 
@@ -74,12 +120,13 @@ export default function DatabaseDashboard({ dbname }) {
     const rows = [
       ['Summary', 'Database', dbname],
       ['Summary', 'Host', `${activeHost?.address}:${activeHost?.port}`],
+      ['Performance', 'TPS', dbStats[0].tps],
       ['Performance', 'QPS', dbStats[0].qps],
       ['Performance', 'Hit Ratio', dbStats[0].hitRatio],
-      ['Performance', 'Fetch', dbStats[0].fetch],
-      ['Performance', 'Dirty', dbStats[0].dirty],
-      ['Performance', 'IO Reads', dbStats[0].ioReads],
-      ['Performance', 'IO Writes', dbStats[0].ioWrites],
+      ['Performance', 'Fetch/s', dbStats[0].fetch],
+      ['Performance', 'Dirty/s', dbStats[0].dirty],
+      ['Performance', 'IO Reads/s', dbStats[0].ioReads],
+      ['Performance', 'IO Writes/s', dbStats[0].ioWrites],
       ...mappedVolumes.map(v => ['Volume', v.name, `${v.free} / ${v.total}`])
     ];
     const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
@@ -97,8 +144,6 @@ export default function DatabaseDashboard({ dbname }) {
 
   return (
     <div className="flex-1 flex flex-col h-full bg-white dark:bg-background-dark overflow-hidden font-sans">
-
-      {/* ── Header ── */}
       <header className="px-6 py-3 border-b border-slate-100 dark:border-white/[0.04] flex items-center justify-between shrink-0 sticky top-0 z-20 bg-white dark:bg-background-dark">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
@@ -107,18 +152,15 @@ export default function DatabaseDashboard({ dbname }) {
           <div>
             <div className="flex items-center gap-2">
               <Typography variant="h1" className="text-sm font-bold text-amber-600 dark:text-amber-500 leading-tight uppercase tracking-tight">{dbname}</Typography>
-
-              <span className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <Typography variant="label" className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Running</Typography>
-              </span>
+              <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+              </div>
             </div>
             <Typography variant="label" className="text-[10px] text-slate-400 font-mono">{activeHost?.address}:{activeHost?.port}</Typography>
           </div>
         </div>
 
         <div className="flex items-center gap-1.5">
-          {/* Auto-refresh toggle */}
           <button
             onClick={() => setAutoRefresh(!autoRefresh)}
             title={autoRefresh ? 'Live monitoring active' : 'Auto refresh off'}
@@ -128,7 +170,6 @@ export default function DatabaseDashboard({ dbname }) {
             {autoRefresh ? 'Live' : 'Paused'}
           </button>
 
-          {/* Manual refresh */}
           <button
             onClick={handleRefresh}
             disabled={isLoading}
@@ -140,7 +181,6 @@ export default function DatabaseDashboard({ dbname }) {
 
           <div className="w-px h-5 bg-slate-200 dark:bg-white/[0.08]" />
 
-          {/* Settings */}
           <button
             onClick={() => setShowSettings(!showSettings)}
             className={`${btnCls} w-8 transition-all ${showSettings ? 'bg-amber-500/10 border-amber-500/20 text-amber-500' : 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/[0.06] text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
@@ -149,7 +189,6 @@ export default function DatabaseDashboard({ dbname }) {
             <Icon name="tune" size="16px" weight={300} />
           </button>
 
-          {/* Export */}
           <button
             onClick={handleExport}
             className={iconBtnCls}
@@ -160,7 +199,6 @@ export default function DatabaseDashboard({ dbname }) {
         </div>
       </header>
 
-      {/* ── Settings Panel ── */}
       {showSettings && (
         <div className="mx-6 mt-4 p-4 bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.06] rounded-xl flex items-center gap-6">
           <div className="flex items-center gap-2 shrink-0">
@@ -189,7 +227,6 @@ export default function DatabaseDashboard({ dbname }) {
         </div>
       )}
 
-      {/* ── Body ── */}
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
         {isLoading && (!data.volumes || data.volumes.length === 0) ? (
           <div className="flex items-center justify-center h-64">
@@ -200,16 +237,17 @@ export default function DatabaseDashboard({ dbname }) {
           </div>
         ) : (
           <div className="space-y-4">
-            <DBPerformanceSection dbStats={dbStats} />
-            <DBVolumesSection volumes={mappedVolumes} />
-            <DBSpaceInfoSection spaceInfo={mappedSpaceInfo} />
+            <DBPerformanceSection dbStats={dbStats} pollingProps={pollingProps} />
+            <DBVolumesSection volumes={mappedVolumes} pollingProps={pollingProps} />
+            <DBSpaceInfoSection spaceInfo={mappedSpaceInfo} pollingProps={pollingProps} />
             <DBBrokersCASSection
               brokersCAS={mappedBrokers}
+              pollingProps={pollingProps}
               onViewSQLLog={(row) => setLogModal({ isOpen: true, brokerName: row.broker, casId: row.id, type: 'sql' })}
               onViewSlowQueryLog={(row) => setLogModal({ isOpen: true, brokerName: row.broker, casId: row.id, type: 'slow' })}
               onRestartCAS={(row) => alert(`Restart request sent for CAS ${row.id} on broker ${row.broker}.`)}
             />
-            <DBLockTransactionSection locks={mappedLocks} />
+            <DBLockTransactionSection locks={mappedLocks} pollingProps={pollingProps} />
           </div>
         )}
       </div>

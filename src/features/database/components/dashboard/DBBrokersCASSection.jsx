@@ -1,8 +1,36 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { useDispatch } from 'react-redux';
+import { fetchDashboardCAS } from '../../databaseSlice';
 import { Icon } from '../../../../components/ds/foundation/Icon';
 import { Table } from '../../../../components/ds/layout/Table';
 import { Card } from '../../../../components/ds/layout/Card';
 
-export default function DBBrokersCASSection({ brokersCAS, onViewSQLLog, onViewSlowQueryLog, onRestartCAS }) {
+export default function DBBrokersCASSection({ brokersCAS, pollingProps, onViewSQLLog, onViewSlowQueryLog, onRestartCAS }) {
+  const dispatch = useDispatch();
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const { hostUid, dbname, isTabActive, autoRefresh, refreshInterval } = pollingProps;
+
+  const refresh = () => {
+    if (hostUid && dbname) dispatch(fetchDashboardCAS({ hostUid, dbname }));
+  };
+
+  const wasActiveAndExpanded = useRef(isTabActive && !isCollapsed);
+  useEffect(() => {
+    const currentActiveAndExpanded = isTabActive && !isCollapsed;
+    if (currentActiveAndExpanded && !wasActiveAndExpanded.current) {
+      refresh();
+    }
+    wasActiveAndExpanded.current = currentActiveAndExpanded;
+  }, [isTabActive, isCollapsed, hostUid, dbname]);
+
+  useEffect(() => {
+    let interval;
+    if (isTabActive && !isCollapsed && autoRefresh && hostUid && dbname) {
+      interval = setInterval(refresh, refreshInterval * 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isTabActive, isCollapsed, autoRefresh, refreshInterval, hostUid, dbname]);
+
   const readyCount = brokersCAS.filter(c => c.status === 'READY').length;
   const busyCount  = brokersCAS.length - readyCount;
 
@@ -75,6 +103,8 @@ export default function DBBrokersCASSection({ brokersCAS, onViewSQLLog, onViewSl
       }
       bodyClassName="p-0"
       collapsible
+      isCollapsed={isCollapsed}
+      onToggle={(v) => setIsCollapsed(v)}
     >
       <Table columns={columns} data={brokersCAS} />
     </Card>

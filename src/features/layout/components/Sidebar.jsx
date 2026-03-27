@@ -41,8 +41,8 @@ import {
   openSetAutomationVolumeModal,
   openAutoVolumeLogModal,
   fetchQueryPlan,
-  setSelectedBackupId,
-  openLoginDatabaseModal
+  openLoginDatabaseModal,
+  openRestoreDatabaseModal
 } from '../../database/databaseSlice';
 import {
   fetchBrokerList,
@@ -227,19 +227,37 @@ export default function Sidebar({ isCollapsed, onAddHost }) {
 
   const [isServerListCollapsed, setIsServerListCollapsed] = useState(false);
   const [serverListSize, setServerListSize] = useState(260);
+  const [prevServerListSize, setPrevServerListSize] = useState(260);
+  const [isTreeCollapsed, setIsTreeCollapsed] = useState(false);
 
   const toggleServerListCollapse = () => {
     setIsServerListCollapsed(!isServerListCollapsed);
     if (!isServerListCollapsed) {
+      setPrevServerListSize(serverListSize);
       setServerListSize(40);
+      setIsTreeCollapsed(false);
     } else {
-      setServerListSize(260);
+      setServerListSize(prevServerListSize > 40 ? prevServerListSize : 260);
+    }
+  };
+
+  const toggleTreeCollapse = () => {
+    const nextState = !isTreeCollapsed;
+    setIsTreeCollapsed(nextState);
+    if (nextState) {
+      setPrevServerListSize(serverListSize);
+      setServerListSize(800); // Push to bottom
+    } else {
+      // Expanding: Restore to balanced middle position or previous size
+      setIsServerListCollapsed(false);
+      setServerListSize(prevServerListSize < 750 && prevServerListSize > 50 ? prevServerListSize : 260);
     }
   };
 
   return (
     <>
-      <aside ref={sidebarRef} className={`w-full h-full border-r border-slate-200 dark:border-white/10 bg-white dark:bg-bk-side flex flex-col ${isCollapsed ? 'hidden' : ''}`} id="sidebar">
+      <aside ref={sidebarRef} className={`w-full h-full bg-white dark:bg-bk-side flex flex-col ${isCollapsed ? 'hidden' : ''}`} id="sidebar">
+
         <SidebarHeader />
 
         <SplitPane
@@ -247,35 +265,57 @@ export default function Sidebar({ isCollapsed, onAddHost }) {
           size={serverListSize}
           onSizeChange={setServerListSize}
           minSize={isServerListCollapsed ? 40 : 100}
-          maxSize={500}
+          maxSize={800}
+
           className="flex-1 w-full flex flex-col overflow-hidden"
         >
           <div className="h-full flex flex-col overflow-hidden bg-white dark:bg-bk-side">
             <div
-              className="flex-none px-4 py-2 border-b border-slate-200 dark:border-white/5 flex items-center justify-between bg-slate-50 dark:bg-white/[0.02] cursor-pointer hover:bg-slate-100 dark:hover:bg-white/5 transition-colors group/host-header"
+              className={`flex-none px-4 py-2 border-b border-slate-200 dark:border-white/5 flex items-center justify-between cursor-pointer transition-all duration-300 group/host-header
+                ${!isServerListCollapsed
+                  ? 'bg-white dark:bg-bk-side'
+                  : 'bg-slate-50 dark:bg-white/[0.02] hover:bg-slate-100 dark:hover:bg-white/5'
+                }`}
               onClick={toggleServerListCollapse}
             >
               <div className="flex items-center gap-2">
-                <Icon
-                  name="chevron_right"
-                  size="xs"
-                  className={`transition-transform duration-200 ${!isServerListCollapsed ? 'rotate-90 text-amber-500' : 'text-slate-400'} group-hover/host-header:text-amber-500`}
-                 weight={300} />
-                <Typography variant="caption" className="font-bold text-amber-600 dark:text-amber-500 text-[12px] uppercase tracking-wider">Server List</Typography>
+                <div className={`w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-all duration-200
+                  ${!isServerListCollapsed ? 'text-amber-500' : 'text-slate-400 group-hover/host-header:text-amber-500'}`}>
+                  <Icon
+                    name="chevron_right"
+                    size="xs"
+                    className={`transition-transform duration-300 ${!isServerListCollapsed ? 'rotate-90' : ''}`}
+                    weight={300}
+                  />
+                </div>
+                <Typography variant="caption" className={`font-bold text-[11px] uppercase tracking-widest transition-colors
+                  ${!isServerListCollapsed ? 'text-slate-600 dark:text-slate-400' : 'text-slate-400 dark:text-slate-500 group-hover/host-header:text-amber-500'}`}>
+                  Server List
+                </Typography>
               </div>
 
-              {!isServerListCollapsed && (
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-slate-400 px-2 py-0.5 rounded-full font-medium">{hosts.length} found</span>
+              <div className="flex items-center gap-2">
+                {isServerListCollapsed && (
+                  <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 shadow-sm animate-in zoom-in-95 duration-200">
+                    <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse shadow-[0_0_5px_rgba(245,158,11,0.5)]" />
+                    <span className="text-[10px] font-bold text-amber-600 dark:text-amber-500 font-mono tracking-tight">
+                      {hosts.length}
+                    </span>
+                  </div>
+                )}
+                {!isServerListCollapsed && (
                   <button
                     onClick={(e) => { e.stopPropagation(); onAddHost(); }}
-                    className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:text-amber-500 hover:bg-amber-500/10 transition-all active:scale-95"
+                    className="flex items-center gap-1 h-6 px-2 rounded border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.04] text-slate-400 hover:text-amber-500 hover:border-amber-400/50 hover:bg-amber-500/5 dark:hover:bg-amber-500/10 transition-all active:scale-95 shadow-sm"
                     title="Add Host"
                   >
-                    <Icon name="add" size="xs" weight={400} />
+                    <Icon name="add" size="12px" weight={400} />
+                    <span className="text-[10px] font-semibold tracking-wide">Add</span>
                   </button>
-                </div>
-              )}
+                )}
+              </div>
+
+
             </div>
 
             <div
@@ -289,10 +329,18 @@ export default function Sidebar({ isCollapsed, onAddHost }) {
                     <Spinner size="md" />
                   </div>
                 ) : hosts.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-8 opacity-40 text-slate-400 dark:text-slate-500">
-                    <Icon name="dns" size="md" className="mb-2"  weight={300} />
-                    <Typography variant="caption">No hosts found</Typography>
-                  </div>
+                  <button
+                    onClick={onAddHost}
+                    className="w-full mt-1 flex flex-col items-center justify-center gap-2 py-6 px-3 rounded-lg border border-dashed border-slate-300 dark:border-white/10 bg-white dark:bg-white/[0.02] hover:border-amber-400/60 hover:bg-amber-500/5 dark:hover:bg-amber-500/10 transition-all group/add-host cursor-pointer"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover/add-host:bg-amber-500/10 group-hover/add-host:border-amber-400/40 transition-all">
+                      <Icon name="add" size="16px" weight={300} className="text-slate-400 group-hover/add-host:text-amber-500 transition-colors" />
+                    </div>
+                    <div className="text-center">
+                      <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 group-hover/add-host:text-slate-700 dark:group-hover/add-host:text-slate-300 transition-colors">Add your first host</p>
+                      <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">Connect to a CUBRID server</p>
+                    </div>
+                  </button>
                 ) : (
                   hosts.map((host) => (
                     <ServerListItem
@@ -311,14 +359,58 @@ export default function Sidebar({ isCollapsed, onAddHost }) {
           <div className="h-full flex flex-col overflow-hidden" id="tree-section-container">
             {selectedHostUid ? (
               <>
-                <TreeTabHeader 
-                  activeTab={activeTab} 
-                  setActiveTab={setActiveTab} 
-                  onDbTabContextMenu={handleDbRootContextMenu} 
-                  onBrokerTabContextMenu={handleBrokerRootContextMenu}
-                />
+                <div
+                  className={`flex-none px-3 py-2 border-b border-t border-slate-200 dark:border-white/5 flex items-center justify-between cursor-pointer transition-all duration-300 group/tree-header
+                    ${!isTreeCollapsed
+                      ? 'bg-white dark:bg-bk-side'
+                      : 'bg-slate-50 dark:bg-white/[0.02] hover:bg-slate-100 dark:hover:bg-white/5'
+                    }`}
+                  onClick={toggleTreeCollapse}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className={`w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-all duration-200
+                      ${!isTreeCollapsed ? 'text-amber-500' : 'text-slate-400 group-hover/tree-header:text-amber-500'}`}>
+                      <Icon
+                        name="chevron_right"
+                        size="xs"
+                        className={`transition-transform duration-300 ${!isTreeCollapsed ? 'rotate-90' : ''}`}
+                        weight={300}
+                      />
+                    </div>
+                    <Typography variant="caption" className={`font-bold text-[11px] uppercase tracking-widest transition-colors
+                      ${!isTreeCollapsed ? 'text-slate-600 dark:text-slate-400' : 'text-slate-400 dark:text-slate-500 group-hover/tree-header:text-amber-500'}`}>
+                      Resources
+                    </Typography>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    {isTreeCollapsed ? (
+                      <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 animate-in fade-in zoom-in-95 duration-200">
+                        <Icon
+                          name={activeTab === 'db' ? 'database' : activeTab === 'broker' ? 'hub' : 'description'}
+                          size="11px"
+                          className="text-amber-500"
+                          weight={400}
+                        />
+                        <span className="text-[9px] font-bold text-amber-600 dark:text-amber-500 uppercase tracking-tight">
+                          {activeTab === 'db' ? 'DB' : activeTab === 'broker' ? 'Broker' : 'Log'}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)] animate-pulse" />
+                    )}
+                  </div>
+                </div>
 
-                <div className="flex-1 overflow-y-auto px-4 pb-4 relative min-h-[200px]">
+                {!isTreeCollapsed && (
+                  <>
+                    <TreeTabHeader 
+                      activeTab={activeTab} 
+                      setActiveTab={setActiveTab} 
+                      onDbTabContextMenu={handleDbRootContextMenu} 
+                      onBrokerTabContextMenu={handleBrokerRootContextMenu}
+                    />
+
+                    <div className="flex-1 overflow-y-auto px-4 pb-4 relative min-h-[200px]">
                   {/* States Overlay */}
                   {isLoggingIntoHost && (
                     <div className="absolute inset-0 bg-white/80 dark:bg-bk-side z-[210] flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-200">
@@ -366,12 +458,15 @@ export default function Sidebar({ isCollapsed, onAddHost }) {
                         onBackupPlanContextMenu={handleBackupPlanContextMenu}
                         onSpaceContextMenu={handleSpaceContextMenu}
                         onBackupItemContextMenu={handleBackupItemContextMenu}
+                        onQueryPlanContextMenu={handleQueryPlanContextMenu}
                       />
                     )}
                     {activeTab === 'broker' && <BrokerTree hostUid={selectedHostUid} onContextMenu={handleBrokerContextMenu} />}
                     {activeTab === 'log' && <LogTree hostUid={selectedHostUid} />}
                   </div>
-                </div>
+                    </div>
+                  </>
+                )}
               </>
             ) : (
               <SidebarEmptyState />
@@ -471,7 +566,7 @@ export default function Sidebar({ isCollapsed, onAddHost }) {
               onClick={() => { dispatch(setSelectedDatabase(dbContextMenu.db)); dispatch(openRenameDatabaseModal()); setDbContextMenu(null); }}
             />
             <MenuDivider />
-            <MenuItem icon="restore" label="Restore Database" />
+            <MenuItem icon="restore" label="Restore Database" onClick={() => { dispatch(setSelectedDatabase(dbContextMenu.db)); dispatch(openRestoreDatabaseModal()); setDbContextMenu(null); }} />
             <MenuItem icon="backup" label="Backup Database" onClick={() => { dispatch(setSelectedDatabase(dbContextMenu.db)); dispatch(openBackupDatabaseModal()); setDbContextMenu(null); }} />
             <MenuDivider />
             <MenuItem icon="delete" iconColor="text-accent-red" label="Delete Database" disabled={dbContextMenu.isActive} onClick={() => { dispatch(setSelectedDatabase(dbContextMenu.db)); dispatch(openDeleteDBModal()); setDbContextMenu(null); }} />
